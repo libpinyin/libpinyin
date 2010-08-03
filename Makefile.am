@@ -21,7 +21,7 @@ EXTRA_DIST		= config.rpath m4/ChangeLog  COPYING \
 			  intltool-merge.in 
 
 AUTOMAKE_OPTIONS 	= gnu
-SUBDIRS 		= po intl src utils modules tests data
+SUBDIRS 		= po intl src utils tests
 
 MAINTAINERCLEANFILES 	= Makefile.in 
 
