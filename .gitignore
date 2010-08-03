@@ -24,3 +24,5 @@ rpm
 stamp-h1
 py-compile
 mkinstalldirs
+libltdl
+*~
