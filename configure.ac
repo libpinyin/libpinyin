@@ -3,13 +3,10 @@
 
 
 AC_PREREQ(2.60)
-AC_INIT(novel-pinyin, 0.2.5, alexepico@gmail.com)
+AC_INIT(libpinyin, 0.2.99, alexepico@gmail.com)
 AM_INIT_AUTOMAKE
 AC_CONFIG_SRCDIR([config.h.in])
 AC_CONFIG_HEADER([config.h])
-
-SCIM_VERSION=1.2.0
-AC_SUBST(SCIM_VERSION)
 
 # Checks for programs.
 AC_PROG_CXX
@@ -36,7 +33,7 @@ AM_GNU_GETTEXT
 #AC_PROG_INTLTOOL
 IT_PROG_INTLTOOL([0.33], [no-xml])
 
-GETTEXT_PACKAGE="novel-pinyin"
+GETTEXT_PACKAGE="libpinyin"
 AC_SUBST(GETTEXT_PACKAGE)
 
 # libtool option to control which symbols are exported
@@ -54,48 +51,6 @@ AC_SUBST(GLIB2_CPPFLAGS)
 GLIB2_LDFLAGS=`$PKG_CONFIG --libs glib-2.0`
 
 AC_SUBST(GLIB2_LDFLAGS)
-
-# Check SCIM
-PKG_CHECK_MODULES(SCIM,[scim >= $SCIM_VERSION])
-
-# Check if we should build setup module
-PKG_CHECK_MODULES(SCIM_GTKUTILS,[scim-gtkutils >= $SCIM_VERSION],
-                                [SCIM_HAS_GTKUTILS=yes],
-                                [SCIM_HAS_GTKUTILS=no])
-
-if test "$SCIM_HAS_GTKUTILS" = "yes"; then
-  SCIM_BUILD_SETUP=1
-else
-  SCIM_BUILD_SETUP=0
-fi
-
-AM_CONDITIONAL(SCIM_BUILD_SETUP, [test "$SCIM_HAS_GTKUTILS" = "yes"])
-AC_SUBST(SCIM_BUILD_SETUP)
-
-
-SCIM_ICONDIR=`$PKG_CONFIG --variable=icondir scim`
-SCIM_MODULEDIR=`$PKG_CONFIG --variable=moduledir scim`
-SCIM_DATADIR=`$PKG_CONFIG --variable=scimdatadir scim`
-
-if test "x$SCIM_ICONDIR" = "x"; then
-  SCIM_ICONDIR=${datadir}/scim/icons
-fi
-
-if test "x$SCIM_MODULEDIR" = "x"; then
-  SCIM_MODULEDIR=${libdir}/scim-1.0
-fi
-
-if test "x$SCIM_DATADIR" = "x"; then
-  SCIM_DATADIR=${datadir}/scim
-fi
-
-AC_SUBST(SCIM_ICONDIR)
-AC_SUBST(SCIM_MODULEDIR)
-AC_SUBST(SCIM_DATADIR)
-
-NOVEL_PINYIN_DATADIR=$SCIM_DATADIR/novel-pinyin
-
-AC_SUBST(NOVEL_PINYIN_DATADIR)
 
 # Checks for header files.
 AC_HEADER_STDC
@@ -125,15 +80,12 @@ AC_SEARCH_LIBS([db_create], [db], [], AC_MSG_ERROR([Cannot find Berkeley DB libr
 AC_CONFIG_FILES([Makefile 
 		 po/Makefile.in
 		 intl/Makefile
-		 data/Makefile
 		 src/Makefile
                  src/include/Makefile
                  src/storage/Makefile
 		 src/segment/Makefile
 		 src/training/Makefile
 		 src/lookup/Makefile
-		 modules/Makefile
-		 modules/scim/Makefile
 		 tests/Makefile
                  tests/include/Makefile
                  tests/storage/Makefile
