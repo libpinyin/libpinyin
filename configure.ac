@@ -25,17 +25,6 @@ AC_PROG_LIBTOOL
 AC_LIB_LTDL
 AC_SUBST(LIBTOOL_DEPS)
 
-# Init gettext
-ALL_LINGUAS="zh_CN zh_TW"#"ko ja de fr it"
-AM_GNU_GETTEXT
-
-# Check intltool
-#AC_PROG_INTLTOOL
-IT_PROG_INTLTOOL([0.33], [no-xml])
-
-GETTEXT_PACKAGE="libpinyin"
-AC_SUBST(GETTEXT_PACKAGE)
-
 # libtool option to control which symbols are exported
 # right now, symbols starting with _ are not exported
 LIBTOOL_EXPORT_OPTIONS='-export-symbols-regex "^[[^_]].*"'
@@ -78,8 +67,6 @@ AC_SEARCH_LIBS([db_create], [db], [], AC_MSG_ERROR([Cannot find Berkeley DB libr
 
 
 AC_CONFIG_FILES([Makefile 
-		 po/Makefile.in
-		 intl/Makefile
 		 src/Makefile
                  src/include/Makefile
                  src/storage/Makefile

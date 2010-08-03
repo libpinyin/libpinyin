@@ -15,21 +15,14 @@
 ## along with this program; if not, write to the Free Software
 ## Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
-EXTRA_DIST		= config.rpath m4/ChangeLog  COPYING \
-			  intltool-extract.in \
-			  intltool-update.in \
-			  intltool-merge.in 
+EXTRA_DIST		= config.rpath COPYING 
 
 AUTOMAKE_OPTIONS 	= gnu
-SUBDIRS 		= po intl src utils tests
+SUBDIRS 		= src utils tests
 
 MAINTAINERCLEANFILES 	= Makefile.in 
 
-CLEANFILES		= *.bak \
-                          intltool-extract \
-                          intltool-merge \
-                          intltool-update
-
+CLEANFILES		= *.bak 
 
 ACLOCAL			= aclocal -I .
 
