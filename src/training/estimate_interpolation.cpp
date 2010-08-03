@@ -1,7 +1,6 @@
 /* 
- *  novel-pinyin,
- *  A Simplified Chinese Sentence-Based Pinyin Input Method Engine
- *  Based On Markov Model.
+ *  libpinyin
+ *  Library to deal with pinyin.
  *  
  *  Copyright (C) 2006-2008 Peng Wu
  *  
