@@ -24,6 +24,7 @@
  */
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include "pinyin_base.h"
 
@@ -144,6 +145,11 @@ int main (int argc, char * argv [])
         }
         printf("\n");
     }
+
+    if (line)
+        free(line);
+
+    return 0;
 }
 
 /*
