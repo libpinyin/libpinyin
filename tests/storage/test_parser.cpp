@@ -23,12 +23,9 @@
  *
  */
 
+#include <stdio.h>
 #include <string.h>
-#include <iostream>
 #include "pinyin_base.h"
-
-typedef std::string String;
-
 
 static const char *help_msg =
     "Too few argument!\n"
@@ -69,19 +66,19 @@ int main (int argc, char * argv [])
     while (i<argc) {
         if (++i >= argc) break;
 
-        if (String ("-h") == argv [i] || String ("--help") == argv [i]) {
-            std::cout << help_msg;
+        if ( !strcmp("-h", argv [i]) || !strcmp ("--help", argv [i]) ) {
+            printf(help_msg);
             return 0;
         }
 
-        if (String ("-i") == argv [i]) {
+        if ( !strcmp("-i", argv [i]) ) {
             custom.set_use_incomplete (true);
             continue;
         }
 
-        if (String ("-p") == argv [i]) {
+        if ( !strcmp("-p", argv [i]) ) {
             if (++i >= argc) {
-                std::cerr << "No argument for option " << argv [i-1] << "\n";
+                fprintf(stderr, "No argument for option %s.\n", argv [i-1]);
                 return -1;
             }
             if (!strcmp (argv[i], "sp") || !strcmp (argv[i], "sp-default"))
@@ -101,62 +98,51 @@ int main (int argc, char * argv [])
             continue;
         }
 
-        if (String ("-f") == argv [i]) {
+        if (!strcmp("-f", argv [i])) {
             if (++i >= argc) {
-                std::cerr << "No argument for option " << argv [i-1] << "\n";
+                fprintf(stderr, "No argument for option %s.\n", argv [i-1]);
                 return -1;
             }
             tablefile = argv [i];
             continue;
         }
 
-        std::cerr << "Invalid option: " << argv [i] << "\n";
+        fprintf(stderr, "Invalid option: %s.\n", argv [i]);
         return -1;
     };
 
     if (!parser) parser = new PinyinDefaultParser ();
 
-/*
-    if (!table.load (tablefile)) {
-        std::cerr << "Failed to load tablefile: " << tablefile << "\n";
-        return -1;
-    }
-*/
-    //table.update_custom_settings (custom);
-
-
-    char buf[1024];
+    char * line = NULL;
+    size_t len = 0;
 
     while (1) {
-        std::cout << "Input:" << std::flush;
-        std::cin.getline (buf, 1023, '\n');
+        printf("Input:"); fflush(stdout);
+        getline(&line, &len, stdin);
 
-        if (strncmp (buf, "quit", 4) == 0) break;
+        if (!strncmp (line, "quit", 4)) break;
 
-        int len = parser->parse (validator, keys, poses,(const char *) buf);
+        int len = parser->parse (validator, keys, poses,(const char *) line);
 
-        std::cout << "Parsed " << len << " chars, " << keys->len << " keys:\n";
-
-        for (size_t i=0; i < keys->len; ++i){
-	    PinyinKey * key = &g_array_index(keys, PinyinKey, i);
-            std::cout << key->get_key_string () << " ";
-	}
-
-	std::cout << std::endl;
-
-	for ( size_t i=0; i < poses->len; ++i){
-	    PinyinKeyPos * pos = &g_array_index(poses, PinyinKeyPos, i);
-	    std::cout << pos->get_pos() << " " << pos->get_length()<<" ";
-	}
-
-        std::cout << std::endl;
+        printf("Parsed %d chars, %d keys:\n", len, keys->len);
 
         for (size_t i=0; i < keys->len; ++i){
-	    PinyinKey * key = &g_array_index(keys, PinyinKey, i);
-            std::cout <<  key->get_key_zhuyin_string () << " ";
-	}
+            PinyinKey * key = &g_array_index(keys, PinyinKey, i);
+            printf("%s ", key->get_key_string ());
+        }
+        printf("\n");
 
-        std::cout << std::endl;
+        for ( size_t i=0; i < poses->len; ++i){
+            PinyinKeyPos * pos = &g_array_index(poses, PinyinKeyPos, i);
+            printf("%d %d ", pos->get_pos(), pos->get_length());
+        }
+        printf("\n");
+
+        for (size_t i=0; i < keys->len; ++i){
+            PinyinKey * key = &g_array_index(keys, PinyinKey, i);
+            printf("%s ", key->get_key_zhuyin_string ());
+        }
+        printf("\n");
     }
 }
 
