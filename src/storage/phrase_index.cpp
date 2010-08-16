@@ -98,7 +98,7 @@ bool SubPhraseIndex::add_unigram_frequency(phrase_token_t token, guint32 delta){
 	((token & PHRASE_MASK) 
 	 * sizeof(table_offset_t), &offset, sizeof(table_offset_t));
 
-    if ( !result)
+    if ( !result )
 	return result;
 
     if ( 0 == offset )
@@ -106,6 +106,10 @@ bool SubPhraseIndex::add_unigram_frequency(phrase_token_t token, guint32 delta){
 
     result = m_phrase_content.get_content
 	(offset + sizeof(guint8) + sizeof(guint8), &freq, sizeof(guint32));
+
+    if ( !result )
+    return result;
+
     //protect total_freq overflow
     if ( delta > 0 && m_total_freq > m_total_freq + delta )
 	return false;
