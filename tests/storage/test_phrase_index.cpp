@@ -58,7 +58,7 @@ int main(int argc, char * argv[]){
     assert(string1 == string2);
 
     FacadePhraseIndex phrase_index;
-    assert(phrase_index.add_phrase_item(1, &phrase_item));
+    assert(!phrase_index.add_phrase_item(1, &phrase_item));
 
     MemoryChunk* chunk = new MemoryChunk;
     assert(phrase_index.store(0, chunk));
