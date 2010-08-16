@@ -91,7 +91,7 @@ guint32 SubPhraseIndex::get_phrase_index_total_freq(){
     return m_total_freq;
 }
 
-bool SubPhraseIndex::add_unigram_frequency(phrase_token_t token, guint32 delta){
+int SubPhraseIndex::add_unigram_frequency(phrase_token_t token, guint32 delta){
     table_offset_t offset;
     guint32 freq;
     bool result = m_phrase_index.get_content
@@ -99,26 +99,29 @@ bool SubPhraseIndex::add_unigram_frequency(phrase_token_t token, guint32 delta){
 	 * sizeof(table_offset_t), &offset, sizeof(table_offset_t));
 
     if ( !result )
-	return result;
+	return ERROR_OUT_OF_RANGE;
 
     if ( 0 == offset )
-	return false;
+    return ERROR_NO_ITEM;
 
     result = m_phrase_content.get_content
 	(offset + sizeof(guint8) + sizeof(guint8), &freq, sizeof(guint32));
 
     if ( !result )
-    return result;
+    return ERROR_FILE_CORRUPTION;
 
     //protect total_freq overflow
     if ( delta > 0 && m_total_freq > m_total_freq + delta )
-	return false;
+	return ERROR_INTEGER_OVERFLOW;
+
     freq += delta;
     m_total_freq += delta;
-    return m_phrase_content.set_content(offset + sizeof(guint8) + sizeof(guint8), &freq, sizeof(guint32));
+    m_phrase_content.set_content(offset + sizeof(guint8) + sizeof(guint8), &freq, sizeof(guint32));
+
+    return ERROR_OK;
 }
 
-bool SubPhraseIndex::get_phrase_item(phrase_token_t token, PhraseItem & item){
+int SubPhraseIndex::get_phrase_item(phrase_token_t token, PhraseItem & item){
     table_offset_t offset;
     guint8 phrase_length;
     guint8 n_prons;
@@ -128,25 +131,25 @@ bool SubPhraseIndex::get_phrase_item(phrase_token_t token, PhraseItem & item){
 	 * sizeof(table_offset_t), &offset, sizeof(table_offset_t));
 
     if ( !result )
-	return result;
+	return ERROR_OUT_OF_RANGE;
 
     if ( 0 == offset )
-	return false;
+    return ERROR_NO_ITEM;
 
     result = m_phrase_content.get_content(offset, &phrase_length, sizeof(guint8));
     if ( !result ) 
-	return result;
+    return ERROR_FILE_CORRUPTION;
     
     result = m_phrase_content.get_content(offset+sizeof(guint8), &n_prons, sizeof(guint8));
     if ( !result ) 
-	return result;
+	return ERROR_FILE_CORRUPTION;
 
     size_t length = phrase_item_header + phrase_length * sizeof ( utf16_t ) + n_prons * ( phrase_length * sizeof (PinyinKey) + sizeof(guint32) );
     item.m_chunk.set_chunk((char *)m_phrase_content.begin() + offset, length, NULL);
-    return true;
+    return ERROR_OK;
 }
 
-bool SubPhraseIndex::add_phrase_item(phrase_token_t token, PhraseItem * item){
+int SubPhraseIndex::add_phrase_item(phrase_token_t token, PhraseItem * item){
     table_offset_t offset = m_phrase_content.size();
     if ( 0 == offset )
 	offset = 8;
@@ -154,15 +157,15 @@ bool SubPhraseIndex::add_phrase_item(phrase_token_t token, PhraseItem * item){
     m_phrase_index.set_content((token & PHRASE_MASK) 
 			       * sizeof(table_offset_t), &offset, sizeof(table_offset_t));
     m_total_freq += item->get_unigram_frequency();
-    return true;
+    return ERROR_OK;
 }
 
-bool SubPhraseIndex::remove_phrase_item(phrase_token_t token, PhraseItem * & item){
+int SubPhraseIndex::remove_phrase_item(phrase_token_t token, PhraseItem * & item){
     PhraseItem old_item;
 
     int result = get_phrase_item(token, old_item);
-    if (!result)
-        return result;
+    if (result != ERROR_OK)
+    return result;
 
     item = new PhraseItem;
     //implictly copy data from m_chunk_content.
@@ -172,7 +175,7 @@ bool SubPhraseIndex::remove_phrase_item(phrase_token_t token, PhraseItem * & ite
     m_phrase_index.set_content((token & PHRASE_MASK)
 			       * sizeof(table_offset_t), &zero_const, sizeof(table_offset_t));
     m_total_freq -= item->get_unigram_frequency();
-    return true;
+    return ERROR_OK;
 }
 
 bool FacadePhraseIndex::load(guint8 phrase_index, MemoryChunk * chunk){

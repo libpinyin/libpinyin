@@ -86,7 +86,9 @@ enum PhraseIndexError{
     ERROR_OK = 0,                /* operate ok */
     ERROR_NO_SUB_PHRASE_INDEX,   /* sub phrase index is not loaded */
     ERROR_NO_ITEM,               /* item has a null slot */
-    ERROR_OUT_OF_RANGE           /* beyond the end of the sub phrase index */
+    ERROR_OUT_OF_RANGE,          /* beyond the end of the sub phrase index */
+    ERROR_FILE_CORRUPTION,       /* file is corrupted */
+    ERROR_INTEGER_OVERFLOW       /* integer is overflowed */
 };
 
 /*
