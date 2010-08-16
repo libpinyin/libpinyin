@@ -211,25 +211,25 @@ public:
 	return m_total_freq;
     }
 
-    bool add_unigram_frequency(phrase_token_t token, guint32 delta){
+    int add_unigram_frequency(phrase_token_t token, guint32 delta){
 	guint8 index = PHRASE_INDEX_LIBRARY_INDEX(token);
 	SubPhraseIndex * sub_phrase = m_sub_phrase_indices[index];
 	if ( !sub_phrase )
-	    return false;
+	    return ERROR_NO_SUB_PHRASE_INDEX;
 	m_total_freq += delta;
 	return sub_phrase->add_unigram_frequency(token, delta);
     }
 
     /* get_phrase_item function can't modify the phrase item */
-    bool get_phrase_item(phrase_token_t token, PhraseItem & item){
+    int get_phrase_item(phrase_token_t token, PhraseItem & item){
 	guint8 index = PHRASE_INDEX_LIBRARY_INDEX(token);
 	SubPhraseIndex * sub_phrase = m_sub_phrase_indices[index];
 	if ( !sub_phrase )
-	    return false;
+	    return ERROR_NO_SUB_PHRASE_INDEX;
 	return sub_phrase->get_phrase_item(token, item);
     }
 
-    bool add_phrase_item(phrase_token_t token, PhraseItem * item){
+    int add_phrase_item(phrase_token_t token, PhraseItem * item){
 	guint8 index = PHRASE_INDEX_LIBRARY_INDEX(token);
 	SubPhraseIndex * & sub_phrase = m_sub_phrase_indices[index];
 	if ( !sub_phrase ){
@@ -239,14 +239,14 @@ public:
 	return sub_phrase->add_phrase_item(token, item);
     }
 
-    bool remove_phrase_item(phrase_token_t token, PhraseItem * & item){
+    int remove_phrase_item(phrase_token_t token, PhraseItem * & item){
 	guint8 index = PHRASE_INDEX_LIBRARY_INDEX(token);
 	SubPhraseIndex * & sub_phrase = m_sub_phrase_indices[index];
 	if ( !sub_phrase ){
-	    return false;
+	    return ERROR_NO_SUB_PHRASE_INDEX;
 	}
-	bool result = sub_phrase->remove_phrase_item(token, item);
-	if ( !result )
+	int result = sub_phrase->remove_phrase_item(token, item);
+	if ( result )
 	    return result;
 	m_total_freq -= item->get_unigram_frequency();
 	return result;
