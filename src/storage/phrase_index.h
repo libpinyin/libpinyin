@@ -29,6 +29,21 @@
 #include "pinyin_phrase.h"
 #include "memory_chunk.h"
 
+/*
+ * Phrase Index File Format
+ *
+ * Indirect Index: Index by Token
+ * +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ * + Phrase Offset + Phrase Offset + Phrase Offset + ......  +
+ * +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ * Phrase Content:
+ * ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ * + Phrase Length + number of  Pronunciations  + Uni-gram Frequency+
+ * ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ * + n Pronunciations + Phrase String(UCS2) +
+ * ++++++++++++++++++++++++++++++++++++++++++
+ */
+
 class PinyinLookup;
 
 namespace novel{
