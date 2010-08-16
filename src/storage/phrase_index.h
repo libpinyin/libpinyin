@@ -168,16 +168,16 @@ public:
     
     /* Zero-gram */
     guint32 get_phrase_index_total_freq();
-    bool add_unigram_frequency(phrase_token_t token, guint32 delta);
+    int add_unigram_frequency(phrase_token_t token, guint32 delta);
     /* get_phrase_item function can't modify the phrase item, 
      * but can increment the freq of the special pronunciation.
      */
-    bool get_phrase_item(phrase_token_t token, PhraseItem & item);
-    bool add_phrase_item(phrase_token_t token, PhraseItem * item);
+    int get_phrase_item(phrase_token_t token, PhraseItem & item);
+    int add_phrase_item(phrase_token_t token, PhraseItem * item);
     /* remove_phrase_item will substract item->get_unigram_frequency()
      * from m_total_freq
      */
-    bool remove_phrase_item(phrase_token_t token, /* out */ PhraseItem * & item);
+    int remove_phrase_item(phrase_token_t token, /* out */ PhraseItem * & item);
 };
 
 class FacadePhraseIndex{
