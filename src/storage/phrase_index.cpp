@@ -154,32 +154,15 @@ bool SubPhraseIndex::add_phrase_item(phrase_token_t token, PhraseItem * item){
 }
 
 bool SubPhraseIndex::remove_phrase_item(phrase_token_t token, PhraseItem * & item){
-    table_offset_t offset;
-    guint8 phrase_length;
-    guint8 n_prons;
-    
-    bool result = m_phrase_index.get_content
-	((token & PHRASE_MASK)
-	 * sizeof(table_offset_t), &offset, sizeof(table_offset_t));
-    
-    if ( !result )
-	return result;
+    PhraseItem old_item;
 
-    if ( 0 == offset )
-	return false;
+    int result = get_phrase_item(token, old_item);
+    if (!result)
+        return result;
 
-    result = m_phrase_content.get_content(offset, &phrase_length, sizeof(guint8));
-    if ( !result )
-	return result;
-
-    result = m_phrase_content.get_content(offset+sizeof(guint8), &n_prons, sizeof(guint8));
-    if ( !result )
-	return result;
-    
-    size_t length = phrase_item_header + phrase_length * sizeof ( utf16_t ) + n_prons * ( phrase_length * sizeof (PinyinKey) + sizeof(guint32) );
     item = new PhraseItem;
     //implictly copy data from m_chunk_content.
-    item->m_chunk.set_content(0, (char *) m_phrase_content.begin() + offset, length);
+    item->m_chunk.set_content(0, (char *) old_item.m_chunk.begin() , old_item.m_chunk.size());
 
     const table_offset_t zero_const = 0;
     m_phrase_index.set_content((token & PHRASE_MASK)
