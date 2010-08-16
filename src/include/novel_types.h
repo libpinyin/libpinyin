@@ -19,6 +19,11 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+/*
+ * This header file contains novel types designed for pinyin processing.
+ */
+
+
 #ifndef NOVEL_TYPES_H
 #define NOVEL_TYPES_H
 
