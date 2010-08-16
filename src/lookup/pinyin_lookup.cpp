@@ -309,7 +309,7 @@ bool PinyinLookup::search_bigram(IBranchIterator * iter,
 
 bool PinyinLookup::unigram_gen_next_step(int nstep, lookup_value_t * cur_step, phrase_token_t token){
     PinyinKey * pinyinkeys = ((PinyinKey *)m_keys->data) + nstep;
-    if (!m_phrase_index->get_phrase_item(token, m_cache_phrase_item))
+    if (m_phrase_index->get_phrase_item(token, m_cache_phrase_item))
 	return false;
     size_t phrase_length = m_cache_phrase_item.get_phrase_length();
     gfloat elem_poss = m_cache_phrase_item.get_unigram_frequency() / (gfloat)
@@ -329,7 +329,7 @@ bool PinyinLookup::unigram_gen_next_step(int nstep, lookup_value_t * cur_step, p
 
 bool PinyinLookup::bigram_gen_next_step(int nstep, lookup_value_t * cur_step, phrase_token_t token, gfloat bigram_poss){
     PinyinKey * pinyinkeys = ((PinyinKey *)m_keys->data) + nstep;
-    if (!m_phrase_index->get_phrase_item(token, m_cache_phrase_item))
+    if (m_phrase_index->get_phrase_item(token, m_cache_phrase_item))
 	return false;
     size_t phrase_length = m_cache_phrase_item.get_phrase_length();
     gfloat unigram_poss = m_cache_phrase_item.get_unigram_frequency() / (gfloat)
@@ -498,7 +498,7 @@ bool PinyinLookup::convert_to_utf8(MatchResults results, /* out */ char * & resu
 }
 
 bool PinyinLookup::add_constraint(CandidateConstraints constraints, size_t index, phrase_token_t token){
-    if ( !m_phrase_index->get_phrase_item(token, m_cache_phrase_item) )
+    if ( m_phrase_index->get_phrase_item(token, m_cache_phrase_item) )
 	return false;
 
     size_t phrase_length = m_cache_phrase_item.get_phrase_length();
@@ -535,7 +535,7 @@ bool PinyinLookup::clear_constraint(CandidateConstraints constraints, size_t ind
     assert(constraint->m_type == CONSTRAINT_ONESTEP);    
 
     phrase_token_t token = constraint->m_token;
-    if (!m_phrase_index->get_phrase_item(token, m_cache_phrase_item))
+    if (m_phrase_index->get_phrase_item(token, m_cache_phrase_item))
 	return false;
 
     size_t phrase_length = m_cache_phrase_item.get_phrase_length();

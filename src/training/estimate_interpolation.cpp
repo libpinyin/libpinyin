@@ -73,7 +73,7 @@ parameter_t compute_interpolation(SingleGram * deleted_bigram,
 		guint32 freq = 0;
 		parameter_t elem_poss = 0;
 		PhraseItem item;
-		if (unigram->get_phrase_item(token, item)){
+		if (!unigram->get_phrase_item(token, item)){
 		    guint32 freq = item.get_unigram_frequency();
 		    guint32 total_freq = unigram->get_phrase_index_total_freq();
 		    elem_poss = freq / (parameter_t)total_freq;
