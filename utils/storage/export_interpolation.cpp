@@ -70,6 +70,14 @@ void gen_unigram(FILE * output, FacadePhraseIndex * phrase_index) {
             assert( result == ERROR_OK);
 
             size_t freq = item.get_unigram_frequency();
+            /* deal with the special phrase index, for "<start>..." */
+            if ( i == 0 ) {
+                const char * phrase = token_to_string(j);
+                if ( NULL == phrase )
+                    continue;
+                fprintf(output, "\\item %s %d\n", phrase, freq);
+                continue;
+            }
             item.get_phrase_string(buffer);
             guint8 length = item.get_phrase_length();
             gchar * phrase = g_utf16_to_utf8(buffer, length, NULL, NULL, NULL);
@@ -81,4 +89,24 @@ void gen_unigram(FILE * output, FacadePhraseIndex * phrase_index) {
 
 void gen_bigram(FILE * output, Bigram * bigram){
 
+}
+
+const char * token_to_string(phrase_token_t token){
+    struct token_pair{
+        phrase_token_t token;
+        const char * string;
+    };
+
+    static const token_pair tokens [] = {
+        {sentence_start, "<start>"},
+        {0, NULL}
+    };
+
+    const token_pair * pair = tokens;
+    while (pair->token) {
+        if ( token == pair->token )
+            return pair->string;
+    }
+
+    return NULL;
 }
