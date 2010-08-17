@@ -9,8 +9,10 @@
 /* export interpolation model as textual format */
 
 void gen_unigram(FILE * output, FacadePhraseIndex * phrase_index);
-void gen_bigram(FILE * output, Bigram * bigram);
-const char * token_to_string(phrase_token_t token);
+void gen_bigram(FILE * output, FacadePhraseIndex * phrase_index, Bigram * bigram);
+
+/* consider moving the following function to utils/storage/utility.h */
+char * token_to_string(FacadePhraseIndex * phrase_index, phrase_token_t token);
 
 void begin_data(FILE * file){
     fprintf(file, "\\data\n");
@@ -37,12 +39,12 @@ int main(int argc, char * argv[]){
     phrase_index.load(2, chunk);
 
     Bigram bigram;
-    bigram.attach(NULL, bigram_filename);
+    bigram.attach(bigram_filename, NULL);
 
     begin_data(file);
 
     gen_unigram(stdout, &phrase_index);
-    gen_bigram(stdout, &bigram);
+    gen_bigram(stdout, &phrase_index, &bigram);
 
     end_data(stdout);
     return 0;
@@ -56,7 +58,6 @@ void gen_unigram(FILE * output, FacadePhraseIndex * phrase_index) {
         const phrase_token_t max = PHRASE_INDEX_MAKE_TOKEN(i, token_max);
 
         PhraseItem item;
-        utf16_t buffer[MAX_PHRASE_LENGTH];
         for ( size_t j = min; j < max; j++) {
             int result = phrase_index->get_phrase_item(j, item);
             if ( result == ERROR_NO_SUB_PHRASE_INDEX ||
@@ -64,34 +65,65 @@ void gen_unigram(FILE * output, FacadePhraseIndex * phrase_index) {
                 break;
             if ( result == ERROR_NO_ITEM )
                 continue;
-            assert( result != ERROR_FILE_CORRUPTION );
-            /* when get_phrase_item, the next error is impossible */
-            assert( result != ERROR_INTEGER_OVERFLOW );
             assert( result == ERROR_OK);
 
             size_t freq = item.get_unigram_frequency();
-            /* deal with the special phrase index, for "<start>..." */
-            if ( i == 0 ) {
-                const char * phrase = token_to_string(j);
-                if ( NULL == phrase )
-                    continue;
-                fprintf(output, "\\item %s %d\n", phrase, freq);
-                continue;
-            }
-            item.get_phrase_string(buffer);
-            guint8 length = item.get_phrase_length();
-            gchar * phrase = g_utf16_to_utf8(buffer, length, NULL, NULL, NULL);
-            fprintf(output, "\\item %s %d\n", phrase, freq);
+            char * phrase = token_to_string(phrase_index, j);
+            if ( phrase )
+                fprintf(output, "\\item %s count %d\n", phrase, freq);
+
             g_free(phrase);
         }
     }
 }
 
-void gen_bigram(FILE * output, Bigram * bigram){
+void gen_bigram(FILE * output, FacadePhraseIndex * phrase_index, Bigram * bigram){
+    fprintf(output, "\\2-gram\n");
 
+    /* Retrieve all user items. */
+    GArray * system_items = g_array_new(FALSE, FALSE, sizeof(phrase_token_t));
+    GArray * user_items = g_array_new(FALSE, FALSE, sizeof(phrase_token_t));
+
+    bigram->get_all_items(system_items, user_items);
+    assert(0 == user_items->len);
+    g_array_free(user_items, TRUE);
+
+    PhraseItem item;
+    utf16_t buffer[MAX_PHRASE_LENGTH];
+
+    for(int i = 0; i < system_items->len; i++){
+        phrase_token_t token = g_array_index(system_items, phrase_token_t, i);
+        SingleGram * system = NULL, * user = NULL;
+        bigram->load(token, system, user);
+        assert(NULL == user);
+
+        PhraseIndexRange range;
+        range.m_range_begin = token_min;
+        range.m_range_end = token_max;
+
+        BigramPhraseArray array = g_array_new(FALSE, FALSE, sizeof(BigramPhraseItem));
+        system->search(&range, array);
+        for(int j = 0; j < array->len; j++) {
+            BigramPhraseItem * item = &g_array_index(array, BigramPhraseItem, j);
+
+            char * word1 = token_to_string(phrase_index, token);
+            char * word2 = token_to_string(phrase_index, item->m_token);
+            guint32 freq = 0;
+            assert(system->get_freq(item->m_token, freq));
+
+            if ( word1 && word2)
+                fprintf(output, "\\item %s %s count %d\n", word1, word2, freq);
+
+            g_free(word1); g_free(word2);
+        }
+
+        g_array_free(array, TRUE);
+    }
+
+    g_array_free(system_items, TRUE);
 }
 
-const char * token_to_string(phrase_token_t token){
+static const char * special_token_to_string(phrase_token_t token){
     struct token_pair{
         phrase_token_t token;
         const char * string;
@@ -109,4 +141,24 @@ const char * token_to_string(phrase_token_t token){
     }
 
     return NULL;
+}
+
+char * token_to_string(FacadePhraseIndex * phrase_index, phrase_token_t token) {
+    PhraseItem item;
+    utf16_t buffer[MAX_PHRASE_LENGTH];
+
+    gchar * phrase;
+    /* deal with the special phrase index, for "<start>..." */
+    if ( PHRASE_INDEX_LIBRARY_INDEX(token) == 0 ) {
+        return g_strdup(special_token_to_string(token));
+    }
+
+    int result = phrase_index->get_phrase_item(token, item);
+    if (result != ERROR_OK)
+        return NULL;
+
+    item.get_phrase_string(buffer);
+    guint8 length = item.get_phrase_length();
+    phrase = g_utf16_to_utf8(buffer, length, NULL, NULL, NULL);
+    return phrase;
 }
