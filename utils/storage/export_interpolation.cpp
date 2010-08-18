@@ -101,15 +101,14 @@ void gen_bigram(FILE * output, FacadePhraseIndex * phrase_index, Bigram * bigram
         range.m_range_begin = token_min;
         range.m_range_end = token_max;
 
-        BigramPhraseArray array = g_array_new(FALSE, FALSE, sizeof(BigramPhraseItem));
-        system->search(&range, array);
+        BigramPhraseWithCountArray array = g_array_new(FALSE, FALSE, sizeof(BigramPhraseItemWithCount));
+        system->retrieve_all(array);
         for(int j = 0; j < array->len; j++) {
-            BigramPhraseItem * item = &g_array_index(array, BigramPhraseItem, j);
+            BigramPhraseItemWithCount * item = &g_array_index(array, BigramPhraseItemWithCount, j);
 
             char * word1 = token_to_string(phrase_index, token);
             char * word2 = token_to_string(phrase_index, item->m_token);
-            guint32 freq = 0;
-            assert(system->get_freq(item->m_token, freq));
+            guint32 freq = item->m_count;
 
             if ( word1 && word2)
                 fprintf(output, "\\item %s %s count %d\n", word1, word2, freq);
