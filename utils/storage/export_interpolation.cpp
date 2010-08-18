@@ -97,10 +97,6 @@ void gen_bigram(FILE * output, FacadePhraseIndex * phrase_index, Bigram * bigram
         bigram->load(token, system, user);
         assert(NULL == user);
 
-        PhraseIndexRange range;
-        range.m_range_begin = token_min;
-        range.m_range_end = token_max;
-
         BigramPhraseWithCountArray array = g_array_new(FALSE, FALSE, sizeof(BigramPhraseItemWithCount));
         system->retrieve_all(array);
         for(int j = 0; j < array->len; j++) {
