@@ -77,11 +77,31 @@ bool token_less_than(const SingleGramItem & lhs,const SingleGramItem & rhs){
     return lhs.m_token < rhs.m_token;
 }
 
+bool SingleGram::retrieve_all(/* out */ BigramPhraseWithCountArray array){
+    const SingleGramItem * begin = (const SingleGramItem *)
+        ((const char *)(m_chunk.begin()) + sizeof(guint32));
+    const SingleGramItem * end = (const SingleGramItem *) m_chunk.end();
+
+    guint32 total_freq;
+    BigramPhraseItemWithCount bigram_item_with_count;
+    assert(get_total_freq(total_freq));
+
+    for ( const SingleGramItem * cur_item = begin; cur_item != end; ++cur_item){
+        bigram_item_with_count.m_token = cur_item->m_token;
+        bigram_item_with_count.m_count = cur_item->m_freq;
+        bigram_item_with_count.m_freq = cur_item->m_freq / (gfloat)total_freq;
+        g_array_append_val(array, bigram_item_with_count);
+    }
+
+    return true;
+}
+
 bool SingleGram::search(/* in */ PhraseIndexRange * range, 
 			/* out */ BigramPhraseArray array){
     const SingleGramItem * begin = (const SingleGramItem *)
 	((const char *)(m_chunk.begin()) + sizeof(guint32));
     const SingleGramItem * end = (const SingleGramItem *)m_chunk.end();
+
     SingleGramItem compare_item;
     compare_item.m_token = range->m_range_begin;
     const SingleGramItem * cur_item = std_lite::lower_bound(begin, end, compare_item, token_less_than);
@@ -89,6 +109,7 @@ bool SingleGram::search(/* in */ PhraseIndexRange * range,
     guint32 total_freq;
     BigramPhraseItem bigram_item;
     assert(get_total_freq(total_freq));
+
     for ( ; cur_item != end; ++cur_item){
 	if ( cur_item->m_token >= range->m_range_end )
 	    break;
@@ -96,6 +117,7 @@ bool SingleGram::search(/* in */ PhraseIndexRange * range,
 	bigram_item.m_freq = cur_item->m_freq / (gfloat)total_freq;
 	g_array_append_val(array, bigram_item);
     }
+
     return true;
 }
 

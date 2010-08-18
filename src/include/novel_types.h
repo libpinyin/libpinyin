@@ -105,7 +105,7 @@ struct BigramPhraseItem{
 
 struct BigramPhraseItemWithCount{
     phrase_token_t m_token;
-    guint32        m_cout;
+    guint32        m_count;
     gfloat         m_freq; /* P(W2|W1) */
 };
 
