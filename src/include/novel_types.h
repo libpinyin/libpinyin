@@ -103,7 +103,14 @@ struct BigramPhraseItem{
   gfloat         m_freq; /* P(W2|W1) */
 };
 
-typedef GArray * BigramPhraseArray; /* Array of HighLevelPhraseItem */
+struct BigramPhraseItemWithCount{
+    phrase_token_t m_token;
+    guint32        m_cout;
+    gfloat         m_freq; /* P(W2|W1) */
+};
+
+typedef GArray * BigramPhraseArray; /* Array of BigramPhraseItem */
+typedef GArray * BigramPhraseWithCountArray; /* Array of BigramPhraseItemWithCount */
 
 /* 
  *  n-gram Definition

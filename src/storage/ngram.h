@@ -47,6 +47,9 @@ private:
 public:
     /* Null Constructor */
     SingleGram();
+    /* retrieve all items */
+    bool retrieve_all(/* out */ BigramPhraseWithCountArray array);
+
     /* search method */
     /* the array result contains many items */
     bool search(/* in */ PhraseIndexRange * range, 
