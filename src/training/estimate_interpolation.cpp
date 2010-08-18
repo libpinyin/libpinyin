@@ -44,19 +44,15 @@ parameter_t compute_interpolation(SingleGram * deleted_bigram,
 	parameter_t numerator = 0;
 	parameter_t part_of_denominator = 0;
 	
-	PhraseIndexRange range;
-	range.m_range_begin = token_min;
-	range.m_range_end = token_max;
-
-	BigramPhraseArray array = g_array_new(FALSE, FALSE, sizeof(BigramPhraseItem));
-	deleted_bigram->search(&range, array);
+	BigramPhraseWithCountArray array = g_array_new(FALSE, FALSE, sizeof(BigramPhraseItemWithCount));
+	deleted_bigram->retrieve_all(array);
 
 	for ( int i = 0; i < array->len; ++i){
-	    BigramPhraseItem * item = &g_array_index(array, BigramPhraseItem, i);
+	    BigramPhraseItemWithCount* item = &g_array_index(array, BigramPhraseItemWithCount, i);
 	    //get the phrase token
 	    phrase_token_t token = item->m_token;
-	    guint32 deleted_freq = 0;
-	    assert(deleted_bigram->get_freq(token, deleted_freq));
+	    guint32 deleted_freq = item->m_count;
+
 	    {
 		guint32 freq = 0;
 		parameter_t elem_poss = 0;
