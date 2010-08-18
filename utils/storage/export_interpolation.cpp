@@ -53,16 +53,16 @@ int main(int argc, char * argv[]){
 void gen_unigram(FILE * output, FacadePhraseIndex * phrase_index) {
     fprintf(output, "\\1-gram\n");
     for ( size_t i = 0; i < PHRASE_INDEX_LIBRARY_COUNT; i++) {
-        /* Generate each phrase index library */
-        const phrase_token_t min = PHRASE_INDEX_MAKE_TOKEN(i, token_min);
-        const phrase_token_t max = PHRASE_INDEX_MAKE_TOKEN(i, token_max);
+
+        PhraseIndexRange range;
+        int result = phrase_index->get_range(i, range);
+        if ( result )
+            continue;
 
         PhraseItem item;
-        for ( size_t j = min; j < max; j++) {
+        for ( size_t j = range.m_range_begin; j < range.m_range_end; j++) {
             int result = phrase_index->get_phrase_item(j, item);
-            if ( result == ERROR_NO_SUB_PHRASE_INDEX ||
-                 result == ERROR_OUT_OF_RANGE)
-                break;
+
             if ( result == ERROR_NO_ITEM )
                 continue;
             assert( result == ERROR_OK);

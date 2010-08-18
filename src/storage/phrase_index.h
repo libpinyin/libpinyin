@@ -161,10 +161,14 @@ public:
 	}
     }    
     
+    /* binary memory chunk load/store method */
     bool load(MemoryChunk * chunk, 
 	      table_offset_t offset, table_offset_t end);
     bool store(MemoryChunk * new_chunk, 
 	       table_offset_t offset, table_offset_t & end);
+
+    /* get token range in this sub phrase */
+    int get_range(/* out */ PhraseIndexRange & range);
     
     /* Zero-gram */
     guint32 get_phrase_index_total_freq();
@@ -205,6 +209,9 @@ public:
     bool load(guint8 phrase_index, MemoryChunk * chunk);
     bool store(guint8 phrase_index, MemoryChunk * new_chunk);
     bool unload(guint8 phrase_index);
+
+    /* get each sub phrase token range with phrase_index added */
+    int get_range(guint8 phrase_index, /* out */ PhraseIndexRange & range);
 
     /* Zero-gram */
     guint32 get_phrase_index_total_freq(){

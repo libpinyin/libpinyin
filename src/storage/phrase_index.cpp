@@ -327,3 +327,27 @@ bool FacadePhraseIndex::load_text(guint8 phrase_index, FILE * infile){
     m_total_freq += m_sub_phrase_indices[phrase_index]->get_phrase_index_total_freq();
     return true;
 }
+
+int FacadePhraseIndex::get_range(guint8 phrase_index, /* out */ PhraseIndexRange & range){
+    SubPhraseIndex * sub_phrase = m_sub_phrase_indices[phrase_index];
+    if ( !sub_phrase )
+        return ERROR_NO_SUB_PHRASE_INDEX;
+
+    int result = sub_phrase->get_range(range);
+    if ( result )
+        return result;
+
+    range.m_range_begin = PHRASE_INDEX_MAKE_TOKEN(phrase_index, range.m_range_begin);
+    range.m_range_end = PHRASE_INDEX_MAKE_TOKEN(phrase_index, range.m_range_end);
+    return ERROR_OK;
+}
+
+int SubPhraseIndex::get_range(/* out */ PhraseIndexRange & range){
+    const table_offset_t * begin = (const table_offset_t *)m_phrase_index.begin();
+    const table_offset_t * end = (const table_offset_t *)m_phrase_index.end();
+
+    range.m_range_begin = 0;
+    range.m_range_end = end - begin;
+
+    return ERROR_OK;
+}
