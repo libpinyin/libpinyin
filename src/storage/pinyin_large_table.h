@@ -128,7 +128,7 @@ public:
 	reset();
     }
 
-    /*load/save method*/
+    /* load/store method */
     bool load(MemoryChunk * chunk){
 	reset();
 	m_chunk = chunk;
@@ -147,16 +147,17 @@ public:
     }
 */
     
-    /*search/add_index method */
+    /* search/add_index/remove_index method */
     int search( int phrase_length, /* in */ PinyinKey keys[],
 		/* out */ PhraseIndexRanges ranges){
 	return m_bitmap_table.search(phrase_length, keys, ranges);
     }
 
-    int add_index( int phrase_length, /* in */ PinyinKey keys[] ,/* in */ phrase_token_t token){
+    int add_index( int phrase_length, /* in */ PinyinKey keys[], /* in */ phrase_token_t token){
 	return m_bitmap_table.add_index(phrase_length, keys, token);
     }
-    int remove_index( int phrase_length, /* in */ PinyinKey keys[] ,/* in */ phrase_token_t token){
+
+    int remove_index( int phrase_length, /* in */ PinyinKey keys[], /* in */ phrase_token_t token){
 	return m_bitmap_table.remove_index(phrase_length, keys, token);
     }
 
