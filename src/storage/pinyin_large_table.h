@@ -35,7 +35,6 @@ namespace novel{
 class PinyinLengthIndexLevel;
 
 class PinyinBitmapIndexLevel{
-    friend class PinyinLargeTable;
     PinyinCustomSettings * m_custom;
 protected:
     PinyinLengthIndexLevel * m_pinyin_length_indexes[PINYIN_Number_Of_Initials]

@@ -24,6 +24,7 @@
 
 class PhraseLargeTable{
 protected:
+    PhraseBitmapIndexLevel m_bitmap_table;
     MemoryChunk * m_chunk;
 
 public:
