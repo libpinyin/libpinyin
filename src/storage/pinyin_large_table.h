@@ -53,7 +53,7 @@ public:
     }
 
     bool load(MemoryChunk * chunk, table_offset_t offset, table_offset_t end);
-    bool store(MemoryChunk * new_chunk, table_offset_t offset, table_offset_t &end);
+    bool store(MemoryChunk * new_chunk, table_offset_t offset, table_offset_t & end);
 
     /*bool load_text(FILE * file);*/
     /*bool save_text(FILE * file);*/
@@ -72,7 +72,7 @@ public:
     PinyinLengthIndexLevel();
     ~PinyinLengthIndexLevel();
     bool load(MemoryChunk * chunk, table_offset_t offset, table_offset_t end);
-    bool store(MemoryChunk * new_chunk, table_offset_t offset, table_offset_t& end);
+    bool store(MemoryChunk * new_chunk, table_offset_t offset, table_offset_t & end);
     
     /*search/add_index method */
     int search( int phrase_length, /* in */ PinyinCustomSettings * custom,
@@ -93,7 +93,7 @@ protected:
 		PhraseIndexRanges ranges);
 public:
     bool load(MemoryChunk * chunk, table_offset_t offset, table_offset_t end);
-    bool store(MemoryChunk * new_chunk, table_offset_t offset, table_offset_t& end);
+    bool store(MemoryChunk * new_chunk, table_offset_t offset, table_offset_t & end);
     
     /*search/add_index method */
     int search(/* in */ PinyinCustomSettings * custom,

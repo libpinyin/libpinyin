@@ -38,7 +38,7 @@ protected:
     //shift one utf16_t for class PhraseLengthIndexLevel, just like PinyinLengthIndexLevel.
 public:
     bool load(MemoryChunk * chunk, table_offset_t offset, table_offset_t end);
-    bool store(MemoryChunk * new_chunk, table_offset_t offset, table_offset_t &end);
+    bool store(MemoryChunk * new_chunk, table_offset_t offset, table_offset_t & end);
 
     /* search/add_index/remove_index method */
     int search( int phrase_length, /* in */ utf16_t phrase[],
@@ -53,7 +53,7 @@ protected:
     GArray* m_phrase_array_indexes;
 public:
     bool load(MemoryChunk * chunk, table_offset_t offset, table_offset_t end);
-    bool store(MemoryChunk * new_chunk, table_offset_t offset, table_offset_t end);
+    bool store(MemoryChunk * new_chunk, table_offset_t offset, table_offset_t & end);
 
     /* search/add_index/remove_index method */
     int search( int phrase_length, /* in */ utf16_t phrase[],
@@ -69,7 +69,7 @@ protected:
     MemoryChunk m_chunk;
 public:
     bool load(MemoryChunk * chunk, table_offset_t offset, table_offset_t end);
-    bool store(MemoryChunk * new_chunk, table_offset_t offset, table_offset_t &end);
+    bool store(MemoryChunk * new_chunk, table_offset_t offset, table_offset_t & end);
 
     /* search/add_index/remove_index method */
     int search( /* in */ utf16_t phrase[],
