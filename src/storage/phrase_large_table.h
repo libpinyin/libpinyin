@@ -84,19 +84,48 @@ protected:
     PhraseBitmapIndexLevel m_bitmap_table;
     MemoryChunk * m_chunk;
 
+    void reset(){
+        if ( m_chunk ){
+            delete m_chunk;
+            m_chunk = NULL;
+        }
+    }
 public:
+    PhraseLargeTable(){
+        m_chunk = NULL;
+    }
+
+    ~PhraseLargeTable(){
+        reset();
+    }
+
     /* load/store method */
-    bool load(MemoryChunk * chunk);
-    bool store(MemoryChunk * new_chunk);
+    bool load(MemoryChunk * chunk){
+        reset();
+        m_chunk = chunk;
+        return m_bitmap_table.load(chunk, 0, chunk->size());
+    }
+
+    bool store(MemoryChunk * new_chunk){
+        table_offset_t end;
+        return m_bitmap_table.store(new_chunk, 0, end);
+    }
 
     bool load_text(FILE * file);
 
     /* search/add_index/remove_index method */
     int search( int phrase_length, /* in */ utf16_t phrase[],
-                /* out */ phrase_token_t & token);
+                /* out */ phrase_token_t & token){
+        return m_bitmap_table.search(phrase_length, phrase, token);
+    }
 
-    int add_index( int phrase_length, /* in */ utf16_t phrase[], /* in */ phrase_token_t token);
-    int remove_index( int phrase_length, /* in */ utf16_t phrase[], /* out */ phrase_token_t & token);
+    int add_index( int phrase_length, /* in */ utf16_t phrase[], /* in */ phrase_token_t token){
+        return m_bitmap_table.add_index(phrase_length, phrase, token);
+    }
+
+    int remove_index( int phrase_length, /* in */ utf16_t phrase[], /* out */ phrase_token_t & token){
+        return m_bitmap_table.remove_index(phrase_length, phrase, token);
+    }
 };
 
 };

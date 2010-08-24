@@ -131,7 +131,7 @@ public:
     bool load(MemoryChunk * chunk){
 	reset();
 	m_chunk = chunk;
-	return m_bitmap_table.load(chunk, 0 , chunk->size());
+	return m_bitmap_table.load(chunk, 0, chunk->size());
     }
 
     bool store(MemoryChunk * new_chunk){
