@@ -24,6 +24,7 @@ noinst_HEADERS          = pinyin_large_table.h \
 		          pinyin_phrase.h \
 			  phrase_index.h \
 		          pinyin_zhuyin_map_data.h \
+			  phrase_large_table.h \
 			  ngram.h
 
 noinst_LTLIBRARIES       = libstorage.la
@@ -31,5 +32,6 @@ noinst_LTLIBRARIES       = libstorage.la
 libstorage_la_SOURCES    = pinyin_base.cpp \
 			  pinyin_large_table.cpp \
 			  phrase_index.cpp \
+			  phrase_large_table.cpp \
 			  ngram.cpp
 

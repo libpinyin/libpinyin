@@ -28,7 +28,7 @@
 
 namespace novel{
 
-const size_t PHRASE_Number_Of_Bitmap_Index = 1<< (sizeof(utf16_t) * 8);
+const size_t PHRASE_Number_Of_Bitmap_Index = 1<<(sizeof(utf16_t) * 8);
 
 class PhraseLengthIndexLevel;
 
@@ -39,7 +39,7 @@ protected:
     void reset();
 public:
     PhraseBitmapIndexLevel();
-    ~PhraseBitmapIndex(){
+    ~PhraseBitmapIndexLevel(){
         reset();
     }
 
@@ -59,6 +59,10 @@ class PhraseLengthIndexLevel{
 protected:
     GArray* m_phrase_array_indexes;
 public:
+    PhraseLengthIndexLevel();
+    ~PhraseLengthIndexLevel();
+
+    /* load/store method */
     bool load(MemoryChunk * chunk, table_offset_t offset, table_offset_t end);
     bool store(MemoryChunk * new_chunk, table_offset_t offset, table_offset_t & end);
 

@@ -28,7 +28,7 @@ PhraseBitmapIndexLevel::PhraseBitmapIndexLevel(){
 }
 
 void PhraseBitmapIndexLevel::reset(){
-    for ( int i = 0; i < PHRASE_Number_Of_Bitmap_Index; i++){
+    for ( size_t i = 0; i < PHRASE_Number_Of_Bitmap_Index; i++){
         PhraseLengthIndexLevel * length_array =
             m_phrase_length_indexes[i];
         if ( length_array )
@@ -62,7 +62,7 @@ PhraseLengthIndexLevel::~PhraseLengthIndexLevel(){
         break;                                                          \
     }
 
-    for ( int i = 0 ; i < m_phrase_array_indexes->len; ++i){
+    for ( size_t i = 0 ; i < m_phrase_array_indexes->len; ++i){
         switch (i){
             CASE(0);
             	    CASE(1);
@@ -131,6 +131,6 @@ int PhraseLengthIndexLevel::search(int phrase_length,
 }
 
 template<size_t phrase_length>
-int PinyinArrayIndexLevel<phrase_length>::search(/* in */ utf16_t phrase[], /* out */ phrase_token_t & token){
+int PhraseArrayIndexLevel<phrase_length>::search(/* in */ utf16_t phrase[], /* out */ phrase_token_t & token){
     
 }
