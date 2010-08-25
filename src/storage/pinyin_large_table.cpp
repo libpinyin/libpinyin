@@ -29,7 +29,7 @@
 
 PinyinBitmapIndexLevel::PinyinBitmapIndexLevel(PinyinCustomSettings * custom)
     :m_custom(custom){
-    memset(m_pinyin_length_indexes, 0 , sizeof(m_pinyin_length_indexes));
+    memset(m_pinyin_length_indexes, 0, sizeof(m_pinyin_length_indexes));
 }
 
 void PinyinBitmapIndexLevel::reset(){
@@ -45,6 +45,7 @@ void PinyinBitmapIndexLevel::reset(){
 
 int PinyinBitmapIndexLevel::search( int phrase_length, /* in */ PinyinKey keys[],
 	    /* out */ PhraseIndexRanges ranges) const{
+    assert(phrase_length > 0);
     return initial_level_search(phrase_length, keys, ranges);
 }
 
@@ -65,7 +66,7 @@ int PinyinBitmapIndexLevel::initial_level_search(int phrase_length,
     
     //deal with the ambiguities
 
-    int result = 0;
+    int result = SEARCH_NONE;
     PinyinKey& first_key = keys[0];
     PinyinCustomSettings &  custom= *m_custom;
     
@@ -119,7 +120,7 @@ int PinyinBitmapIndexLevel::final_level_search(PinyinInitial initial,
 	return result;							\
     }
     
-    int result = 0;
+    int result = SEARCH_NONE;
     PinyinKey& first_key = keys[0];
     PinyinCustomSettings &  custom= *m_custom;
 
@@ -156,7 +157,7 @@ int PinyinBitmapIndexLevel::tone_level_search(PinyinInitial initial,
 					      int phrase_length, 
 					      /* in */PinyinKey keys[],
 					      /* out */ PhraseIndexRanges ranges) const{
-    int result = 0;
+    int result = SEARCH_NONE;
     PinyinKey& first_key = keys[0];
     PinyinCustomSettings &  custom= *m_custom;
 
@@ -189,7 +190,7 @@ int PinyinBitmapIndexLevel::tone_level_search(PinyinInitial initial,
 	    return result;
 	}
     }
-	return result;
+    return result;
 }
 
 PinyinLengthIndexLevel::PinyinLengthIndexLevel(){
@@ -197,10 +198,10 @@ PinyinLengthIndexLevel::PinyinLengthIndexLevel(){
 }
 
 PinyinLengthIndexLevel::~PinyinLengthIndexLevel(){
-#define CASE(x) case x:							\
+#define CASE(len) case len:                                             \
     {									\
-	PinyinArrayIndexLevel<x> * array = g_array_index		\
-	    (m_pinyin_array_indexes, PinyinArrayIndexLevel<x> *, x);	\
+	PinyinArrayIndexLevel<len> * array = g_array_index		\
+	    (m_pinyin_array_indexes, PinyinArrayIndexLevel<len> *, len); \
 	if (array)							\
 	    delete array;						\
 	break;  							\
@@ -236,7 +237,7 @@ int PinyinLengthIndexLevel::search( int phrase_length,
 				    /* in */ PinyinKey keys[],
 				    /* out */ PhraseIndexRanges ranges){
     int result = SEARCH_NONE;
-    if(m_pinyin_array_indexes->len < phrase_length + 1)
+    if (m_pinyin_array_indexes->len < phrase_length + 1)
 	return result;
     if (m_pinyin_array_indexes->len > phrase_length + 1)
 	result |= SEARCH_CONTINUED;

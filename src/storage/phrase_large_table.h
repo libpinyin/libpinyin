@@ -28,7 +28,7 @@
 
 namespace novel{
 
-const size_t PHRASE_Number_Of_Bitmap_Index = 1<<16;
+const size_t PHRASE_Number_Of_Bitmap_Index = 1<< (sizeof(utf16_t) * 8);
 
 class PhraseLengthIndexLevel;
 
@@ -36,7 +36,14 @@ class PhraseBitmapIndexLevel{
 protected:
     PhraseLengthIndexLevel * m_phrase_length_indexes[PHRASE_Number_Of_Bitmap_Index];
     //shift one utf16_t for class PhraseLengthIndexLevel, just like PinyinLengthIndexLevel.
+    void reset();
 public:
+    PhraseBitmapIndexLevel();
+    ~PhraseBitmapIndex(){
+        reset();
+    }
+
+    /* load/store method */
     bool load(MemoryChunk * chunk, table_offset_t offset, table_offset_t end);
     bool store(MemoryChunk * new_chunk, table_offset_t offset, table_offset_t & end);
 
