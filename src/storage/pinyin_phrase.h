@@ -186,7 +186,7 @@ inline void compute_upper_value(const PinyinCustomSettings &custom,
     }
 }
 
-template<int phrase_length>
+template<size_t phrase_length>
 struct PinyinIndexItem{
     phrase_token_t m_token;
     PinyinKey m_keys[phrase_length];

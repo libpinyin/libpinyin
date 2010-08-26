@@ -23,6 +23,32 @@
 #include <string.h>
 #include "phrase_large_table.h"
 
+template<size_t phrase_length>
+struct PhraseIndexItem{
+    phrase_token_t m_token;
+    utf16_t m_phrase[phrase_length];
+public:
+    PhraseIndexItem<phrase_length>(utf16_t phrase[], phrase_token_t token){
+        memmove(m_phrase, phrase, sizeof(utf16_t) * phrase_length);
+        m_token = token;
+    }
+};
+
+template<size_t phrase_length>
+static int phrase_compare(const PhraseIndexItem<phrase_length> &lhs,
+                          const PhraseIndexItem<phrase_length> &rhs){
+    utf16_t * phrase_lhs = (utf16_t *) lhs.m_phrase;
+    utf16_t * phrase_rhs = (utf16_t *) rhs.m_phrase;
+
+    return memcmp(phrase_lhs, phrase_rhs, sizeof(utf16_t) * phrase_length);
+}
+
+template<size_t phrase_length>
+static bool phrase_less_than(const PhraseIndexItem<phrase_length> & lhs,
+                             const PhraseIndexItem<phrase_length> & rhs){
+    return 0 > phrase_compare(lhs, rhs);
+}
+
 PhraseBitmapIndexLevel::PhraseBitmapIndexLevel(){
     memset(m_phrase_length_indexes, 0, sizeof(m_phrase_length_indexes));
 }
@@ -132,5 +158,17 @@ int PhraseLengthIndexLevel::search(int phrase_length,
 
 template<size_t phrase_length>
 int PhraseArrayIndexLevel<phrase_length>::search(/* in */ utf16_t phrase[], /* out */ phrase_token_t & token){
-    
+    PhraseIndexItem<phrase_length> * chunk_begin, * chunk_end;
+    chunk_begin = (PhraseIndexItem<phrase_length> *)m_chunk.begin();
+    chunk_end = (PhraseIndexItem<phrase_length> *)m_chunk.end();
+    PhraseIndexItem<phrase_length> search_elem(phrase, -1);
+
+    //do the search
+    std_lite::pair<PhraseIndexItem<phrase_length> *, PhraseIndexItem<phrase_length> *> range;
+    range = std_lite::equal_range(chunk_begin, chunk_end, search_elem, phrase_less_than<phrase_length>);
+
+    if ( range.first == range.second )
+        return SEARCH_NONE;
+    assert(range.second - range.first == 1);
+    return SEARCH_OK;
 }
