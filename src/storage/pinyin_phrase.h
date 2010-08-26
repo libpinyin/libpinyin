@@ -27,6 +27,7 @@
 
 namespace novel{
 
+/*
 static inline int pinyin_utility_sign(int value){
   if(value > 0)
     return 1;
@@ -34,6 +35,7 @@ static inline int pinyin_utility_sign(int value){
     return -1;
   else return 0;
 }
+*/
 
 inline int pinyin_exact_compare(const PinyinKey key_lhs[], 
 				const PinyinKey key_rhs[],
@@ -43,17 +45,17 @@ inline int pinyin_exact_compare(const PinyinKey key_lhs[],
   for ( i = 0 ; i < phrase_length ; i++){
     result = key_lhs[i].m_initial - key_rhs[i].m_initial;
     if ( result != 0 )
-      return pinyin_utility_sign(result);
+      return result;
   }
   for( i = 0 ; i < phrase_length ; i++){
     result = key_lhs[i].m_final - key_rhs[i].m_final;
     if ( result != 0 )
-      return pinyin_utility_sign(result);
+      return result;
   }
   for( i = 0 ; i < phrase_length ; i++){
     result = key_lhs[i].m_tone - key_rhs[i].m_tone;
     if ( result != 0 )
-      return pinyin_utility_sign(result);
+      return result;
   }
   return 0;
 }
@@ -269,7 +271,7 @@ class PhraseExactLessThan
  public:
   bool operator () (const PinyinIndexItem<phrase_length> &lhs,
 		   const PinyinIndexItem<phrase_length> &rhs) const{
-    return -1 == m_compare(lhs, rhs);
+    return 0 > m_compare(lhs, rhs);
   }
 };
 
@@ -285,7 +287,7 @@ class PhraseExactLessThanWithToken
  public:
   bool operator () (const PinyinIndexItem<phrase_length> &lhs,
 		   const PinyinIndexItem<phrase_length> &rhs) const{
-    return -1 == m_compare(lhs, rhs);
+    return 0 > m_compare(lhs, rhs);
   }
 };
 */

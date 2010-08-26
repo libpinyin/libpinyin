@@ -1384,8 +1384,7 @@ int pinyin_compare_initial (const PinyinCustomSettings &custom,
 		  (lhs == PINYIN_He && rhs == PINYIN_Fo)))
 	    )
 	  return 0;
-	else if (lhs < rhs) return -1;
-	return 1;
+	else return (lhs - rhs);
 }
 
 int pinyin_compare_final (const PinyinCustomSettings &custom,
@@ -1407,8 +1406,7 @@ int pinyin_compare_final (const PinyinCustomSettings &custom,
         return 0;
     else if (custom.use_incomplete && (lhs == PINYIN_ZeroFinal || rhs == PINYIN_ZeroFinal))
         return 0;
-    else if (lhs < rhs) return -1;
-    return 1;
+    else return (lhs - rhs);
 }
 
 int pinyin_compare_tone (const PinyinCustomSettings &custom,
@@ -1417,8 +1415,7 @@ int pinyin_compare_tone (const PinyinCustomSettings &custom,
 {
     if(lhs == rhs || !lhs || !rhs)
         return 0;
-    else if (lhs < rhs) return -1;
-    return 1;
+    else return (lhs - rhs);
 }
 
 };
