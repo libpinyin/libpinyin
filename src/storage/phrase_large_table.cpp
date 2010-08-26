@@ -169,6 +169,8 @@ int PhraseArrayIndexLevel<phrase_length>::search(/* in */ utf16_t phrase[], /* o
 
     if ( range.first == range.second )
         return SEARCH_NONE;
+
     assert(range.second - range.first == 1);
+    token = range.first->m_token;
     return SEARCH_OK;
 }
