@@ -333,26 +333,26 @@ int PinyinArrayIndexLevel<phrase_length>::convert(PinyinCustomSettings * custom,
     return result;
 }
 
-int PinyinBitmapIndexLevel::add_index( int phrase_length, /* in */ PinyinKey keys[] ,/* in */ phrase_token_t token){
-    PinyinKey firstkey = keys[0];
+int PinyinBitmapIndexLevel::add_index( int phrase_length, /* in */ PinyinKey keys[], /* in */ phrase_token_t token){
+    PinyinKey first_key = keys[0];
     PinyinLengthIndexLevel * &length_array = 
-	m_pinyin_length_indexes[firstkey.m_initial][firstkey.m_final][firstkey.m_tone];
-    if ( ! length_array ){
+	m_pinyin_length_indexes[first_key.m_initial][first_key.m_final][first_key.m_tone];
+    if ( !length_array ){
 	length_array = new PinyinLengthIndexLevel();
     }
     return length_array->add_index(phrase_length - 1, keys + 1, token);
 }
 
-int PinyinBitmapIndexLevel::remove_index( int phrase_length, /* in */ PinyinKey keys[] ,/* in */ phrase_token_t token){
-    PinyinKey firstkey = keys[0];
+int PinyinBitmapIndexLevel::remove_index( int phrase_length, /* in */ PinyinKey keys[], /* in */ phrase_token_t token){
+    PinyinKey first_key = keys[0];
     PinyinLengthIndexLevel * &length_array = 
-	m_pinyin_length_indexes[firstkey.m_initial][firstkey.m_final][firstkey.m_tone];
+	m_pinyin_length_indexes[first_key.m_initial][first_key.m_final][first_key.m_tone];
     if ( length_array )
-	return length_array->add_index(phrase_length - 1, keys + 1, token);
+	return length_array->remove_index(phrase_length - 1, keys + 1, token);
     return REMOVE_ITEM_DONOT_EXISTS;
 }
 
-int PinyinLengthIndexLevel::add_index( int phrase_length, /* in */ PinyinKey keys[] ,/* in */ phrase_token_t token){
+int PinyinLengthIndexLevel::add_index( int phrase_length, /* in */ PinyinKey keys[], /* in */ phrase_token_t token){
     assert(phrase_length + 1 < MAX_PHRASE_LENGTH);
     if ( m_pinyin_array_indexes -> len <= phrase_length )
 	g_array_set_size(m_pinyin_array_indexes, phrase_length + 1);
@@ -387,7 +387,7 @@ int PinyinLengthIndexLevel::add_index( int phrase_length, /* in */ PinyinKey key
 #undef CASE
 }
 
-int PinyinLengthIndexLevel::remove_index( int phrase_length, /* in */ PinyinKey keys[] ,/* in */ phrase_token_t token){
+int PinyinLengthIndexLevel::remove_index( int phrase_length, /* in */ PinyinKey keys[], /* in */ phrase_token_t token){
     assert(phrase_length + 1 < MAX_PHRASE_LENGTH);
     if ( m_pinyin_array_indexes -> len <= phrase_length )
 	return false;
@@ -423,7 +423,7 @@ int PinyinLengthIndexLevel::remove_index( int phrase_length, /* in */ PinyinKey 
 }
 
 template<size_t phrase_length>
-int PinyinArrayIndexLevel<phrase_length>::add_index(/* in */ PinyinKey keys[] ,/* in */ phrase_token_t token){
+int PinyinArrayIndexLevel<phrase_length>::add_index(/* in */ PinyinKey keys[], /* in */ phrase_token_t token){
     PhraseExactLessThan<phrase_length> m_lessthan;
     PinyinIndexItem<phrase_length> * buf_begin, * buf_end;
 
@@ -451,7 +451,7 @@ int PinyinArrayIndexLevel<phrase_length>::add_index(/* in */ PinyinKey keys[] ,/
 }
 
 template<size_t phrase_length>
-int PinyinArrayIndexLevel<phrase_length>::remove_index(/* in */ PinyinKey keys[] ,/* in */ phrase_token_t token){
+int PinyinArrayIndexLevel<phrase_length>::remove_index(/* in */ PinyinKey keys[], /* in */ phrase_token_t token){
     PhraseExactLessThan<phrase_length> m_lessthan;
     PinyinIndexItem<phrase_length> * buf_begin, * buf_end;
 

@@ -61,8 +61,8 @@ public:
     /*search/add_index method */
     int search( int phrase_length, /* in */ PinyinKey keys[],
 		/* out */ PhraseIndexRanges ranges) const;
-    int add_index( int phrase_length, /* in */ PinyinKey keys[] ,/* in */ phrase_token_t token); 
-    int remove_index( int phrase_length, /* in */ PinyinKey keys[] ,/* in */ phrase_token_t token);
+    int add_index( int phrase_length, /* in */ PinyinKey keys[], /* in */ phrase_token_t token);
+    int remove_index( int phrase_length, /* in */ PinyinKey keys[], /* in */ phrase_token_t token);
 };
 
 class PinyinLengthIndexLevel{
@@ -78,8 +78,8 @@ public:
     int search( int phrase_length, /* in */ PinyinCustomSettings * custom,
 		/* in */ PinyinKey keys[],
 		/* out */ PhraseIndexRanges ranges);
-    int add_index( int phrase_length, /* in */ PinyinKey keys[] ,/* in */ phrase_token_t token); 
-    int remove_index( int phrase_length, /* in */ PinyinKey keys[] ,/* in */ phrase_token_t token);
+    int add_index( int phrase_length, /* in */ PinyinKey keys[], /* in */ phrase_token_t token);
+    int remove_index( int phrase_length, /* in */ PinyinKey keys[], /* in */ phrase_token_t token);
 };
 
 template<size_t phrase_length>
@@ -99,8 +99,8 @@ public:
     int search(/* in */ PinyinCustomSettings * custom,
 	       /* in */ PinyinKey keys[],
 	       /* out */ PhraseIndexRanges ranges);
-    int add_index(/* in */ PinyinKey keys[] ,/* in */ phrase_token_t token); 
-    int remove_index(/* in */ PinyinKey keys[] ,/* in */ phrase_token_t token);
+    int add_index(/* in */ PinyinKey keys[], /* in */ phrase_token_t token);
+    int remove_index(/* in */ PinyinKey keys[], /* in */ phrase_token_t token);
 };
 
 
