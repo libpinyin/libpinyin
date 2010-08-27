@@ -356,13 +356,13 @@ int PinyinLengthIndexLevel::add_index( int phrase_length, /* in */ PinyinKey key
     assert(phrase_length + 1 < MAX_PHRASE_LENGTH);
     if ( m_pinyin_array_indexes -> len <= phrase_length )
 	g_array_set_size(m_pinyin_array_indexes, phrase_length + 1);
-#define CASE(x)	case x:						     \
-    {                                                                \
-	PinyinArrayIndexLevel<x> * &array = g_array_index	     \
-	    (m_pinyin_array_indexes, PinyinArrayIndexLevel<x> *, x); \
-	if ( !array )						     \
-	    array = new PinyinArrayIndexLevel<x>;		     \
-	return array->add_index(keys, token);				     \
+#define CASE(len)	case len:                                       \
+    {                                                                   \
+	PinyinArrayIndexLevel<len> * &array = g_array_index             \
+	    (m_pinyin_array_indexes, PinyinArrayIndexLevel<len> *, len); \
+	if ( !array )                                                   \
+	    array = new PinyinArrayIndexLevel<len>;                     \
+	return array->add_index(keys, token);                           \
     }
     switch(phrase_length){
 	CASE(0);
@@ -391,10 +391,10 @@ int PinyinLengthIndexLevel::remove_index( int phrase_length, /* in */ PinyinKey 
     assert(phrase_length + 1 < MAX_PHRASE_LENGTH);
     if ( m_pinyin_array_indexes -> len <= phrase_length )
 	return false;
-#define CASE(x)	case x:							\
+#define CASE(len)	case len:                                       \
     {									\
-	PinyinArrayIndexLevel<x> * &array = g_array_index		\
-	    (m_pinyin_array_indexes, PinyinArrayIndexLevel<x> *, x);	\
+	PinyinArrayIndexLevel<len> * &array = g_array_index		\
+	    (m_pinyin_array_indexes, PinyinArrayIndexLevel<len> *, len); \
 	if ( !array )							\
 	    return false;						\
 	return array->remove_index(keys, token);			\
