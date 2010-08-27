@@ -390,13 +390,13 @@ int PinyinLengthIndexLevel::add_index( int phrase_length, /* in */ PinyinKey key
 int PinyinLengthIndexLevel::remove_index( int phrase_length, /* in */ PinyinKey keys[], /* in */ phrase_token_t token){
     assert(phrase_length + 1 < MAX_PHRASE_LENGTH);
     if ( m_pinyin_array_indexes -> len <= phrase_length )
-	return false;
+	return REMOVE_ITEM_DONOT_EXISTS;
 #define CASE(len)	case len:                                       \
     {									\
 	PinyinArrayIndexLevel<len> * &array = g_array_index		\
 	    (m_pinyin_array_indexes, PinyinArrayIndexLevel<len> *, len); \
 	if ( !array )							\
-	    return false;						\
+	    return REMOVE_ITEM_DONOT_EXISTS;                            \
 	return array->remove_index(keys, token);			\
     }
     switch(phrase_length){

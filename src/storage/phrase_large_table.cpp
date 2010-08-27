@@ -174,3 +174,94 @@ int PhraseArrayIndexLevel<phrase_length>::search(/* in */ utf16_t phrase[], /* o
     token = range.first->m_token;
     return SEARCH_OK;
 }
+
+int PhraseBitmapIndexLevel::add_index( int phrase_length, /* in */ utf16_t phrase[], /* in */ phrase_token_t token){
+    utf16_t first_key =  phrase[0];
+    PhraseLengthIndexLevel * & length_array = m_phrase_length_indexes[first_key];
+    if ( !length_array ){
+        length_array = new PhraseLengthIndexLevel();
+    }
+    return length_array->add_index(phrase_length - 1, phrase + 1, token);
+}
+
+int PhraseBitmapIndexLevel::remove_index( int phrase_length, /* in */ utf16_t phrase[], /* out */ phrase_token_t & token){
+    utf16_t first_key = phrase[0];
+    PhraseLengthIndexLevel * &length_array = m_phrase_length_indexes[first_key];
+    if ( length_array )
+        return length_array->remove_index(phrase_length - 1, phrase + 1, token);
+    return REMOVE_ITEM_DONOT_EXISTS;
+}
+
+int PhraseLengthIndexLevel::add_index( int phrase_length, /* in */ utf16_t phrase[], /* in */ phrase_token_t token){
+    assert(phrase_length + 1 < MAX_PHRASE_LENGTH);
+    if ( m_phrase_array_indexes -> len <= phrase_length )
+        g_array_set_size(m_phrase_array_indexes, phrase_length + 1);
+
+#define CASE(len) case len:                                             \
+    {                                                                   \
+        PhraseArrayIndexLevel<len> * &array = g_array_index             \
+            (m_phrase_array_indexes, PhraseArrayIndexLevel<len> *, len); \
+        if ( !array )                                                   \
+            array = new PhraseArrayIndexLevel<len>;                     \
+        return array->add_index(phrase, token);                         \
+    }
+
+    switch(phrase_length){
+	CASE(0);
+	CASE(1);
+	CASE(2);
+	CASE(3);
+	CASE(4);
+	CASE(5);
+	CASE(6);
+	CASE(7);
+	CASE(8);
+	CASE(9);
+	CASE(10);
+	CASE(11);
+	CASE(12);
+	CASE(13);
+	CASE(14);
+	CASE(15);
+    default:
+	assert(false);
+    }
+
+#undef CASE
+}
+
+int PhraseLengthIndexLevel::remove_index( int phrase_length, /* in */ utf16_t phrase[], /* out */ phrase_token_t & token){
+    assert(phrase_length + 1 < MAX_PHRASE_LENGTH);
+    if ( m_phrase_array_indexes -> len <= phrase_length )
+        return REMOVE_ITEM_DONOT_EXISTS;
+#define CASE(len) case len:                                             \
+    {                                                                   \
+        PhraseArrayIndexLevel<len> * &array =  g_array_index            \
+            (m_phrase_array_indexes, PhraseArrayIndexLevel<len> *, len); \
+        if ( !array )                                                   \
+            return REMOVE_ITEM_DONOT_EXISTS;                            \
+        return array->remove_index(phrase, token);                      \
+    }
+
+    switch(phrase_length){
+	CASE(0);
+	CASE(1);
+	CASE(2);
+	CASE(3);
+	CASE(4);
+	CASE(5);
+	CASE(6);
+	CASE(7);
+	CASE(8);
+	CASE(9);
+	CASE(10);
+	CASE(11);
+	CASE(12);
+	CASE(13);
+	CASE(14);
+	CASE(15);
+    default:
+	assert(false);
+    }
+#undef CASE
+}
