@@ -455,12 +455,12 @@ int PinyinArrayIndexLevel<phrase_length>::remove_index(/* in */ PinyinKey keys[]
     PhraseExactLessThan<phrase_length> m_lessthan;
     PinyinIndexItem<phrase_length> * buf_begin, * buf_end;
 
-    PinyinIndexItem<phrase_length> new_elem(keys, token);
+    PinyinIndexItem<phrase_length> remove_elem(keys, token);
     buf_begin = (PinyinIndexItem<phrase_length> *) m_chunk.begin();
     buf_end = (PinyinIndexItem<phrase_length> *) m_chunk.end();
 
     std_lite::pair<PinyinIndexItem<phrase_length> *, PinyinIndexItem<phrase_length> *> range;
-    range = std_lite::equal_range(buf_begin, buf_end, new_elem, m_lessthan);
+    range = std_lite::equal_range(buf_begin, buf_end, remove_elem, m_lessthan);
 
     PinyinIndexItem<phrase_length> * cur_elem;
     for ( cur_elem = range.first; 

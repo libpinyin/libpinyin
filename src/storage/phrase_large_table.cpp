@@ -265,3 +265,49 @@ int PhraseLengthIndexLevel::remove_index( int phrase_length, /* in */ utf16_t ph
     }
 #undef CASE
 }
+
+template<size_t phrase_length>
+int PhraseArrayIndexLevel<phrase_length>::add_index(/* in */ utf16_t phrase[], /* in */ phrase_token_t token){
+    PhraseIndexItem<phrase_length> * buf_begin, * buf_end;
+
+    PhraseIndexItem<phrase_length> new_elem(phrase, token);
+    buf_begin = (PhraseIndexItem<phrase_length> *) m_chunk.begin();
+    buf_end = (PhraseIndexItem<phrase_length> *) m_chunk.end();
+
+    std_lite::pair<PhraseIndexItem<phrase_length> *, PhraseIndexItem<phrase_length> *> range;
+    range = std_lite::equal_range(buf_begin, buf_end, new_elem, phrase_less_than<phrase_length>);
+
+    assert(range.second - range.first <= 1);
+    if ( range.second - range.first == 1 )
+        return INSERT_ITEM_EXISTS;
+
+    PhraseIndexItem<phrase_length> * cur_elem = range.first;
+    int offset = (cur_elem - buf_begin) *
+        sizeof(PhraseIndexItem<phrase_length>);
+    m_chunk.insert_content(offset, &new_elem,
+                           sizeof(PhraseIndexItem<phrase_length> ));
+    return INSERT_OK;
+}
+
+template<size_t phrase_length>
+int PhraseArrayIndexLevel<phrase_length>::remove_index(/* in */ utf16_t phrase[], /* out */ phrase_token_t & token){
+    PhraseIndexItem<phrase_length> * buf_begin, * buf_end;
+
+    PhraseIndexItem<phrase_length> remove_elem(phrase, -1);
+    buf_begin = (PhraseIndexItem<phrase_length> *) m_chunk.begin();
+    buf_end = (PhraseIndexItem<phrase_length> *) m_chunk.end();
+
+    std_lite::pair<PhraseIndexItem<phrase_length> *, PhraseIndexItem<phrase_length> *> range;
+    range = std_lite::equal_range(buf_begin, buf_end, remove_elem, phrase_less_than<phrase_length>);
+
+    assert(range.second - range.first <= 1);
+    PhraseIndexItem<phrase_length> * cur_elem = range.first;
+    if ( range.first == range.second || cur_elem == buf_end)
+        return REMOVE_ITEM_DONOT_EXISTS;
+
+    token = cur_elem->m_token;
+    int offset = (cur_elem -  buf_begin) *
+        sizeof(PhraseIndexItem<phrase_length>);
+    m_chunk.remove_content(offset, sizeof (PhraseIndexItem<phrase_length>));
+    return REMOVE_OK;
+}
