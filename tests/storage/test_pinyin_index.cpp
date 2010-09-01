@@ -1,7 +1,6 @@
 #include <string.h>
 #include <stdio.h>
 #include <sys/time.h>
-#include <glib.h>
 #include "novel_types.h"
 #include "pinyin_base.h"
 #include "pinyin_phrase.h"
@@ -34,18 +33,20 @@ int main( int argc, char * argv[]){
     PinyinLargeTable largetable(&custom);
 
     FILE * gbfile = fopen("../../data/gb_char.table", "r");
-    if ( gbfile == NULL) {
-	printf("open gb_char.table failed!");
+    if ( gbfile == NULL ) {
+	printf("open gb_char.table failed!\n");
 	return 1;
     }
+
+    largetable.load_text(gbfile);
+    fclose(gbfile);
+
     FILE * gbkfile = fopen("../../data/gbk_char.table","r");
-    if ( gbkfile == NULL) {
-	printf("open gb_char.table failed!");
+    if ( gbkfile == NULL ) {
+	printf("open gb_char.table failed!\n");
 	return 1;
     }
     
-    largetable.load_text(gbfile);
-    fclose(gbfile);
     largetable.load_text(gbkfile);
     fclose(gbkfile);
 
