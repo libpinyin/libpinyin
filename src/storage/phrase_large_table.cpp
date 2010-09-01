@@ -311,3 +311,24 @@ int PhraseArrayIndexLevel<phrase_length>::remove_index(/* in */ utf16_t phrase[]
     m_chunk.remove_content(offset, sizeof (PhraseIndexItem<phrase_length>));
     return REMOVE_OK;
 }
+
+bool PhraseLargeTable::load_text(FILE * infile){
+    char pinyin[256];
+    char phrase[256];
+    phrase_token_t token;
+    size_t freq;
+
+    while ( !feof(infile) ){
+        fscanf(infile, "%s", pinyin);
+        fscanf(infile, "%s", phrase);
+        fscanf(infile, "%ld", &token);
+        fscanf(infile, "%ld", &freq);
+
+        glong phrase_len = g_utf8_strlen(phrase, -1);
+        utf16_t * new_phrase = g_utf8_to_utf16(phrase, -1, NULL, NULL, NULL);
+        add_index(phrase_len, new_phrase, token);
+
+        g_free(new_phrase);
+    }
+    return true;
+}

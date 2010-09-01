@@ -482,6 +482,7 @@ bool PinyinLargeTable::load_text(FILE * infile){
     char phrase[256];
     phrase_token_t token;
     size_t freq;    
+
     while ( !feof(infile)){
         fscanf(infile, "%s", pinyin);
         fscanf(infile, "%s", phrase);
@@ -502,7 +503,7 @@ bool PinyinLargeTable::load_text(FILE * infile){
 	g_array_free(keys, true);
 	g_array_free(poses, true);
     }
-	return true;
+    return true;
 }
 
 bool PinyinBitmapIndexLevel::load(MemoryChunk * chunk, table_offset_t offset,
