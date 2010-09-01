@@ -318,11 +318,14 @@ bool PhraseLargeTable::load_text(FILE * infile){
     phrase_token_t token;
     size_t freq;
 
-    while ( !feof(infile) ){
+    while ( !feof(infile) ) {
         fscanf(infile, "%s", pinyin);
         fscanf(infile, "%s", phrase);
         fscanf(infile, "%ld", &token);
         fscanf(infile, "%ld", &freq);
+
+        if ( feof(infile) )
+            break;
 
         glong phrase_len = g_utf8_strlen(phrase, -1);
         utf16_t * new_phrase = g_utf8_to_utf16(phrase, -1, NULL, NULL, NULL);
