@@ -74,8 +74,8 @@ int main( int argc, char * argv[]){
     largetable.store(new_chunk);
     largetable.load(new_chunk);
     
-    char* linebuf = (char *)malloc ( 1024 * sizeof (char) );
-    size_t size = 1024;
+    char* linebuf = NULL;
+    size_t size = 0;
     while( getline(&linebuf, &size, stdin) ){
         linebuf[strlen(linebuf)-1] = '\0';
 	if ( strcmp ( linebuf, "quit" ) == 0)
@@ -145,5 +145,7 @@ int main( int argc, char * argv[]){
 	g_array_free(keys, TRUE);
 	g_array_free(poses, TRUE);
     }
-    free(linebuf);
+    if (linebuf)
+        free(linebuf);
+    return 0;
 }

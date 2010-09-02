@@ -1,3 +1,4 @@
+#include <string.h>
 #include <stdio.h>
 #include <sys/time.h>
 #include "novel_types.h"
@@ -44,5 +45,30 @@ int main(int argc, char * argv[]){
     largetable.load_text(gbkfile);
     fclose(gbkfile);
 
+    char * linebuf = NULL;
+    size_t size = 0;
+    while( getline(&linebuf, &size, stdin) ){
+        linebuf[strlen(linebuf) - 1] = '\0';
+        if ( strcmp ( linebuf, "quit" ) == 0)
+            break;
 
+        glong phrase_len = g_utf8_strlen(linebuf, -1);
+        utf16_t * new_phrase = g_utf8_to_utf16(linebuf, -1, NULL, NULL, NULL);
+        phrase_token_t token;
+
+        guint32 start = record_time();
+        for ( int i = 0; i < bench_times; ++i){
+            largetable.search(phrase_len, new_phrase, token);
+        }
+        print_time(start, bench_times);
+
+        largetable.search(phrase_len, new_phrase, token);
+        printf("%s:\t%d\n", linebuf, token);
+
+        g_free(new_phrase);
+    }
+
+    if ( linebuf )
+        free(linebuf);
+    return 0;
 }
