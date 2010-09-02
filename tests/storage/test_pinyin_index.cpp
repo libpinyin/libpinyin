@@ -131,7 +131,7 @@ int main( int argc, char * argv[]){
 			    for ( size_t o = 0; o < item.get_phrase_length(); ++o){
 				printf("%s'", pinyin_buffer[o].get_key_string());
 			    }
-			    printf("\b \t %d", freq);
+			    printf("\b\t%d\t", freq);
 			}
 			printf("\n");
 		    }

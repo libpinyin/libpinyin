@@ -481,17 +481,17 @@ bool PinyinLargeTable::load_text(FILE * infile){
     char pinyin[256];
     char phrase[256];
     phrase_token_t token;
-    size_t freq;    
+    size_t freq;
 
     while ( !feof(infile) ) {
         fscanf(infile, "%s", pinyin);
         fscanf(infile, "%s", phrase);
         fscanf(infile, "%ld", &token);
-	fscanf(infile, "%ld", &freq);	
+	fscanf(infile, "%ld", &freq);
 
         if ( feof(infile) )
             break;
-	
+
 	PinyinDefaultParser parser;
 	NullPinyinValidator validator;
 	PinyinKeyVector keys;
