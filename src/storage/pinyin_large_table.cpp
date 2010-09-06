@@ -530,8 +530,8 @@ bool PinyinBitmapIndexLevel::load(MemoryChunk * chunk, table_offset_t offset,
 		assert( phrase_end <= end );
 		assert( *(buf_begin + phrase_end - 1) == c_separate);
 	    }
-    offset += (PINYIN_Number_Of_Initials * PINYIN_Number_Of_Finals * PINYIN_Number_Of_Tones + 1) * sizeof ( table_offset_t);
-    assert( c_separate == *(buf_begin + offset));
+    offset += (PINYIN_Number_Of_Initials * PINYIN_Number_Of_Finals * PINYIN_Number_Of_Tones + 1) * sizeof (table_offset_t);
+    assert( c_separate == *(buf_begin + offset) );
     return true;
 }
 
@@ -546,11 +546,11 @@ bool PinyinBitmapIndexLevel::store(MemoryChunk * new_chunk,
     offset += sizeof(char);
     new_chunk->set_content(index, &offset, sizeof(table_offset_t));
     index += sizeof(table_offset_t);
-    for ( int m = 0; m < PINYIN_Number_Of_Initials; ++m )
+    for ( int m = 0; m < PINYIN_Number_Of_Initials; ++m)
 	for ( int n = 0; n < PINYIN_Number_Of_Finals; ++n)
-	    for ( int k = 0; k < PINYIN_Number_Of_Tones; ++k){
+	    for ( int k = 0; k < PINYIN_Number_Of_Tones; ++k) {
 		PinyinLengthIndexLevel * phrases = m_pinyin_length_indexes[m][n][k];
-		if ( !phrases ){ //null pointer
+		if ( !phrases ) { //null pointer
 		    new_chunk->set_content(index, &offset, sizeof(table_offset_t));
 		    index += sizeof(table_offset_t);
 		    continue;
@@ -575,19 +575,19 @@ bool PinyinLengthIndexLevel::load(MemoryChunk * chunk, table_offset_t offset, ta
 
     table_offset_t phrase_begin, phrase_end = *index;
     m_pinyin_array_indexes = g_array_new(FALSE, TRUE, sizeof(void *));
-    for ( size_t i = 1; i <= nindex; i++){
+    for ( size_t i = 0; i < nindex; ++i) {
 	phrase_begin = phrase_end;
 	index++;
 	phrase_end = *index;
 	if ( phrase_begin == phrase_end ){
-	    void * null = NULL;
-	    g_array_append_val(m_pinyin_array_indexes , null);
+            void * null = NULL;
+	    g_array_append_val(m_pinyin_array_indexes, null);
 	    continue;
 	}
 
-#define CASE(x) case x - 1:						\
+#define CASE(len) case len:						\
 	{								\
-	    PinyinArrayIndexLevel<x> * phrase = new PinyinArrayIndexLevel<x>; \
+	    PinyinArrayIndexLevel<len> * phrase = new PinyinArrayIndexLevel<len>; \
 	    phrase->load(chunk, phrase_begin, phrase_end - 1);		\
 	    assert( *(buf_begin + phrase_end - 1) == c_separate);	\
 	    assert( phrase_end <= end );				\
@@ -614,6 +614,7 @@ bool PinyinLengthIndexLevel::load(MemoryChunk * chunk, table_offset_t offset, ta
 	default:
 	    assert(false);
 	}
+
 #undef CASE
     }
     offset += sizeof(guint32) + (nindex + 1) * sizeof(table_offset_t);
@@ -621,7 +622,7 @@ bool PinyinLengthIndexLevel::load(MemoryChunk * chunk, table_offset_t offset, ta
     return true;
 }
 
-bool PinyinLengthIndexLevel::store(MemoryChunk * new_chunk, table_offset_t offset, table_offset_t& end){
+bool PinyinLengthIndexLevel::store(MemoryChunk * new_chunk, table_offset_t offset, table_offset_t & end) {
     guint32 nindex = m_pinyin_array_indexes->len;
     new_chunk->set_content(offset, &nindex, sizeof(guint32));
     table_offset_t index = offset + sizeof(guint32);
@@ -631,11 +632,13 @@ bool PinyinLengthIndexLevel::store(MemoryChunk * new_chunk, table_offset_t offse
     offset += sizeof(char);
     new_chunk->set_content(index, &offset, sizeof(table_offset_t));
     index += sizeof(table_offset_t);
+
     table_offset_t phrase_end;
-    for ( size_t i = 0 ; i < m_pinyin_array_indexes->len; ++i){
-#define CASE(x) case x:	{						\
-	    PinyinArrayIndexLevel<x> * phrase = g_array_index		\
-		(m_pinyin_array_indexes, PinyinArrayIndexLevel<x> * , i); \
+    for ( size_t i = 0 ; i < m_pinyin_array_indexes->len; ++i) {
+#define CASE(len) case len:                                             \
+        {                                                               \
+	    PinyinArrayIndexLevel<len> * phrase = g_array_index		\
+		(m_pinyin_array_indexes, PinyinArrayIndexLevel<len> * , i); \
 	    if ( !phrase ){						\
 		new_chunk->set_content					\
 		    (index, &offset, sizeof(table_offset_t));		\
@@ -644,11 +647,6 @@ bool PinyinLengthIndexLevel::store(MemoryChunk * new_chunk, table_offset_t offse
 	    }								\
 	    phrase->store(new_chunk, offset, phrase_end);		\
 	    offset = phrase_end;					\
-	    /*add '#'*/							\
-	    new_chunk->set_content(offset, &c_separate, sizeof(char));	\
-	    offset += sizeof(char);					\
-	    new_chunk->set_content(index, &offset, sizeof(table_offset_t));\
-	    index += sizeof(table_offset_t);				\
 	    break;							\
 	}
 	switch ( i ){
@@ -671,6 +669,12 @@ bool PinyinLengthIndexLevel::store(MemoryChunk * new_chunk, table_offset_t offse
 	default:
 	    assert(false);
 	}
+        //add '#'
+        new_chunk->set_content(offset, &c_separate, sizeof(char));
+        offset += sizeof(char);
+        new_chunk->set_content(index, &offset, sizeof(table_offset_t));
+        index += sizeof(table_offset_t);
+
 #undef CASE							
     }
     end = offset;
@@ -687,7 +691,7 @@ load(MemoryChunk * chunk, table_offset_t offset, table_offset_t end){
 
 template<size_t phrase_length>
 bool PinyinArrayIndexLevel<phrase_length>::
-store(MemoryChunk * new_chunk, table_offset_t offset, table_offset_t& end){
+store(MemoryChunk * new_chunk, table_offset_t offset, table_offset_t & end) {
     new_chunk->set_content(offset, m_chunk.begin(), m_chunk.size());
     end = offset + m_chunk.size();
     return true;
