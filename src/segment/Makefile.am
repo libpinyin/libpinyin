@@ -21,8 +21,12 @@ INCLUDES		= -I$(top_srcdir)/src/include \
 			  -I$(top_srcdir)/src/storage \
 			  @GLIB2_CPPFLAGS@
 
-noinst_PROGRAMS		= mmseg
+noinst_PROGRAMS		= mmseg spseg
 
 mmseg_SOURCES		= mmseg.cpp
 
 mmseg_LDADD		= @GLIB2_LDFLAGS@
+
+spseg_SOURCES		= spseg.cpp
+
+spseg_LDADD		= @GLIB2_LDFLAGS@
