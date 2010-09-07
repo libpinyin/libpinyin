@@ -45,6 +45,10 @@ int main(int argc, char * argv[]){
     largetable.load_text(gbkfile);
     fclose(gbkfile);
 
+    MemoryChunk * chunk = new MemoryChunk;
+    largetable.store(chunk);
+    largetable.load(chunk);
+
     char * linebuf = NULL;
     size_t size = 0;
     while( getline(&linebuf, &size, stdin) ){
