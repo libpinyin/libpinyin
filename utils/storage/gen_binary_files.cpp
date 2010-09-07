@@ -26,33 +26,47 @@
 #include "pinyin_phrase.h"
 #include "pinyin_large_table.h"
 #include "phrase_index.h"
+#include "phrase_large_table.h"
 
 int main(int argc, char * argv[]){
     /* generate pinyin index*/
     PinyinCustomSettings custom;
-    PinyinLargeTable largetable(&custom);
+    PinyinLargeTable pinyinlargetable(&custom);
+    PhraseLargeTable phraselargetable;
 
     FILE * gbfile = fopen("../../data/gb_char.table", "r");
     if ( gbfile == NULL) {
 	printf("open gb_char.table failed!");
 	return 1;
     }
+
+    pinyinlargetable.load_text(gbfile);
+
+    fseek(gbfile, 0L, SEEK_SET);
+    phraselargetable.load_text(gbfile);
+    fclose(gbfile);
+
     FILE * gbkfile = fopen("../../data/gbk_char.table","r");
     if ( gbkfile == NULL) {
 	printf("open gb_char.table failed!");
 	return 1;
     }
     
-    largetable.load_text(gbfile);
-    fclose(gbfile);
-    largetable.load_text(gbkfile);
+    pinyinlargetable.load_text(gbkfile);
+
+    fseek(gbkfile, 0L, SEEK_SET);
+    phraselargetable.load_text(gbkfile);
     fclose(gbkfile);
 
     MemoryChunk * new_chunk = new MemoryChunk;
-    largetable.store(new_chunk);
+    pinyinlargetable.store(new_chunk);
     new_chunk->save("../../data/pinyin_index.bin");
-    largetable.load(new_chunk);
+    pinyinlargetable.load(new_chunk);
     
+    new_chunk = new MemoryChunk;
+    phraselargetable.store(new_chunk);
+    new_chunk->save("../../data/phrase_index.bin");
+    phraselargetable.load(new_chunk);
 
     /* generate phrase index*/
     FacadePhraseIndex phrase_index;
