@@ -20,6 +20,7 @@
  */
 
 #include <stdio.h>
+#include <locale.h>
 #include <glib.h>
 #include "novel_types.h"
 #include "phrase_large_table.h"
@@ -40,6 +41,11 @@ struct SegmentStep{
     size_t m_nword;
     //backtrace information, -1 one step backward.
     gint m_backword_nstep;
+};
+
+void print_help(){
+    printf("Usage: mmseg [--generate-extra-enter]\n");
+    exit(1);
 }
 
 int main(int argc, char * argv[]){
@@ -64,7 +70,7 @@ int main(int argc, char * argv[]){
 	fprintf(stderr, "can't open gb_char.table!\n");
 	exit(1);
     }
-    g_phrases.load_text(gb_file);
+    g_phrases->load_text(gb_file);
     fclose(gb_file);
 
     FILE * gbk_file = fopen("../../data/gbk_char.table", "r");
@@ -72,12 +78,12 @@ int main(int argc, char * argv[]){
 	fprintf(stderr, "can't open gbk_char.table!\n");
 	exit(1);
     }
-    g_phrases.load_text(gbk_file);
+    g_phrases->load_text(gbk_file);
     fclose(gbk_file);
 
     MemoryChunk * chunk = new MemoryChunk;
-    g_phrases.store(chunk);
-    g_phrases.load(chunk);
+    g_phrases->store(chunk);
+    g_phrases->load(chunk);
 
     return 0;
 }

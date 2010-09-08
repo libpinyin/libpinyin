@@ -29,4 +29,4 @@ mmseg_LDADD		= @GLIB2_LDFLAGS@
 
 spseg_SOURCES		= spseg.cpp
 
-spseg_LDADD		= @GLIB2_LDFLAGS@
+spseg_LDADD		= @GLIB2_LDFLAGS@ ../storage/libstorage.la
