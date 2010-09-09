@@ -20,6 +20,7 @@
  */
 
 #include <stdio.h>
+#include <string.h>
 #include <locale.h>
 #include <glib.h>
 #include "novel_types.h"
@@ -85,5 +86,14 @@ int main(int argc, char * argv[]){
     g_phrases->store(chunk);
     g_phrases->load(chunk);
 
+    char * linebuf = NULL;
+    size_t size = 0;
+    while(getline(&linebuf, &size, stdin)) {
+        if ( feof(stdin) )
+            break;
+        linebuf[strlen(linebuf) - 1] = '\0';
+
+        
+    }
     return 0;
 }
