@@ -23,3 +23,11 @@ MAINTAINERCLEANFILES 	= Makefile.in
 CLEANFILES		= *.bak 
 
 ACLOCAL			= aclocal -I $(ac_aux_dir)
+
+noinst_LTLIBRARIES	= libpinyin.la
+
+libpinyin_la_LDFLAGS	= -static
+
+libpinyin_la_SOURCES	= pinyin.cpp
+
+libpinyin_la_LIBADD	= storage/libstorage.la lookup/liblookup.la

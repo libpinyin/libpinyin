@@ -24,4 +24,4 @@ noinst_PROGRAMS          = test_simple_lookup
 
 test_simple_lookup_SOURCES = test_simple_lookup.cpp
 
-test_simple_lookup_LDADD   = ../../src/storage/libstorage.la ../../src/lookup/liblookup.la @GLIB2_LDFLAGS@
+test_simple_lookup_LDADD   = ../../src/libpinyin.la @GLIB2_LDFLAGS@

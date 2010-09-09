@@ -21,5 +21,5 @@ noinst_PROGRAMS          = test_memory_chunk
 
 test_memory_chunk_SOURCES    = test_memory_chunk.cpp
 
-test_memory_chunk_LDADD      = ../../src/storage/libstorage.la @GLIB2_LIBS@ 
+test_memory_chunk_LDADD      = ../../src/libpinyin.la @GLIB2_LIBS@
 
