@@ -41,7 +41,7 @@ struct SegmentStep{
     utf16_t * m_phrase;
     size_t m_phrase_len;
     //use formula W = number of words. Zero handle means one word.
-    size_t m_nword;
+    guint m_nword;
     //backtrace information, -1 one step backward.
     gint m_backward_nstep;
 public:
@@ -67,6 +67,9 @@ bool segment(PhraseLargeTable * phrases, //Lookup Phrase
     for ( glong i = 0; i < phrase_len + 1; ++i ){
         g_array_append_val(steps, step);
     }
+
+    SegmentStep * first_step = &g_array_index(steps, SegmentStep, 0);
+    first_step->m_nword = 0;
 
     for ( glong i = 0; i < phrase_len + 1; ++i ) {
         SegmentStep * step_begin = &g_array_index(steps, SegmentStep, i);
@@ -104,9 +107,10 @@ bool backtrace(GArray * steps, glong phrase_len, GArray * strings){
     g_array_set_size(strings, 0);
     while ( cur_step ){
         SegmentStep * step = &g_array_index(steps, SegmentStep, cur_step);
-        step->m_nword = 0; step->m_backward_nstep = 0;
         g_array_append_val(strings, *step);
         cur_step = cur_step + step->m_backward_nstep;
+        //intended to avoid leaking internal informations
+        step->m_nword = 0; step->m_backward_nstep = 0;
     }
 
     //reverse the strings
