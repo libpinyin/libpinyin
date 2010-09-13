@@ -77,7 +77,7 @@ bool segment(GHashTable * phrases, // Lookup Phrases
     assert( *p == '\0' );
 
     //initialize segment steps values.
-    for ( size_t i = 0; i < phrase_length + 1; ++i){
+    for ( size_t i = 1; i < phrase_length + 1; ++i){
 	SegmentStep* step = &g_array_index(steps, SegmentStep, i);
 	step->m_nword = UINT_MAX;
     }
