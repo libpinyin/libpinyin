@@ -351,3 +351,33 @@ int SubPhraseIndex::get_range(/* out */ PhraseIndexRange & range){
 
     return ERROR_OK;
 }
+
+bool FacadePhraseIndex::compat(){
+    for ( size_t index = 0; index < PHRASE_INDEX_LIBRARY_COUNT; ++index) {
+        SubPhraseIndex * sub_phrase = m_sub_phrase_indices[index];
+        if ( !sub_phrase )
+            continue;
+
+        SubPhraseIndex * new_sub_phrase =  new SubPhraseIndex;
+        PhraseIndexRange range;
+        int result = sub_phrase->get_range(range);
+        if ( result != ERROR_OK ) {
+            delete new_sub_phrase;
+            continue;
+        }
+
+        PhraseItem item;
+        for ( phrase_token_t token = range.m_range_begin;
+              token < range.m_range_end;
+              ++token ) {
+            result = sub_phrase->get_phrase_item(token, item);
+            if ( result != ERROR_OK )
+                continue;
+            new_sub_phrase->add_phrase_item(token, &item);
+        }
+
+        delete sub_phrase;
+        m_sub_phrase_indices[index] = new_sub_phrase;
+    }
+    return true;
+}

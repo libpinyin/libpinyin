@@ -210,6 +210,9 @@ public:
     bool store(guint8 phrase_index, MemoryChunk * new_chunk);
     bool unload(guint8 phrase_index);
 
+    /* compat all SubPhraseIndex m_phrase_content memory usage.*/
+    bool compat();
+
     /* get each sub phrase token range with phrase_index added */
     int get_range(guint8 phrase_index, /* out */ PhraseIndexRange & range);
 
