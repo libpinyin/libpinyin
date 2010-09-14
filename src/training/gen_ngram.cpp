@@ -28,28 +28,10 @@
 #include "novel_types.h"
 #include "phrase_index.h"
 #include "ngram.h"
+#include "phrase_large_table.h"
 
 
-static GHashTable * g_phrases;
-
-//read gb_char.table and gbk_char.table
-bool init_phrases(FILE * infile){
-    char pinyin[256];
-    char phrase[256];
-    phrase_token_t token;
-    size_t freq;
-    while (!feof(infile)){
-        fscanf(infile, "%s", pinyin);
-        fscanf(infile, "%s", phrase);
-        fscanf(infile, "%d", &token);
-        fscanf(infile, "%ld", &freq);
-        if ( feof(infile) )
-            break;
-	g_hash_table_insert(g_phrases, g_strdup(phrase), 
-			    GUINT_TO_POINTER(token));	
-    }
-	return true;
-}
+static PhraseLargeTable * g_phrases = NULL;
 
 void print_help(){
     printf("gen_ngram [--skip-pi-gram-training] [--skip-unigram-training]\n");
@@ -79,21 +61,21 @@ int main(int argc, char * argv[]){
 	++i;
     }
     
-    g_phrases = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, NULL);
+    g_phrases = new PhraseLargeTable;
     //init phrase lookup
     FILE * gb_file = fopen("../../data/gb_char.table", "r");
     if ( gb_file == NULL ){
 	fprintf(stderr, "can't open gb_char.table!\n");
 	exit(1);
     }
-    init_phrases(gb_file);
+    g_phrases->load_text(gb_file);
     fclose(gb_file);
     FILE * gbk_file = fopen("../../data/gbk_char.table", "r");
     if ( gbk_file == NULL ){
 	fprintf(stderr, "can't open gbk_char.table!\n");
 	exit(1);
     }
-    init_phrases(gbk_file);
+    g_phrases->load_text(gbk_file);
     fclose(gbk_file);
 
     FacadePhraseIndex phrase_index;
@@ -119,17 +101,15 @@ int main(int argc, char * argv[]){
 	if ( feof(stdin) )
 	    break;
         linebuf[strlen(linebuf)-1] = '\0';
-	
-	phrase_token_t token;
-	gpointer orig_key, value;
-	gboolean result = g_hash_table_lookup_extended
-	    (g_phrases, linebuf, &orig_key, &value);
-	if (result){
-	    token = GPOINTER_TO_UINT(value);
-	}else{
+
+        glong phrase_len = 0;
+        utf16_t * phrase = g_utf8_to_utf16(linebuf, -1, NULL, &phrase_len, NULL);
+
+	phrase_token_t token = 0;
+        int result = g_phrases->search( phrase_len, phrase, token);
+	if ( ! (result & SEARCH_OK) )
 	    token = 0;
-	}
-	
+
 	last_token = cur_token;
 	cur_token = token;
 	if ( cur_token ){
