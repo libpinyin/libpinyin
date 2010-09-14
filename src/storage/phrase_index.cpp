@@ -346,7 +346,7 @@ int SubPhraseIndex::get_range(/* out */ PhraseIndexRange & range){
     const table_offset_t * begin = (const table_offset_t *)m_phrase_index.begin();
     const table_offset_t * end = (const table_offset_t *)m_phrase_index.end();
 
-    range.m_range_begin = 0;
+    range.m_range_begin = 1; /* token starts with 1 in gen_pinyin_table. */
     range.m_range_end = end - begin;
 
     return ERROR_OK;

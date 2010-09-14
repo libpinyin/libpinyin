@@ -40,13 +40,20 @@ int main(int argc, char * argv[]){
     chunk->load("../../data/gbk_char.bin");
     phrase_index.load(2, chunk);
 
-    for ( size_t i = 16777217; i <= 16870566; ++i){
-	phrase_index.add_unigram_frequency(i, 1);
+    PhraseIndexRange range;
+    int result = phrase_index.get_range(1, range);
+    if ( result == ERROR_OK ) {
+        for ( size_t i = range.m_range_begin; i <= range.m_range_end; ++i){
+            phrase_index.add_unigram_frequency(i, 1);
+        }
     }
 
 #if 0
-    for ( size_t i = 33554433; i <= 33570193 ; ++i){
-	phrase_index.add_unigram_frequency(i, 1);
+    int result = phrase_index.get_range(2, range);
+    if ( result == ERROR_OK ) {
+        for ( size_t i = range.m_range_begin; i <= range.m_range_end; ++i){
+            phrase_index.add_unigram_frequency(i, 1);
+        }
     }
 #endif
 
