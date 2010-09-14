@@ -89,6 +89,8 @@ int main(int argc, char * argv[]){
     phrase_index.load_text(2, infile);
     fclose(infile);
 
+    phrase_index.compat();
+
     new_chunk = new MemoryChunk;
     phrase_index.store(1, new_chunk);
     new_chunk->save("../../data/gb_char.bin");

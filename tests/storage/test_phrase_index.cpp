@@ -110,6 +110,8 @@ int main(int argc, char * argv[]){
     phrase_index_load.load_text(2, infile);
     fclose(infile);
 
+    phrase_index.compat();
+
     MemoryChunk* store1 = new MemoryChunk;
     phrase_index_load.store(1, store1);
     phrase_index_load.load(1, store1);
@@ -117,6 +119,8 @@ int main(int argc, char * argv[]){
     MemoryChunk* store2 = new MemoryChunk;
     phrase_index_load.store(2, store2);
     phrase_index_load.load(2, store2);
+
+    phrase_index.compat();
 
     phrase_index_load.get_phrase_item(16870555, item2);
     assert( item2.get_phrase_length() == 14);
