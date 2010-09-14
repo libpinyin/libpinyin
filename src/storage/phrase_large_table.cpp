@@ -321,7 +321,7 @@ bool PhraseLargeTable::load_text(FILE * infile){
     while ( !feof(infile) ) {
         fscanf(infile, "%s", pinyin);
         fscanf(infile, "%s", phrase);
-        fscanf(infile, "%ld", &token);
+        fscanf(infile, "%u", &token);
         fscanf(infile, "%ld", &freq);
 
         if ( feof(infile) )

@@ -283,7 +283,7 @@ bool FacadePhraseIndex::load_text(guint8 phrase_index, FILE * infile){
     while ( !feof(infile)){
         fscanf(infile, "%s", pinyin);
         fscanf(infile, "%s", phrase);
-        fscanf(infile, "%ld", &token);
+        fscanf(infile, "%u", &token);
 	fscanf(infile, "%ld", &freq);
 	if ( feof(infile) )
 	    break;

@@ -206,7 +206,7 @@ PinyinLengthIndexLevel::~PinyinLengthIndexLevel(){
 	    delete array;						\
 	break;  							\
     }
-    for ( int i = 0 ; i < m_pinyin_array_indexes->len; ++i){
+    for ( size_t i = 0 ; i < m_pinyin_array_indexes->len; ++i){
 	switch (i){
 	    CASE(0);
 	    CASE(1);
@@ -312,7 +312,7 @@ int PinyinArrayIndexLevel<phrase_length>::convert(PinyinCustomSettings * custom,
 
         result |= SEARCH_OK;
 
-	if ( cursor.m_range_begin == -1 ){
+	if ( cursor.m_range_begin == (phrase_token_t) -1 ){
 	    cursor.m_range_begin = token;
 	    cursor.m_range_end = token + 1;
 	    cursor_head = head;
@@ -326,7 +326,7 @@ int PinyinArrayIndexLevel<phrase_length>::convert(PinyinCustomSettings * custom,
 	    cursor_head = head;
 	}
     }
-    if ( cursor.m_range_begin == -1 )
+    if ( cursor.m_range_begin == (phrase_token_t) -1 )
 	return result;
 
     g_array_append_val(cursor_head, cursor);
@@ -486,7 +486,7 @@ bool PinyinLargeTable::load_text(FILE * infile){
     while ( !feof(infile) ) {
         fscanf(infile, "%s", pinyin);
         fscanf(infile, "%s", phrase);
-        fscanf(infile, "%ld", &token);
+        fscanf(infile, "%u", &token);
 	fscanf(infile, "%ld", &freq);
 
         if ( feof(infile) )
