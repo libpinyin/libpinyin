@@ -22,21 +22,33 @@
 #ifndef TAG_UTILITY_H
 #define TAG_UTILITY_H
 
+/* Note: the optional tag has been removed from the first implementation.
+ * Maybe the optional tag will be added back later.
+ */
+
 bool taglib_init();
 
 /* Note: most string array (const char *) are null pointer terminated. */
-bool taglib_add_tag(int line_type, const char * line_tag, int num_of_values, const char * required_tags[], const char * optional_tags[], const char * ignored_tags[]);
+bool taglib_add_tag(int line_type, const char * line_tag, int num_of_values, const char * required_tags[], const char * ignored_tags[]);
 
-/* most parameters are Array of string (const char *).
- * required tags are listed in the beginning of the array.
- */
-bool taglib_read(const char * input_line, int & line_type, GPtrArray * values, GPtrArray * tagnames, GPtrArray * tagvalues);
+/* most parameters are hash table of string (const char *). */
+bool taglib_read(const char * input_line, int & line_type, GPtrArray * values, GHashTable * required);
 
 /* Note: taglib_write is omited, as printf is more suitable for this. */
 
-bool taglib_report_status(int line_type);
+/* Note the following function is only available when the optional tag exists.
+ * bool taglib_report_status(int line_type);
+ */
 
-/* clear up the tag of type line_type. */
-bool taglib_fini(int line_type);
+/* remove the tag of type line_type. */
+bool taglib_remove_tag(int line_type);
+
+/* the following functions are used to save current known tag list in stack.
+ * Used when the parsing context is changed.
+ */
+bool taglib_push_state();
+bool taglib_pop_state();
+
+bool taglib_fini();
 
 #endif
