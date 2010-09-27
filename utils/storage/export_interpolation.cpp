@@ -91,7 +91,7 @@ void gen_unigram(FILE * output, FacadePhraseIndex * phrase_index) {
             size_t freq = item.get_unigram_frequency();
             char * phrase = token_to_string(phrase_index, j);
             if ( phrase )
-                fprintf(output, "\\item %s count %d\n", phrase, freq);
+                fprintf(output, "\\item %s count %lu\n", phrase, freq);
 
             g_free(phrase);
         }
@@ -110,9 +110,8 @@ void gen_bigram(FILE * output, FacadePhraseIndex * phrase_index, Bigram * bigram
     g_array_free(user_items, TRUE);
 
     PhraseItem item;
-    utf16_t buffer[MAX_PHRASE_LENGTH];
 
-    for(int i = 0; i < system_items->len; i++){
+    for(size_t i = 0; i < system_items->len; i++){
         phrase_token_t token = g_array_index(system_items, phrase_token_t, i);
         SingleGram * system = NULL, * user = NULL;
         bigram->load(token, system, user);
@@ -120,7 +119,7 @@ void gen_bigram(FILE * output, FacadePhraseIndex * phrase_index, Bigram * bigram
 
         BigramPhraseWithCountArray array = g_array_new(FALSE, FALSE, sizeof(BigramPhraseItemWithCount));
         system->retrieve_all(array);
-        for(int j = 0; j < array->len; j++) {
+        for(size_t j = 0; j < array->len; j++) {
             BigramPhraseItemWithCount * item = &g_array_index(array, BigramPhraseItemWithCount, j);
 
             char * word1 = token_to_string(phrase_index, token);
