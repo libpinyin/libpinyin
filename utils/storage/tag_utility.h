@@ -63,7 +63,7 @@ bool taglib_fini();
         ;
 
 #define TAGLIB_REQUIRED_TAGS const char * required_tags_saved[]
-/* #define TAGLIB_OPTIONAL_TAGS const char * optional_tags_saved */
+/* #define TAGLIB_OPTIONAL_TAGS const char * optional_tags_saved[] */
 #define TAGLIB_IGNORED_TAGS const char * ignored_tags_saved[]
 
 #define TAGLIB_END_ADD_TAG                                              \

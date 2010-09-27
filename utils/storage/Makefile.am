@@ -19,6 +19,8 @@ INCLUDES                = -I$(top_srcdir)/src/include \
 			  -I$(top_srcdir)/src/storage \
 			  @GLIB2_CPPFLAGS@
 
+noinst_HEADERS		= tag_utility.h
+
 noinst_PROGRAMS          = gen_pinyin_table gen_binary_files export_interpolation
 
 gen_pinyin_table_SOURCES    = gen_pinyin_table.cpp

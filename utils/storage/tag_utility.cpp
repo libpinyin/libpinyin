@@ -9,6 +9,7 @@ struct tag_entry{
     int m_num_of_values;
     const char ** m_required_tags;
     /* const char ** m_optional_tags; */
+    /* int m_optional_count = 0; */
     const char ** m_ignored_tags;
 
 public:
