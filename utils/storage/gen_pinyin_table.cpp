@@ -169,7 +169,7 @@ void feed_line (const char * phrase, const char * pinyin, const guint32 freq){
 	return;
     }
     bool found = false;
-    for ( int i = 0; i < array->len ; ++i){
+    for ( size_t i = 0; i < array->len ; ++i){
 	pinyin_and_freq_item * old_value_item = &g_array_index(array, pinyin_and_freq_item, i);
 	int result = pinyin_exact_compare((PinyinKey *)value_item.pinyin->data, 
 					  (PinyinKey *)old_value_item->pinyin->data , value_item.pinyin->len);
@@ -233,10 +233,10 @@ void gen_phrase_file(const char * outfilename, int phrase_index){
     phrase_token_t token = 1;
     char pinyin_buffer[4096];
     //phrase length
-    for ( int i = 1; i < MAX_PHRASE_LENGTH + 1; ++i){
+    for ( size_t i = 1; i < MAX_PHRASE_LENGTH + 1; ++i){
 	GArray * item_array = g_item_array[i];
 	//item array
-	for( int m = 0; m < item_array->len; ++m){
+	for( size_t m = 0; m < item_array->len; ++m){
 	    item* oneitem = & g_array_index(item_array, item, m);
 	    phrase_item * phrase = oneitem->phrase;
 	    GArray * pinyin_and_freqs = oneitem->pinyin_and_freq_array;
@@ -244,7 +244,7 @@ void gen_phrase_file(const char * outfilename, int phrase_index){
 						 phrase->length, 
 						 NULL, NULL, NULL);
 	    //each pinyin
-	    for( int n = 0 ; n < pinyin_and_freqs->len; ++n){
+	    for( size_t n = 0 ; n < pinyin_and_freqs->len; ++n){
 		pinyin_and_freq_item * pinyin_and_freq = &g_array_index(pinyin_and_freqs, pinyin_and_freq_item, n);
 		GArray * pinyin = pinyin_and_freq->pinyin;
 		PinyinKey * key = &g_array_index(pinyin, PinyinKey, 0);
