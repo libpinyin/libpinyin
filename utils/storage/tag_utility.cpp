@@ -120,6 +120,7 @@ bool taglib_fini(){
         taglib_free_tag_array(tag_array);
     }
     g_ptr_array_free(g_tagutils_stack, TRUE);
+    g_tagutils_stack = NULL;
     return true;
 }
 
