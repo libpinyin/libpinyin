@@ -69,8 +69,9 @@ bool taglib_fini();
 #define TAGLIB_IGNORED_TAGS const char * ignored_tags_saved[]
 
 #define TAGLIB_END_ADD_TAG                                              \
-    taglib_add_tag(line_type_saved, line_tag_saved, num_of_values_saved, \
-                   required_tags_saved, ignored_tags_saved);            \
+    assert(taglib_add_tag(line_type_saved, line_tag_saved,              \
+                          num_of_values_saved,                          \
+                          required_tags_saved, ignored_tags_saved));    \
     };
 
 #endif

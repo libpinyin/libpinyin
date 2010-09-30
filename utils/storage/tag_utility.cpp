@@ -1,3 +1,4 @@
+#include <string.h>
 #include <assert.h>
 #include <glib.h>
 #include "tag_utility.h"
@@ -63,10 +64,18 @@ bool taglib_add_tag(int line_type, const char * line_tag, int num_of_values,
                     const char * required_tags[], const char * ignored_tags[]){
     GArray * tag_array = (GArray *) g_ptr_array_index(g_tagutils_stack,
                                      g_tagutils_stack->len - 1);
+
+    /* some duplicate tagname or line_type check here. */
+    for ( size_t i = 0; i < tag_array->len; ++i) {
+        tag_entry * entry = &g_array_index(tag_array, tag_entry, i);
+        if ( entry->m_line_type == line_type ||
+             strcmp( entry->m_line_tag, line_tag ) == 0 )
+            return false;
+    }
+
     tag_entry entry = tag_entry_copy(line_type, line_tag, num_of_values,
                                      (char **)required_tags,
                                      (char **)ignored_tags);
-    /* TODO: maybe also do some duplicate tagname or line_type check here. */
     g_array_append_val(tag_array, entry);
     return true;
 }
