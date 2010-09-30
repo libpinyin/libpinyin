@@ -129,6 +129,40 @@ bool taglib_read(const char * input_line, int & line_type, GPtrArray * values,
 
     for ( int i = cur_entry->m_num_of_values + 1; i < num_of_tokens; ++i){
         g_return_val_if_fail(i < num_of_tokens, false);
+        const char * tmp = tokens[i];
+
+        /* check ignored tags. */
+        bool ignored = false;
+        int ignored_len = g_strv_length( entry->m_ignored_tags );
+        for ( int m = 0; m < ignored_len; ++m) {
+            if ( strcmp(tmp, entry->m_ignored_tags[i]) == 0) {
+                ignored = true;
+                break;
+            }
+        }
+
+        if ( ignored ) {
+            ++i;
+            continue;
+        }
+
+        /* check required tags. */
+        bool required = false;
+        int required_len = g_strv_length( entry->m_required_tags);
+        for ( int m = 0; m < required_len; ++m) {
+            if ( strcmp(tmp, entry->m_required_tags[i]) == 0) {
+                required = true;
+                break;
+            }
+        }
+
+        /* warning on the un-expected tags. */
+        if ( !required ) {
+            g_warning("un-expected tags:%s.\n", tmp);
+            ++i;
+            continue;
+        }
+
         char * key = g_strdup(tokens[i]);
         ++i;
         g_return_val_if_fail(i < num_of_tokens, false);
