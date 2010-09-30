@@ -80,12 +80,64 @@ bool taglib_add_tag(int line_type, const char * line_tag, int num_of_values,
     return true;
 }
 
+static void ptr_array_entry_free(gpointer data, gpointer user_data){
+    g_free(data);
+}
+
+static gboolean hash_table_key_value_free(gpointer key, gpointer value,
+                                          gpointer user_data){
+    g_free(key);
+    g_free(value);
+    return TRUE;
+}
+
 bool taglib_read(const char * input_line, int & line_type, GPtrArray * values,
                  GHashTable * required){
-    /* TODO: implement this. */
-    assert(false);
+    /* reset values and required. */
+    g_ptr_array_foreach(values, ptr_array_entry_free, NULL);
+    g_ptr_array_set_size(values, 0);
+    g_hash_table_foreach_steal(required, hash_table_key_value_free, NULL);
+
     /* use own version of string split
-       instead of g_strsplit for special token.*/
+       instead of g_strsplit_set for special token.*/
+    char ** tokens = g_strsplit_set(input_line, " \t", -1);
+    int num_of_tokens = g_strv_length(tokens);
+
+    char * line_tag = tokens[0];
+    GArray * tag_array = (GArray *) g_ptr_array_index(g_tagutils_stack, g_tagutils_stack->len - 1);
+
+    tag_entry * cur_entry = NULL;
+    /* find line type. */
+    for ( size_t i = 0; i < tag_array->len; ++i) {
+        tag_entry * entry = &g_array_index(tag_array, tag_entry, i);
+        if ( strcmp( entry->m_line_tag, line_tag ) == 0 ) {
+            cur_entry = entry;
+            break;
+        }
+    }
+
+    if ( !cur_entry )
+        return false;
+
+    line_type = cur_entry->m_line_type;
+
+    for ( int i = 1; i < cur_entry->m_num_of_values + 1; ++i) {
+        g_return_val_if_fail(i < num_of_tokens, false);
+        char * value = g_strdup( tokens[i] );
+        g_ptr_array_add(values, value);
+    }
+
+    for ( int i = cur_entry->m_num_of_values + 1; i < num_of_tokens; ++i){
+        g_return_val_if_fail(i < num_of_tokens, false);
+        char * key = g_strdup(tokens[i]);
+        ++i;
+        g_return_val_if_fail(i < num_of_tokens, false);
+        char * value = g_strdup(tokens[i]);
+        g_hash_table_insert(required, key, value);
+    }
+
+    g_strfreev(tokens);
+    return true;
 }
 
 bool taglib_remove_tag(int line_type){
