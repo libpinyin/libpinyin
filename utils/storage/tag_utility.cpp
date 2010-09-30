@@ -127,37 +127,38 @@ bool taglib_read(const char * input_line, int & line_type, GPtrArray * values,
         g_ptr_array_add(values, value);
     }
 
+    int ignored_len = g_strv_length( cur_entry->m_ignored_tags );
+    int required_len = g_strv_length( cur_entry->m_required_tags);
+
     for ( int i = cur_entry->m_num_of_values + 1; i < num_of_tokens; ++i){
         g_return_val_if_fail(i < num_of_tokens, false);
         const char * tmp = tokens[i];
 
         /* check ignored tags. */
-        bool ignored = false;
-        int ignored_len = g_strv_length( entry->m_ignored_tags );
+        bool tag_ignored = false;
         for ( int m = 0; m < ignored_len; ++m) {
-            if ( strcmp(tmp, entry->m_ignored_tags[i]) == 0) {
-                ignored = true;
+            if ( strcmp(tmp, cur_entry->m_ignored_tags[i]) == 0) {
+                tag_ignored = true;
                 break;
             }
         }
 
-        if ( ignored ) {
+        if ( tag_ignored ) {
             ++i;
             continue;
         }
 
         /* check required tags. */
-        bool required = false;
-        int required_len = g_strv_length( entry->m_required_tags);
+        bool tag_required = false;
         for ( int m = 0; m < required_len; ++m) {
-            if ( strcmp(tmp, entry->m_required_tags[i]) == 0) {
-                required = true;
+            if ( strcmp(tmp, cur_entry->m_required_tags[i]) == 0) {
+                tag_required = true;
                 break;
             }
         }
 
         /* warning on the un-expected tags. */
-        if ( !required ) {
+        if ( !tag_required ) {
             g_warning("un-expected tags:%s.\n", tmp);
             ++i;
             continue;
@@ -168,6 +169,17 @@ bool taglib_read(const char * input_line, int & line_type, GPtrArray * values,
         g_return_val_if_fail(i < num_of_tokens, false);
         char * value = g_strdup(tokens[i]);
         g_hash_table_insert(required, key, value);
+    }
+
+    /* check for all required tags. */
+    for ( int i = 0; i < required_len; ++i) {
+        const char * required_tag_str = cur_entry->m_required_tags[i];
+        gboolean result = g_hash_table_lookup_extended(required, required_tag_str, NULL, NULL);
+        if ( !result ) {
+            g_warning("missed required tags: %s.\n", required_tag_str);
+            g_strfreev(tokens);
+            return false;
+        }
     }
 
     g_strfreev(tokens);
