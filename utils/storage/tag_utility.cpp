@@ -118,6 +118,7 @@ static gchar ** split_line(const gchar * line){
             continue;
         }else if ( unichar == quote ) {
             /* handles "\"". */
+            begin = cur = g_utf8_next_char(cur);
             while (*cur) {
                 unichar = g_utf8_get_char(cur);
                 if ( unichar == backslash ) {
@@ -125,9 +126,8 @@ static gchar ** split_line(const gchar * line){
                     g_return_val_if_fail(*cur, NULL);
                 } else if ( unichar == quote ){
                     break;
-                } else {
-                    cur = g_utf8_next_char(cur);
                 }
+                cur = g_utf8_next_char(cur);
             }
             gchar * tmp = g_strndup( begin, cur - begin);
             token = g_strdup_printf(tmp);
