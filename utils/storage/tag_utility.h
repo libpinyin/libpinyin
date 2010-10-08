@@ -31,9 +31,7 @@ bool taglib_init();
 /* Note: most string array (const char *) are null pointer terminated. */
 bool taglib_add_tag(int line_type, const char * line_tag, int num_of_values, const char * required_tags[], const char * ignored_tags[]);
 
-/* most parameters are hash table of string (const char *).
- * "..." special token handling is also omitted from the first implementation.
- */
+/* most parameters are hash table of string (const char *). */
 bool taglib_read(const char * input_line, int & line_type, GPtrArray * values, GHashTable * required);
 
 /* Note: taglib_write is omited, as printf is more suitable for this. */

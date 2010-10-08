@@ -49,6 +49,16 @@ static bool taglib_free_tag_array(GArray * tag_array){
     return true;
 }
 
+/* special unichar to be handled in split_line. */
+static gunichar backslash = 0;
+static gunichar quote = 0;
+
+static gboolean split_line_init(){
+    backslash = g_utf8_get_char("\\");
+    quote = g_utf8_get_char("\"");
+    return TRUE;
+}
+
 /* Pointer Array of Array of tag_entry */
 static GPtrArray * g_tagutils_stack = NULL;
 
@@ -57,6 +67,9 @@ bool taglib_init(){
     g_tagutils_stack = g_ptr_array_new();
     GArray * tag_array = g_array_new(TRUE, TRUE, sizeof(tag_entry));
     g_ptr_array_add(g_tagutils_stack, tag_array);
+
+    /* init split_line. */
+    split_line_init();
     return true;
 }
 
@@ -91,6 +104,56 @@ static gboolean hash_table_key_value_free(gpointer key, gpointer value,
     return TRUE;
 }
 
+/* split the line into tokens. */
+static gchar ** split_line(const gchar * line){
+    /* array for tokens. */
+    GArray * tokens = g_array_new(TRUE, TRUE, sizeof(gchar *));
+
+    for ( const gchar * cur = line; *cur; cur = g_utf8_next_char(cur) ){
+        gunichar unichar = g_utf8_get_char(cur);
+        const gchar * begin = cur;
+        gchar * token = NULL;
+
+        if ( g_unichar_isspace (unichar) ) {
+            continue;
+        }else if ( unichar == quote ) {
+            /* handles "\"". */
+            while (*cur) {
+                unichar = g_utf8_get_char(cur);
+                if ( unichar == backslash ) {
+                    cur = g_utf8_next_char(cur);
+                    g_return_val_if_fail(*cur, NULL);
+                } else if ( unichar == quote ){
+                    break;
+                } else {
+                    cur = g_utf8_next_char(cur);
+                }
+            }
+            gchar * tmp = g_strndup( begin, cur - begin);
+            token = g_strdup_printf(tmp);
+            g_free(tmp);
+        } else {
+            /* handles other tokens. */
+            while(*cur) {
+                unichar = g_utf8_get_char(cur);
+                if ( g_unichar_isgraph(unichar) ) {
+                    cur = g_utf8_next_char(cur);
+                } else {
+                    /* space and other characters handles. */
+                    break;
+                }
+            }
+            token = g_strndup( begin, cur - begin );
+        }
+
+        g_array_append_val(tokens, token);
+        if ( !*cur )
+            break;
+    }
+
+    return (gchar **)g_array_free(tokens, FALSE);
+}
+
 bool taglib_read(const char * input_line, int & line_type, GPtrArray * values,
                  GHashTable * required){
     /* reset values and required. */
@@ -98,9 +161,9 @@ bool taglib_read(const char * input_line, int & line_type, GPtrArray * values,
     g_ptr_array_set_size(values, 0);
     g_hash_table_foreach_steal(required, hash_table_key_value_free, NULL);
 
-    /* use own version of string split
+    /* use own version of split_line
        instead of g_strsplit_set for special token.*/
-    char ** tokens = g_strsplit_set(input_line, " \t", -1);
+    char ** tokens = split_line(input_line);
     int num_of_tokens = g_strv_length(tokens);
 
     char * line_tag = tokens[0];
