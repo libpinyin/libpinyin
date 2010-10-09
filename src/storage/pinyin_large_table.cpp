@@ -27,6 +27,54 @@
 #include "pinyin_large_table.h"
 
 
+/* class definition */
+
+namespace novel{
+
+class PinyinLengthIndexLevel{
+protected:
+    GArray* m_pinyin_array_indexes;
+public:
+    PinyinLengthIndexLevel();
+    ~PinyinLengthIndexLevel();
+    bool load(MemoryChunk * chunk, table_offset_t offset, table_offset_t end);
+    bool store(MemoryChunk * new_chunk, table_offset_t offset, table_offset_t & end);
+
+    /*search/add_index method */
+    int search( int phrase_length, /* in */ PinyinCustomSettings * custom,
+		/* in */ PinyinKey keys[],
+		/* out */ PhraseIndexRanges ranges);
+    int add_index( int phrase_length, /* in */ PinyinKey keys[], /* in */ phrase_token_t token);
+    int remove_index( int phrase_length, /* in */ PinyinKey keys[], /* in */ phrase_token_t token);
+};
+
+template<size_t phrase_length>
+class PinyinArrayIndexLevel{
+protected:
+    MemoryChunk m_chunk;
+    int convert(PinyinCustomSettings * custom,
+		PinyinKey keys[],
+		PinyinIndexItem<phrase_length> * begin,
+		PinyinIndexItem<phrase_length> * end,
+		PhraseIndexRanges ranges);
+public:
+    bool load(MemoryChunk * chunk, table_offset_t offset, table_offset_t end);
+    bool store(MemoryChunk * new_chunk, table_offset_t offset, table_offset_t & end);
+
+    /*search/add_index method */
+    int search(/* in */ PinyinCustomSettings * custom,
+	       /* in */ PinyinKey keys[],
+	       /* out */ PhraseIndexRanges ranges);
+    int add_index(/* in */ PinyinKey keys[], /* in */ phrase_token_t token);
+    int remove_index(/* in */ PinyinKey keys[], /* in */ phrase_token_t token);
+};
+
+};
+
+using namespace novel;
+
+/* class implementation */
+
 PinyinBitmapIndexLevel::PinyinBitmapIndexLevel(PinyinCustomSettings * custom)
     :m_custom(custom){
     memset(m_pinyin_length_indexes, 0, sizeof(m_pinyin_length_indexes));
