@@ -123,6 +123,7 @@ static gchar ** split_line(const gchar * line){
             continue;
         }else if ( unichar == quote ) {
             /* handles "\"". */
+            /* skip the first '"'. */
             begin = cur = g_utf8_next_char(cur);
             while (*cur) {
                 unichar = g_utf8_get_char(cur);
@@ -135,7 +136,8 @@ static gchar ** split_line(const gchar * line){
                 cur = g_utf8_next_char(cur);
             }
             gchar * tmp = g_strndup( begin, cur - begin);
-            /* TODO: switch to strdup_escape for \"->" transforming. */
+            /* TODO: switch to own strdup_escape implementation
+               for \"->" transforming. */
             token = g_strdup_printf(tmp);
             g_free(tmp);
         } else {
@@ -143,6 +145,7 @@ static gchar ** split_line(const gchar * line){
             while(*cur) {
                 unichar = g_utf8_get_char(cur);
                 if ( g_unichar_isgraph(unichar) ) {
+                    /* next unichar */
                     cur = g_utf8_next_char(cur);
                 } else {
                     /* space and other characters handles. */
