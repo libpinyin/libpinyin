@@ -55,41 +55,6 @@ public:
     int remove_index( int phrase_length, /* in */ utf16_t phrase[], /* out */ phrase_token_t & token);
 };
 
-class PhraseLengthIndexLevel{
-protected:
-    GArray* m_phrase_array_indexes;
-public:
-    PhraseLengthIndexLevel();
-    ~PhraseLengthIndexLevel();
-
-    /* load/store method */
-    bool load(MemoryChunk * chunk, table_offset_t offset, table_offset_t end);
-    bool store(MemoryChunk * new_chunk, table_offset_t offset, table_offset_t & end);
-
-    /* search/add_index/remove_index method */
-    int search( int phrase_length, /* in */ utf16_t phrase[],
-                /* out */ phrase_token_t & token);
-
-    int add_index( int phrase_length, /* in */ utf16_t phrase[], /* in */ phrase_token_t token);
-    int remove_index( int phrase_length, /* in */ utf16_t phrase[], /* out */ phrase_token_t & token);
-};
-
-template<size_t phrase_length>
-class PhraseArrayIndexLevel{
-protected:
-    MemoryChunk m_chunk;
-public:
-    bool load(MemoryChunk * chunk, table_offset_t offset, table_offset_t end);
-    bool store(MemoryChunk * new_chunk, table_offset_t offset, table_offset_t & end);
-
-    /* search/add_index/remove_index method */
-    int search( /* in */ utf16_t phrase[],
-                /* out */ phrase_token_t & token);
-
-    int add_index(/* in */ utf16_t phrase[], /* in */ phrase_token_t token);
-    int remove_index(/* in */ utf16_t phrase[], /* out */ phrase_token_t & token);
-};
-
 class PhraseLargeTable{
 protected:
     PhraseBitmapIndexLevel m_bitmap_table;
