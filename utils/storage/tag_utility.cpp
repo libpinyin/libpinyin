@@ -74,7 +74,7 @@ bool taglib_init(){
 }
 
 bool taglib_add_tag(int line_type, const char * line_tag, int num_of_values,
-                    const char * required_tags[], const char * ignored_tags[]){
+                    const char * required_tags, const char * ignored_tags){
     GArray * tag_array = (GArray *) g_ptr_array_index(g_tagutils_stack,
                                      g_tagutils_stack->len - 1);
 
@@ -86,10 +86,15 @@ bool taglib_add_tag(int line_type, const char * line_tag, int num_of_values,
             return false;
     }
 
+    char ** required = g_strsplit_set(required_tags, ",:", -1);
+    char ** ignored = g_strsplit_set(ignored_tags, ",:", -1);
+
     tag_entry entry = tag_entry_copy(line_type, line_tag, num_of_values,
-                                     (char **)required_tags,
-                                     (char **)ignored_tags);
+                                     required, ignored);
     g_array_append_val(tag_array, entry);
+
+    g_strfreev(required);
+    g_strfreev(ignored);
     return true;
 }
 
@@ -130,6 +135,7 @@ static gchar ** split_line(const gchar * line){
                 cur = g_utf8_next_char(cur);
             }
             gchar * tmp = g_strndup( begin, cur - begin);
+            /* TODO: switch to strdup_escape for \"->" transforming. */
             token = g_strdup_printf(tmp);
             g_free(tmp);
         } else {
@@ -295,8 +301,5 @@ bool taglib_fini(){
 }
 
 void test(){
-    TAGLIB_BEGIN_ADD_TAG(1, "\\data", 0);
-    TAGLIB_REQUIRED_TAGS = {"model", NULL};
-    TAGLIB_IGNORED_TAGS = {"data", NULL};
-    TAGLIB_END_ADD_TAG;
+    assert(taglib_add_tag(2, "\\data", 1, "data", ""));
 }
