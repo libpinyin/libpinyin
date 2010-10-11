@@ -21,7 +21,7 @@ INCLUDES                = -I$(top_srcdir)/src/include \
 
 noinst_HEADERS		= tag_utility.h
 
-noinst_PROGRAMS          = gen_pinyin_table gen_binary_files export_interpolation
+noinst_PROGRAMS          = gen_pinyin_table gen_binary_files export_interpolation import_interpolation
 
 gen_pinyin_table_SOURCES    = gen_pinyin_table.cpp
 
@@ -40,3 +40,7 @@ noinst_LTLIBRARIES        = libtagutils.la
 libtagutils_la_LDFLAGS    = -static
 
 libtagutils_la_SOURCES    = tag_utility.cpp
+
+import_interpolation_SOURCES = import_interpolation.cpp
+
+import_interpolation_LDADD = ../../src/libpinyin.la @GLIB2_LDFLAGS@ ./libtagutils.la
