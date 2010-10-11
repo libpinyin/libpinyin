@@ -209,7 +209,7 @@ bool taglib_read(const char * input_line, int & line_type, GPtrArray * values,
         /* check ignored tags. */
         bool tag_ignored = false;
         for ( int m = 0; m < ignored_len; ++m) {
-            if ( strcmp(tmp, cur_entry->m_ignored_tags[i]) == 0) {
+            if ( strcmp(tmp, cur_entry->m_ignored_tags[m]) == 0) {
                 tag_ignored = true;
                 break;
             }
@@ -223,7 +223,7 @@ bool taglib_read(const char * input_line, int & line_type, GPtrArray * values,
         /* check required tags. */
         bool tag_required = false;
         for ( int m = 0; m < required_len; ++m) {
-            if ( strcmp(tmp, cur_entry->m_required_tags[i]) == 0) {
+            if ( strcmp(tmp, cur_entry->m_required_tags[m]) == 0) {
                 tag_required = true;
                 break;
             }
