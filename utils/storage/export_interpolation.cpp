@@ -22,8 +22,8 @@
 #include <stdio.h>
 #include <assert.h>
 #include <glib.h>
-#include "memory_chunk.h"
 #include "novel_types.h"
+#include "memory_chunk.h"
 #include "phrase_index.h"
 #include "ngram.h"
 
@@ -44,7 +44,7 @@ void end_data(FILE * file){
 }
 
 int main(int argc, char * argv[]){
-    FILE * file = stdout;
+    FILE * output = stdout;
     const char * bigram_filename = "../../data/bigram.db";
 
     FacadePhraseIndex phrase_index;
@@ -62,12 +62,12 @@ int main(int argc, char * argv[]){
     Bigram bigram;
     bigram.attach(bigram_filename, NULL);
 
-    begin_data(file);
+    begin_data(output);
 
-    gen_unigram(stdout, &phrase_index);
-    gen_bigram(stdout, &phrase_index, &bigram);
+    gen_unigram(output, &phrase_index);
+    gen_bigram(output, &phrase_index, &bigram);
 
-    end_data(stdout);
+    end_data(output);
     return 0;
 }
 
