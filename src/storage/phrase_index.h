@@ -52,7 +52,7 @@ namespace novel{
  * Store this in user home directory.
  */
 
-const int phrase_item_header = sizeof(guint8) + sizeof(guint8) + sizeof(guint32);
+const size_t phrase_item_header = sizeof(guint8) + sizeof(guint8) + sizeof(guint32);
 
 class PhraseItem{
     friend class SubPhraseIndex;
