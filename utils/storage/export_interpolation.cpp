@@ -36,7 +36,7 @@ void gen_bigram(FILE * output, FacadePhraseIndex * phrase_index, Bigram * bigram
 char * token_to_string(FacadePhraseIndex * phrase_index, phrase_token_t token);
 
 void begin_data(FILE * file){
-    fprintf(file, "\\data\n");
+    fprintf(file, "\\data model interpolation\n");
 }
 
 void end_data(FILE * file){
