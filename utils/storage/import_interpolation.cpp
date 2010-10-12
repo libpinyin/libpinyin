@@ -107,8 +107,7 @@ bool parse_unigram(FILE * input, PhraseLargeTable * phrases,
         switch(line_type) {
         case GRAM_1_ITEM_LINE:{
             /* handle \item in \1-gram */
-            assert(values->len == 1);
-            const char * string = (const char *)g_ptr_array_index(values, 0);
+            const char * string = (const char *) g_ptr_array_index(values, 0);
             phrase_token_t token = string_to_token(phrases, string);
             char * value = NULL;
             assert(g_hash_table_lookup_extended(required, "count", NULL, (gpointer *)&value));
@@ -136,6 +135,62 @@ bool parse_bigram(FILE * input, PhraseLargeTable * phrases,
     taglib_push_state();
 
     assert(taglib_add_tag(GRAM_2_ITEM_LINE, "\\item", 2, "count", ""));
+
+    phrase_token_t last_token = 0; SingleGram * last_single_gram = NULL;
+    do {
+        assert(taglib_read(linebuf, line_type, values, required));
+        switch(line_type) {
+        case GRAM_2_ITEM_LINE:{
+            /* handle \item in \2-gram */
+            /* two tokens */
+            const char * string = (const char *) g_ptr_array_index(values, 0);
+            phrase_token_t token1 = string_to_token(phrases, string);
+            string = (const char *) g_ptr_array_index(values, 1);
+            phrase_token_t token2 = string_to_token(phrases, string);
+
+            /* tag: count */
+            char * value = NULL;
+            assert(g_hash_table_lookup_extended(required, "count", NULL, (gpointer *)&value));
+            glong count = atol(value);
+
+            if ( last_token != token1 ) {
+                if ( last_token && last_single_gram ) {
+                    bigram->store(last_token, last_single_gram);
+                    delete last_single_gram;
+                    //safe guard
+                    last_token = 0;
+                    last_single_gram = NULL;
+                }
+                SingleGram * system_gram = NULL, * user_gram = NULL;
+                bigram->load(token1, system_gram, user_gram);
+                assert(system_gram == NULL);
+
+                //create the new single gram
+                if ( user_gram == NULL )
+                    user_gram = new SingleGram;
+                last_token = token1;
+                last_single_gram = user_gram;
+            }
+            last_single_gram->set_freq(token2, count);
+            break;
+        }
+        case END_LINE:
+        case GRAM_1_LINE:
+        case GRAM_2_LINE:
+            goto end;
+        default:
+            assert(false);
+        }
+    } while (my_getline(input) != -1);
+
+ end:
+    if ( last_token && last_single_gram ) {
+        bigram->store(last_token, last_single_gram);
+        delete last_single_gram;
+        //safe guard
+        last_token = 0;
+        last_single_gram = NULL;
+    }
 
     taglib_pop_state();
     return true;
