@@ -155,6 +155,7 @@ static const char * special_token_to_string(phrase_token_t token){
             return pair->string;
     }
 
+    fprintf(stderr, "error: unknown token:%d.\n", token);
     return NULL;
 }
 
@@ -169,8 +170,10 @@ char * token_to_string(FacadePhraseIndex * phrase_index, phrase_token_t token) {
     }
 
     int result = phrase_index->get_phrase_item(token, item);
-    if (result != ERROR_OK)
+    if (result != ERROR_OK) {
+        fprintf(stderr, "error: unknown token:%d.\n", token);
         return NULL;
+    }
 
     item.get_phrase_string(buffer);
     guint8 length = item.get_phrase_length();
