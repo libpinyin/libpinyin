@@ -29,7 +29,7 @@
 
 class WinnerTree;
 
-/** @file lookup.h
+/** @file pinyin_lookup.h
  *  @brief the definitions of lookup related classes and structs.
  *         Currently only contains pinyin lookup.
  */

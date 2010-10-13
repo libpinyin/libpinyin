@@ -15,7 +15,7 @@
 ## along with this program; if not, write to the Free Software
 ## Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
-EXTRA_DIST		= config.rpath COPYING 
+EXTRA_DIST		= COPYING
 
 AUTOMAKE_OPTIONS 	= gnu
 SUBDIRS 		= src utils tests

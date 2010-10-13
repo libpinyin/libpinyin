@@ -23,7 +23,6 @@
 #define LOOKUP_WINNER_TREE_H
 
 #include <assert.h>
-#include "lookup.h"
 
 const int nbranch = 32;
 

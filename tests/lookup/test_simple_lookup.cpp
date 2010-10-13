@@ -8,7 +8,7 @@
 #include "pinyin_large_table.h"
 #include "phrase_index.h"
 #include "ngram.h"
-#include "lookup.h"
+#include "pinyin_lookup.h"
 
 size_t bench_times = 1000;
 

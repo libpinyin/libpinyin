@@ -24,7 +24,7 @@
 #include <stdio.h>
 #include "memory_chunk.h"
 #include "phrase_index.h"
-#include "lookup.h"
+#include "pinyin_lookup.h"
 #include "winner_tree.h"
 
 WinnerTreeBranchIterator::WinnerTreeBranchIterator(WinnerTree & tree)
