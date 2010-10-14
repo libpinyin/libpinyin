@@ -37,9 +37,13 @@ class WinnerTree;
 typedef phrase_token_t lookup_key_t;
 
 struct lookup_value_t{
+    /* previous and current tokens of the node */
     phrase_token_t m_handles[2];
+    /* maximum possibility of current node  */
     gfloat m_poss;
+    /* trace back information for final step */
     gint32 m_last_step;
+
     lookup_value_t(gfloat poss = FLT_MAX){
 	m_handles[0] = NULL; m_handles[1] = NULL;
 	m_poss = poss;
@@ -50,7 +54,24 @@ struct lookup_value_t{
 enum constraint_type{NO_CONSTRAINT, CONSTRAINT_ONESTEP, CONSTRAINT_NOSEARCH };
 
 struct lookup_constraint_t{
+    /* current type of the step */
     constraint_type m_type;
+
+    /* Note:
+     *   value of m_type:
+     *     NO_CONSTRAINT:
+     *       no values in the below union.
+     *       search all possible next words.
+     *     CONSTRAINT_ONESTEP:
+     *       m_token contains the next word.
+     *       only one word can be used to search for the next step,
+     *       use case for user selected candidates.
+     *     CONSTRAINT_NOSEARCH:
+     *       m_constraint_step contains the value
+     *       which points back to the CONSTRAINT_ONESTEP step.
+     *       no search is allowed for the current step.
+     */
+
     union{
 	phrase_token_t m_token;
 	guint32 m_constraint_step; /* index of m_token */
@@ -66,11 +87,26 @@ class FacadePhraseIndex;
 class Bigram;
 };
 
+/* Note:
+ *   LookupStepIndex:
+ *     the main purpose of lookup step index is served for an index
+ *     for lookup step content, which can quickly merge the same node
+ *     with different possibilities,
+ *     then only keep the highest value of the node.
+ *   LookupStepContent:
+ *     the place to store the lookup values of current step,
+ *     and indexed by lookup step index.
+ *     See also comments on lookup_value_t.
+ */
+
 typedef GHashTable * LookupStepIndex;
 /* Key: lookup_key_t, Value: int m, index to m_steps_content[i][m] */
 typedef GArray * LookupStepContent; /* array of lookup_value_t */
 
 
+/* Note:
+ *   winner tree for beam search.
+ */
 class IBranchIterator{
 public:
   virtual ~IBranchIterator(){}
