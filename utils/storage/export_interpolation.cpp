@@ -88,7 +88,7 @@ void gen_unigram(FILE * output, FacadePhraseIndex * phrase_index) {
             size_t freq = item.get_unigram_frequency();
             char * phrase = token_to_string(phrase_index, j);
             if ( phrase )
-                fprintf(output, "\\item %s count %lu\n", phrase, freq);
+                fprintf(output, "\\item %s count %ld\n", phrase, freq);
 
             g_free(phrase);
         }

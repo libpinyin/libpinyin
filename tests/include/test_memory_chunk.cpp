@@ -11,14 +11,14 @@ int main(int argc, char * argv[]){
   int * p = (int *)chunk->begin();
   assert(chunk->size() == sizeof(int));
   printf("%d\n", *p);
-  printf("%d\n", chunk->capacity());
+  printf("%ld\n", chunk->capacity());
 
   p = & i;
   chunk->set_chunk(p, sizeof(int), NULL);
   short t = 5;
   chunk->set_content(sizeof(int), &t, sizeof(short));
   assert( sizeof(int) + sizeof(short) == chunk->size());
-  printf("%d\n", chunk->capacity());
+  printf("%ld\n", chunk->capacity());
 
   p = (int *)chunk->begin();
   short * p2 =(short *)(((char *) (chunk->begin())) + sizeof(int));
@@ -27,7 +27,7 @@ int main(int argc, char * argv[]){
   chunk->set_content(sizeof(int) + sizeof(short), &t, sizeof(short));
   
   assert( sizeof(int) + (sizeof(short) << 1) == chunk->size());
-  printf("%d\n", chunk->capacity());
+  printf("%ld\n", chunk->capacity());
   p = (int *)chunk->begin();
   p2 =(short *)(((char *) (chunk->begin())) + sizeof(int));
   printf("%d\t%d\t%d\n", *p, *p2, *(p2 + 1));
