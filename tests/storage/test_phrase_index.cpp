@@ -1,9 +1,7 @@
 #include <stdio.h>
 #include <sys/time.h>
 #include <glib.h>
-#include "memory_chunk.h"
-#include "pinyin_base.h"
-#include "phrase_index.h"
+#include "pinyin.h"
 
 size_t bench_times = 100000;
 

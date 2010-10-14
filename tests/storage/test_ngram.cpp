@@ -1,7 +1,5 @@
 #include <stdio.h>
-#include "memory_chunk.h"
-#include "novel_types.h"
-#include "ngram.h"
+#include "pinyin.h"
 
 
 int main(int argc, char * argv[]){

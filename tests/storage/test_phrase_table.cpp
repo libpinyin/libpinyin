@@ -1,8 +1,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <sys/time.h>
-#include "novel_types.h"
-#include "phrase_large_table.h"
+#include "pinyin.h"
 
 size_t bench_times = 1000;
 

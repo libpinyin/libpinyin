@@ -1,11 +1,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <sys/time.h>
-#include "novel_types.h"
-#include "pinyin_base.h"
-#include "pinyin_phrase.h"
-#include "pinyin_large_table.h"
-#include "phrase_index.h"
+#include "pinyin.h"
 
 size_t bench_times = 1000;
 

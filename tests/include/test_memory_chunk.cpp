@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include "memory_chunk.h"
+#include "pinyin.h"
 
 //Test Memory Chunk Functionality
 int main(int argc, char * argv[]){

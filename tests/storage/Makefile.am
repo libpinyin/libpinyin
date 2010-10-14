@@ -15,9 +15,11 @@
 ## along with this program; if not, write to the Free Software
 ## Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
-INCLUDES                = -I$(top_srcdir)/src/include \
-			  -I$(top_srcdir)/src/storage \
-			  @GLIB2_CPPFLAGS@
+INCLUDES                = -I$(top_srcdir)/src \
+                          -I$(top_srcdir)/src/include \
+                          -I$(top_srcdir)/src/storage \
+                          -I$(top_srcdir)/src/lookup \
+                          @GLIB2_CPPFLAGS@
 
 noinst_PROGRAMS          = test_parser \
 			   test_pinyin_index \
