@@ -45,7 +45,7 @@ struct lookup_value_t{
     gint32 m_last_step;
 
     lookup_value_t(gfloat poss = FLT_MAX){
-	m_handles[0] = NULL; m_handles[1] = NULL;
+	m_handles[0] = null_token; m_handles[1] = null_token;
 	m_poss = poss;
 	m_last_step = -1;
     }

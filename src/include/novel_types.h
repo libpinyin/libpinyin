@@ -125,6 +125,7 @@ enum AttachOption{
 
 #define MAX_PHRASE_LENGTH 16
 
+const phrase_token_t null_token = 0;
 const phrase_token_t sentence_start = 1;
 const phrase_token_t token_min = 0;
 const phrase_token_t token_max = UINT_MAX;
