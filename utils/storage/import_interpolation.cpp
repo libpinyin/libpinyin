@@ -21,11 +21,7 @@
 
 #include <stdio.h>
 #include <glib.h>
-#include "novel_types.h"
-#include "memory_chunk.h"
-#include "phrase_index.h"
-#include "ngram.h"
-#include "phrase_large_table.h"
+#include "pinyin.h"
 #include "tag_utility.h"
 
 enum LINE_TYPE{

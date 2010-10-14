@@ -22,10 +22,7 @@
 #include <stdio.h>
 #include <assert.h>
 #include <glib.h>
-#include "novel_types.h"
-#include "memory_chunk.h"
-#include "phrase_index.h"
-#include "ngram.h"
+#include "pinyin.h"
 
 /* export interpolation model as textual format */
 

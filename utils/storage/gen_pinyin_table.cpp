@@ -22,9 +22,7 @@
 #include <stdio.h>
 #include <locale.h>
 #include <glib.h>
-#include "novel_types.h"
-#include "pinyin_base.h"
-#include "pinyin_phrase.h"
+#include "pinyin.h"
 
 
 GTree * g_pinyin_tree;

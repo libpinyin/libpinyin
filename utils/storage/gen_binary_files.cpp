@@ -20,13 +20,7 @@
  */
 
 #include <stdio.h>
-#include "memory_chunk.h"
-#include "novel_types.h"
-#include "pinyin_base.h"
-#include "pinyin_phrase.h"
-#include "pinyin_large_table.h"
-#include "phrase_index.h"
-#include "phrase_large_table.h"
+#include "pinyin.h"
 
 int main(int argc, char * argv[]){
     /* generate pinyin index*/
