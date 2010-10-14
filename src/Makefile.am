@@ -24,6 +24,14 @@ CLEANFILES		= *.bak
 
 ACLOCAL			= aclocal -I $(ac_aux_dir)
 
+INCLUDES                = -I$(top_srcdir)/src \
+			  -I$(top_srcdir)/src/include \
+			  -I$(top_srcdir)/src/storage \
+			  -I$(top_srcdir)/src/lookup \
+                          @GLIB2_CPPFLAGS@
+
+noinst_HEADERS		= pinyin.h
+
 noinst_LTLIBRARIES	= libpinyin.la
 
 libpinyin_la_LDFLAGS	= -static
