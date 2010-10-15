@@ -87,7 +87,7 @@ int main( int argc, char * argv[]){
 	    phrase_token_t * token = &g_array_index(results, phrase_token_t, i);
 	    if ( NULL == *token)
 		continue;
-	    printf("pos:%d,token:%d\t", i, *token);
+	    printf("pos:%ld,token:%d\t", i, *token);
 	}
 	printf("\n");
 	char * sentence = NULL;

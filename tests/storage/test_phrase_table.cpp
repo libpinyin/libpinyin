@@ -60,7 +60,7 @@ int main(int argc, char * argv[]){
         phrase_token_t token;
 
         guint32 start = record_time();
-        for ( int i = 0; i < bench_times; ++i){
+        for ( size_t i = 0; i < bench_times; ++i){
             largetable.search(phrase_len, new_phrase, token);
         }
         print_time(start, bench_times);

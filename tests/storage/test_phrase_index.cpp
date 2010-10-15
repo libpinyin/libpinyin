@@ -64,7 +64,7 @@ int main(int argc, char * argv[]){
 
     PhraseItem item2;
     guint32 time = record_time();
-    for ( int i = 0; i < bench_times; ++i){
+    for ( size_t i = 0; i < bench_times; ++i){
 	phrase_index.get_phrase_item(1, item2);
 	assert(item2.get_unigram_frequency() == 0);
 	assert(item2.get_n_pronunciation() == 2);

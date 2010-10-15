@@ -12,7 +12,7 @@ int main(int argc, char * argv[]){
     phrase_token_t tokens[6] = { 2, 6, 4, 3, 1, 3};
     guint32 freqs[6] = { 1, 2, 4, 8, 16, 32};
 
-    for(int i = 0; i < 6 ;++i){
+    for(size_t i = 0; i < 6 ;++i){
 	single_gram.set_freq(tokens[i], freqs[i]);
     }
 
@@ -25,7 +25,7 @@ int main(int argc, char * argv[]){
     BigramPhraseArray array = g_array_new(FALSE, FALSE, sizeof(BigramPhraseItem));
     range.m_range_begin = 0; range.m_range_end = 8;
     single_gram.search(&range,array);
-    for ( int i = 0; i < array->len; ++i){
+    for ( size_t i = 0; i < array->len; ++i){
 	BigramPhraseItem * item = &g_array_index(array, BigramPhraseItem, i);
 	printf("item:%d:%f\n", item->m_token, item->m_freq);
     } 
@@ -50,7 +50,7 @@ int main(int argc, char * argv[]){
     g_array_set_size(array, 0);
     range.m_range_begin = 0; range.m_range_end = 8;
     user->search(&range,array);
-    for ( int i = 0; i < array->len; ++i){
+    for ( size_t i = 0; i < array->len; ++i){
 	BigramPhraseItem * item = &g_array_index(array, BigramPhraseItem, i);
 	printf("item:%d:%f\n", item->m_token, item->m_freq);
     } 
@@ -62,7 +62,7 @@ int main(int argc, char * argv[]){
     g_array_set_size(array, 0);
     range.m_range_begin = 0; range.m_range_end = 8;
     user->search(&range,array);
-    for ( int i = 0; i < array->len; ++i){
+    for ( size_t i = 0; i < array->len; ++i){
 	BigramPhraseItem * item = &g_array_index(array, BigramPhraseItem, i);
 	printf("item:%d:%f\n", item->m_token, item->m_freq);
     } 
@@ -75,7 +75,7 @@ int main(int argc, char * argv[]){
     g_array_set_size(array, 0);
     range.m_range_begin = 0; range.m_range_end = 8;
     system->search(&range,array);
-    for ( int i = 0; i < array->len; ++i){
+    for ( size_t i = 0; i < array->len; ++i){
 	BigramPhraseItem * item = &g_array_index(array, BigramPhraseItem, i);
 	printf("item:%d:%f\n", item->m_token, item->m_freq);
     } 
@@ -87,7 +87,7 @@ int main(int argc, char * argv[]){
     g_array_set_size(array, 0);
     range.m_range_begin = 0; range.m_range_end = 8;
     system->search(&range,array);
-    for ( int i = 0; i < array->len; ++i){
+    for ( size_t i = 0; i < array->len; ++i){
 	BigramPhraseItem * item = &g_array_index(array, BigramPhraseItem, i);
 	printf("item:%d:%f\n", item->m_token, item->m_freq);
     }
@@ -98,7 +98,7 @@ int main(int argc, char * argv[]){
     g_array_set_size(array, 0);
     range.m_range_begin = 0; range.m_range_end = 8;
     single_gram.search(&range,array);
-    for ( int i = 0; i < array->len; ++i){
+    for ( size_t i = 0; i < array->len; ++i){
         BigramPhraseItem * item = &g_array_index(array, BigramPhraseItem, i);
         printf("item:%d:%f\n", item->m_token, item->m_freq);
     }
@@ -112,12 +112,12 @@ int main(int argc, char * argv[]){
     bigram.get_all_items(system_items, user_items);
 
     printf("----------------------system----------------------------\n");
-    for ( int i = 0; i < system_items->len; ++i){
+    for ( size_t i = 0; i < system_items->len; ++i){
 	phrase_token_t * token = &g_array_index(system_items, phrase_token_t, i);
 	printf("item:%d\n", *token);
     }
     printf("-----------------------user-----------------------------\n");
-    for ( int i = 0; i < user_items->len; ++i){
+    for ( size_t i = 0; i < user_items->len; ++i){
 	phrase_token_t * token = &g_array_index(user_items, phrase_token_t, i);
 	printf("item:%d\n", *token);
     }

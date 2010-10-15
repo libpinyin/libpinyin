@@ -135,7 +135,7 @@ int main (int argc, char * argv [])
 
         for ( size_t i=0; i < poses->len; ++i){
             PinyinKeyPos * pos = &g_array_index(poses, PinyinKeyPos, i);
-            printf("%d %d ", pos->get_pos(), pos->get_length());
+            printf("%d %ld ", pos->get_pos(), pos->get_length());
         }
         printf("\n");
 

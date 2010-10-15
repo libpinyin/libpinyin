@@ -89,26 +89,26 @@ int main( int argc, char * argv[]){
 	guint32 start = record_time();
 
 	PhraseIndexRanges ranges;
-	for( int i = 0 ; i < PHRASE_INDEX_LIBRARY_COUNT ; ++i){
+	for( size_t i = 0 ; i < PHRASE_INDEX_LIBRARY_COUNT ; ++i){
 	    ranges[i] = g_array_new(FALSE, FALSE, sizeof (PhraseIndexRange));
 	}
-	for ( int i = 0 ; i < bench_times; ++i){
+	for ( size_t i = 0 ; i < bench_times; ++i){
 	    largetable.search(keys->len, (PinyinKey *)keys->data, ranges);
 	}
        
-	for( int i = 0 ; i < PHRASE_INDEX_LIBRARY_COUNT ; ++i){
+	for( size_t i = 0 ; i < PHRASE_INDEX_LIBRARY_COUNT ; ++i){
 	    GArray * range = ranges[i];
 	    g_array_set_size( range, 0);
 	}
 	print_time(start, bench_times);
 
 	largetable.search(keys->len, (PinyinKey *)keys->data, ranges);
-	for( int i = 0 ; i < PHRASE_INDEX_LIBRARY_COUNT ; ++i){
+	for( size_t i = 0 ; i < PHRASE_INDEX_LIBRARY_COUNT ; ++i){
 	    GArray * range = ranges[i];
 	    if ( range ){
-		for (int k = 0; k < range->len; ++k){
+		for (size_t k = 0; k < range->len; ++k){
 		    PhraseIndexRange* onerange = &g_array_index(range, PhraseIndexRange, k);
-		    printf("start:%ld\tend:%ld\n", onerange->m_range_begin, onerange->m_range_end); 
+		    printf("start:%d\tend:%d\n", onerange->m_range_begin, onerange->m_range_end); 
 		    PhraseItem item;
 		    for ( phrase_token_t token = onerange->m_range_begin; token != onerange->m_range_end; ++token){
 			phrase_index.get_phrase_item( token, item);
