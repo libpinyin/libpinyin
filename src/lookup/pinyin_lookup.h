@@ -19,8 +19,8 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#ifndef LOOKUP_H
-#define LOOKUP_H
+#ifndef PINYIN_LOOKUP_H
+#define PINYIN_LOOKUP_H
 
 #include <float.h>
 #include <glib.h>
