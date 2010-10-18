@@ -21,7 +21,8 @@ INCLUDES		= -I$(top_srcdir)/src/include \
 			  -I$(top_srcdir)/src/storage \
 			  @GLIB2_CPPFLAGS@
 
-noinst_HEADERS		= pinyin_lookup.h winner_tree.h
+noinst_HEADERS		= lookup.h pinyin_lookup.h \
+			  phrase_lookup.h winner_tree.h
 
 noinst_PROGRAMS		= 
 

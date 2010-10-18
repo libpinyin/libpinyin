@@ -26,30 +26,13 @@
 #include <glib.h>
 #include "novel_types.h"
 #include "pinyin_base.h"
+#include "lookup.h"
 
 class WinnerTree;
 
 /** @file pinyin_lookup.h
- *  @brief the definitions of lookup related classes and structs.
- *         Currently only contains pinyin lookup.
+ *  @brief the definitions of pinyin lookup related classes and structs.
  */
-
-typedef phrase_token_t lookup_key_t;
-
-struct lookup_value_t{
-    /* previous and current tokens of the node */
-    phrase_token_t m_handles[2];
-    /* maximum possibility of current node  */
-    gfloat m_poss;
-    /* trace back information for final step */
-    gint32 m_last_step;
-
-    lookup_value_t(gfloat poss = FLT_MAX){
-	m_handles[0] = null_token; m_handles[1] = null_token;
-	m_poss = poss;
-	m_last_step = -1;
-    }
-};
 
 enum constraint_type{NO_CONSTRAINT, CONSTRAINT_ONESTEP, CONSTRAINT_NOSEARCH };
 
