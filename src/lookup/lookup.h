@@ -43,4 +43,29 @@ struct lookup_value_t{
     }
 };
 
+typedef GArray * MatchResults;         /* Array of phrase_token_t */
+
+namespace novel{
+    class PinyinLargeTable;
+    class PhraseLargeTable;
+    class FacadePhraseIndex;
+    class Bigram;
+};
+
+/* Note:
+ *   LookupStepIndex:
+ *     the main purpose of lookup step index is served for an index
+ *     for lookup step content, which can quickly merge the same node
+ *     with different possibilities,
+ *     then only keep the highest value of the node.
+ *   LookupStepContent:
+ *     the place to store the lookup values of current step,
+ *     and indexed by lookup step index.
+ *     See also comments on lookup_value_t.
+ */
+
+typedef GHashTable * LookupStepIndex;
+/* Key: lookup_key_t, Value: int m, index to m_steps_content[i][m] */
+typedef GArray * LookupStepContent; /* array of lookup_value_t */
+
 #endif

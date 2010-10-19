@@ -29,5 +29,28 @@
  *  @brief the definitions of phrase lookup related classes and structs.
  */
 
+class PhraseLookup{
+private:
+
+protected:
+    //saved varibles
+    novel::PhraseLargeTable * m_phrase_table;
+    novel::FacadePhraseIndex * m_phrase_index;
+    novel::Bigram * m_bigram;
+
+    //internal step data structure
+    GPtrArray * m_steps_index;
+    /* Array of LookupStepIndex */
+    GPtrArray * m_steps_content;
+    /* Array of LookupStepContent */
+
+    GArray * m_table_cache;
+    /* Array of phrase_token_t, for phrase lookup. */
+
+public:
+    bool get_best_match(int sentence_length, utf16_t sentence[], MatchResults & results);
+
+    bool convert_to_utf8(MatchResults results, /* out */ char * & result_string);
+};
 
 #endif
