@@ -70,13 +70,15 @@ AC_CONFIG_FILES([Makefile
 		 src/Makefile
                  src/include/Makefile
                  src/storage/Makefile
-		 src/segment/Makefile
-		 src/training/Makefile
 		 src/lookup/Makefile
 		 tests/Makefile
                  tests/include/Makefile
                  tests/storage/Makefile
 		 tests/lookup/Makefile
 		 utils/Makefile
-                 utils/storage/Makefile])
+                 utils/storage/Makefile
+                 utils/segment/Makefile
+                 utils/training/Makefile
+])
+
 AC_OUTPUT

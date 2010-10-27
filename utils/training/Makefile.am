@@ -19,18 +19,19 @@ MAINTAINERCLEANFILES    = Makefile.in
 
 INCLUDES		= -I$(top_srcdir)/src/include \
 			  -I$(top_srcdir)/src/storage \
+                          -I$(top_srcdir)/src/lookup \
 			  @GLIB2_CPPFLAGS@
 
 noinst_PROGRAMS		= gen_ngram gen_unigram estimate_interpolation
 
 gen_ngram_SOURCES	= gen_ngram.cpp
 
-gen_ngram_LDADD		= ../storage/libstorage.la @GLIB2_LDFLAGS@
+gen_ngram_LDADD		= @GLIB2_LDFLAGS@ ../../src/libpinyin.la
 
 gen_unigram_SOURCES     = gen_unigram.cpp
 
-gen_unigram_LDADD       = ../storage/libstorage.la @GLIB2_LDFLAGS@
+gen_unigram_LDADD       = @GLIB2_LDFLAGS@ ../../src/libpinyin.la
 
 estimate_interpolation_SOURCES = estimate_interpolation.cpp
 
-estimate_interpolation_LDADD = ../storage/libstorage.la @GLIB2_LDFLAGS@
+estimate_interpolation_LDADD = @GLIB2_LDFLAGS@ ../../src/libpinyin.la

@@ -19,10 +19,11 @@ MAINTAINERCLEANFILES    = Makefile.in
 
 INCLUDES		= -I$(top_srcdir)/src/include \
 			  -I$(top_srcdir)/src/storage \
+			  -I$(top_srcdir)/src/lookup \
 			  @GLIB2_CPPFLAGS@
 
 noinst_PROGRAMS		= spseg
 
 spseg_SOURCES		= spseg.cpp
 
-spseg_LDADD		= @GLIB2_LDFLAGS@ ../storage/libstorage.la
+spseg_LDADD		= @GLIB2_LDFLAGS@ ../../src/libpinyin.la

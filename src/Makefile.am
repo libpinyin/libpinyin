@@ -16,7 +16,7 @@
 ## Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 AUTOMAKE_OPTIONS 	= gnu
-SUBDIRS 		= include storage segment training lookup
+SUBDIRS 		= include storage lookup
 
 MAINTAINERCLEANFILES 	= Makefile.in 
 
