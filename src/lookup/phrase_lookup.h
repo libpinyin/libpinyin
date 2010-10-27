@@ -30,8 +30,6 @@
  */
 
 class PhraseLookup{
-private:
-
 protected:
     //saved varibles
     novel::PhraseLargeTable * m_phrase_table;
@@ -44,9 +42,23 @@ protected:
     GPtrArray * m_steps_content;
     /* Array of LookupStepContent */
 
-    GArray * m_table_cache;
-    /* Array of phrase_token_t, for phrase lookup. */
+    /* Saved sentence */
+    int m_sentence_length;
+    utf16_t * m_sentence;
 
+protected:
+    /* Explicitly search the next phrase,
+     *  to avoid double phrase lookup as the next token has only one.
+     */
+    bool search_unigram(int nstep, phrase_token_t token);
+    bool search_bigram(int nstep, phrase_token_t token);
+
+    bool unigram_gen_next_step(int nstep, lookup_value_t * cur_step, phrase_token_t token);
+    bool bigram_gen_next_step(int nstep, lookup_value_t * cur_step, phrase_token_t token, gfloat bigram_poss);
+
+    bool save_next_step(int next_step_pos, lookup_value_t * cur_step, lookup_value_t * next_step);
+
+    bool final_step(MatchResults & results);
 public:
     bool get_best_match(int sentence_length, utf16_t sentence[], MatchResults & results);
 
