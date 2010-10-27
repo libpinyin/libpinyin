@@ -20,9 +20,7 @@
  */
 
 #include <stdio.h>
-#include "memory_chunk.h"
-#include "novel_types.h"
-#include "phrase_index.h"
+#include "pinyin.h"
 
 //increase all unigram frequency by one.
 

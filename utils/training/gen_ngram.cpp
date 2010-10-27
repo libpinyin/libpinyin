@@ -24,12 +24,7 @@
 #include <string.h>
 #include <locale.h>
 #include <glib.h>
-#include "memory_chunk.h"
-#include "novel_types.h"
-#include "phrase_index.h"
-#include "ngram.h"
-#include "phrase_large_table.h"
-
+#include "pinyin.h"
 
 static PhraseLargeTable * g_phrases = NULL;
 

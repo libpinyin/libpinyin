@@ -23,8 +23,7 @@
 #include <string.h>
 #include <locale.h>
 #include <glib.h>
-#include "novel_types.h"
-#include "phrase_large_table.h"
+#include "pinyin.h"
 
 /* graph shortest path sentence segment. */
 

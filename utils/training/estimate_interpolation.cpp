@@ -25,10 +25,7 @@
 #include <locale.h>
 #include <math.h>
 #include <glib.h>
-#include "memory_chunk.h"
-#include "novel_types.h"
-#include "phrase_index.h"
-#include "ngram.h"
+#include "pinyin.h"
 
 parameter_t compute_interpolation(SingleGram * deleted_bigram,
 				  FacadePhraseIndex * unigram,
