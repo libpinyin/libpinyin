@@ -19,6 +19,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+#include <math.h>
 #include "stl_lite.h"
 #include "novel_types.h"
 #include "phrase_index.h"
@@ -44,7 +45,7 @@ bool PhraseLookup::get_best_match(int sentence_length, utf16_t sentence[],
                                   MatchResults & results){
     m_sentence_length = sentence_length;
     m_sentence = sentence;
-    int nstep = keys->len + 1;
+    int nstep = m_sentence_length + 1;
 
     //free m_steps_index
     for ( size_t i = 0; i < m_steps_index->len; ++i){
@@ -54,7 +55,7 @@ bool PhraseLookup::get_best_match(int sentence_length, utf16_t sentence[],
     }
 
     //free m_steps_content
-    for ( size_t i = 0; m < m_steps_content->len; ++i){
+    for ( size_t i = 0; i < m_steps_content->len; ++i){
         GArray * array = (GArray *) g_ptr_array_index(m_steps_content, i);
         g_array_free(array, TRUE);
         g_ptr_array_index(m_steps_content, i) = NULL;
@@ -64,7 +65,7 @@ bool PhraseLookup::get_best_match(int sentence_length, utf16_t sentence[],
     g_ptr_array_set_size(m_steps_index, nstep);
     g_ptr_array_set_size(m_steps_content, nstep);
 
-    for ( size_t i = 0; i < nstep; ++i ){
+    for ( int i = 0; i < nstep; ++i ){
         //initialize m_steps_index
         g_ptr_array_index(m_steps_index, i) = g_hash_table_new(g_direct_hash, g_direct_equal);
         //initialize m_steps_content
@@ -79,10 +80,10 @@ bool PhraseLookup::get_best_match(int sentence_length, utf16_t sentence[],
     GHashTable * initial_step_index = (GHashTable *) g_ptr_array_index(m_steps_index, 0);
     g_hash_table_insert(initial_step_index, GUINT_TO_POINTER(initial_key), GUINT_TO_POINTER(initial_step_content->len - 1));
 
-    for ( size_t i = 0; i < nstep - 1; ++i) {
-        for ( size_t m = i; m < n_step; ++m ){
-            phrase_token_t next_token = NULL;
-            int result = m_phrase_index->search(m - i, sentence + i, next_token);
+    for ( int i = 0; i < nstep - 1; ++i) {
+        for ( int m = i; m < nstep; ++m ){
+            phrase_token_t next_token = null_token;
+            int result = m_phrase_table->search(m - i, sentence + i, next_token);
             /* found next phrase */
             if ( result & SEARCH_OK ) {
                 search_bigram(i, next_token),
