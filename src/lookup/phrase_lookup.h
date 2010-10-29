@@ -60,6 +60,7 @@ protected:
 
     bool final_step(MatchResults & results);
 public:
+    /* Note: this method only accepts the characters in phrase large table. */
     bool get_best_match(int sentence_length, utf16_t sentence[], MatchResults & results);
 
     bool convert_to_utf8(MatchResults results, /* out */ char * & result_string);

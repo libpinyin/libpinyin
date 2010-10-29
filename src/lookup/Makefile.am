@@ -30,4 +30,4 @@ noinst_LTLIBRARIES	= liblookup.la
 
 liblookup_la_LDFLAGS	= -static
 
-liblookup_la_SOURCES	= pinyin_lookup.cpp winner_tree.cpp
+liblookup_la_SOURCES	= pinyin_lookup.cpp winner_tree.cpp phrase_lookup.cpp
