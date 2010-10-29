@@ -40,6 +40,7 @@ PinyinLookup::PinyinLookup(PinyinCustomSettings * custom, PinyinLargeTable * pin
     m_pinyin_table = pinyin_table;
     m_phrase_index = phrase_index;
     m_bigram = bigram;
+
     m_winner_tree = new WinnerTree;
     m_steps_index = g_ptr_array_new();
     m_steps_content = g_ptr_array_new();
