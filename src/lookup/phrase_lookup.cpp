@@ -25,3 +25,30 @@
 #include "phrase_large_table.h"
 #include "ngram.h"
 #include "phrase_lookup.h"
+
+const gfloat PhraseLookup::bigram_lambda;
+const gfloat PhraseLookup::unigram_lambda;
+
+PhraseLookup::PhraseLookup(PhraseLargeTable * phrase_table,
+                           FacadePhraseIndex * phrase_index,
+                           Bigram * bigram){
+    m_phrase_table = phrase_table;
+    m_phrase_index = phrase_index;
+    m_bigram = bigram;
+
+    m_steps_index = g_ptr_array_new();
+    m_steps_content = g_ptr_array_new();
+}
+
+
+
+
+
+bool PhraseLookup::convert_to_utf8(phrase_token_t token, /* out */ char * & phrase){
+    m_phrase_index->get_phrase_item(token, m_cache_phrase_item);
+    utf16_t buffer[MAX_PHRASE_LENGTH];
+    m_cache_phrase_item.get_phrase_string(buffer);
+    guint8 length = m_cache_phrase_item.get_phrase_length();
+    phrase = g_utf16_to_utf8(buffer, length, NULL, NULL, NULL);
+    return true;
+}

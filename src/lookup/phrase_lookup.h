@@ -30,6 +30,11 @@
  */
 
 class PhraseLookup{
+private:
+    static const gfloat bigram_lambda = LAMBDA_PARAMETER;
+    static const gfloat unigram_lambda = 1 - LAMBDA_PARAMETER;
+
+    PhraseItem m_cache_phrase_item;
 protected:
     //saved varibles
     novel::PhraseLargeTable * m_phrase_table;
@@ -60,10 +65,17 @@ protected:
 
     bool final_step(MatchResults & results);
 public:
+    PhraseLookup(PhraseLargeTable * phrase_table,
+                 FacadePhraseIndex * phrase_index,
+                 Bigram * bigram);
+
+    ~PhraseLookup();
+
     /* Note: this method only accepts the characters in phrase large table. */
     bool get_best_match(int sentence_length, utf16_t sentence[], MatchResults & results);
 
-    bool convert_to_utf8(MatchResults results, /* out */ char * & result_string);
+    /* Note: free the phrase by g_free */
+    bool convert_to_utf8(phrase_token_t token, /* out */ char * & phrase);
 };
 
 #endif
