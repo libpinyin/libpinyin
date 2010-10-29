@@ -166,6 +166,7 @@ bool PinyinLookup::get_best_match(PinyinKeyVector keys, CandidateConstraints con
     g_hash_table_insert(initial_step_index, GUINT_TO_POINTER(initial_key), GUINT_TO_POINTER(initial_step_content->len - 1));
 
 #if 0
+    /* Note: this section has been dropped to enable pi-gram. */
     LookupStepContent tmp_step = (LookupStepContent) g_ptr_array_index(m_steps_content, 0);
     IBranchIterator * iter = m_winner_tree->get_iterator(tmp_step);
     size_t npinyin = prepare_table_cache(0, keys->len);
@@ -173,7 +174,7 @@ bool PinyinLookup::get_best_match(PinyinKeyVector keys, CandidateConstraints con
     delete iter;
 #endif
 
-    for ( size_t i = 0 ; i < nstep - 1 ; ++i ){
+    for ( size_t i = 0; i < nstep - 1; ++i ){
 	LookupStepContent tmp_step = (LookupStepContent) g_ptr_array_index(m_steps_content, i);
 	IBranchIterator * iter = m_winner_tree->get_iterator(tmp_step);
 	size_t npinyin = prepare_table_cache(i, keys->len - i);
