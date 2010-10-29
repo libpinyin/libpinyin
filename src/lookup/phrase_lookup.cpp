@@ -80,8 +80,8 @@ bool PhraseLookup::get_best_match(int sentence_length, utf16_t sentence[],
     GHashTable * initial_step_index = (GHashTable *) g_ptr_array_index(m_steps_index, 0);
     g_hash_table_insert(initial_step_index, GUINT_TO_POINTER(initial_key), GUINT_TO_POINTER(initial_step_content->len - 1));
 
-    for ( int i = 0; i < nstep - 1; ++i) {
-        for ( int m = i; m < nstep; ++m ){
+    for ( int i = 0; i < nstep - 1; ++i ){
+        for ( int m = i + 1; m < nstep; ++m ){
             phrase_token_t next_token = null_token;
             int result = m_phrase_table->search(m - i, sentence + i, next_token);
             /* found next phrase */
