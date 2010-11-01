@@ -347,7 +347,8 @@ bool PinyinLookup::bigram_gen_next_step(int nstep, lookup_value_t * cur_step, ph
     lookup_value_t next_step;
     next_step.m_handles[0] = cur_step->m_handles[1]; next_step.m_handles[1] = token;
     next_step.m_poss = cur_step->m_poss + 
-	log(( bigram_lambda * bigram_poss + unigram_lambda * unigram_poss) *pinyin_poss);
+	log(bigram_lambda * bigram_poss + unigram_lambda * unigram_poss) +
+        log( pinyin_poss);
     next_step.m_last_step = nstep;
     
     return save_next_step(nstep + phrase_length, cur_step, &next_step);
