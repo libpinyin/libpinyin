@@ -58,10 +58,10 @@ protected:
     bool search_unigram(int nstep, phrase_token_t token);
     bool search_bigram(int nstep, phrase_token_t token);
 
-    bool unigram_gen_next_step(int nstep, lookup_value_t * cur_step, phrase_token_t token);
-    bool bigram_gen_next_step(int nstep, lookup_value_t * cur_step, phrase_token_t token, gfloat bigram_poss);
+    bool unigram_gen_next_step(int nstep, lookup_value_t * cur_value, phrase_token_t token);
+    bool bigram_gen_next_step(int nstep, lookup_value_t * cur_value, phrase_token_t token, gfloat bigram_poss);
 
-    bool save_next_step(int next_step_pos, lookup_value_t * cur_step, lookup_value_t * next_step);
+    bool save_next_step(int next_step_pos, lookup_value_t * cur_value, lookup_value_t * next_step);
 
     bool final_step(MatchResults & results);
 public:
