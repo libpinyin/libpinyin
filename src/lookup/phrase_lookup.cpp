@@ -238,7 +238,7 @@ bool PhraseLookup::final_step(MatchResults & results ){
     //backtracing
     while( true ){
         int cur_step_pos = max_value->m_last_step;
-        if ( -1 = cur_step_pos )
+        if ( -1 == cur_step_pos )
             break;
 
         phrase_token_t * token = &g_array_index(results, phrase_token_t, cur_step_pos);
@@ -258,11 +258,24 @@ bool PhraseLookup::final_step(MatchResults & results ){
     return true;
 }
 
-bool PhraseLookup::convert_to_utf8(phrase_token_t token, /* out */ char * & phrase){
-    m_phrase_index->get_phrase_item(token, m_cache_phrase_item);
-    utf16_t buffer[MAX_PHRASE_LENGTH];
-    m_cache_phrase_item.get_phrase_string(buffer);
-    guint8 length = m_cache_phrase_item.get_phrase_length();
-    phrase = g_utf16_to_utf8(buffer, length, NULL, NULL, NULL);
+bool PhraseLookup::convert_to_utf8(MatchResults results, /* in */ const char * delimiter, /* out */ char * & result_string){
+    //init variables
+    if ( NULL == delimiter )
+        delimiter = "";
+    result_string = g_strdup("");
+
+    for ( size_t i = 0; i < results->len; ++i ){
+        phrase_token_t * token = &g_array_index(results, phrase_token_t, i);
+        if ( null_token == *token )
+            continue;
+        m_phrase_index->get_phrase_item(*token, m_cache_phrase_item);
+        utf16_t buffer[MAX_PHRASE_LENGTH];
+        m_cache_phrase_item.get_phrase_string(buffer);
+        guint8 length = m_cache_phrase_item.get_phrase_length();
+        gchar * phrase = g_utf16_to_utf8(buffer, length, NULL, NULL, NULL);
+        char * tmp = result_string;
+        result_string = g_strconcat(result_string, delimiter, phrase, NULL);
+        g_free(tmp); g_free(phrase);
+    }
     return true;
 }

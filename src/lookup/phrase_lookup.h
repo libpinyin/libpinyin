@@ -75,7 +75,7 @@ public:
     bool get_best_match(int sentence_length, utf16_t sentence[], MatchResults & results);
 
     /* Note: free the phrase by g_free */
-    bool convert_to_utf8(phrase_token_t token, /* out */ char * & phrase);
+    bool convert_to_utf8(MatchResults results, /* in */ const char * delimiter, /* out */ char * & result_string);
 };
 
 #endif
