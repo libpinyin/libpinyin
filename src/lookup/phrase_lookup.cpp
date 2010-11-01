@@ -262,7 +262,7 @@ bool PhraseLookup::convert_to_utf8(MatchResults results, /* in */ const char * d
     //init variables
     if ( NULL == delimiter )
         delimiter = "";
-    result_string = g_strdup("");
+    result_string = NULL;
 
     for ( size_t i = 0; i < results->len; ++i ){
         phrase_token_t * token = &g_array_index(results, phrase_token_t, i);
@@ -274,7 +274,10 @@ bool PhraseLookup::convert_to_utf8(MatchResults results, /* in */ const char * d
         guint8 length = m_cache_phrase_item.get_phrase_length();
         gchar * phrase = g_utf16_to_utf8(buffer, length, NULL, NULL, NULL);
         char * tmp = result_string;
-        result_string = g_strconcat(result_string, delimiter, phrase, NULL);
+        if ( NULL == result_string )
+            result_string = g_strdup(phrase);
+        else
+            result_string = g_strconcat(result_string, delimiter, phrase, NULL);
         g_free(tmp); g_free(phrase);
     }
     return true;
