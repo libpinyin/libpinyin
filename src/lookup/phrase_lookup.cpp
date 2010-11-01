@@ -97,7 +97,122 @@ bool PhraseLookup::get_best_match(int sentence_length, utf16_t sentence[],
     return final_step(results);
 }
 
+bool PhraseLookup::search_unigram(int nstep, phrase_token_t token){
+    GArray * lookup_content = (GArray *) g_ptr_array_index(m_steps_content, nstep);
+    if ( 0 == lookup_content->len )
+        return false;
 
+    lookup_value_t * max_value = &g_array_index(lookup_content, lookup_value_t, 0);
+    /* find the maximum node */
+    for ( size_t i = 1; i < m_steps_content->len; ++i ){
+        lookup_value_t * cur_value = &g_array_index(lookup_content, lookup_value_t, i);
+        if ( cur_value->m_poss > max_value->m_poss )
+            max_value = cur_value;
+    }
+
+    return unigram_gen_next_step(nstep, max_value, token);
+}
+
+bool PhraseLookup::search_bigram(int nstep, phrase_token_t token){
+    bool found = false;
+    GArray * lookup_content = (GArray *) g_ptr_array_index(m_steps_content, nstep);
+    if ( 0 == lookup_content->len )
+        return false;
+
+    for ( size_t i = 0; i < lookup_content->len; ++i ){
+        lookup_value_t * cur_value = &g_array_index(lookup_content, lookup_value_t, i);
+        phrase_token_t index_token = cur_value->m_handles[1];
+        SingleGram * system, * user;
+        m_bigram->load(index_token, system, user);
+        if ( system && user ){
+            guint32 total_freq;
+            assert(user->get_total_freq(total_freq));
+            assert(system->set_total_freq(total_freq));
+        }
+        if ( system ){
+            guint32 freq;
+            if ( system->get_freq(token, freq) ){
+                guint32 total_freq;
+                system->get_total_freq(total_freq);
+                gfloat bigram_poss = freq / (gfloat) total_freq;
+                found = bigram_gen_next_step(nstep, cur_value, token, bigram_poss) || found;
+            }
+        }
+        if ( user ){
+            guint32 freq;
+            if ( user->get_freq(token, freq) ){
+                guint32 total_freq;
+                user->get_total_freq(total_freq);
+                gfloat bigram_poss = freq / (gfloat) total_freq;
+                found = bigram_gen_next_step(nstep, cur_value, token, bigram_poss) || found;
+            }
+        }
+    }
+
+    return found;
+}
+
+bool PhraseLookup::unigram_gen_next_step(int nstep, lookup_value_t * cur_value,
+phrase_token_t token){
+    if ( m_phrase_index->get_phrase_item(token, m_cache_phrase_item))
+        return false;
+    size_t phrase_length = m_cache_phrase_item.get_phrase_length();
+    gfloat elem_poss = m_cache_phrase_item.get_unigram_frequency() / (gfloat)
+        m_phrase_index->get_phrase_index_total_freq();
+    if ( elem_poss < FLT_EPSILON )
+        return false;
+
+    lookup_value_t next_value;
+    next_value.m_handles[0] = cur_value->m_handles[1]; next_value.m_handles[1] = token;
+    next_value.m_poss = cur_value->m_poss + log(elem_poss * unigram_lambda);
+    next_value.m_last_step = nstep;
+
+    return save_next_step(nstep + phrase_length, cur_value, &next_value);
+}
+
+bool PhraseLookup::bigram_gen_next_step(int nstep, lookup_value_t * cur_value, phrase_token_t token, gfloat bigram_poss){
+    if ( m_phrase_index->get_phrase_item(token, m_cache_phrase_item))
+        return false;
+    size_t phrase_length = m_cache_phrase_item.get_phrase_length();
+    gfloat unigram_poss = m_cache_phrase_item.get_unigram_frequency() /
+        (gfloat) m_phrase_index->get_phrase_index_total_freq();
+
+    if ( bigram_poss < FLT_EPSILON && unigram_poss < FLT_EPSILON )
+        return false;
+
+    lookup_value_t next_value;
+    next_value.m_handles[0] = cur_value->m_handles[1]; next_value.m_handles[1] = token;
+    next_value.m_poss = cur_value->m_poss +
+        log( bigram_lambda * bigram_poss + unigram_lambda * unigram_poss );
+    next_value.m_last_step = nstep;
+
+    return save_next_step(nstep + phrase_length, cur_value, &next_value);
+}
+
+bool PhraseLookup::save_next_step(int next_step_pos, lookup_value_t * cur_value, lookup_value_t * next_value){
+    lookup_key_t next_key = next_value->m_handles[1];
+    GHashTable * next_lookup_index = (GHashTable *) g_ptr_array_index(m_steps_index, next_step_pos);
+    GArray * next_lookup_content = (GArray *) g_ptr_array_index(m_steps_content, next_step_pos);
+
+    gpointer key, value;
+    gboolean lookup_result = g_hash_table_lookup_extended(next_lookup_index, GUINT_TO_POINTER(next_key), &key, &value);
+    size_t step_index = GPOINTER_TO_UINT(value);
+    if ( !lookup_result ){
+        g_array_append_val(next_lookup_content, *next_value);
+        g_hash_table_insert(next_lookup_index, GUINT_TO_POINTER(next_key), GUINT_TO_POINTER(next_lookup_content->len - 1));
+        return true;
+    }else{
+        lookup_value_t * orig_next_value = &g_array_index(next_lookup_content, lookup_value_t, step_index);
+        if ( orig_next_value->m_poss < next_value->m_poss ){
+            orig_next_value->m_handles[0] = next_value->m_handles[0];
+            assert(orig_next_value->m_handles[1] == next_value->m_handles[1]);
+            orig_next_value->m_poss = next_value->m_poss;
+            orig_next_value->m_last_step = next_value->m_last_step;
+            return true;
+        }
+        return false;
+    }
+}
 
 bool PhraseLookup::convert_to_utf8(phrase_token_t token, /* out */ char * & phrase){
     m_phrase_index->get_phrase_item(token, m_cache_phrase_item);
