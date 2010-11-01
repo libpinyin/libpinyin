@@ -111,7 +111,7 @@ size_t PinyinLookup::prepare_table_cache(int nstep, int total_pinyin){
     pinyin_keys += nstep;
     //init resources
     g_array_set_size(m_table_cache, MAX_PHRASE_LENGTH + 1);
-    size_t len;
+    int len;
     for ( len = 1; len <= total_pinyin && len <= MAX_PHRASE_LENGTH; ++len){
 	PhraseIndexRanges * ranges = &g_array_index(m_table_cache, PhraseIndexRanges, len);
 	prepare_pinyin_lookup(*ranges);
@@ -121,7 +121,7 @@ size_t PinyinLookup::prepare_table_cache(int nstep, int total_pinyin){
 	    break;
 	}
     }
-    g_array_set_size(m_table_cache, std_lite::min(len, (size_t) MAX_PHRASE_LENGTH + 1));
+    g_array_set_size(m_table_cache, std_lite::min(len, MAX_PHRASE_LENGTH + 1));
     return m_table_cache->len - 1;
 }
 
@@ -150,7 +150,7 @@ bool PinyinLookup::get_best_match(PinyinKeyVector keys, CandidateConstraints con
     g_ptr_array_set_size(m_steps_index, nstep);
     g_ptr_array_set_size(m_steps_content, nstep);
 
-    for ( size_t i = 0 ; i < nstep; ++i ){
+    for ( int i = 0 ; i < nstep; ++i ){
 	//initialize m_steps_index
 	g_ptr_array_index(m_steps_index, i) = g_hash_table_new(g_direct_hash, g_direct_equal);
 	//initialize m_steps_content
@@ -174,7 +174,7 @@ bool PinyinLookup::get_best_match(PinyinKeyVector keys, CandidateConstraints con
     delete iter;
 #endif
 
-    for ( size_t i = 0; i < nstep - 1; ++i ){
+    for ( int i = 0; i < nstep - 1; ++i ){
 	LookupStepContent tmp_step = (LookupStepContent) g_ptr_array_index(m_steps_content, i);
 	IBranchIterator * iter = m_winner_tree->get_iterator(tmp_step);
 	size_t npinyin = prepare_table_cache(i, keys->len - i);
@@ -226,7 +226,10 @@ bool PinyinLookup::search_bigram(IBranchIterator * iter,
     lookup_constraint_t* constraint = &g_array_index(m_constraints, lookup_constraint_t, nstep);
     if ( CONSTRAINT_NOSEARCH == constraint->m_type )
 	return false;
+
+#if 0
     GArray * lookup_content = (GArray *) g_ptr_array_index(m_steps_content, nstep);
+#endif
 
     bool found = false;
     BigramPhraseArray bigram_phrase_items = g_array_new(FALSE, FALSE, 
@@ -255,7 +258,7 @@ bool PinyinLookup::search_bigram(IBranchIterator * iter,
 	    }
 	    if ( user ){
 		guint32 freq;
-		if( user->get_freq(token, freq)){
+		if( user->get_freq(token, freq) ){
 		    guint32 total_freq;
 		    user->get_total_freq(total_freq);
 		    gfloat bigram_poss = freq / (gfloat) total_freq;
@@ -380,7 +383,7 @@ bool PinyinLookup::final_step(MatchResults & results){
     g_array_set_size(results, m_steps_content->len);
     for ( size_t i = 0 ; i < m_steps_content->len ; ++i){
 	phrase_token_t * token = &g_array_index(results, phrase_token_t, i);
-	*token = NULL;
+	*token = null_token;
     }
     //find max element
     size_t last_step_pos = m_steps_content->len - 1;
@@ -431,7 +434,7 @@ bool PinyinLookup::train_result(PinyinKeyVector keys, CandidateConstraints const
     guint32 train_factor = 23;
     for ( size_t i = 0; i < constraints->len; ++i){
 	phrase_token_t * token = &g_array_index(results, phrase_token_t, i);
-	if ( *token == NULL )
+	if ( *token == null_token )
 	    continue;
 	lookup_constraint_t * constraint = &g_array_index(constraints, lookup_constraint_t, i);
 	if (train_next || CONSTRAINT_ONESTEP == constraint->m_type ){
@@ -485,7 +488,7 @@ bool PinyinLookup::convert_to_utf8(MatchResults results, /* out */ char * & resu
     result_string = g_strdup("");
     for ( size_t i = 0; i < results->len; ++i){
 	phrase_token_t * token = &g_array_index(results, phrase_token_t, i);
-	if ( NULL == *token )
+	if ( null_token == *token )
 	    continue;
 	m_phrase_index->get_phrase_item(*token, m_cache_phrase_item);
 	utf16_t buffer[MAX_PHRASE_LENGTH];
