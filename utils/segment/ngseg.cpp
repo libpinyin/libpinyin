@@ -19,6 +19,19 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+/* n-gram based sentence segment. */
+
+/* Note:
+ * Currently libpinyin only supports ucs2 characters, as this is a
+ * pre-processor tool for raw corpus, it will skip all sentences
+ * which contains non-ucs2 characters.
+ */
+
+void print_help(){
+    printf("Usage: ngseg [--generate-extra-enter]\n");
+    exit(1);
+}
+
 #include <stdio.h>
 
 int main(int argc, char * argv[]){
