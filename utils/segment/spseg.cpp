@@ -128,7 +128,7 @@ bool backtrace(GArray * steps, glong phrase_len, GArray * strings){
 }
 
 void print_help(){
-    printf("Usage: mmseg [--generate-extra-enter]\n");
+    printf("Usage: spseg [--generate-extra-enter]\n");
     exit(1);
 }
 
