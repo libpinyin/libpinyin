@@ -23,8 +23,12 @@ INCLUDES		= -I$(top_srcdir)/src \
 			  -I$(top_srcdir)/src/lookup \
 			  @GLIB2_CPPFLAGS@
 
-noinst_PROGRAMS		= spseg
+noinst_PROGRAMS		= spseg ngseg
 
 spseg_SOURCES		= spseg.cpp
 
 spseg_LDADD		= @GLIB2_LDFLAGS@ ../../src/libpinyin.la
+
+ngseg_SOURCES		= ngseg.cpp
+
+ngseg_LDADD		= @GLIB2_LDFLAGS@ ../../src/libpinyin.la
