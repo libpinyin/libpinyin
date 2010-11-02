@@ -19,6 +19,9 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+#include <stdio.h>
+#include <stdlib.h>
+
 /* n-gram based sentence segment. */
 
 /* Note:
@@ -31,8 +34,6 @@ void print_help(){
     printf("Usage: ngseg [--generate-extra-enter]\n");
     exit(1);
 }
-
-#include <stdio.h>
 
 int main(int argc, char * argv[]){
     return 0;
