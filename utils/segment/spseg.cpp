@@ -148,7 +148,7 @@ int main(int argc, char * argv[]){
     }
 
     //init phrase table
-    g_phrases =  new PhraseLargeTable;
+    g_phrases = new PhraseLargeTable;
     FILE * gb_file = fopen("../../data/gb_char.table", "r");
     if ( gb_file == NULL ){
 	fprintf(stderr, "can't open gb_char.table!\n");

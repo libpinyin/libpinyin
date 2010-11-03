@@ -288,6 +288,8 @@ bool FacadePhraseIndex::load_text(guint8 phrase_index, FILE * infile){
 	if ( feof(infile) )
 	    break;
 
+        assert(PHRASE_INDEX_LIBRARY_INDEX(token) == phrase_index );
+
 	glong written;
 	utf16_t * phrase_utf16 = g_utf8_to_utf16(phrase, -1, NULL, 
 					       &written, NULL);
