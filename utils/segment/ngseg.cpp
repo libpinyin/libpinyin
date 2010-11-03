@@ -21,6 +21,8 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <locale.h>
+#include "pinyin.h"
 
 /* n-gram based sentence segment. */
 
@@ -30,11 +32,54 @@
  * which contains non-ucs2 characters.
  */
 
+PhraseLargeTable * g_phrase_table = NULL;
+FacadePhraseIndex * g_phrase_index = NULL;
+Bigram * g_bigram = NULL;
+PhraseLookup * g_phrase_lookup = NULL;
+
 void print_help(){
     printf("Usage: ngseg [--generate-extra-enter]\n");
     exit(1);
 }
 
 int main(int argc, char * argv[]){
+    int i = 1;
+    bool gen_extra_enter = false;
+
+    setlocale(LC_ALL, "");
+    //deal with options.
+    while ( i < argc ){
+        if ( strcmp ("--help", argv[i]) == 0 ){
+            print_help();
+        } else if ( strcmp("--generate-extra-enter", argv[i]) == 0 ){
+            gen_extra_enter = true;
+        }
+        ++i;
+    }
+
+    //init phrase table
+    g_phrase_table = new PhraseLargeTable;
+    MemoryChunk * chunk = new MemoryChunk;
+    chunk->load("../../data/phrase_index.bin");
+    g_phrase_table->load(chunk);
+
+    //init phrase index
+    g_phrase_index = new FacadePhraseIndex;
+    chunk = new MemoryChunk;
+    chunk->load("../../data/gb_char.bin");
+    g_phrase_index->load(1, chunk);
+    chunk = new MemoryChunk;
+    chunk->load("../../data/gbk_char.bin");
+    g_phrase_index->load(2, chunk);
+
+    //init bi-gram
+    g_bigram = new Bigram;
+    g_bigram->attach("../../data/bigram.db", NULL);
+
+    //init phrase lookup
+    g_phrase_lookup = new PhraseLookup(g_phrase_table, g_phrase_index,
+                                       g_bigram);
+
+
     return 0;
 }
