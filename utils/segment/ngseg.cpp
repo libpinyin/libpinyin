@@ -32,6 +32,11 @@
  * which contains non-ucs2 characters.
  */
 
+/* TODO:
+ * Try to add punctuation mark and english support,
+ * such as ',', '.', '?', '!', <english>, and other punctuations.
+ */
+
 PhraseLargeTable * g_phrase_table = NULL;
 FacadePhraseIndex * g_phrase_index = NULL;
 Bigram * g_bigram = NULL;
