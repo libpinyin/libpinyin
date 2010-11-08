@@ -171,9 +171,8 @@ int main(int argc, char * argv[]){
 
     char * linebuf = NULL;
     size_t size = 0;
-    while(getline(&linebuf, &size, stdin)) {
-        if ( feof(stdin) )
-            break;
+    ssize_t read;
+    while( (read = getline(&linebuf, &size, stdin)) != -1 ){
         linebuf[strlen(linebuf) - 1] = '\0';
 
         //check non-ucs2 characters
@@ -197,7 +196,7 @@ int main(int argc, char * argv[]){
             g_free(string);
         }
 
-        //print extra enter
+        /* print extra enter */
         if ( gen_extra_enter )
             printf("\n");
 
