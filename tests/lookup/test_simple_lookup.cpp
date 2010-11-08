@@ -93,9 +93,10 @@ int main( int argc, char * argv[]){
 	char * sentence = NULL;
 	pinyin_lookup.convert_to_utf8(results, sentence);
 	printf("%s\n", sentence);
+	g_array_free(results, TRUE);
 
-	g_array_free(keys, true);
-	g_array_free(poses, true);
+	g_array_free(keys, TRUE);
+	g_array_free(poses, TRUE);
 	g_free(sentence);
     }
     free(linebuf);
