@@ -628,8 +628,7 @@ bool PinyinLengthIndexLevel::load(MemoryChunk * chunk, table_offset_t offset, ta
 	index++;
 	phrase_end = *index;
 	if ( phrase_begin == phrase_end ){
-            void * null = NULL;
-	    g_array_append_val(m_pinyin_array_indexes, null);
+	    g_array_append_val(m_pinyin_array_indexes, null_token);
 	    continue;
 	}
 
