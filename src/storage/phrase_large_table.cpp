@@ -450,7 +450,8 @@ bool PhraseLengthIndexLevel::load(MemoryChunk * chunk, table_offset_t offset, ta
         index++;
         phrase_end = *index;
         if ( phrase_begin == phrase_end ){
-            g_array_append_val(m_phrase_array_indexes, null_token);
+            void * null = NULL;
+            g_array_append_val(m_phrase_array_indexes, null);
             continue;
         }
 
