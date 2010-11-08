@@ -42,10 +42,37 @@ FacadePhraseIndex * g_phrase_index = NULL;
 Bigram * g_bigram = NULL;
 PhraseLookup * g_phrase_lookup = NULL;
 
+enum CONTEXT_STATE{
+    CONTEXT_INIT,
+    CONTEXT_SEGMENTABLE,
+    CONTEXT_UNKNOWN
+};
+
 void print_help(){
     printf("Usage: ngseg [--generate-extra-enter]\n");
     exit(1);
 }
+
+bool deal_with_segmentable(GArray * current_utf16){
+    char * result_string = NULL;
+    MatchResults results = g_array_new(FALSE, FALSE, sizeof(phrase_token_t));
+    g_phrase_lookup->get_best_match(current_utf16->len, (utf16_t *) current_utf16->data, results);
+    g_phrase_lookup->convert_to_utf8(results, "\n", result_string);
+    printf("%s\n", result_string);
+    g_array_free(results, TRUE);
+    g_free(result_string);
+    return true;
+}
+
+bool deal_with_unknown(GArray * current_utf16){
+    char * result_string = g_utf16_to_utf8
+        ( (utf16_t *) current_utf16->data, current_utf16->len,
+          NULL, NULL, NULL);
+    printf("%s\n", result_string);
+    g_free(result_string);
+    return true;
+}
+
 
 int main(int argc, char * argv[]){
     int i = 1;
@@ -86,5 +113,81 @@ int main(int argc, char * argv[]){
                                        g_bigram);
 
 
+    CONTEXT_STATE state, next_state;
+    GArray * current_utf16 = g_array_new(TRUE, TRUE, sizeof(utf16_t));
+    phrase_token_t token = null_token;
+
+    //split the sentence
+    char * linebuf = NULL;
+    size_t size = 0;
+    ssize_t read;
+    while( (read = getline(&linebuf, &size, stdin)) != -1 ){
+        linebuf[strlen(linebuf) - 1] = '\0';
+
+        //check non-ucs2 characters
+        const glong num_of_chars = g_utf8_strlen(linebuf, -1);
+        glong len = 0;
+        utf16_t * sentence = g_utf8_to_utf16(linebuf, -1, NULL, &len, NULL);
+        if ( len != num_of_chars ) {
+            fprintf(stderr, "non-ucs2 characters encountered:%s.\n", linebuf);
+            continue;
+        }
+
+        /* only new-line persists. */
+        if ( 0  == num_of_chars ) {
+            printf("\n");
+            continue;
+        }
+
+        state = CONTEXT_INIT;
+        bool result = g_phrase_table->search( 1, sentence, token);
+        g_array_append_val( current_utf16, sentence[0]);
+        if ( result & SEARCH_OK )
+            state = CONTEXT_SEGMENTABLE;
+        else
+            state = CONTEXT_UNKNOWN;
+
+        for ( int i = 1; i < num_of_chars; ++i) {
+            bool result = g_phrase_table->search( 1, sentence + i, token);
+            if ( result & SEARCH_OK )
+                next_state = CONTEXT_SEGMENTABLE;
+            else
+                next_state = CONTEXT_UNKNOWN;
+
+            if ( state == next_state ){
+                g_array_append_val(current_utf16, sentence[i]);
+                continue;
+            }
+
+            assert ( state != next_state );
+            if ( state == CONTEXT_SEGMENTABLE )
+                deal_with_segmentable(current_utf16);
+
+            if ( state == CONTEXT_UNKNOWN )
+                deal_with_unknown(current_utf16);
+
+            /* save the current character */
+            g_array_set_size(current_utf16, 0);
+            g_array_append_val(current_utf16, sentence[i]);
+            state = next_state;
+        }
+
+        if ( current_utf16->len ) {
+            /* this seems always true. */
+            if ( state == CONTEXT_SEGMENTABLE )
+                deal_with_segmentable(current_utf16);
+
+            if ( state == CONTEXT_UNKNOWN )
+                deal_with_unknown(current_utf16);
+            g_array_set_size(current_utf16, 0);
+        }
+
+        /* print extra enter */
+        if ( gen_extra_enter )
+            printf("\n");
+    }
+
+    g_array_free(current_utf16, TRUE);
+    free(linebuf);
     return 0;
 }
