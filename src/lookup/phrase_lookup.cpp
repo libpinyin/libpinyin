@@ -104,7 +104,7 @@ bool PhraseLookup::search_unigram(int nstep, phrase_token_t token){
 
     lookup_value_t * max_value = &g_array_index(lookup_content, lookup_value_t, 0);
     /* find the maximum node */
-    for ( size_t i = 1; i < m_steps_content->len; ++i ){
+    for ( size_t i = 1; i < lookup_content->len; ++i ){
         lookup_value_t * cur_value = &g_array_index(lookup_content, lookup_value_t, i);
         if ( cur_value->m_poss > max_value->m_poss )
             max_value = cur_value;
@@ -217,20 +217,20 @@ bool PhraseLookup::save_next_step(int next_step_pos, lookup_value_t * cur_value,
 bool PhraseLookup::final_step(MatchResults & results ){
     //reset results
     g_array_set_size(results, m_steps_content->len);
-    for ( size_t i = 0; i < m_steps_content->len; ++i ){
+    for ( size_t i = 0; i < results->len; ++i ){
         phrase_token_t * token = &g_array_index(results, phrase_token_t, i);
         *token = null_token;
     }
 
     //find max element
     size_t last_step_pos = m_steps_content->len - 1;
-    GArray * last_step_array =  (GArray *) g_ptr_array_index(m_steps_content, last_step_pos);
-    if ( last_step_array->len == 0 )
+    GArray * last_step_content =  (GArray *) g_ptr_array_index(m_steps_content, last_step_pos);
+    if ( last_step_content->len == 0 )
         return false;
 
-    lookup_value_t * max_value = &g_array_index(last_step_array, lookup_value_t, 0);
-    for ( size_t i = 1; i < last_step_array->len; ++i ){
-        lookup_value_t * cur_value = &g_array_index(last_step_array, lookup_value_t, i);
+    lookup_value_t * max_value = &g_array_index(last_step_content, lookup_value_t, 0);
+    for ( size_t i = 1; i < last_step_content->len; ++i ){
+        lookup_value_t * cur_value = &g_array_index(last_step_content, lookup_value_t, i);
         if ( cur_value->m_poss > max_value->m_poss )
             max_value = cur_value;
     }

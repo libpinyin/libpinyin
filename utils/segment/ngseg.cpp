@@ -57,6 +57,15 @@ bool deal_with_segmentable(GArray * current_utf16){
     char * result_string = NULL;
     MatchResults results = g_array_new(FALSE, FALSE, sizeof(phrase_token_t));
     g_phrase_lookup->get_best_match(current_utf16->len, (utf16_t *) current_utf16->data, results);
+#if 0
+    for ( size_t i = 0; i < results->len; ++i) {
+        phrase_token_t * token = &g_array_index(results, phrase_token_t, i);
+        if ( *token == null_token )
+            continue;
+        printf("%d:%d\t", i, *token);
+    }
+    printf("\n");
+#endif
     g_phrase_lookup->convert_to_utf8(results, "\n", result_string);
     printf("%s\n", result_string);
     g_array_free(results, TRUE);
