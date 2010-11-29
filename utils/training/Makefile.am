@@ -27,12 +27,12 @@ noinst_PROGRAMS		= gen_ngram gen_unigram estimate_interpolation
 
 gen_ngram_SOURCES	= gen_ngram.cpp
 
-gen_ngram_LDADD		= @GLIB2_LDFLAGS@ ../../src/libpinyin.la
+gen_ngram_LDADD		= ../../src/libpinyin.la @GLIB2_LDFLAGS@
 
 gen_unigram_SOURCES     = gen_unigram.cpp
 
-gen_unigram_LDADD       = @GLIB2_LDFLAGS@ ../../src/libpinyin.la
+gen_unigram_LDADD       = ../../src/libpinyin.la @GLIB2_LDFLAGS@
 
 estimate_interpolation_SOURCES = estimate_interpolation.cpp
 
-estimate_interpolation_LDADD = @GLIB2_LDFLAGS@ ../../src/libpinyin.la
+estimate_interpolation_LDADD = ../../src/libpinyin.la @GLIB2_LDFLAGS@
