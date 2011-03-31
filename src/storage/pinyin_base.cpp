@@ -1350,7 +1350,7 @@ PinyinShuangPinParser::get_scheme (PinyinInitial initial_map[27], PinyinFinal fi
     }
 }
 
-namespace novel{
+namespace pinyin{
 
 //////////////////////////////////////////////////////////////////////////////
 // implementation of PinyinKey comparision classe

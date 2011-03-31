@@ -37,9 +37,9 @@ private:
     PhraseItem m_cache_phrase_item;
 protected:
     //saved varibles
-    novel::PhraseLargeTable * m_phrase_table;
-    novel::FacadePhraseIndex * m_phrase_index;
-    novel::Bigram * m_bigram;
+    PhraseLargeTable * m_phrase_table;
+    FacadePhraseIndex * m_phrase_index;
+    Bigram * m_bigram;
 
     //internal step data structure
     GPtrArray * m_steps_index;

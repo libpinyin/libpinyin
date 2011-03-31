@@ -29,7 +29,7 @@
 
 /* class definition */
 
-namespace novel{
+namespace pinyin{
 
 class PinyinLengthIndexLevel{
 protected:
@@ -71,7 +71,7 @@ public:
 
 };
 
-using namespace novel;
+using namespace pinyin;
 
 /* class implementation */
 

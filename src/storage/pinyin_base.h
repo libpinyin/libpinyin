@@ -28,7 +28,7 @@
 
 #include <glib.h>
 
-namespace novel{
+namespace pinyin{
 
 // Predefinition of some classes and structs
 struct PinyinKey;
@@ -722,6 +722,6 @@ int pinyin_compare_tone (const PinyinCustomSettings &custom,
 			 PinyinTone rhs);
 };
 
-using namespace novel;
+using namespace pinyin;
 
 #endif

@@ -85,10 +85,10 @@ protected:
     CandidateConstraints m_constraints;
     PinyinKeyVector m_keys;
     
-    novel::PinyinLargeTable * m_pinyin_table;
-    novel::FacadePhraseIndex * m_phrase_index;
-    novel::PinyinCustomSettings * m_custom;
-    novel::Bigram * m_bigram;
+    PinyinLargeTable * m_pinyin_table;
+    FacadePhraseIndex * m_phrase_index;
+    PinyinCustomSettings * m_custom;
+    Bigram * m_bigram;
     
     //internal step data structure
     GPtrArray * m_steps_index;  

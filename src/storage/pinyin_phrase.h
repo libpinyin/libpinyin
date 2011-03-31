@@ -25,7 +25,7 @@
 #include <string.h>
 #include "stl_lite.h"
 
-namespace novel{
+namespace pinyin{
 
 /*
 static inline int pinyin_utility_sign(int value){
@@ -294,6 +294,6 @@ class PhraseExactLessThanWithToken
 
 };
 
-using namespace novel;
+using namespace pinyin;
 
 #endif

@@ -26,7 +26,7 @@
 #include "novel_types.h"
 #include "memory_chunk.h"
 
-namespace novel{
+namespace pinyin{
 
 /* Because this is not large,
  * Store this in user home directory.
@@ -134,5 +134,5 @@ public:
 
 };
 
-using namespace novel;
+using namespace pinyin;
 #endif

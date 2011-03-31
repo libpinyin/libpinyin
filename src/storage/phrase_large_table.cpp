@@ -26,7 +26,7 @@
 
 /* class definition */
 
-namespace novel{
+namespace pinyin{
 
 class PhraseLengthIndexLevel{
 protected:
@@ -65,7 +65,7 @@ public:
 
 };
 
-using namespace novel;
+using namespace pinyin;
 
 /* class implementation */
 

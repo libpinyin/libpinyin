@@ -45,12 +45,14 @@ struct lookup_value_t{
 
 typedef GArray * MatchResults;         /* Array of phrase_token_t */
 
-namespace novel{
+namespace pinyin{
     class PinyinLargeTable;
     class PhraseLargeTable;
     class FacadePhraseIndex;
     class Bigram;
 };
+
+using namespace pinyin;
 
 /* Note:
  *   LookupStepIndex:

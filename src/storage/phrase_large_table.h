@@ -26,7 +26,7 @@
 #include "novel_types.h"
 #include "memory_chunk.h"
 
-namespace novel{
+namespace pinyin{
 
 const size_t PHRASE_Number_Of_Bitmap_Index = 1<<(sizeof(utf16_t) * 8);
 
@@ -106,6 +106,6 @@ public:
 
 };
 
-using namespace novel;
+using namespace pinyin;
 
 #endif

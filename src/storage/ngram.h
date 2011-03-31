@@ -24,7 +24,7 @@
 
 #include <db.h>
 
-namespace novel{
+namespace pinyin{
 
 class Bigram;
 
@@ -116,7 +116,7 @@ public:
 
 };
 
-using namespace novel;
+using namespace pinyin;
 
 
 #endif
