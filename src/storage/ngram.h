@@ -62,16 +62,16 @@ public:
      */
     bool set_freq(/* in */ phrase_token_t token,
 		  guint32 freq);
-
-    /* set_total_freq method
-     * used in user bigram table
-     */
-    bool set_total_freq(guint32 m_total);
     
     /* get_total_freq method
      * used in user bigram table
      */
     bool get_total_freq(guint32 & m_total);
+
+    /* set_total_freq method
+     * used in user bigram table
+     */
+    bool set_total_freq(guint32 m_total);
     
     /* prune one method
      * only used in training
@@ -108,10 +108,17 @@ public:
     /* when with training systemdb is NULL, only user_gram */
     bool attach(const char * systemfile, const char * userfile);
 
-    bool load(phrase_token_t index, SingleGram * & system_gram, SingleGram * & user_gram);
-    bool store(phrase_token_t index, SingleGram * user_gram);
+    /* load/store one single gram */
+    bool load(/* in */ phrase_token_t index,
+              /* out */ SingleGram * & system_gram,
+              /* out */ SingleGram * & user_gram);
+
+    bool store(/* in */ phrase_token_t index,
+               /* in */ SingleGram * user_gram);
+
     /* array of phrase_token_t items, for parameter estimation. */
-    bool get_all_items(GArray * system, GArray * user);
+    bool get_all_items(/* out */ GArray * system,
+                       /* out */ GArray * user);
 };
 
 };
