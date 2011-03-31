@@ -83,14 +83,6 @@ class Bigram{
 private:
     DB * m_system;
     DB * m_user;
-public:
-    Bigram(){
-	m_system = NULL; m_user = NULL;
-    }
-
-    ~Bigram(){
-	reset();
-    }
 
     void reset(){
 	if ( m_system ){
@@ -102,7 +94,16 @@ public:
 	    m_user = NULL;
 	}
     }
-    
+
+public:
+    Bigram(){
+	m_system = NULL; m_user = NULL;
+    }
+
+    ~Bigram(){
+	reset();
+    }
+
     /* attach system and user bi-gram */
     /* when with training systemdb is NULL, only user_gram */
     bool attach(const char * systemfile, const char * userfile);
