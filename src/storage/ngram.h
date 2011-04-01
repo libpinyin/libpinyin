@@ -66,12 +66,12 @@ public:
     /* get_total_freq method
      * used in user bigram table
      */
-    bool get_total_freq(guint32 & m_total);
+    bool get_total_freq(guint32 & total);
 
     /* set_total_freq method
      * used in user bigram table
      */
-    bool set_total_freq(guint32 m_total);
+    bool set_total_freq(guint32 total);
     
     /* prune one method
      * only used in training

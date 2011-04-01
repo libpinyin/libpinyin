@@ -19,6 +19,12 @@ private:
     MemoryChunk m_chunk;
     FlexibleSingleGram(void * buffer, size_t length);
 public:
+    /* item typedefs */
+    typedef struct{
+        phrase_token_t m_token;
+        ArrayItem m_item;
+    } ArrayItemWithToken;
+
     /* Null Constructor */
     FlexibleSingleGram();
     /* retrieve all items */
@@ -73,6 +79,10 @@ public:
     bool store(phrase_token_t index, FlexibleSingleGram * & single_gram);
     /* array of phrase_token_t items, for parameter estimation. */
     bool get_all_items(GArray * items);
+
+    /* get/set magic header. */
+    bool get_magic_header(MagicHeader & header);
+    bool set_magic_header(const MagicHeader & header);
 };
 
 #endif

@@ -48,7 +48,7 @@ parameter_t compute_interpolation(SingleGram * deleted_bigram,
 	    BigramPhraseItemWithCount* item = &g_array_index(array, BigramPhraseItemWithCount, i);
 	    //get the phrase token
 	    phrase_token_t token = item->m_token;
-	    guint32 deleted_freq = item->m_count;
+	    guint32 deleted_count = item->m_count;
 
 	    {
 		guint32 freq = 0;
@@ -77,7 +77,7 @@ parameter_t compute_interpolation(SingleGram * deleted_bigram,
 	    if ( 0 == (numerator + part_of_denominator))
 		continue;
 	    
-	    next_lambda += deleted_freq * (numerator / (numerator + part_of_denominator));
+	    next_lambda += deleted_count * (numerator / (numerator + part_of_denominator));
 	}
 	assert(deleted_bigram->get_total_freq(table_num));
 	next_lambda /= table_num;
