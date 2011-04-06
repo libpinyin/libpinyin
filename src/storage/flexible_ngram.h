@@ -54,6 +54,7 @@ public:
         m_chunk.set_size(sizeof(ArrayHeader));
         memset(m_chunk.begin(), 0, sizeof(ArrayHeader));
     }
+
     /* retrieve all items */
     bool retrieve_all(/* out */ FlexibleBigramPhraseArray array);
 
@@ -70,10 +71,18 @@ public:
                         /* in */ const ArrayItem & item);
 
     /* get array header */
-    bool get_array_header(/* out */ ArrayHeader & header);
+    bool get_array_header(/* out */ ArrayHeader & header){
+        char * buf_begin = (char *)m_chunk.begin();
+        memcpy(&header, buf_begin, sizeof(ArrayHeader));
+        return true;
+    }
 
     /* set array header */
-    bool set_array_header(/* in */ const ArrayHeader & header);
+    bool set_array_header(/* in */ const ArrayHeader & header){
+        char * buf_begin = (char *)m_chunk.begin();
+        memcpy(buf_begin, &header, sizeof(ArrayHeader));
+        return true;
+    }
 };
 
 template<typename MagicHeader, typename ArrayHeader,
