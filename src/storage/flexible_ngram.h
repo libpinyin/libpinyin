@@ -24,6 +24,7 @@
 #ifndef FLEXIBLE_NGRAM_H
 #define FLEXIBLE_NGRAM_H
 
+#include <db.h>
 
 /* Note: the signature of the template parameters.
  * struct MagicHeader, ArrayHeader, ArrayItem.
@@ -33,12 +34,14 @@ typedef GArray * FlexibleBigramPhraseArray;
 
 template<typename ArrayHeader, typename ArrayItem>
 class FlexibleSingleGram{
-    template<typename MagicHeader, typename ArrayHeader,
-             typename ArrayItem>
+    template<typename MH, typename AH,
+             typename AI>
     friend class FlexibleBigram;
 private:
     MemoryChunk m_chunk;
-    FlexibleSingleGram(void * buffer, size_t length);
+    FlexibleSingleGram(void * buffer, size_t length){
+        m_chunk.set_chunk(buffer, length, NULL);
+    }
 public:
     /* item typedefs */
     typedef struct{
@@ -47,7 +50,10 @@ public:
     } ArrayItemWithToken;
 
     /* Null Constructor */
-    FlexibleSingleGram();
+    FlexibleSingleGram(){
+        m_chunk.set_size(sizeof(ArrayHeader));
+        memset(m_chunk.begin(), 0, sizeof(ArrayHeader));
+    }
     /* retrieve all items */
     bool retrieve_all(/* out */ FlexibleBigramPhraseArray array);
 
@@ -97,7 +103,8 @@ public:
     /* load/store one array. */
     bool load(phrase_token_t index,
               FlexibleSingleGram<ArrayHeader, ArrayItem> * & single_gram);
-    bool store(phrase_token_t index, FlexibleSingleGram * & single_gram);
+    bool store(phrase_token_t index,
+               FlexibleSingleGram<ArrayHeader, ArrayItem> * & single_gram);
     /* array of phrase_token_t items, for parameter estimation. */
     bool get_all_items(GArray * items);
 
