@@ -49,6 +49,13 @@ public:
         ArrayItem m_item;
     } ArrayItemWithToken;
 
+private:
+    static bool token_less_than(const ArrayItemWithToken & lhs,
+                                const ArrayItemWithToken & rhs){
+        return lhs.m_token < rhs.m_token;
+    }
+
+public:
     /* Null Constructor */
     FlexibleSingleGram(){
         m_chunk.set_size(sizeof(ArrayHeader));
@@ -56,12 +63,50 @@ public:
     }
 
     /* retrieve all items */
-    bool retrieve_all(/* out */ FlexibleBigramPhraseArray array);
+    bool retrieve_all(/* out */ FlexibleBigramPhraseArray array){
+        const ArrayItemWithToken * begin = (const ArrayItemWithToken *)
+            ((const char *)(m_chunk.begin()) + sizeof(ArrayHeader));
+        const ArrayItemWithToken * end = (const ArrayItemWithToken *)
+            m_chunk.end();
+
+        ArrayItemWithToken item;
+        for ( const ArrayItemWithToken * cur_item = begin;
+              cur_item != end;
+              ++cur_item){
+            /* Note: optimize this with g_array_append_vals? */
+            item.m_token = cur_item->m_token;
+            item.m_item = cur_item->m_item;
+            g_array_append_val(array, item);
+        }
+
+        return true;
+    }
 
     /* search method */
     /* the array result contains many items */
     bool search(/* in */ PhraseIndexRange * range,
-                /* out */ FlexibleBigramPhraseArray array);
+                /* out */ FlexibleBigramPhraseArray array){
+        const ArrayItemWithToken * begin = (const ArrayItemWithToken *)
+            ((const char *)(m_chunk.begin()) + sizeof(ArrayHeader));
+        const ArrayItemWithToken * end = (const ArrayItemWithToken *)
+            m_chunk.end();
+
+        ArrayItemWithToken compare_item;
+        compare_item.m_token = range->m_range_begin;
+        const ArrayItemWithToken * cur_item = std_lite::lower_bound
+            (begin, end, compare_item, token_less_than);
+
+        ArrayItemWithToken item;
+        for ( ; cur_item != end; ++cur_item){
+            if ( cur_item->m_token >= range->m_range_end )
+                break;
+            item.m_token = cur_item->m_token;
+            item.m_item = cur_item->m_item;
+            g_array_append_val(array, item);
+        }
+
+        return true;
+    }
 
     /* get array item */
     bool get_array_item(/* in */ phrase_token_t token,
