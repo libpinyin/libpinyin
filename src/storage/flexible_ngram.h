@@ -189,8 +189,11 @@ public:
 template<typename MagicHeader, typename ArrayHeader,
          typename ArrayItem>
 class FlexibleBigram{
+    /* Note: some flexible bi-gram file format check should be here. */
 private:
     DB * m_db;
+
+    phrase_token_t m_magic_header_index[2];
 
     void reset(){
         if ( m_db ){
@@ -202,6 +205,8 @@ private:
 public:
     FlexibleBigram(){
         m_db = NULL;
+        m_magic_header_index[0] = null_token;
+        m_magic_header_index[1] = null_token;
     }
 
     ~FlexibleBigram(){
@@ -209,18 +214,137 @@ public:
     }
 
     /* attach berkeley db on filesystem for training purpose. */
-    bool attach(const char * dbfile);
+    bool attach(const char * dbfile){
+        reset();
+        if ( dbfile ){
+            int ret = db_create(&m_db, NULL, 0);
+            if ( ret != 0 )
+                assert(false);
+
+            m_db->open(m_db, NULL, dbfile, NULL, DB_HASH, DB_CREATE, 0644);
+            if ( ret != 0 )
+                return false;
+        }
+        return true;
+    }
+
     /* load/store one array. */
     bool load(phrase_token_t index,
-              FlexibleSingleGram<ArrayHeader, ArrayItem> * & single_gram);
+              FlexibleSingleGram<ArrayHeader, ArrayItem> * & single_gram){
+        DBT db_key;
+        memset(&db_key, 0, sizeof(DBT));
+        db_key.data = &index;
+        db_key.size = sizeof(phrase_token_t);
+
+        single_gram = NULL;
+        if ( !m_db )
+            return false;
+
+        DBT db_data;
+        memset(&db_data, 0, sizeof(DBT));
+        int ret = m_db->get(m_db, NULL, &db_key, &db_data, 0);
+        if ( ret == 0)
+            single_gram = new FlexibleSingleGram<ArrayHeader, ArrayItem>
+                (db_data.data, db_data.size);
+
+        return true;
+    }
+
     bool store(phrase_token_t index,
-               FlexibleSingleGram<ArrayHeader, ArrayItem> * & single_gram);
+               FlexibleSingleGram<ArrayHeader, ArrayItem> * & single_gram){
+        if ( !m_db )
+            return false;
+
+        DBT db_key;
+        memset(&db_key, 0, sizeof(DBT));
+        db_key.data = &index;
+        db_key.size = sizeof(phrase_token_t);
+        DBT db_data;
+        memset(&db_data, 0, sizeof(DBT));
+        db_data.data = single_gram->m_chunk.begin();
+        db_data.size = single_gram->m_chunk.size();
+
+        int ret = m_db->put(m_db, NULL, &db_key, &db_data, 0);
+        return ret == 0;
+    }
+
     /* array of phrase_token_t items, for parameter estimation. */
-    bool get_all_items(GArray * items);
+    bool get_all_items(GArray * items){
+        g_array_set_size(items, 0);
+        if ( !m_db )
+            return false;
+
+        DBC * cursorp;
+        DBT key, data;
+        int ret;
+
+        /* Get a cursor */
+        m_db->cursor(m_db, NULL, &cursorp, 0);
+
+        /* Initialize our DBTs. */
+        memset(&key, 0, sizeof(DBT));
+        memset(&data, 0, sizeof(DBT));
+
+        /* Iterate over the database, retrieving each record in turn. */
+        while ((ret =  cursorp->c_get(cursorp, &key, &data, DB_NEXT)) == 0 ){
+            assert(key.size == sizeof(phrase_token_t));
+            phrase_token_t * token = (phrase_token_t *) key.data;
+            g_array_append_val(items, *token);
+        }
+
+        if ( ret != DB_NOTFOUND ){
+            fprintf(stderr, "training db error, exit!");
+            exit(1);
+        }
+
+        /* Cursors must be closed */
+        if (cursorp != NULL)
+            cursorp->c_close(cursorp);
+        return true;
+    }
 
     /* get/set magic header. */
-    bool get_magic_header(MagicHeader & header);
-    bool set_magic_header(const MagicHeader & header);
+    bool get_magic_header(MagicHeader & header){
+        /* Note: remove the below statement later? */
+        assert(sizeof(m_magic_header_index) == 2 * sizeof(phrase_token_t));
+
+        if ( !m_db )
+            return false;
+
+        DBT db_key;
+        memset(&db_key, 0, sizeof(DBT));
+        db_key.data = m_magic_header_index;
+        db_key.size = sizeof(m_magic_header_index);
+        DBT db_data;
+        memset(&db_data, 0, sizeof(DBT));
+        
+        int ret = m_db->get(m_db, NULL, &db_key, &db_data, 0);
+        if ( ret != 0 )
+            return false;
+        assert(sizeof(MagicHeader) == db_data.size);
+        memcpy(&header, db_data.data, sizeof(MagicHeader));
+        return true;
+    }
+
+    bool set_magic_header(const MagicHeader & header){
+        /* Note: remove the below statement later? */
+        assert(sizeof(m_magic_header_index) == 2 * sizeof(phrase_token_t));
+
+        if ( !m_db )
+            return false;
+
+        DBT db_key;
+        memset(&db_key, 0, sizeof(DBT));
+        db_key.data = m_magic_header_index;
+        db_key.size = sizeof(m_magic_header_index);
+        DBT db_data;
+        memset(&db_data, 0, sizeof(DBT));
+        db_data.data = &header;
+        db_data.size = sizeof(MagicHeader);
+
+        int ret = m_db->put(m_db, NULL, &db_key, &db_data, 0);
+        return ret == 0;
+    }
 };
 
 #endif
