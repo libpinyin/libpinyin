@@ -25,7 +25,8 @@ noinst_PROGRAMS          = test_parser \
 			   test_pinyin_index \
 			   test_phrase_index \
 			   test_phrase_table \
-			   test_ngram
+			   test_ngram \
+			   test_flexible_ngram
 
 test_parser_SOURCES    = test_parser.cpp
 
@@ -46,3 +47,7 @@ test_phrase_table_LDADD = ../../src/libpinyin.la @GLIB2_LDFLAGS@
 test_ngram_SOURCES	= test_ngram.cpp
 
 test_ngram_LDADD	= ../../src/libpinyin.la @GLIB2_LDFLAGS@
+
+test_flexible_ngram_SOURCES	= test_flexible_ngram.cpp
+
+test_flexible_ngram_LDADD	= ../../src/libpinyin.la @GLIB2_LDFLAGS@

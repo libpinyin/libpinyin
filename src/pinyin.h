@@ -10,3 +10,6 @@
 #include "lookup.h"
 #include "pinyin_lookup.h"
 #include "phrase_lookup.h"
+
+/* training module */
+#include "flexible_ngram.h"
