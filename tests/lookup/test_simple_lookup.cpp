@@ -85,7 +85,7 @@ int main( int argc, char * argv[]){
 	print_time(start_time, times);
 	for ( size_t i = 0; i < results->len; ++i){
 	    phrase_token_t * token = &g_array_index(results, phrase_token_t, i);
-	    if ( NULL == *token)
+	    if ( null_token == *token)
 		continue;
 	    printf("pos:%ld,token:%d\t", i, *token);
 	}
