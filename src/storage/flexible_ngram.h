@@ -162,7 +162,7 @@ public:
                 return true;
             }
             if ( cur_item->m_token == token ){
-                cur_item.m_item = item;
+                cur_item->m_item = item;
                 return true;
             }
         }
@@ -251,7 +251,7 @@ public:
     }
 
     bool store(phrase_token_t index,
-               FlexibleSingleGram<ArrayHeader, ArrayItem> * & single_gram){
+               FlexibleSingleGram<ArrayHeader, ArrayItem> * single_gram){
         if ( !m_db )
             return false;
 
@@ -287,7 +287,10 @@ public:
 
         /* Iterate over the database, retrieving each record in turn. */
         while ((ret =  cursorp->c_get(cursorp, &key, &data, DB_NEXT)) == 0 ){
-            assert(key.size == sizeof(phrase_token_t));
+            if (key.size > sizeof(phrase_token_t)){
+                /* skip magic header. */
+                continue;
+            }
             phrase_token_t * token = (phrase_token_t *) key.data;
             g_array_append_val(items, *token);
         }
@@ -305,9 +308,6 @@ public:
 
     /* get/set magic header. */
     bool get_magic_header(MagicHeader & header){
-        /* Note: remove the below statement later? */
-        assert(sizeof(m_magic_header_index) == 2 * sizeof(phrase_token_t));
-
         if ( !m_db )
             return false;
 
@@ -327,9 +327,6 @@ public:
     }
 
     bool set_magic_header(const MagicHeader & header){
-        /* Note: remove the below statement later? */
-        assert(sizeof(m_magic_header_index) == 2 * sizeof(phrase_token_t));
-
         if ( !m_db )
             return false;
 
@@ -339,7 +336,7 @@ public:
         db_key.size = sizeof(m_magic_header_index);
         DBT db_data;
         memset(&db_data, 0, sizeof(DBT));
-        db_data.data = &header;
+        db_data.data = (void *) &header;
         db_data.size = sizeof(MagicHeader);
 
         int ret = m_db->put(m_db, NULL, &db_key, &db_data, 0);
