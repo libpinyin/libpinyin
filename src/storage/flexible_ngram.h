@@ -231,14 +231,15 @@ public:
     /* load/store one array. */
     bool load(phrase_token_t index,
               FlexibleSingleGram<ArrayHeader, ArrayItem> * & single_gram){
+        if ( !m_db )
+            return false;
+
         DBT db_key;
         memset(&db_key, 0, sizeof(DBT));
         db_key.data = &index;
         db_key.size = sizeof(phrase_token_t);
 
         single_gram = NULL;
-        if ( !m_db )
-            return false;
 
         DBT db_data;
         memset(&db_data, 0, sizeof(DBT));
@@ -342,6 +343,50 @@ public:
         int ret = m_db->put(m_db, NULL, &db_key, &db_data, 0);
         return ret == 0;
     }
+
+    bool get_array_header(phrase_token_t index, ArrayHeader & header){
+        if ( !m_db )
+            return false;
+
+        DBT db_key;
+        memset(&db_key, 0, sizeof(DBT));
+        db_key.data = &index;
+        db_key.size = sizeof(phrase_token_t);
+
+        DBT db_data;
+        memset(&db_data, 0, sizeof(DBT));
+        db_data.flags = DB_DBT_PARTIAL;
+        db_data.doff = 0;
+        db_data.dlen = sizeof(ArrayHeader);
+        int ret = m_db->get(m_db, NULL, &db_key, &db_data, 0);
+        if ( ret != 0 )
+            return false;
+
+        assert(db_data.size == sizeof(ArrayHeader));
+        memcpy(&header, db_data.data, sizeof(ArrayHeader));
+        return true;
+    }
+
+    bool set_array_header(phrase_token_t index, const ArrayHeader & header){
+        if ( !m_db )
+            return false;
+
+        DBT db_key;
+        memset(&db_key, 0, sizeof(DBT));
+        db_key.data = &index;
+        db_key.size = sizeof(phrase_token_t);
+        DBT db_data;
+        memset(&db_data, 0, sizeof(DBT));
+        db_data.data = (void *)&header;
+        db_data.size = sizeof(ArrayHeader);
+        db_data.flags = DB_DBT_PARTIAL;
+        db_data.doff = 0;
+        db_data.dlen = sizeof(ArrayHeader);
+
+        int ret = m_db->put(m_db, NULL, &db_key, &db_data, 0);
+        return ret == 0;
+    }
+
 };
 
 #endif

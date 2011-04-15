@@ -38,7 +38,6 @@ int main(int argc, char * argv[]) {
     single_gram.set_array_header(32);
     single_gram.get_array_header(freq);
     printf("new array header:%d\n", freq);
-
     bigram.store(2, &single_gram);
 
     for (int m = 1; m <= 2; ++m ){
@@ -69,4 +68,20 @@ int main(int argc, char * argv[]) {
     bigram.get_magic_header(freq);
     assert(total_freq == freq);
     printf("magic header:%d\n", freq);
+
+    printf("-----------------------array header---------------------\n");
+    for ( size_t i = 1; i <= 2; ++i){
+        bigram.get_array_header(i, freq);
+        printf("single gram: %d, freq:%d\n", i, freq);
+    }
+
+    bigram.set_array_header(1, 1);
+
+    printf("-----------------------array header---------------------\n");
+    for ( size_t i = 1; i <= 2; ++i){
+        bigram.get_array_header(i, freq);
+        printf("single gram: %d, freq:%d\n", i, freq);
+    }
+
+    return 0;
 }
