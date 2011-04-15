@@ -53,7 +53,6 @@ int main(int argc, char * argv[]) {
         }
         delete train_gram;
     }
-    g_array_free(array, TRUE);
 
     GArray * items = g_array_new(FALSE, FALSE, sizeof(phrase_token_t));
     bigram.get_all_items(items);
@@ -83,5 +82,20 @@ int main(int argc, char * argv[]) {
         printf("single gram: %d, freq:%d\n", i, freq);
     }
 
+    for (int m = 1; m <= 2; ++m ){
+        printf("--------------------------------------------------------\n");
+        FlexibleSingleGram<guint32, guint32> * train_gram;
+        bigram.load(m, train_gram);
+        g_array_set_size(array, 0);
+        range.m_range_begin = 0; range.m_range_end = 8;
+        train_gram->search(&range, array);
+        for ( size_t i = 0; i < array->len; ++i ){
+            array_item_t * item = &g_array_index(array, array_item_t, i);
+            printf("item:%d:%d\n", item->m_token, item->m_item);
+        }
+        delete train_gram;
+    }
+
+    g_array_free(array, TRUE);
     return 0;
 }
