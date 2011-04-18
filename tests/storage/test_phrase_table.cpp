@@ -65,8 +65,11 @@ int main(int argc, char * argv[]){
         }
         print_time(start, bench_times);
 
-        largetable.search(phrase_len, new_phrase, token);
-        printf("%s:\t%d\n", linebuf, token);
+        int retval = largetable.search(phrase_len, new_phrase, token);
+        if ( retval & SEARCH_OK )
+            printf("%s:\t%d\n", linebuf, token);
+        else
+            printf("phrase %s not found.\n", linebuf);
 
         g_free(new_phrase);
     }
