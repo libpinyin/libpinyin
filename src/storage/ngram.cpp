@@ -243,14 +243,14 @@ bool Bigram::attach(const char * dbfile, guint32 flags){
 }
 
 bool Bigram::load(phrase_token_t index, SingleGram * & single_gram){
+    single_gram = NULL;
+    if ( !m_db )
+        return false;
+
     DBT db_key;
     memset(&db_key, 0, sizeof(DBT));
     db_key.data = &index;
     db_key.size = sizeof(phrase_token_t);
-    
-    single_gram = NULL;
-    if ( !m_db )
-        return false;
 
     DBT db_data;
     memset(&db_data, 0, sizeof(DBT));
