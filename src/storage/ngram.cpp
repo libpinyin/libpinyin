@@ -217,132 +217,99 @@ bool SingleGram::set_freq( /* in */ phrase_token_t token,
 }
 
 
-bool Bigram::attach(const char * systemfile, const char * userfile){
+bool Bigram::attach(const char * dbfile, guint32 flags){
     reset();
-    if ( systemfile ){
-	int ret = db_create(&m_system, NULL, 0);
+    u_int32_t db_flags = 0;
+
+    if ( flags & ATTACH_READONLY )
+        db_flags |= DB_RDONLY;
+    if ( flags & ATTACH_READWRITE )
+        /* nothing */;
+    if ( flags & ATTACH_CREATE )
+        db_flags |= DB_CREATE;
+
+    if ( dbfile ){
+	int ret = db_create(&m_db, NULL, 0);
 	if ( ret != 0 )
 	    assert(false);
 	
-	m_system->open(m_system, NULL, systemfile, NULL, 
-		       DB_HASH, DB_RDONLY, 0664);
+	ret = m_db->open(m_db, NULL, dbfile, NULL,
+                   DB_HASH, db_flags, 0664);
 	if ( ret != 0)
 	    return false;
     }
 
-    if ( userfile ){
-	int ret = db_create(&m_user, NULL, 0);
-	if ( ret != 0 )
-	    assert(false);
-	
-	m_user->open(m_user, NULL, userfile, NULL, DB_HASH, DB_CREATE, 0664);
-	if ( ret != 0)
-	    return false;	
-    }
     return true;
 }
 
-bool Bigram::load(phrase_token_t index, SingleGram * & system_gram, SingleGram * & user_gram){
+bool Bigram::load(phrase_token_t index, SingleGram * & single_gram){
     DBT db_key;
     memset(&db_key, 0, sizeof(DBT));
     db_key.data = &index;
     db_key.size = sizeof(phrase_token_t);
     
-    system_gram = NULL; user_gram = NULL;
-    if ( m_system ){
-	DBT db_data;
-	memset(&db_data, 0, sizeof(DBT));
-	int ret = m_system->get(m_system, NULL, &db_key, &db_data, 0);
-	if ( ret == 0 )
-	    system_gram = new SingleGram(db_data.data, db_data.size);
-    }
-    if ( m_user ){
-	DBT db_data;
-	memset(&db_data, 0, sizeof(DBT));
-	int ret = m_user->get(m_user, NULL, &db_key, &db_data, 0);
-	if ( ret == 0 )
-	    user_gram = new SingleGram(db_data.data, db_data.size);
-    }
+    single_gram = NULL;
+    if ( !m_db )
+        return false;
+
+    DBT db_data;
+    memset(&db_data, 0, sizeof(DBT));
+    int ret = m_db->get(m_db, NULL, &db_key, &db_data, 0);
+    if ( ret != 0 )
+        return false;
+
+    single_gram = new SingleGram(db_data.data, db_data.size);
     return true;
 }
 
-bool Bigram::store(phrase_token_t index, SingleGram * user_gram){
-    if ( !m_user )
+bool Bigram::store(phrase_token_t index, SingleGram * single_gram){
+    if ( !m_db )
 	return false;
+
     DBT db_key;
     memset(&db_key, 0, sizeof(DBT));
     db_key.data = &index;
     db_key.size = sizeof(phrase_token_t);
     DBT db_data;
     memset(&db_data, 0, sizeof(DBT));
-    db_data.data = user_gram->m_chunk.begin();
-    db_data.size = user_gram->m_chunk.size();
+    db_data.data = single_gram->m_chunk.begin();
+    db_data.size = single_gram->m_chunk.size();
     
-    int ret = m_user->put(m_user, NULL, &db_key, &db_data, 0);
+    int ret = m_db->put(m_db, NULL, &db_key, &db_data, 0);
     return ret == 0;
 }
 
-bool Bigram::get_all_items(GArray * system, GArray * user){
-    bool retval = false;
-    g_array_set_size(system, 0);
-    g_array_set_size(user, 0);
-    if ( m_system ){
-	DBC * cursorp;
-	DBT key, data;
-	int ret;
-	/* Get a cursor */
-	m_system->cursor(m_system, NULL, &cursorp, 0); 
-	
-	/* Initialize our DBTs. */
-	memset(&key, 0, sizeof(DBT));
-	memset(&data, 0, sizeof(DBT));
-	
-	/* Iterate over the database, retrieving each record in turn. */
-	while ((ret = cursorp->c_get(cursorp, &key, &data, DB_NEXT)) == 0) {
-	    assert(key.size == sizeof(phrase_token_t));
-	    phrase_token_t * token = (phrase_token_t *)key.data;
-	    g_array_append_val(system, *token);
-	}
-	
-	if (ret != DB_NOTFOUND) {
-	    fprintf(stderr, "system db error, exit!");
-	    exit(1);
-	}
+bool Bigram::get_all_items(GArray * items){
+    g_array_set_size(items, 0);
 
-	/* Cursors must be closed */
-	if (cursorp != NULL) 
-	    cursorp->c_close(cursorp); 
+    if ( !m_db )
+        return false;
 
-	retval = true;
+    DBC * cursorp;
+    DBT key, data;
+    int ret;
+    /* Get a cursor */
+    m_db->cursor(m_db, NULL, &cursorp, 0); 
+
+    /* Initialize our DBTs. */
+    memset(&key, 0, sizeof(DBT));
+    memset(&data, 0, sizeof(DBT));
+	
+    /* Iterate over the database, retrieving each record in turn. */
+    while ((ret = cursorp->c_get(cursorp, &key, &data, DB_NEXT)) == 0) {
+        assert(key.size == sizeof(phrase_token_t));
+        phrase_token_t * token = (phrase_token_t *)key.data;
+        g_array_append_val(items, *token);
     }
-    if ( m_user ){
-	DBC * cursorp;
-	DBT key, data;
-	int ret;
-	/* Get a cursor */
-	m_user->cursor(m_user, NULL, &cursorp, 0);
 
-	/* Initialize out DBTs. */
-	memset(&key, 0, sizeof(DBT));
-	memset(&data, 0, sizeof(DBT));
-	
-	/* Iterate over the database, retrieving each record in turn. */
-	while((ret = cursorp->c_get(cursorp, &key, &data, DB_NEXT)) == 0) {
-	    assert(key.size == sizeof(phrase_token_t));
-	    phrase_token_t * token = (phrase_token_t *) key.data;
-	    g_array_append_val(user, *token);
-	}
-	
-	if (ret != DB_NOTFOUND){
-	    fprintf(stderr, "user db error, exit!");
-	    exit(1);
-	}
-	
-	/* Cursor must be closed */
-	if ( cursorp != NULL)
-	    cursorp->c_close(cursorp);
-
-	retval = true;
+    if (ret != DB_NOTFOUND) {
+        fprintf(stderr, "system db error, exit!");
+        exit(1);
     }
-    return retval;
+
+    /* Cursors must be closed */
+    if (cursorp != NULL) 
+        cursorp->c_close(cursorp); 
+
+    return true;
 }

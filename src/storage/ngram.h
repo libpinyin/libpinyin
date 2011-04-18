@@ -26,6 +26,12 @@
 
 namespace pinyin{
 
+enum {
+    ATTACH_READONLY = 1,
+    ATTACH_READWRITE = 0x1 << 1,
+    ATTACH_CREATE = 0x1 << 2,
+};
+
 class Bigram;
 
 /* Note:
@@ -93,44 +99,40 @@ public:
 
 class Bigram{
 private:
-    DB * m_system;
-    DB * m_user;
+    DB * m_db;
 
     void reset(){
-	if ( m_system ){
-	    m_system->close(m_system, 0);
-	    m_system = NULL;
-	}
-	if ( m_user ){
-	    m_user->close(m_user, 0);
-	    m_user = NULL;
+	if ( m_db ){
+	    m_db->close(m_db, 0);
+	    m_db = NULL;
 	}
     }
 
 public:
     Bigram(){
-	m_system = NULL; m_user = NULL;
+	m_db = NULL;
     }
 
     ~Bigram(){
 	reset();
     }
 
-    /* attach system and user bi-gram */
-    /* when with training systemdb is NULL, only user_gram */
-    bool attach(const char * systemfile, const char * userfile);
+    /* load/save berkeley db in memory. */
+    bool load_db(const char * dbfile);
+    bool save_db(const char * dbfile);
+
+    /* attach bi-gram */
+    bool attach(const char * dbfile, guint32 flags);
 
     /* load/store one single gram */
     bool load(/* in */ phrase_token_t index,
-              /* out */ SingleGram * & system_gram,
-              /* out */ SingleGram * & user_gram);
+              /* out */ SingleGram * & single_gram);
 
     bool store(/* in */ phrase_token_t index,
-               /* in */ SingleGram * user_gram);
+               /* in */ SingleGram * single_gram);
 
     /* array of phrase_token_t items, for parameter estimation. */
-    bool get_all_items(/* out */ GArray * system,
-                       /* out */ GArray * user);
+    bool get_all_items(/* out */ GArray * items);
 };
 
 };
