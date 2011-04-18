@@ -157,15 +157,14 @@ bool parse_bigram(FILE * input, PhraseLargeTable * phrases,
                     last_token = 0;
                     last_single_gram = NULL;
                 }
-                SingleGram * system_gram = NULL, * user_gram = NULL;
-                bigram->load(token1, system_gram, user_gram);
-                assert(system_gram == NULL);
+                SingleGram * single_gram = NULL;
+                bigram->load(token1, single_gram);
 
                 //create the new single gram
-                if ( user_gram == NULL )
-                    user_gram = new SingleGram;
+                if ( single_gram == NULL )
+                    single_gram = new SingleGram;
                 last_token = token1;
-                last_single_gram = user_gram;
+                last_single_gram = single_gram;
             }
             //save the freq
             guint32 total_freq = 0;
@@ -220,7 +219,7 @@ int main(int argc, char * argv[]){
     phrase_index.load(2, chunk);
 
     Bigram bigram;
-    bigram.attach(NULL, bigram_filename);
+    bigram.attach(bigram_filename, ATTACH_CREATE|ATTACH_READWRITE);
 
     taglib_init();
 

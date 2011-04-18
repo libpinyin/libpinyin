@@ -44,10 +44,13 @@ int main( int argc, char * argv[]){
     new_chunk->load("../../data/gbk_char.bin");
     phrase_index.load(2, new_chunk);
 
-    Bigram bigram;
-    bigram.attach("../../data/bigram.db", "/tmp/bigram.db");
+    Bigram system_bigram;
+    system_bigram.attach("../../data/bigram.db", ATTACH_READONLY);
+    Bigram user_bigram;
+    user_bigram.attach("/tmp/bigram.db", ATTACH_CREATE|ATTACH_READWRITE);
     
-    PinyinLookup pinyin_lookup(&custom, &largetable, &phrase_index, &bigram);
+    PinyinLookup pinyin_lookup(&custom, &largetable, &phrase_index,
+                               &system_bigram, &user_bigram);
     
     char* linebuf = (char *)malloc ( 1024 * sizeof (char) );
     size_t size = 1024;

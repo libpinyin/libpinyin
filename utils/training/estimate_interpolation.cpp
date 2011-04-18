@@ -102,42 +102,38 @@ int main(int argc, char * argv[]){
     phrase_index.load(2, chunk);
 
     Bigram bigram;
-    bigram.attach("../../data/bigram.db", NULL);
+    bigram.attach("../../data/bigram.db", ATTACH_READONLY);
 
     Bigram deleted_bigram;
-    deleted_bigram.attach("../../data/deleted_bigram.db", NULL);
+    deleted_bigram.attach("../../data/deleted_bigram.db", ATTACH_READONLY);
 
-    GArray * system_items = g_array_new(FALSE, FALSE, sizeof(phrase_token_t));
-    GArray * user_items = g_array_new(FALSE, FALSE, sizeof(phrase_token_t));
-
-    deleted_bigram.get_all_items(system_items, user_items);
-    assert(0 == user_items->len);
-    g_array_free(user_items, TRUE);
+    GArray * deleted_items = g_array_new(FALSE, FALSE, sizeof(phrase_token_t));
+    deleted_bigram.get_all_items(deleted_items);
 
     parameter_t lambda_sum = 0;
     int lambda_count = 0;
 
-    for ( int i = 0; i < system_items->len; ++i ){
-	phrase_token_t * token = &g_array_index(system_items, phrase_token_t, i);
-	SingleGram * system = NULL, * user = NULL;
-	bigram.load(*token, system, user);
-	assert(NULL == user);
-	SingleGram * deleted_system = NULL, * deleted_user = NULL;
-	deleted_bigram.load(*token, deleted_system, deleted_user);
-	assert(NULL == deleted_user);
+    for ( int i = 0; i < deleted_items->len; ++i ){
+	phrase_token_t * token = &g_array_index(deleted_items, phrase_token_t, i);
+	SingleGram * single_gram = NULL;
+	bigram.load(*token, single_gram);
+
+	SingleGram * deleted_single_gram = NULL;
+	deleted_bigram.load(*token, deleted_single_gram);
 	
-	parameter_t lambda = compute_interpolation(deleted_system, &phrase_index, system);
+	parameter_t lambda = compute_interpolation(deleted_single_gram, &phrase_index, single_gram);
 	
 	printf("lambda:%f\n", lambda);
 
 	lambda_sum += lambda;
 	lambda_count ++;
 
-	if (system) delete system;
-	delete deleted_system;
+	if (single_gram)
+            delete single_gram;
+	delete deleted_single_gram;
     }
 
     printf("average lambda:%f\n", (lambda_sum/lambda_count));
-    g_array_free(system_items, TRUE);
+    g_array_free(deleted_items, TRUE);
 }
 

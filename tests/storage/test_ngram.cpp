@@ -39,7 +39,7 @@ int main(int argc, char * argv[]){
 
 
     Bigram bigram;
-    assert(bigram.attach(NULL, "/tmp/system.db"));
+    assert(bigram.attach("/tmp/test.db", ATTACH_CREATE|ATTACH_READWRITE));
     bigram.store(1, &single_gram);
     assert(single_gram.insert_freq(5, 8));
     single_gram.set_total_freq(32);
@@ -47,37 +47,20 @@ int main(int argc, char * argv[]){
     bigram.store(2, &single_gram);
 
 
-    SingleGram * system, * user;
+    SingleGram * gram = NULL;
     for ( int m = 1; m <= 2; ++m ){
         printf("--------------------------------------------------------\n");
-        bigram.load(m, system, user);
-        assert(NULL == system);
+        bigram.load(m, gram);
         g_array_set_size(array, 0);
         range.m_range_begin = 0; range.m_range_end = 8;
-        user->search(&range,array);
+        gram->search(&range,array);
         for ( size_t i = 0; i < array->len; ++i){
             BigramPhraseItem * item = &g_array_index(array, BigramPhraseItem, i);
             printf("item:%d:%f\n", item->m_token, item->m_freq);
         } 
-        delete user;
+        delete gram;
     }
     
-    bigram.attach("/tmp/system.db", NULL);
-
-    for ( int m = 1; m <=2; ++m ){
-        printf("--------------------------------------------------------\n");
-        bigram.load(m, system, user);
-        assert(NULL == user);
-        g_array_set_size(array, 0);
-        range.m_range_begin = 0; range.m_range_end = 8;
-        system->search(&range,array);
-        for ( size_t i = 0; i < array->len; ++i){
-            BigramPhraseItem * item = &g_array_index(array, BigramPhraseItem, i);
-            printf("item:%d:%f\n", item->m_token, item->m_freq);
-        }
-        delete system;
-    }
-
     printf("--------------------------------------------------------\n");
     single_gram.prune();
     g_array_set_size(array, 0);
@@ -92,18 +75,12 @@ int main(int argc, char * argv[]){
 
     g_array_free(array, TRUE);
 
-    GArray * system_items = g_array_new(FALSE, FALSE, sizeof(phrase_token_t));
-    GArray * user_items = g_array_new(FALSE, FALSE, sizeof(phrase_token_t));
-    bigram.get_all_items(system_items, user_items);
+    GArray * items = g_array_new(FALSE, FALSE, sizeof(phrase_token_t));
+    bigram.get_all_items(items);
 
     printf("----------------------system----------------------------\n");
-    for ( size_t i = 0; i < system_items->len; ++i){
-	phrase_token_t * token = &g_array_index(system_items, phrase_token_t, i);
-	printf("item:%d\n", *token);
-    }
-    printf("-----------------------user-----------------------------\n");
-    for ( size_t i = 0; i < user_items->len; ++i){
-	phrase_token_t * token = &g_array_index(user_items, phrase_token_t, i);
+    for ( size_t i = 0; i < items->len; ++i){
+	phrase_token_t * token = &g_array_index(items, phrase_token_t, i);
 	printf("item:%d\n", *token);
     }
 }

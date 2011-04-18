@@ -86,7 +86,7 @@ int main(int argc, char * argv[]){
     phrase_index.load(2, chunk);
     
     Bigram bigram;
-    bigram.attach(NULL, bigram_filename);
+    bigram.attach(bigram_filename, ATTACH_CREATE|ATTACH_READWRITE);
     
     
     char* linebuf = (char *)malloc ( 1024 * sizeof (char) );
@@ -113,31 +113,31 @@ int main(int argc, char * argv[]){
 		phrase_index.add_unigram_frequency(cur_token, 1);
 	}
 	if ( cur_token ){
-	    SingleGram * system = NULL, * user = NULL;
+	    SingleGram * single_gram = NULL;
 	    if ( 0 == last_token ){
 		if (train_pi_gram)
-		    bigram.load(sentence_start, system, user);
+		    bigram.load(sentence_start, single_gram);
 	    } else
-		bigram.load(last_token, system, user);
-	    assert(NULL == system);
-	    if ( NULL == user ){
-		user = new SingleGram;
+		bigram.load(last_token, single_gram);
+
+	    if ( NULL == single_gram ){
+		single_gram = new SingleGram;
 	    }
 	    guint32 freq, total_freq;
 	    //increase freq
-	    if (user->get_freq(cur_token, freq))
-                user->set_freq(cur_token, freq + 1);
+	    if (single_gram->get_freq(cur_token, freq))
+                single_gram->set_freq(cur_token, freq + 1);
             else
-                user->insert_freq(cur_token, 1);
+                single_gram->insert_freq(cur_token, 1);
 	    //increase total freq
-	    user->get_total_freq(total_freq);
-	    user->set_total_freq(total_freq + 1);
+	    single_gram->get_total_freq(total_freq);
+	    single_gram->set_total_freq(total_freq + 1);
 	    if ( 0 == last_token ){
 		if ( train_pi_gram )
-		    bigram.store(sentence_start, user);
+		    bigram.store(sentence_start, single_gram);
 	    }else
-		bigram.store(last_token, user);
-	    delete user;
+		bigram.store(last_token, single_gram);
+	    delete single_gram;
 	}
     }
     

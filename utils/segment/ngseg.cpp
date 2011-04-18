@@ -39,7 +39,8 @@
 
 PhraseLargeTable * g_phrase_table = NULL;
 FacadePhraseIndex * g_phrase_index = NULL;
-Bigram * g_bigram = NULL;
+Bigram * g_system_bigram = NULL;
+Bigram * g_user_bigram = NULL;
 PhraseLookup * g_phrase_lookup = NULL;
 
 enum CONTEXT_STATE{
@@ -114,12 +115,14 @@ int main(int argc, char * argv[]){
     g_phrase_index->load(2, chunk);
 
     //init bi-gram
-    g_bigram = new Bigram;
-    g_bigram->attach("../../data/bigram.db", NULL);
+    g_system_bigram = new Bigram;
+    g_system_bigram->attach("../../data/bigram.db", ATTACH_READONLY);
+    g_user_bigram = new Bigram;
+
 
     //init phrase lookup
     g_phrase_lookup = new PhraseLookup(g_phrase_table, g_phrase_index,
-                                       g_bigram);
+                                       g_system_bigram, g_user_bigram);
 
 
     CONTEXT_STATE state, next_state;

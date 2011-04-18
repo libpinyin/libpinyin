@@ -57,7 +57,7 @@ int main(int argc, char * argv[]){
     phrase_index.load(2, chunk);
 
     Bigram bigram;
-    bigram.attach(bigram_filename, NULL);
+    bigram.attach(bigram_filename, ATTACH_READONLY);
 
     begin_data(output);
 
@@ -99,23 +99,19 @@ void gen_bigram(FILE * output, FacadePhraseIndex * phrase_index, Bigram * bigram
     fprintf(output, "\\2-gram\n");
 
     /* Retrieve all user items. */
-    GArray * system_items = g_array_new(FALSE, FALSE, sizeof(phrase_token_t));
-    GArray * user_items = g_array_new(FALSE, FALSE, sizeof(phrase_token_t));
+    GArray * items = g_array_new(FALSE, FALSE, sizeof(phrase_token_t));
 
-    bigram->get_all_items(system_items, user_items);
-    assert(0 == user_items->len);
-    g_array_free(user_items, TRUE);
+    bigram->get_all_items(items);
 
     PhraseItem item;
 
-    for(size_t i = 0; i < system_items->len; i++){
-        phrase_token_t token = g_array_index(system_items, phrase_token_t, i);
-        SingleGram * system = NULL, * user = NULL;
-        bigram->load(token, system, user);
-        assert(NULL == user);
+    for(size_t i = 0; i < items->len; i++){
+        phrase_token_t token = g_array_index(items, phrase_token_t, i);
+        SingleGram * single_gram = NULL;
+        bigram->load(token, single_gram);
 
         BigramPhraseWithCountArray array = g_array_new(FALSE, FALSE, sizeof(BigramPhraseItemWithCount));
-        system->retrieve_all(array);
+        single_gram->retrieve_all(array);
         for(size_t j = 0; j < array->len; j++) {
             BigramPhraseItemWithCount * item = &g_array_index(array, BigramPhraseItemWithCount, j);
 
@@ -132,7 +128,7 @@ void gen_bigram(FILE * output, FacadePhraseIndex * phrase_index, Bigram * bigram
         g_array_free(array, TRUE);
     }
 
-    g_array_free(system_items, TRUE);
+    g_array_free(items, TRUE);
 }
 
 static const char * special_token_to_string(phrase_token_t token){
