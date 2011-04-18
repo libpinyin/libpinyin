@@ -73,7 +73,7 @@ bool SingleGram::prune(){
 	return true;
 }
 
-bool token_less_than(const SingleGramItem & lhs,const SingleGramItem & rhs){
+static bool token_less_than(const SingleGramItem & lhs,const SingleGramItem & rhs){
     return lhs.m_token < rhs.m_token;
 }
 
