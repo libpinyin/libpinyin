@@ -125,8 +125,10 @@ int main(int argc, char * argv[]){
 	    }
 	    guint32 freq, total_freq;
 	    //increase freq
-	    user->get_freq(cur_token, freq);
-	    user->set_freq(cur_token, freq + 1);
+	    if (user->get_freq(cur_token, freq))
+                user->set_freq(cur_token, freq + 1);
+            else
+                user->insert_freq(cur_token, 1);
 	    //increase total freq
 	    user->get_total_freq(total_freq);
 	    user->set_total_freq(total_freq + 1);

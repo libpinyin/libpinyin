@@ -170,7 +170,7 @@ bool parse_bigram(FILE * input, PhraseLargeTable * phrases,
             //save the freq
             guint32 total_freq = 0;
             assert(last_single_gram->get_total_freq(total_freq));
-            last_single_gram->set_freq(token2, count);
+            last_single_gram->insert_freq(token2, count);
             total_freq += count;
             assert(last_single_gram->set_total_freq(total_freq));
             break;

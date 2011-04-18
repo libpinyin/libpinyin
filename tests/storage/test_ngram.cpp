@@ -7,16 +7,19 @@ int main(int argc, char * argv[]){
     
     const guint32 total_freq = 16;
     assert(single_gram.set_total_freq(total_freq));
-    
 
     phrase_token_t tokens[6] = { 2, 6, 4, 3, 1, 3};
     guint32 freqs[6] = { 1, 2, 4, 8, 16, 32};
 
+    guint32 freq;
+
     for(size_t i = 0; i < 6 ;++i){
-	single_gram.set_freq(tokens[i], freqs[i]);
+        if ( single_gram.get_freq(tokens[i], freq))
+            single_gram.set_freq(tokens[i], freqs[i]);
+        else
+            single_gram.insert_freq(tokens[i], freqs[i]);
     }
 
-    guint32 freq;
     single_gram.get_freq(3, freq);
     assert(freq == 32);
 
@@ -38,7 +41,7 @@ int main(int argc, char * argv[]){
     Bigram bigram;
     assert(bigram.attach(NULL, "/tmp/system.db"));
     bigram.store(1, &single_gram);
-    single_gram.set_freq(5, 8);
+    assert(single_gram.insert_freq(5, 8));
     single_gram.set_total_freq(32);
     
     bigram.store(2, &single_gram);

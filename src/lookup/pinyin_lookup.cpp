@@ -463,7 +463,7 @@ bool PinyinLookup::train_result(PinyinKeyVector keys, CandidateConstraints const
 		guint32 freq = 0;
 		if ( !user->get_freq(*token, freq)){
 		    if (system) system->get_freq(*token, freq);
-		    user->set_freq(*token, freq);
+		    user->insert_freq(*token, freq);
 		}
 		assert(user->get_total_freq(total_freq));
 		//protect against total_freq overflow.
