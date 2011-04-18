@@ -15,9 +15,9 @@ int main(int argc, char * argv[]){
 
     for(size_t i = 0; i < 6 ;++i){
         if ( single_gram.get_freq(tokens[i], freq))
-            single_gram.set_freq(tokens[i], freqs[i]);
+            assert(single_gram.set_freq(tokens[i], freqs[i]));
         else
-            single_gram.insert_freq(tokens[i], freqs[i]);
+            assert(single_gram.insert_freq(tokens[i], freqs[i]));
     }
 
     single_gram.get_freq(3, freq);

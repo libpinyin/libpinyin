@@ -10,11 +10,15 @@ int main(int argc, char * argv[]) {
     phrase_token_t tokens[6] = { 2, 6, 4, 3, 1, 3 };
     guint32 freqs[6] = { 1, 2, 4, 8, 16, 32};
 
+    guint32 freq;
+
     for ( size_t i = 0; i < 6; ++i ){
-        single_gram.set_array_item(tokens[i], freqs[i]);
+        if ( single_gram.get_array_item(tokens[i], freq) )
+            assert(single_gram.set_array_item(tokens[i], freqs[i]));
+        else
+            assert(single_gram.insert_array_item(tokens[i], freqs[i]));
     }
 
-    guint32 freq;
     single_gram.get_array_item(3, freq);
     assert(freq == 32);
 
@@ -34,9 +38,9 @@ int main(int argc, char * argv[]) {
     FlexibleBigram<guint32, guint32, guint32> bigram;
     assert(bigram.attach("/tmp/training.db"));
     bigram.store(1, &single_gram);
-    single_gram.set_array_item(5, 8);
-    single_gram.set_array_header(32);
-    single_gram.get_array_header(freq);
+    assert(single_gram.insert_array_item(5, 8));
+    assert(single_gram.set_array_header(32));
+    assert(single_gram.get_array_header(freq));
     printf("new array header:%d\n", freq);
     bigram.store(2, &single_gram);
 
