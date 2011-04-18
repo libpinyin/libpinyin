@@ -121,8 +121,61 @@ bool SingleGram::search(/* in */ PhraseIndexRange * range,
     return true;
 }
 
+bool SingleGram::insert_freq( /* in */ phrase_token_t token,
+                              /* in */ guint32 freq){
+    SingleGramItem * begin = (SingleGramItem *)
+        ((const char *)(m_chunk.begin()) + sizeof(guint32));
+    SingleGramItem * end = (SingleGramItem *) m_chunk.end();
+    SingleGramItem compare_item;
+    compare_item.m_token = token;
+    SingleGramItem * cur_item = std_lite::lower_bound(begin, end, compare_item, token_less_than);
+
+    SingleGramItem insert_item;
+    insert_item.m_token = token;
+    insert_item.m_freq = freq;
+    for ( ; cur_item != end; ++cur_item ){
+        if ( cur_item->m_token > token ){
+            size_t offset = sizeof(guint32) +
+                sizeof(SingleGramItem) * (cur_item - begin);
+            m_chunk.insert_content(offset, &insert_item,
+                                   sizeof(SingleGramItem));
+            return true;
+        }
+        if ( cur_item->m_token == token ){
+            return false;
+        }
+    }
+    m_chunk.insert_content(m_chunk.size(), &insert_item,
+                           sizeof(SingleGramItem));
+    return true;
+}
+
+bool SingleGram::remove_freq( /* in */ phrase_token_t token,
+                              /* out */ guint32 & freq){
+    freq = 0;
+    const SingleGramItem * begin = (const SingleGramItem *)
+        ((const char *)(m_chunk.begin()) + sizeof(guint32));
+    const SingleGramItem * end = (const SingleGramItem *)m_chunk.end();
+    SingleGramItem compare_item;
+    compare_item.m_token = token;
+    const SingleGramItem * cur_item = std_lite::lower_bound(begin, end, compare_item, token_less_than);
+
+    for ( ; cur_item != end; ++cur_item ){
+        if ( cur_item->m_token > token )
+            return false;
+        if ( cur_item->m_token == token ){
+            freq = cur_item -> m_freq;
+            size_t offset = sizeof(guint32) +
+                sizeof(SingleGramItem) * (cur_item - begin);
+            m_chunk.remove_content(offset, sizeof(SingleGramItem));
+            return true;
+        }
+    }
+    return false;
+}
+
 bool SingleGram::get_freq(/* in */ phrase_token_t token,
-			/* out */ guint32 & freq){
+                          /* out */ guint32 & freq){
     freq = 0;
     const SingleGramItem * begin = (const SingleGramItem *)
 	((const char *)(m_chunk.begin()) + sizeof(guint32));
@@ -142,8 +195,8 @@ bool SingleGram::get_freq(/* in */ phrase_token_t token,
     return false;
 }
 
-bool SingleGram::set_freq(/* in */ phrase_token_t token,
-			      guint32 freq){
+bool SingleGram::set_freq( /* in */ phrase_token_t token,
+			   /* in */ guint32 freq){
     SingleGramItem * begin = (SingleGramItem *)
 	((const char *)(m_chunk.begin()) + sizeof(guint32));
     SingleGramItem * end = (SingleGramItem *)m_chunk.end();
@@ -151,25 +204,16 @@ bool SingleGram::set_freq(/* in */ phrase_token_t token,
     compare_item.m_token = token;
     SingleGramItem * cur_item = std_lite::lower_bound(begin, end, compare_item, token_less_than);
     
-    SingleGramItem insert_item;
-    insert_item.m_token = token;
-    insert_item.m_freq = freq;
     for ( ;cur_item != end; ++cur_item){
 	if ( cur_item->m_token > token ){
-	    size_t offset  = sizeof(guint32) + 
-		sizeof(SingleGramItem) * (cur_item - begin);
-	    m_chunk.insert_content(offset, &insert_item, 
-				   sizeof(SingleGramItem));
-	    return true;
+	    return false;
 	}
 	if ( cur_item->m_token == token ){
 	    cur_item -> m_freq = freq;
 	    return true;
 	}
     }
-    m_chunk.insert_content(m_chunk.size(), &insert_item, 
-			   sizeof(SingleGramItem));
-    return true;
+    return false;
 }
 
 

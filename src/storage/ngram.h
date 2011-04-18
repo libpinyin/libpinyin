@@ -55,13 +55,25 @@ public:
     bool search(/* in */ PhraseIndexRange * range, 
 	       /* out */ BigramPhraseArray array);
 
+    /* insert_freq method
+     */
+    bool insert_freq(/* in */ phrase_token_t token,
+                     /* in */ guint32 freq);
+
+    /* remove_freq method
+     */
+    bool remove_freq(/* in */ phrase_token_t token,
+                     /* out */ guint32 & freq);
+
+    /* get_freq method
+     */
     bool get_freq(/* in */ phrase_token_t token,
 	       /* out */ guint32 & freq); 
     
     /* set_freq method
      */
     bool set_freq(/* in */ phrase_token_t token,
-		  guint32 freq);
+		  /* in */ guint32 freq);
     
     /* get_total_freq method
      * used in user bigram table
