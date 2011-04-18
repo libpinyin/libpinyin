@@ -32,10 +32,12 @@ const gfloat PhraseLookup::unigram_lambda;
 
 PhraseLookup::PhraseLookup(PhraseLargeTable * phrase_table,
                            FacadePhraseIndex * phrase_index,
-                           Bigram * bigram){
+                           Bigram * system_bigram,
+                           Bigram * user_bigram){
     m_phrase_table = phrase_table;
     m_phrase_index = phrase_index;
-    m_bigram = bigram;
+    m_system_bigram = system_bigram;
+    m_user_bigram = user_bigram;
 
     m_steps_index = g_ptr_array_new();
     m_steps_content = g_ptr_array_new();
@@ -123,7 +125,9 @@ bool PhraseLookup::search_bigram(int nstep, phrase_token_t token){
         lookup_value_t * cur_value = &g_array_index(lookup_content, lookup_value_t, i);
         phrase_token_t index_token = cur_value->m_handles[1];
         SingleGram * system, * user;
-        m_bigram->load(index_token, system, user);
+        m_system_bigram->load(index_token, system);
+        m_user_bigram->load(index_token, user);
+
         if ( system && user ){
             guint32 total_freq;
             assert(user->get_total_freq(total_freq));

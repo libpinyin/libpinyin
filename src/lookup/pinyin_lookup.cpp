@@ -35,11 +35,16 @@
 const gfloat PinyinLookup::bigram_lambda;
 const gfloat PinyinLookup::unigram_lambda;
 
-PinyinLookup::PinyinLookup(PinyinCustomSettings * custom, PinyinLargeTable * pinyin_table, FacadePhraseIndex * phrase_index, Bigram * bigram){
+PinyinLookup::PinyinLookup(PinyinCustomSettings * custom,
+                           PinyinLargeTable * pinyin_table,
+                           FacadePhraseIndex * phrase_index,
+                           Bigram * system_bigram,
+                           Bigram * user_bigram){
     m_custom = custom;
     m_pinyin_table = pinyin_table;
     m_phrase_index = phrase_index;
-    m_bigram = bigram;
+    m_system_bigram = system_bigram;
+    m_user_bigram = user_bigram;
 
     m_winner_tree = new WinnerTree;
     m_steps_index = g_ptr_array_new();
@@ -239,7 +244,8 @@ bool PinyinLookup::search_bigram(IBranchIterator * iter,
 	//printf("token:%d\t%d\n", cur_step.m_handles[0], cur_step.m_handles[1]);
 	phrase_token_t index_token = cur_step.m_handles[1];
 	SingleGram * system, * user;
-	m_bigram->load(index_token, system, user);
+	m_system_bigram->load(index_token, system);
+        m_user_bigram->load(index_token, user);
 	if ( system && user ){
 	    guint32 total_freq;
 	    assert(user->get_total_freq(total_freq));
@@ -451,7 +457,8 @@ bool PinyinLookup::train_result(PinyinKeyVector keys, CandidateConstraints const
 	    m_phrase_index->add_unigram_frequency(*token, train_factor);
 	    if ( last_token ){
 		SingleGram * system, *user;
-		m_bigram->load(last_token, system, user);
+		m_system_bigram->load(last_token, system);
+                m_user_bigram->load(last_token, user);
 		guint32 total_freq;
 		if ( !user ){
 		    total_freq = 0;
@@ -473,7 +480,7 @@ bool PinyinLookup::train_result(PinyinKeyVector keys, CandidateConstraints const
 		assert(user->get_freq(*token, freq));
 		//if total_freq is not overflow, then freq won't overflow.
 		assert(user->set_freq(*token, freq + train_factor));
-		assert(m_bigram->store(last_token, user));
+		assert(m_user_bigram->store(last_token, user));
 	    next:
 		if (system) delete system;
 		if (user) delete user;

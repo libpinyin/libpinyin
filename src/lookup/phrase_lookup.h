@@ -39,7 +39,8 @@ protected:
     //saved varibles
     PhraseLargeTable * m_phrase_table;
     FacadePhraseIndex * m_phrase_index;
-    Bigram * m_bigram;
+    Bigram * m_system_bigram;
+    Bigram * m_user_bigram;
 
     //internal step data structure
     GPtrArray * m_steps_index;
@@ -67,7 +68,8 @@ protected:
 public:
     PhraseLookup(PhraseLargeTable * phrase_table,
                  FacadePhraseIndex * phrase_index,
-                 Bigram * bigram);
+                 Bigram * system_bigram,
+                 Bigram * user_bigram);
 
     ~PhraseLookup();
 

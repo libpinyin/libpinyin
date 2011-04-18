@@ -88,7 +88,8 @@ protected:
     PinyinLargeTable * m_pinyin_table;
     FacadePhraseIndex * m_phrase_index;
     PinyinCustomSettings * m_custom;
-    Bigram * m_bigram;
+    Bigram * m_system_bigram;
+    Bigram * m_user_bigram;
     
     //internal step data structure
     GPtrArray * m_steps_index;  
@@ -116,7 +117,7 @@ protected:
     
     bool final_step(MatchResults & results);
 public:
-    PinyinLookup( PinyinCustomSettings * custom, PinyinLargeTable * pinyin_table, FacadePhraseIndex * phrase_index, Bigram * bigram);
+    PinyinLookup( PinyinCustomSettings * custom, PinyinLargeTable * pinyin_table, FacadePhraseIndex * phrase_index, Bigram * system_bigram, Bigram * user_bigram);
 
     ~PinyinLookup();
 
