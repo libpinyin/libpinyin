@@ -100,6 +100,9 @@ int main(int argc, char * argv[]){
         glong phrase_len = 0;
         utf16_t * phrase = g_utf8_to_utf16(linebuf, -1, NULL, &phrase_len, NULL);
 
+        if ( phrase_len == 0 )
+            continue;
+
 	phrase_token_t token = 0;
         int result = g_phrases->search( phrase_len, phrase, token);
 	if ( ! (result & SEARCH_OK) )
