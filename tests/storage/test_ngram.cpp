@@ -31,17 +31,16 @@ int main(int argc, char * argv[]){
     for ( size_t i = 0; i < array->len; ++i){
 	BigramPhraseItem * item = &g_array_index(array, BigramPhraseItem, i);
 	printf("item:%d:%f\n", item->m_token, item->m_freq);
-    } 
-
+    }
 
     assert(single_gram.get_total_freq(freq));
     assert(freq == total_freq);
-
 
     Bigram bigram;
     assert(bigram.attach("/tmp/test.db", ATTACH_CREATE|ATTACH_READWRITE));
     bigram.store(1, &single_gram);
     assert(single_gram.insert_freq(5, 8));
+    assert(single_gram.remove_freq(1, freq));
     single_gram.set_total_freq(32);
     
     bigram.store(2, &single_gram);
@@ -62,14 +61,6 @@ int main(int argc, char * argv[]){
     }
     
     printf("--------------------------------------------------------\n");
-    single_gram.prune();
-    g_array_set_size(array, 0);
-    range.m_range_begin = 0; range.m_range_end = 8;
-    single_gram.search(&range,array);
-    for ( size_t i = 0; i < array->len; ++i){
-        BigramPhraseItem * item = &g_array_index(array, BigramPhraseItem, i);
-        printf("item:%d:%f\n", item->m_token, item->m_freq);
-    }
     assert(single_gram.get_total_freq(freq));
     printf("total_freq:%d\n", freq);
 

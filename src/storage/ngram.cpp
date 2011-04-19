@@ -51,7 +51,8 @@ bool SingleGram::set_total_freq(guint32 total){
 }
 
 bool SingleGram::prune(){
-#if 1
+    assert(false);
+#if 0
     SingleGramItem * begin = (SingleGramItem *)
 	((const char *)(m_chunk.begin()) + sizeof(guint32));
     SingleGramItem * end = (SingleGramItem *)m_chunk.end();

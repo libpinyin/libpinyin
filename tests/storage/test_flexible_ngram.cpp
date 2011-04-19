@@ -39,6 +39,7 @@ int main(int argc, char * argv[]) {
     assert(bigram.attach("/tmp/training.db"));
     bigram.store(1, &single_gram);
     assert(single_gram.insert_array_item(5, 8));
+    assert(single_gram.remove_array_item(1, freq));
     assert(single_gram.set_array_header(32));
     assert(single_gram.get_array_header(freq));
     printf("new array header:%d\n", freq);
