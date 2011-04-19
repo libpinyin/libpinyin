@@ -225,7 +225,7 @@ bool Bigram::attach(const char * dbfile, guint32 flags){
     if ( flags & ATTACH_READONLY )
         db_flags |= DB_RDONLY;
     if ( flags & ATTACH_READWRITE )
-        /* nothing */;
+        assert( !( flags & ATTACH_READONLY ) );
     if ( flags & ATTACH_CREATE )
         db_flags |= DB_CREATE;
 
