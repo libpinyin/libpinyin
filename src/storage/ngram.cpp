@@ -20,6 +20,8 @@
  */
 
 #include <stdio.h>
+#include <glib.h>
+#include <glib/gstdio.h>
 #include "memory_chunk.h"
 #include "novel_types.h"
 #include "ngram.h"
@@ -217,6 +219,92 @@ bool SingleGram::set_freq( /* in */ phrase_token_t token,
     return false;
 }
 
+bool Bigram::load_db(const char * dbfile){
+    reset();
+
+    DB * tmp_db = NULL;
+    int ret = db_create(&tmp_db, NULL, 0);
+    assert(ret == 0);
+
+    ret = tmp_db->open(tmp_db, NULL, dbfile, NULL,
+                       DB_HASH, DB_RDONLY, 0600);
+    if ( ret != 0 )
+        return false;
+
+    ret = db_create(&m_db, NULL, 0);
+    assert(ret == 0);
+
+    ret = m_db->open(m_db, NULL, NULL, NULL,
+                     DB_HASH, DB_CREATE, 0600);
+    if ( ret != 0 )
+        return false;
+
+    DBC * cursorp = NULL;
+    DBT key, data;
+    /* Get a cursor */
+    tmp_db->cursor(tmp_db, NULL, &cursorp, 0);
+
+    /* Initialize our DBTs. */
+    memset(&key, 0, sizeof(DBT));
+    memset(&data, 0, sizeof(DBT));
+
+    /* Iterate over the database, retrieving each record in turn. */
+    while ((ret = cursorp->c_get(cursorp, &key, &data, DB_NEXT)) == 0) {
+        int ret = m_db->put(m_db, NULL, &key, &data, 0);
+        assert(ret == 0);
+    }
+    assert (ret == DB_NOTFOUND);
+
+    /* Cursors must be closed */
+    if ( cursorp != NULL )
+        cursorp->c_close(cursorp);
+
+    if ( tmp_db != NULL )
+        tmp_db->close(tmp_db, 0);
+
+    return true;
+}
+
+bool Bigram::save_db(const char * dbfile){
+    DB * tmp_db = NULL;
+
+    int ret = g_unlink(dbfile);
+    if ( ret != 0 )
+        return false;
+
+    ret = db_create(&tmp_db, NULL, 0);
+    assert(ret == 0);
+
+    ret = tmp_db->open(tmp_db, NULL, dbfile, NULL,
+                       DB_HASH, DB_CREATE, 0600);
+    if ( ret != 0 )
+        return false;
+
+    DBC * cursorp = NULL;
+    DBT key, data;
+    /* Get a cursor */
+    m_db->cursor(m_db, NULL, &cursorp, 0);
+
+    /* Initialize our DBTs. */
+    memset(&key, 0, sizeof(DBT));
+    memset(&data, 0, sizeof(DBT));
+
+    /* Iterate over the database, retrieving each record in turn. */
+    while ((ret = cursorp->c_get(cursorp, &key, &data, DB_NEXT)) == 0) {
+        int ret = tmp_db->put(tmp_db, NULL, &key, &data, 0);
+        assert(ret == 0);
+    }
+    assert (ret == DB_NOTFOUND);
+
+    /* Cursors must be closed */
+    if ( cursorp != NULL )
+        cursorp->c_close(cursorp);
+
+    if ( tmp_db != NULL )
+        tmp_db->close(tmp_db, 0);
+
+    return true;
+}
 
 bool Bigram::attach(const char * dbfile, guint32 flags){
     reset();
@@ -229,16 +317,16 @@ bool Bigram::attach(const char * dbfile, guint32 flags){
     if ( flags & ATTACH_CREATE )
         db_flags |= DB_CREATE;
 
-    if ( dbfile ){
-	int ret = db_create(&m_db, NULL, 0);
-	if ( ret != 0 )
-	    assert(false);
+    if ( !dbfile )
+        return false;
+    int ret = db_create(&m_db, NULL, 0);
+    if ( ret != 0 )
+        assert(false);
 	
-	ret = m_db->open(m_db, NULL, dbfile, NULL,
-                   DB_HASH, db_flags, 0664);
-	if ( ret != 0)
-	    return false;
-    }
+    ret = m_db->open(m_db, NULL, dbfile, NULL,
+                     DB_HASH, db_flags, 0664);
+    if ( ret != 0)
+        return false;
 
     return true;
 }
@@ -286,7 +374,7 @@ bool Bigram::get_all_items(GArray * items){
     if ( !m_db )
         return false;
 
-    DBC * cursorp;
+    DBC * cursorp = NULL;
     DBT key, data;
     int ret;
     /* Get a cursor */
@@ -303,10 +391,7 @@ bool Bigram::get_all_items(GArray * items){
         g_array_append_val(items, *token);
     }
 
-    if (ret != DB_NOTFOUND) {
-        fprintf(stderr, "system db error, exit!");
-        exit(1);
-    }
+    assert (ret == DB_NOTFOUND);
 
     /* Cursors must be closed */
     if (cursorp != NULL) 
