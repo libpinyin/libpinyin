@@ -23,6 +23,8 @@ INCLUDES		= -I$(top_srcdir)/src \
                           -I$(top_srcdir)/src/lookup \
 			  @GLIB2_CPPFLAGS@
 
+noinst_HEADERS		= k_mixture_model.h
+
 noinst_PROGRAMS		= gen_ngram gen_unigram estimate_interpolation
 
 gen_ngram_SOURCES	= gen_ngram.cpp
