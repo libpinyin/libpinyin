@@ -74,4 +74,9 @@ int main(int argc, char * argv[]){
 	phrase_token_t * token = &g_array_index(items, phrase_token_t, i);
 	printf("item:%d\n", *token);
     }
+
+    assert(bigram.load_db("/tmp/test.db"));
+    assert(bigram.save_db("/tmp/test.db"));
+
+    return 0;
 }
