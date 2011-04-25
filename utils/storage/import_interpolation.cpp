@@ -228,7 +228,11 @@ int main(int argc, char * argv[]){
 
     //enter "\data" line
     assert(taglib_add_tag(BEGIN_LINE, "\\data", 0, "model", ""));
-    my_getline(input);
+    ssize_t result = my_getline(input);
+    if ( result == -1 ) {
+        fprintf(stderr, "empty file input.\n");
+        exit(1);
+    }
 
     //read "\data" line
     assert(taglib_read(linebuf, line_type, values, required));
@@ -240,8 +244,9 @@ int main(int argc, char * argv[]){
         exit(1);
     }
 
-    my_getline(input);
-    parse_body(input, &phrases, &phrase_index, &bigram);
+    result = my_getline(input);
+    if ( result != -1 )
+	parse_body(input, &phrases, &phrase_index, &bigram);
 
     taglib_fini();
 
