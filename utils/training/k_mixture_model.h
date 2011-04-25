@@ -24,6 +24,7 @@
 #define K_MIXTURE_MODEL
 
 #include "novel_types.h"
+#include "flexible_ngram.h"
 
 namespace pinyin{
 
@@ -103,6 +104,46 @@ static inline parameter_t compute_Pr_G_2_with_count(corpus_count_t k,
     parameter_t B = compute_B(N, T, n_0, n_1);
     return compute_Pr_G_2(k, alpha, B);
 }
+
+typedef struct{
+    /* the total number of instances of all words. */
+    guint32 m_WC;
+    /* the total number of documents. */
+    guint32 m_N;
+} KMixtureModelMagicHeader;
+
+typedef struct{
+    /* the total number of instances of word W1. */
+    guint32 m_WC;
+} KMixtureModelArrayHeader;
+
+typedef struct{
+    /* the total number of all W1,W2 word pair. */
+    guint32 m_WC;
+
+    /* the total number of instances of the word or phrases.
+       (two word phrase) */
+    guint32 m_T; /* alias of m_WC, always the same. */
+    /* n_r: the number of documents having exactly r occurrences. */
+    guint32 m_n_0;
+    guint32 m_n_1;
+
+    /* maximum instances of the word or phrase (two word phrase)
+       in previous documents last seen. */
+    guint32 m_Mr;
+} KMixtureModelArrayItem;
+
+typedef FlexibleBigram<KMixtureModelMagicHeader,
+                       KMixtureModelArrayHeader,
+                       KMixtureModelArrayItem>
+KMixtureModelBigram;
+
+typedef FlexibleSingleGram<KMixtureModelArrayHeader,
+                           KMixtureModelArrayItem>
+KMixtureModelSingleGram;
+
+typedef KMixtureModelSingleGram::ArrayItemWithToken
+KMixtureModelArrayItemWithToken;
 
 };
 
