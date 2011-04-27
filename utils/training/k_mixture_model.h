@@ -105,7 +105,10 @@ static inline parameter_t compute_Pr_G_2_with_count(corpus_count_t k,
     return compute_Pr_G_2(k, alpha, B);
 }
 
+#define K_MIXTURE_MODEL_MAGIC_NUMBER "KMMP";
+
 typedef struct{
+    char m_magic_number[4];
     /* the total number of instances of all words. */
     guint32 m_WC;
     /* the total number of documents. */
