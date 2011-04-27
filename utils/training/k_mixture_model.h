@@ -23,6 +23,7 @@
 #ifndef K_MIXTURE_MODEL
 #define K_MIXTURE_MODEL
 
+#include <math.h>
 #include "novel_types.h"
 #include "flexible_ngram.h"
 
