@@ -325,6 +325,19 @@ public:
         return ret == 0;
     }
 
+    bool remove(phrase_token_t index){
+        if ( !m_db )
+            return false;
+
+        DBT db_key;
+        memset(&db_key, 0, sizeof(DBT));
+        db_key.data = &index;
+        db_key.size = sizeof(phrase_token_t);
+
+        int ret = m_db->del(m_db, NULL, &db_key, 0);
+        return ret == 0;
+    }
+
     /* array of phrase_token_t items, for parameter estimation. */
     bool get_all_items(GArray * items){
         g_array_set_size(items, 0);

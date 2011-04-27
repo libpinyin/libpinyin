@@ -61,7 +61,7 @@ int main(int argc, char * argv[]) {
 
     GArray * items = g_array_new(FALSE, FALSE, sizeof(phrase_token_t));
     bigram.get_all_items(items);
-    printf("-----------------------train----------------------------\n");
+    printf("-----------------------items----------------------------\n");
     for ( size_t i = 0; i < items->len; ++i ){
         phrase_token_t * token = &g_array_index(items, phrase_token_t, i);
         printf("item:%d\n", *token);
@@ -101,6 +101,16 @@ int main(int argc, char * argv[]) {
         delete train_gram;
     }
 
+    assert(bigram.remove(1));
+
+    bigram.get_all_items(items);
+    printf("-----------------------items----------------------------\n");
+    for ( size_t i = 0; i < items->len; ++i ){
+        phrase_token_t * token = &g_array_index(items, phrase_token_t, i);
+        printf("item:%d\n", *token);
+    }
+
+    g_array_free(items, TRUE);
     g_array_free(array, TRUE);
     return 0;
 }

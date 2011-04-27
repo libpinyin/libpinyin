@@ -8,7 +8,7 @@ parameter_t compute_interpolation(KMixtureModelSingleGram * deleted_bigram,
     parameter_t lambda = 0, next_lambda = 0.6;
     parameter_t epsilon = 0.001;
 
-    while ( fabs(lambda - next_lambda) > epsilon){
+    while (fabs(lambda - next_lambda) > epsilon){
         lambda = next_lambda;
         next_lambda = 0;
         parameter_t numerator = 0;
@@ -54,6 +54,7 @@ parameter_t compute_interpolation(KMixtureModelSingleGram * deleted_bigram,
         }
         KMixtureModelArrayHeader header;
         assert(deleted_bigram->get_array_header(header));
+        assert(0 != header.m_WC);
         next_lambda /= header.m_WC;
 
         g_array_free(array, TRUE);
