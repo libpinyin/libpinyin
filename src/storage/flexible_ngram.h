@@ -227,6 +227,8 @@ public:
 
     /* get array header */
     bool get_array_header(/* out */ ArrayHeader & header){
+        /* clear retval */
+        memset(&header, 0, sizeof(ArrayHeader));
         char * buf_begin = (char *)m_chunk.begin();
         memcpy(&header, buf_begin, sizeof(ArrayHeader));
         return true;
@@ -363,6 +365,9 @@ public:
 
     /* get/set magic header. */
     bool get_magic_header(MagicHeader & header){
+        /* clear retval */
+        memset(&header, 0, sizeof(MagicHeader));
+
         if ( !m_db )
             return false;
 
@@ -399,6 +404,9 @@ public:
     }
 
     bool get_array_header(phrase_token_t index, ArrayHeader & header){
+        /* clear retval */
+        memset(&header, 0, sizeof(ArrayHeader));
+
         if ( !m_db )
             return false;
 
