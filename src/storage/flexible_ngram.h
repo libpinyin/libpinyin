@@ -25,6 +25,7 @@
 #define FLEXIBLE_NGRAM_H
 
 #include <db.h>
+#include <errno.h>
 
 /* Note: the signature of the template parameters.
  * struct MagicHeader, ArrayHeader, ArrayItem.
@@ -367,7 +368,7 @@ public:
 
         if ( ret != DB_NOTFOUND ){
             fprintf(stderr, "training db error, exit!");
-            exit(1);
+            exit(EIO);
         }
 
         /* Cursors must be closed */

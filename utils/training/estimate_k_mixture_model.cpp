@@ -26,7 +26,6 @@
 void print_help(){
     printf("estimate_k_mixture_model [--bigram-file <FILENAME>]\n");
     printf("                         [--deleted-bigram-file <FILENAME]\n");
-    exit(1);
 }
 
 parameter_t compute_interpolation(KMixtureModelSingleGram * deleted_bigram,
@@ -100,16 +99,22 @@ int main(int argc, char * argv[]){
     while ( i < argc ){
         if ( strcmp("--help", argv[i] ) == 0 ){
             print_help();
+            exit(0);
         } else if ( strcmp("--bigram-file", argv[i]) == 0 ){
-            if ( ++i >= argc )
+            if ( ++i >= argc ) {
                 print_help();
+                exit(EINVAL);
+            }
             bigram_filename = argv[i];
         } else if ( strcmp("--deleted-bigram-file", argv[i]) == 0){
-            if ( ++i >= argc )
+            if ( ++i >= argc ) {
                 print_help();
+                exit(EINVAL);
+            }
             deleted_bigram_filename = argv[i];
         } else{
             print_help();
+            exit(EINVAL);
         }
         ++i;
     }

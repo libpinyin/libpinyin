@@ -59,7 +59,6 @@ void print_help(){
     printf("<OUTPUTFILE> the result output file\n");
     printf("<FILEi> input pinyin files\n");
     printf("<PHRASE_INDEX> phrase index identifier\n");
-    exit(1);
 }
 
 gint phrase_item_compare(gconstpointer a, gconstpointer b){
@@ -83,13 +82,18 @@ int main(int argc, char * argv[]){
     while (  i < argc ){
 	if ( strcmp("--help", argv[i] ) == 0) {
 		print_help();
+                exit(0);
 	}else if ( strcmp("-t", argv[i] ) == 0){
-	    if ( ++i >= argc )
+	    if ( ++i >= argc ) {
 		print_help();
+                exit(EINVAL);
+            }
 	    phrase_index = atoi(argv[i]);
 	}else if ( strcmp("-o", argv[i] ) == 0 ){
-	    if ( ++i >= argc )
+	    if ( ++i >= argc ) {
 		print_help();
+                exit(EINVAL);
+            }
 	    strcpy( outfilename, argv[i]);
 	} else {
 	    feed_file(argv[i]);
@@ -113,7 +117,7 @@ void feed_file ( const char * filename){
     FILE * infile = fopen(filename, "r");
     if ( NULL == infile ){
         fprintf(stderr, "Can't open file %s.\n", filename);
-        exit(1);
+        exit(ENOENT);
     }
     while ( !feof(infile)){
 	fscanf(infile, "%s", phrase);
@@ -226,7 +230,7 @@ void gen_phrase_file(const char * outfilename, int phrase_index){
     FILE * outfile = fopen(outfilename, "w");
     if (NULL == outfile ) {
         fprintf(stderr, "Can't write file %s.\n", outfilename);
-        exit(1);
+        exit(ENOENT);
     }
     phrase_token_t token = 1;
     char pinyin_buffer[4096];

@@ -31,7 +31,6 @@ static PhraseLargeTable * g_phrases = NULL;
 void print_help(){
     printf("gen_ngram [--skip-pi-gram-training] [--skip-unigram-training]\n");
     printf("          [--bigram-file <FILENAME>]\n");
-    exit(1);
 }
 
 int main(int argc, char * argv[]){
@@ -44,16 +43,20 @@ int main(int argc, char * argv[]){
     while ( i < argc ){
 	if ( strcmp("--help", argv[i] ) == 0){
 	    print_help();
+            exit(0);
 	}else if ( strcmp("--skip-pi-gram-training", argv[i] ) == 0) {
 	    train_pi_gram = false;
 	}else if ( strcmp("--skip-unigram-training", argv[i] ) == 0) {
 	    train_unigram = false;
 	}else if ( strcmp("--bigram-file", argv[i] ) == 0){
-            if ( ++i >= argc )
+            if ( ++i >= argc ) {
                 print_help();
+                exit(EINVAL);
+            }
             bigram_filename = argv[i];
 	}else{
             print_help();
+            exit(EINVAL);
         }
 	++i;
     }
@@ -63,14 +66,14 @@ int main(int argc, char * argv[]){
     FILE * gb_file = fopen("../../data/gb_char.table", "r");
     if ( gb_file == NULL ){
 	fprintf(stderr, "can't open gb_char.table!\n");
-	exit(1);
+	exit(ENOENT);
     }
     g_phrases->load_text(gb_file);
     fclose(gb_file);
     FILE * gbk_file = fopen("../../data/gbk_char.table", "r");
     if ( gbk_file == NULL ){
 	fprintf(stderr, "can't open gbk_char.table!\n");
-	exit(1);
+	exit(ENOENT);
     }
     g_phrases->load_text(gbk_file);
     fclose(gbk_file);

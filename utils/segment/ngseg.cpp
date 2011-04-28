@@ -51,7 +51,6 @@ enum CONTEXT_STATE{
 
 void print_help(){
     printf("Usage: ngseg [--generate-extra-enter]\n");
-    exit(1);
 }
 
 bool deal_with_segmentable(GArray * current_utf16){
@@ -93,8 +92,12 @@ int main(int argc, char * argv[]){
     while ( i < argc ){
         if ( strcmp ("--help", argv[i]) == 0 ){
             print_help();
+            exit(0);
         } else if ( strcmp("--generate-extra-enter", argv[i]) == 0 ){
             gen_extra_enter = true;
+        } else {
+            print_help();
+            exit(EINVAL);
         }
         ++i;
     }

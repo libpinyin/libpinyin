@@ -129,7 +129,6 @@ bool backtrace(GArray * steps, glong phrase_len, GArray * strings){
 
 void print_help(){
     printf("Usage: spseg [--generate-extra-enter]\n");
-    exit(1);
 }
 
 int main(int argc, char * argv[]){
@@ -141,8 +140,12 @@ int main(int argc, char * argv[]){
     while ( i < argc ){
         if ( strcmp ("--help", argv[i]) == 0) {
             print_help();
-        }else if (strcmp("--generate-extra-enter", argv[i]) == 0) {
+            exit(0);
+        } else if (strcmp("--generate-extra-enter", argv[i]) == 0) {
             gen_extra_enter = true;
+        } else {
+            print_help();
+            exit(EINVAL);
         }
         ++i;
     }
@@ -152,7 +155,7 @@ int main(int argc, char * argv[]){
     FILE * gb_file = fopen("../../data/gb_char.table", "r");
     if ( gb_file == NULL ){
 	fprintf(stderr, "can't open gb_char.table!\n");
-	exit(1);
+	exit(ENOENT);
     }
     g_phrases->load_text(gb_file);
     fclose(gb_file);
@@ -160,7 +163,7 @@ int main(int argc, char * argv[]){
     FILE * gbk_file = fopen("../../data/gbk_char.table", "r");
     if ( gbk_file == NULL ){
 	fprintf(stderr, "can't open gbk_char.table!\n");
-	exit(1);
+	exit(ENOENT);
     }
     g_phrases->load_text(gbk_file);
     fclose(gbk_file);

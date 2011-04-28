@@ -51,7 +51,7 @@ int main( int argc, char * argv[]){
     FILE* infile = fopen("../../data/gb_char.table", "r");
     if ( NULL == infile ){
 	printf("open gb_char.table failed!\n");
-	exit(1);
+	exit(ENOENT);
     }
 
     phrase_index.load_text(1, infile);
@@ -60,7 +60,7 @@ int main( int argc, char * argv[]){
     infile = fopen("../../data/gbk_char.table", "r");
     if ( NULL == infile ){
 	printf("open gbk_char.table failed!\n");
-	exit(1);
+	exit(ENOENT);
     }
 
     phrase_index.load_text(2, infile);

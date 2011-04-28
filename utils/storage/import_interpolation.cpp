@@ -231,7 +231,7 @@ int main(int argc, char * argv[]){
     ssize_t result = my_getline(input);
     if ( result == -1 ) {
         fprintf(stderr, "empty file input.\n");
-        exit(1);
+        exit(ENODATA);
     }
 
     //read "\data" line
@@ -241,7 +241,7 @@ int main(int argc, char * argv[]){
     assert(g_hash_table_lookup_extended(required, "model", NULL, (gpointer *)&value));
     if ( !( strcmp("interpolation", value) == 0 ) ) {
         fprintf(stderr, "error: interpolation model expected.\n");
-        exit(1);
+        exit(ENODATA);
     }
 
     result = my_getline(input);
