@@ -19,8 +19,15 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+#include <locale.h>
 #include "pinyin.h"
 #include "k_mixture_model.h"
+
+void print_help(){
+    printf("estimate_k_mixture_model [--bigram-file <FILENAME>]\n");
+    printf("                         [--deleted-bigram-file <FILENAME]\n");
+    exit(1);
+}
 
 parameter_t compute_interpolation(KMixtureModelSingleGram * deleted_bigram,
                                   KMixtureModelBigram * unigram,
@@ -85,12 +92,34 @@ parameter_t compute_interpolation(KMixtureModelSingleGram * deleted_bigram,
 }
 
 int main(int argc, char * argv[]){
+    int i = 1;
+    const char * bigram_filename = "../../data/k_mixture_model_ngram.db";
+    const char * deleted_bigram_filename = "../../data/k_mixture_model_deleted_ngram.db";
+
+    setlocale(LC_ALL, "");
+    while ( i < argc ){
+        if ( strcmp("--help", argv[i] ) == 0 ){
+            print_help();
+        } else if ( strcmp("--bigram-file", argv[i]) == 0 ){
+            if ( ++i >= argc )
+                print_help();
+            bigram_filename = argv[i];
+        } else if ( strcmp("--deleted-bigram-file", argv[i]) == 0){
+            if ( ++i >= argc )
+                print_help();
+            deleted_bigram_filename = argv[i];
+        } else{
+            print_help();
+        }
+        ++i;
+    }
+
     /* TODO: magic header signature check here. */
     KMixtureModelBigram bigram;
-    bigram.attach("../../data/k_mixture_model_ngram.db");
+    bigram.attach(bigram_filename);
 
     KMixtureModelBigram deleted_bigram;
-    deleted_bigram.attach("../../data/k_mixture_model_deleted_ngram.db");
+    deleted_bigram.attach(deleted_bigram_filename);
 
     GArray * deleted_items = g_array_new(FALSE, FALSE, sizeof(phrase_token_t));
     deleted_bigram.get_all_items(deleted_items);

@@ -35,12 +35,12 @@ void print_help(){
 }
 
 int main(int argc, char * argv[]){
-	int i = 1;
+    int i = 1;
     bool train_pi_gram = true;
     bool train_unigram = true;
     const char * bigram_filename = "../../data/bigram.db";
 
-    setlocale(LC_ALL,"");
+    setlocale(LC_ALL, "");
     while ( i < argc ){
 	if ( strcmp("--help", argv[i] ) == 0){
 	    print_help();
@@ -52,7 +52,9 @@ int main(int argc, char * argv[]){
             if ( ++i >= argc )
                 print_help();
             bigram_filename = argv[i];
-	}
+	}else{
+            print_help();
+        }
 	++i;
     }
     
