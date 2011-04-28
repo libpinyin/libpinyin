@@ -135,5 +135,6 @@ int main(int argc, char * argv[]){
 
     printf("average lambda:%f\n", (lambda_sum/lambda_count));
     g_array_free(deleted_items, TRUE);
+    return 0;
 }
 

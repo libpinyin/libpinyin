@@ -1,3 +1,24 @@
+/* 
+ *  libpinyin
+ *  Library to deal with pinyin.
+ *  
+ *  Copyright (C) 2011 Peng Wu <alexepico@gmail.com>
+ *  
+ *  This program is free software; you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation; either version 2 of the License, or
+ *  (at your option) any later version.
+ * 
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ *  GNU General Public License for more details.
+ *  
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program; if not, write to the Free Software
+ *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+ */
+
 #include "pinyin.h"
 #include "k_mixture_model.h"
 
@@ -64,5 +85,40 @@ parameter_t compute_interpolation(KMixtureModelSingleGram * deleted_bigram,
 }
 
 int main(int argc, char * argv[]){
+    /* TODO: magic header signature check here. */
+    KMixtureModelBigram bigram;
+    bigram.attach("../../data/k_mixture_model_ngram.db");
+
+    KMixtureModelBigram deleted_bigram;
+    deleted_bigram.attach("../../data/k_mixture_model_deleted_ngram.db");
+
+    GArray * deleted_items = g_array_new(FALSE, FALSE, sizeof(phrase_token_t));
+    deleted_bigram.get_all_items(deleted_items);
+
+    parameter_t lambda_sum = 0;
+    int lambda_count = 0;
+
+    for( int i = 0; i < deleted_items->len; ++i ){
+        phrase_token_t * token = &g_array_index(deleted_items, phrase_token_t, i);
+        KMixtureModelSingleGram * single_gram = NULL;
+        bigram.load(*token, single_gram);
+
+        KMixtureModelSingleGram * deleted_single_gram = NULL;
+        deleted_bigram.load(*token, deleted_single_gram);
+
+        parameter_t lambda = compute_interpolation(deleted_single_gram, &bigram, single_gram);
+
+        printf("lambda:%f\n", lambda);
+
+        lambda_sum += lambda;
+        lambda_count ++;
+
+        if (single_gram)
+            delete single_gram;
+        delete deleted_single_gram;
+    }
+
+    printf("average lambda:%f\n", (lambda_sum/lambda_count));
+    g_array_free(deleted_items, TRUE);
     return 0;
 }
