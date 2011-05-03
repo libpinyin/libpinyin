@@ -269,8 +269,6 @@ public:
         m_magic_header_index[0] = null_token;
         m_magic_header_index[1] = null_token;
 
-        /* Note: remove the below line? */
-        assert(sizeof(m_magic_number) == 4 * sizeof(char) );
         memcpy(m_magic_number, magic_number, sizeof(m_magic_number));
     }
 
@@ -445,10 +443,9 @@ public:
         if ( ret != 0 )
             return false;
 
-        if ( 0 == db_data.size )
+        if ( sizeof(MagicHeader) != db_data.size )
             return false;
 
-        assert(sizeof(MagicHeader) == db_data.size);
         memcpy(&header, db_data.data, sizeof(MagicHeader));
         return true;
     }
