@@ -324,7 +324,7 @@ bool Bigram::attach(const char * dbfile, guint32 flags){
         assert(false);
 	
     ret = m_db->open(m_db, NULL, dbfile, NULL,
-                     DB_HASH, db_flags, 0664);
+                     DB_HASH, db_flags, 0644);
     if ( ret != 0)
         return false;
 

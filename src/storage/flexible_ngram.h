@@ -252,6 +252,9 @@ private:
 
     phrase_token_t m_magic_header_index[2];
 
+    char m_magic_number[4];
+    const size_t m_magic_number_length;
+
     void reset(){
         if ( m_db ){
             m_db->close(m_db, 0);
@@ -260,10 +263,15 @@ private:
     }
 
 public:
-    FlexibleBigram(){
+    FlexibleBigram(const char * magic_number)
+        : m_magic_number_length(sizeof(m_magic_number)){
         m_db = NULL;
         m_magic_header_index[0] = null_token;
         m_magic_header_index[1] = null_token;
+
+        /* Note: remove the below line? */
+        assert(sizeof(m_magic_number) == 4 * sizeof(char) );
+        memcpy(m_magic_number, magic_number, sizeof(m_magic_number));
     }
 
     ~FlexibleBigram(){
@@ -273,16 +281,54 @@ public:
     /* attach berkeley db on filesystem for training purpose. */
     bool attach(const char * dbfile){
         reset();
-        if ( dbfile ){
-            int ret = db_create(&m_db, NULL, 0);
-            if ( ret != 0 )
-                assert(false);
+        if ( !dbfile )
+            return false;
+        int ret = db_create(&m_db, NULL, 0);
+        if ( ret != 0 )
+            assert(false);
 
-            m_db->open(m_db, NULL, dbfile, NULL, DB_HASH, DB_CREATE, 0644);
+        ret = m_db->open(m_db, NULL, dbfile, NULL, DB_HASH, 0, 0644);
+        if ( ret != 0 ) {
+            /* Create database file here, and write the signature. */
+            ret = m_db->open(m_db, NULL, dbfile, NULL, DB_HASH, DB_CREATE, 0644);
             if ( ret != 0 )
                 return false;
+
+            DBT db_key;
+            memset(&db_key, 0, sizeof(DBT));
+            db_key.data = m_magic_header_index;
+            db_key.size = sizeof(m_magic_header_index);
+            DBT db_data;
+            memset(&db_data, 0, sizeof(DBT));
+            db_data.data = m_magic_number;
+            db_data.size = sizeof(m_magic_number);
+            db_data.flags = DB_DBT_PARTIAL;
+            db_data.doff = 0;
+            db_data.dlen = sizeof(m_magic_number);
+
+            ret = m_db->put(m_db, NULL, &db_key, &db_data, 0);
+            return ret == 0;
         }
-        return true;
+
+        /* check the signature. */
+        DBT db_key;
+        memset(&db_key, 0, sizeof(DBT));
+        db_key.data = m_magic_header_index;
+        db_key.size = sizeof(m_magic_header_index);
+        DBT db_data;
+        memset(&db_data, 0, sizeof(DBT));
+        db_data.flags = DB_DBT_PARTIAL;
+        db_data.doff = 0;
+        db_data.dlen = sizeof(m_magic_number);
+        ret = m_db->get(m_db, NULL, &db_key, &db_data, 0);
+        if ( ret != 0 )
+            return false;
+        if ( sizeof(m_magic_number) != db_data.size )
+            return false;
+        if ( memcmp(db_data.data, m_magic_number,
+                    sizeof(m_magic_number)) == 0 )
+            return true;
+        return false;
     }
 
     /* load/store one array. */
@@ -391,10 +437,17 @@ public:
         db_key.size = sizeof(m_magic_header_index);
         DBT db_data;
         memset(&db_data, 0, sizeof(DBT));
+        db_data.flags = DB_DBT_PARTIAL;
+        db_data.doff = m_magic_number_length;
+        db_data.dlen = sizeof(MagicHeader);
         
         int ret = m_db->get(m_db, NULL, &db_key, &db_data, 0);
         if ( ret != 0 )
             return false;
+
+        if ( 0 == db_data.size )
+            return false;
+
         assert(sizeof(MagicHeader) == db_data.size);
         memcpy(&header, db_data.data, sizeof(MagicHeader));
         return true;
@@ -412,6 +465,9 @@ public:
         memset(&db_data, 0, sizeof(DBT));
         db_data.data = (void *) &header;
         db_data.size = sizeof(MagicHeader);
+        db_data.flags = DB_DBT_PARTIAL;
+        db_data.doff = m_magic_number_length;
+        db_data.dlen = sizeof(MagicHeader);
 
         int ret = m_db->put(m_db, NULL, &db_key, &db_data, 0);
         return ret == 0;

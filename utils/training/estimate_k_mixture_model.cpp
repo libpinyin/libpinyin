@@ -44,7 +44,7 @@ parameter_t compute_interpolation(KMixtureModelSingleGram * deleted_bigram,
         FlexibleBigramPhraseArray array = g_array_new(FALSE, FALSE, sizeof(KMixtureModelArrayItemWithToken));
         deleted_bigram->retrieve_all(array);
 
-        for ( int i = 0; i < array->len; ++i){
+        for ( size_t i = 0; i < array->len; ++i){
             KMixtureModelArrayItemWithToken * item = &g_array_index(array, KMixtureModelArrayItemWithToken, i);
             //get the phrase token
             phrase_token_t token = item->m_token;
@@ -120,10 +120,10 @@ int main(int argc, char * argv[]){
     }
 
     /* TODO: magic header signature check here. */
-    KMixtureModelBigram bigram;
+    KMixtureModelBigram bigram(K_MIXTURE_MODEL_MAGIC_NUMBER);
     bigram.attach(bigram_filename);
 
-    KMixtureModelBigram deleted_bigram;
+    KMixtureModelBigram deleted_bigram(K_MIXTURE_MODEL_MAGIC_NUMBER);
     deleted_bigram.attach(deleted_bigram_filename);
 
     GArray * deleted_items = g_array_new(FALSE, FALSE, sizeof(phrase_token_t));
@@ -132,7 +132,7 @@ int main(int argc, char * argv[]){
     parameter_t lambda_sum = 0;
     int lambda_count = 0;
 
-    for( int i = 0; i < deleted_items->len; ++i ){
+    for( size_t i = 0; i < deleted_items->len; ++i ){
         phrase_token_t * token = &g_array_index(deleted_items, phrase_token_t, i);
         KMixtureModelSingleGram * single_gram = NULL;
         bigram.load(*token, single_gram);
