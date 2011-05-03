@@ -253,7 +253,6 @@ private:
     phrase_token_t m_magic_header_index[2];
 
     char m_magic_number[4];
-    const size_t m_magic_number_length;
 
     void reset(){
         if ( m_db ){
@@ -263,8 +262,7 @@ private:
     }
 
 public:
-    FlexibleBigram(const char * magic_number)
-        : m_magic_number_length(sizeof(m_magic_number)){
+    FlexibleBigram(const char * magic_number){
         m_db = NULL;
         m_magic_header_index[0] = null_token;
         m_magic_header_index[1] = null_token;
@@ -436,7 +434,7 @@ public:
         DBT db_data;
         memset(&db_data, 0, sizeof(DBT));
         db_data.flags = DB_DBT_PARTIAL;
-        db_data.doff = m_magic_number_length;
+        db_data.doff = sizeof(m_magic_number);
         db_data.dlen = sizeof(MagicHeader);
         
         int ret = m_db->get(m_db, NULL, &db_key, &db_data, 0);
@@ -463,7 +461,7 @@ public:
         db_data.data = (void *) &header;
         db_data.size = sizeof(MagicHeader);
         db_data.flags = DB_DBT_PARTIAL;
-        db_data.doff = m_magic_number_length;
+        db_data.doff = sizeof(m_magic_number);
         db_data.dlen = sizeof(MagicHeader);
 
         int ret = m_db->put(m_db, NULL, &db_key, &db_data, 0);
