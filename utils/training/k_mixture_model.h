@@ -124,11 +124,18 @@ typedef struct{
     /* the total number of all W1,W2 word pair. */
     guint32 m_WC;
 
-    /* the total number of instances of the word or phrases.
+    /* the total number of instances of the word or phrase.
        (two word phrase) */
-    guint32 m_T; /* alias of m_WC, always the same. */
+    /* guint32 m_T; Please use m_WC instead.
+       alias of m_WC, always the same. */
+
     /* n_r: the number of documents having exactly r occurrences. */
-    guint32 m_n_0;
+    /* guint32 m_n_0;
+       Note: compute this value using the following equation.
+       m_n_0 = KMixtureModelMagicHeader.m_N - m_N_n_0;
+       m_N_n_0, the number of documents which contains the word or phrase.
+       (two word phrase) */
+    guint m_N_n_0;
     guint32 m_n_1;
 
     /* maximum instances of the word or phrase (two word phrase)
