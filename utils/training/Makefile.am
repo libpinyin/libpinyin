@@ -26,6 +26,7 @@ INCLUDES		= -I$(top_srcdir)/src \
 noinst_HEADERS		= k_mixture_model.h
 
 noinst_PROGRAMS		= gen_ngram \
+			  gen_deleted_ngram \
 			  gen_unigram \
 			  estimate_interpolation \
 			  estimate_k_mixture_model \
@@ -34,6 +35,10 @@ noinst_PROGRAMS		= gen_ngram \
 gen_ngram_SOURCES	= gen_ngram.cpp
 
 gen_ngram_LDADD		= ../../src/libpinyin.la @GLIB2_LDFLAGS@
+
+gen_deleted_ngram_SOURCES = gen_deleted_ngram.cpp
+
+gen_deleted_ngram_LDADD = ../../src/libpinyin.la @GLIB2_LDFLAGS@
 
 gen_unigram_SOURCES     = gen_unigram.cpp
 

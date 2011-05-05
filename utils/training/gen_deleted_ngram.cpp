@@ -29,7 +29,7 @@
 static PhraseLargeTable * g_phrases = NULL;
 
 void print_help(){
-    printf("gen_ngram [--skip-pi-gram-training]\n");
+    printf("gen_deleted_ngram [--skip-pi-gram-training]\n");
     printf("          [--bigram-file <FILENAME>]\n");
 }
 
@@ -75,22 +75,9 @@ int main(int argc, char * argv[]){
     g_phrases->load_text(gbk_file);
     fclose(gbk_file);
 
-    FacadePhraseIndex phrase_index;
-    
-    //gb_char binary file
-    MemoryChunk * chunk = new MemoryChunk;
-    chunk->load("../../data/gb_char.bin");
-    phrase_index.load(1, chunk);
-    
-    //gbk_char binary file
-    chunk = new MemoryChunk;
-    chunk->load("../../data/gbk_char.bin");
-    phrase_index.load(2, chunk);
-    
     Bigram bigram;
     bigram.attach(bigram_filename, ATTACH_CREATE|ATTACH_READWRITE);
-    
-    
+
     char* linebuf = (char *)malloc ( 1024 * sizeof (char) );
     size_t size = 1024;
     phrase_token_t last_token, cur_token = last_token = 0;
@@ -112,10 +99,6 @@ int main(int argc, char * argv[]){
 
 	last_token = cur_token;
 	cur_token = token;
-	if ( cur_token ){
-	    //training uni-gram
-            phrase_index.add_unigram_frequency(cur_token, 1);
-	}
 	if ( cur_token ){
 	    SingleGram * single_gram = NULL;
 	    if ( 0 == last_token ){
@@ -145,15 +128,5 @@ int main(int argc, char * argv[]){
 	}
     }
     
-    MemoryChunk * new_chunk = new MemoryChunk;
-    phrase_index.store(1, new_chunk);
-    new_chunk->save("../../data/gb_char.bin");
-    phrase_index.load(1, new_chunk);
-
-    new_chunk = new MemoryChunk;
-    phrase_index.store(2, new_chunk);
-    new_chunk->save("../../data/gbk_char.bin");
-    phrase_index.load(2, new_chunk);
-
     return 0;
 }
