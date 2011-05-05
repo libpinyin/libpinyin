@@ -30,7 +30,7 @@ static guint32 g_prune_k = 3;
 static parameter_t g_prune_poss = 0.99;
 
 void print_help(){
-    printf("prune_k_mixture_model <FILENAME>\n");
+    printf("prune_k_mixture_model -k <INT> --CDF <FLOAT>  <FILENAME>\n");
 }
 
 bool prune_k_mixture_model(KMixtureModelMagicHeader * magic_header,
@@ -78,14 +78,29 @@ bool prune_k_mixture_model(KMixtureModelMagicHeader * magic_header,
 }
 
 int main(int argc, char * argv[]){
+    int i = 1;
     const char * bigram_filename = NULL;
 
     setlocale(LC_ALL, "");
-    if ( 2 != argc ){
-        print_help();
-        exit(EINVAL);
-    } else {
-        bigram_filename = argv[1];
+    while ( i < argc ){
+        if ( strcmp("--help", argv[i]) == 0 ){
+            print_help();
+            exit(0);
+        } else if ( strcmp("-k", argv[i]) == 0 ){
+            if ( ++i >= argc ){
+                print_help();
+                exit(EINVAL);
+            }
+            g_prune_k = atoi(argv[i]);
+        } else if ( strcmp("--CDF", argv[i]) == 0 ){
+            if ( ++i >= argc ){
+                print_help();
+                exit(EINVAL);
+            }
+            g_prune_poss = atof(argv[i]);
+        } else {
+            bigram_filename = argv[i];
+        }
     }
 
     /* TODO: magic header signature check here. */
