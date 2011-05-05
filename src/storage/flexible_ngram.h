@@ -275,18 +275,26 @@ public:
     }
 
     /* attach berkeley db on filesystem for training purpose. */
-    bool attach(const char * dbfile){
+    bool attach(const char * dbfile, guint32 flags){
         reset();
+        u_int32_t db_flags = 0;
+
+        if ( flags & ATTACH_READONLY )
+            db_flags |= DB_RDONLY;
+        if ( flags & ATTACH_READWRITE )
+            assert( !(flags & ATTACH_READONLY ) );
+
         if ( !dbfile )
             return false;
         int ret = db_create(&m_db, NULL, 0);
         if ( ret != 0 )
             assert(false);
 
-        ret = m_db->open(m_db, NULL, dbfile, NULL, DB_HASH, 0, 0644);
-        if ( ret != 0 ) {
+        ret = m_db->open(m_db, NULL, dbfile, NULL, DB_HASH, db_flags, 0644);
+        if ( ret != 0 && (flags & ATTACH_CREATE) ) {
+            db_flags |= DB_CREATE;
             /* Create database file here, and write the signature. */
-            ret = m_db->open(m_db, NULL, dbfile, NULL, DB_HASH, DB_CREATE, 0644);
+            ret = m_db->open(m_db, NULL, dbfile, NULL, DB_HASH, db_flags, 0644);
             if ( ret != 0 )
                 return false;
 

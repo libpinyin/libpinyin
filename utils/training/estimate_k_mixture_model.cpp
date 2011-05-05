@@ -121,10 +121,10 @@ int main(int argc, char * argv[]){
 
     /* TODO: magic header signature check here. */
     KMixtureModelBigram bigram(K_MIXTURE_MODEL_MAGIC_NUMBER);
-    bigram.attach(bigram_filename);
+    bigram.attach(bigram_filename, ATTACH_READONLY);
 
     KMixtureModelBigram deleted_bigram(K_MIXTURE_MODEL_MAGIC_NUMBER);
-    deleted_bigram.attach(deleted_bigram_filename);
+    deleted_bigram.attach(deleted_bigram_filename, ATTACH_READONLY);
 
     GArray * deleted_items = g_array_new(FALSE, FALSE, sizeof(phrase_token_t));
     deleted_bigram.get_all_items(deleted_items);

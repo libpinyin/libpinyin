@@ -26,12 +26,6 @@
 
 namespace pinyin{
 
-enum {
-    ATTACH_READONLY = 1,
-    ATTACH_READWRITE = 0x1 << 1,
-    ATTACH_CREATE = 0x1 << 2,
-};
-
 class Bigram;
 
 /* Note:

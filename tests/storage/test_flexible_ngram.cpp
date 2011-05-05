@@ -36,7 +36,7 @@ int main(int argc, char * argv[]) {
     assert(freq == total_freq);
 
     FlexibleBigram<guint32, guint32, guint32> bigram("TEST");
-    assert(bigram.attach("/tmp/training.db"));
+    assert(bigram.attach("/tmp/training.db", ATTACH_READWRITE|ATTACH_CREATE));
     bigram.store(1, &single_gram);
     assert(single_gram.insert_array_item(5, 8));
     assert(single_gram.remove_array_item(1, freq));

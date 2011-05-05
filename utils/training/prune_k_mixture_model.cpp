@@ -90,7 +90,7 @@ int main(int argc, char * argv[]){
 
     /* TODO: magic header signature check here. */
     KMixtureModelBigram bigram(K_MIXTURE_MODEL_MAGIC_NUMBER);
-    bigram.attach(bigram_filename);
+    bigram.attach(bigram_filename, ATTACH_READWRITE);
 
     KMixtureModelMagicHeader magic_header;
     bigram.get_magic_header(magic_header);
