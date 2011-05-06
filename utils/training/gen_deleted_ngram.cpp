@@ -30,13 +30,13 @@ static PhraseLargeTable * g_phrases = NULL;
 
 void print_help(){
     printf("gen_deleted_ngram [--skip-pi-gram-training]\n");
-    printf("          [--bigram-file <FILENAME>]\n");
+    printf("                  [--deleted-bigram-file <FILENAME>]\n");
 }
 
 int main(int argc, char * argv[]){
     int i = 1;
     bool train_pi_gram = true;
-    const char * bigram_filename = "../../data/bigram.db";
+    const char * bigram_filename = "../../data/deleted_bigram.db";
 
     setlocale(LC_ALL, "");
     while ( i < argc ){
@@ -45,7 +45,7 @@ int main(int argc, char * argv[]){
             exit(0);
 	}else if ( strcmp("--skip-pi-gram-training", argv[i]) == 0 ){
 	    train_pi_gram = false;
-	}else if ( strcmp("--bigram-file", argv[i]) == 0){
+	}else if ( strcmp("--deleted-bigram-file", argv[i]) == 0){
             if ( ++i >= argc ) {
                 print_help();
                 exit(EINVAL);
