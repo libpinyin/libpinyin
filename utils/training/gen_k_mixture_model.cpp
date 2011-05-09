@@ -51,7 +51,7 @@ bool convert_document_to_hash(FILE * document){
         if ( feof(document) )
             break;
         /* Note: check '\n' here? */
-        linebuf[strlen(linebuf) - 1] = "\0";
+        linebuf[strlen(linebuf) - 1] = '\0';
 
         glong phrase_len = 0;
         utf16_t * phrase = g_utf8_to_utf16(linebuf, -1, NULL, &phrase_len, NULL);
@@ -60,27 +60,31 @@ bool convert_document_to_hash(FILE * document){
             continue;
 
         phrase_token_t token = 0;
-        int result = g_phrases->search( phrase_len, phrase, token );
-        if ( ! (result & SEARCH_OK) )
+        int search_result = g_phrases->search( phrase_len, phrase, token );
+        if ( ! (search_result & SEARCH_OK) )
             token = 0;
 
         last_token = cur_token;
         cur_token = token;
 
         /* remember the (last_token, cur_token) word pair. */
-        HashofSecondWord hash_of_second_word = NULL;
-        gboolean result = g_hash_table_lookup_extended
-            (g_hash_of_document, GUINT_TO_POINTER(last_token),
-             NULL, &hash_of_second_word);
-        if ( !result ){
-            hash_of_second_word = g_hash_table_new(g_int_hash, g_int_equal);
-        }
         gpointer value = NULL;
-        result = g_hash_table_lookup_extended
+        HashofSecondWord hash_of_second_word = NULL;
+        gboolean lookup_result = g_hash_table_lookup_extended
+            (g_hash_of_document, GUINT_TO_POINTER(last_token),
+             NULL, &value);
+        if ( !lookup_result ){
+            hash_of_second_word = g_hash_table_new(g_int_hash, g_int_equal);
+        } else {
+            hash_of_second_word = (HashofSecondWord) value;
+        }
+
+        value = NULL;
+        lookup_result = g_hash_table_lookup_extended
             (hash_of_second_word, GUINT_TO_POINTER(cur_token),
              NULL, &value);
         guint32 count = 0;
-        if ( result ) {
+        if ( lookup_result ) {
             count = GPOINTER_TO_UINT(value);
         }
         count ++;
@@ -90,14 +94,14 @@ bool convert_document_to_hash(FILE * document){
         g_hash_table_insert(g_hash_of_document,
                             GUINT_TO_POINTER(last_token),
                             hash_of_second_word);
-                            
     }
 
     return true;
 }
 
 int main(int argc, char * argv[]){
-    g_hash_of_document = g_hash_table_new(g_int_hash, g_int_equal, NULL, g_hash_table_unref);
+    g_hash_of_document = g_hash_table_new_full
+        (g_int_hash, g_int_equal, NULL, (GDestroyNotify)g_hash_table_unref);
 
 
     return 0;

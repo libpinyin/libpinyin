@@ -28,6 +28,7 @@ noinst_HEADERS		= k_mixture_model.h
 noinst_PROGRAMS		= gen_ngram \
 			  gen_deleted_ngram \
 			  gen_unigram \
+			  gen_k_mixture_model \
 			  estimate_interpolation \
 			  estimate_k_mixture_model \
 			  prune_k_mixture_model
@@ -43,6 +44,10 @@ gen_deleted_ngram_LDADD = ../../src/libpinyin.la @GLIB2_LDFLAGS@
 gen_unigram_SOURCES     = gen_unigram.cpp
 
 gen_unigram_LDADD       = ../../src/libpinyin.la @GLIB2_LDFLAGS@
+
+gen_k_mixture_model_SOURCES = gen_k_mixture_model.cpp
+
+gen_k_mixture_model_LDADD = ../../src/libpinyin.la @GLIB2_LDFLAGS@
 
 estimate_interpolation_SOURCES = estimate_interpolation.cpp
 
