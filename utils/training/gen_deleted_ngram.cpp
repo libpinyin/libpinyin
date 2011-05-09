@@ -78,8 +78,8 @@ int main(int argc, char * argv[]){
     Bigram bigram;
     bigram.attach(bigram_filename, ATTACH_CREATE|ATTACH_READWRITE);
 
-    char* linebuf = (char *)malloc ( 1024 * sizeof (char) );
-    size_t size = 1024;
+    char* linebuf = NULL;
+    size_t size = 0;
     phrase_token_t last_token, cur_token = last_token = 0;
     while( getline(&linebuf, &size, stdin) ){
 	if ( feof(stdin) )
@@ -127,6 +127,7 @@ int main(int argc, char * argv[]){
 	    delete single_gram;
 	}
     }
-    
+    free(linebuf);
+
     return 0;
 }
