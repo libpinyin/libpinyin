@@ -31,7 +31,7 @@ typedef GHashTable * HashofSecondWord;
 /* Hash token of Hash token of word count. */
 static HashofWordPair g_hash_of_document = NULL;
 static PhraseLargeTable * g_phrases = NULL;
-static KMixtureModelBigram * g_bigram = NULL;
+static KMixtureModelBigram * g_k_mixture_model = NULL;
 static guint32 g_maximum_occurs = 20;
 static parameter_t g_maximum_increase_rates = 3.;
 
@@ -179,7 +179,7 @@ static void train_single_gram_wrapper(gpointer key, gpointer value,
     guint32 delta = 0;
 
     KMixtureModelSingleGram * single_gram = NULL;
-    bool exists = g_bigram->load(token, single_gram);
+    bool exists = g_k_mixture_model->load(token, single_gram);
     if ( exists ){
         train_single_gram(token, single_gram, delta);
     } else { /* item doesn't exist. */
@@ -188,17 +188,17 @@ static void train_single_gram_wrapper(gpointer key, gpointer value,
     }
 
     KMixtureModelMagicHeader magic_header;
-    assert(g_bigram->get_magic_header(magic_header));
+    assert(g_k_mixture_model->get_magic_header(magic_header));
     if ( magic_header.m_WC + delta < magic_header.m_WC ){
         fprintf(stderr, "the m_WC integer in magic header overflows.\n");
         return;
     }
     magic_header.m_WC += delta;
     magic_header.m_N ++;
-    assert(g_bigram->set_magic_header(magic_header));
+    assert(g_k_mixture_model->set_magic_header(magic_header));
 
     /* save the single gram. */
-    assert(g_bigram->store(token, single_gram));
+    assert(g_k_mixture_model->store(token, single_gram));
     delete single_gram;
 }
 
@@ -208,9 +208,25 @@ bool train_document(){
 }
 
 int main(int argc, char * argv[]){
+    const char * k_mixture_model_filename = NULL;
+
     g_hash_of_document = g_hash_table_new_full
         (g_int_hash, g_int_equal, NULL, (GDestroyNotify)g_hash_table_unref);
 
+    g_phrases = new PhraseLargeTable;
+    MemoryChunk * chunk = new MemoryChunk;
+    chunk->load("../../data/phrase_index.bin");
+    g_phrases->load(chunk);
+
+    g_k_mixture_model = new KMixtureModelBigram(K_MIXTURE_MODEL_MAGIC_NUMBER);
+    g_k_mixture_model->attach(k_mixture_model_filename, ATTACH_READWRITE|ATTACH_CREATE);
+
+    assert(convert_document_to_hash(stdin));
+    assert(train_document());
+
+    g_hash_table_unref(g_hash_of_document);
+    delete g_phrases;
+    delete g_k_mixture_model;
 
     return 0;
 }
