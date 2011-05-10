@@ -202,6 +202,8 @@ int main(int argc, char * argv[]){
             printf("\n");
     }
 
+    /* print enter at file tail */
+    printf("\n");
     g_array_free(current_utf16, TRUE);
     free(linebuf);
     return 0;

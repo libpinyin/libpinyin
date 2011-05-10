@@ -206,5 +206,8 @@ int main(int argc, char * argv[]){
         g_array_free(strings, TRUE);
         g_free(sentence);
     }
+
+    /* print enter at file tail */
+    printf("\n");
     return 0;
 }
