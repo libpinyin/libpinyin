@@ -60,20 +60,9 @@ int main(int argc, char * argv[]){
     
     g_phrases = new PhraseLargeTable;
     //init phrase lookup
-    FILE * gb_file = fopen("../../data/gb_char.table", "r");
-    if ( gb_file == NULL ){
-	fprintf(stderr, "can't open gb_char.table!\n");
-	exit(ENOENT);
-    }
-    g_phrases->load_text(gb_file);
-    fclose(gb_file);
-    FILE * gbk_file = fopen("../../data/gbk_char.table", "r");
-    if ( gbk_file == NULL ){
-	fprintf(stderr, "can't open gbk_char.table!\n");
-	exit(ENOENT);
-    }
-    g_phrases->load_text(gbk_file);
-    fclose(gbk_file);
+    MemoryChunk * chunk = new MemoryChunk;
+    chunk->load("../../data/phrase_index.bin");
+    g_phrases->load(chunk);
 
     Bigram bigram;
     bigram.attach(bigram_filename, ATTACH_CREATE|ATTACH_READWRITE);
