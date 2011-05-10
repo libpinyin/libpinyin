@@ -351,9 +351,11 @@ public:
         DBT db_data;
         memset(&db_data, 0, sizeof(DBT));
         int ret = m_db->get(m_db, NULL, &db_key, &db_data, 0);
-        if ( ret == 0)
-            single_gram = new FlexibleSingleGram<ArrayHeader, ArrayItem>
-                (db_data.data, db_data.size);
+        if ( ret != 0)
+            return false;
+
+        single_gram = new FlexibleSingleGram<ArrayHeader, ArrayItem>
+            (db_data.data, db_data.size);
 
         return true;
     }
