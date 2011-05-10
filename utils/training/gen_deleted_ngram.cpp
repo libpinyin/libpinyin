@@ -43,15 +43,15 @@ int main(int argc, char * argv[]){
 	if ( strcmp("--help", argv[i]) == 0){
 	    print_help();
             exit(0);
-	}else if ( strcmp("--skip-pi-gram-training", argv[i]) == 0 ){
+	} else if ( strcmp("--skip-pi-gram-training", argv[i]) == 0 ){
 	    train_pi_gram = false;
-	}else if ( strcmp("--deleted-bigram-file", argv[i]) == 0){
+	} else if ( strcmp("--deleted-bigram-file", argv[i]) == 0){
             if ( ++i >= argc ) {
                 print_help();
                 exit(EINVAL);
             }
             bigram_filename = argv[i];
-	}else{
+	} else {
             print_help();
             exit(EINVAL);
         }

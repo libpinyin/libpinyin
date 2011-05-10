@@ -20,9 +20,9 @@
  */
 
 
-
-#include <glib.h>
 #include "pinyin.h"
+#include <glib.h>
+#include <locale.h>
 #include "k_mixture_model.h"
 
 typedef GHashTable * HashofWordPair;
@@ -34,11 +34,11 @@ static PhraseLargeTable * g_phrases = NULL;
 static KMixtureModelBigram * g_k_mixture_model = NULL;
 static guint32 g_maximum_occurs = 20;
 static parameter_t g_maximum_increase_rates = 3.;
+static bool g_train_pi_gram = true;
+
 
 void print_help(){
     printf("gen_k_mixture_model [--skip-pi-gram-training]\n");
-    printf("                    [--skip-bi-gram-training]\n");
-    printf("                    [--skip-k-mixture-model-training]\n");
     printf("                    [--maximum-ocurrs-allowed <INT>]\n");
     printf("                    [--maximum-increase-rates-allowed <FLOAT>]\n");
     printf("                    [--k-mixture-model-file <FILENAME>]\n");
@@ -178,6 +178,11 @@ static void train_single_gram_wrapper(gpointer key, gpointer value,
     phrase_token_t token = GPOINTER_TO_UINT(key);
     guint32 delta = 0;
 
+    if ( null_token == token ){
+        if ( !g_train_pi_gram )
+            return;
+    }
+
     KMixtureModelSingleGram * single_gram = NULL;
     bool exists = g_k_mixture_model->load(token, single_gram);
     if ( exists ){
@@ -202,16 +207,40 @@ static void train_single_gram_wrapper(gpointer key, gpointer value,
     delete single_gram;
 }
 
-bool train_document(){
-    g_hash_table_foreach(g_hash_of_document, train_single_gram_wrapper, NULL);
-    return true;
-}
-
 int main(int argc, char * argv[]){
+    int i = 1;
     const char * k_mixture_model_filename = NULL;
 
-    g_hash_of_document = g_hash_table_new_full
-        (g_int_hash, g_int_equal, NULL, (GDestroyNotify)g_hash_table_unref);
+    setlocale(LC_ALL, "");
+    while ( i < argc ){
+        if ( strcmp("--help", argv[i]) == 0 ){
+            print_help();
+            exit(0);
+        } else if ( strcmp("--skip-pi-gram-training", argv[i]) == 0 ){
+            g_train_pi_gram = false;
+        } else if ( strcmp("--maximum-ocurrs-allowed", argv[i]) == 0 ){
+            if ( ++i >= argc ){
+                print_help();
+                exit(EINVAL);
+            }
+            g_maximum_occurs = atoi(argv[i]);
+        } else if ( strcmp("--maximum-increase-rates-allowed", argv[i]) == 0 ){
+            if ( ++i >= argc ){
+                print_help();
+                exit(EINVAL);
+            }
+            g_maximum_increase_rates = atof(argv[i]);
+        } else if ( strcmp("--k-mixture-model-file", argv[i]) == 0 ){
+            if ( ++i >= argc ){
+                print_help();
+                exit(EINVAL);
+            }
+            k_mixture_model_filename = argv[i];
+        } else {
+            break;
+        }
+        ++i;
+    }
 
     g_phrases = new PhraseLargeTable;
     MemoryChunk * chunk = new MemoryChunk;
@@ -221,10 +250,33 @@ int main(int argc, char * argv[]){
     g_k_mixture_model = new KMixtureModelBigram(K_MIXTURE_MODEL_MAGIC_NUMBER);
     g_k_mixture_model->attach(k_mixture_model_filename, ATTACH_READWRITE|ATTACH_CREATE);
 
-    assert(convert_document_to_hash(stdin));
-    assert(train_document());
+    while ( i < argc ){
+        const char * filename = argv[i];
+        FILE * document = fopen(filename, "r");
+        if ( NULL == document ){
+            int err_saved = errno;
+            fprintf(stderr, "can't open file: %s.\n", filename);
+            fprintf(stderr, "error:%s.\n", strerror(err_saved));
+            exit(err_saved);
+        }
 
-    g_hash_table_unref(g_hash_of_document);
+        g_hash_of_document = g_hash_table_new_full
+            (g_int_hash, g_int_equal, NULL,
+             (GDestroyNotify)g_hash_table_unref);
+
+        assert(convert_document_to_hash(document));
+        fclose(document);
+
+        /* train the document, and convert it to k mixture model. */
+        g_hash_table_foreach(g_hash_of_document,
+                             train_single_gram_wrapper, NULL);
+
+        g_hash_table_unref(g_hash_of_document);
+        g_hash_of_document = NULL;
+
+        ++i;
+     }
+
     delete g_phrases;
     delete g_k_mixture_model;
 

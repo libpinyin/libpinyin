@@ -101,6 +101,7 @@ int main(int argc, char * argv[]){
         } else {
             bigram_filename = argv[i];
         }
+        ++i;
     }
 
     /* TODO: magic header signature check here. */
