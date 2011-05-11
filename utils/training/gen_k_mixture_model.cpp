@@ -185,12 +185,9 @@ static void train_single_gram_wrapper(gpointer key, gpointer value,
 
     KMixtureModelSingleGram * single_gram = NULL;
     bool exists = g_k_mixture_model->load(token, single_gram);
-    if ( exists ){
-        train_single_gram(token, single_gram, delta);
-    } else { /* item doesn't exist. */
+    if ( !exists )
         single_gram = new KMixtureModelSingleGram;
-        train_single_gram(token, single_gram, delta);
-    }
+    train_single_gram(token, single_gram, delta);
 
     KMixtureModelMagicHeader magic_header;
     assert(g_k_mixture_model->get_magic_header(magic_header));
@@ -275,7 +272,7 @@ int main(int argc, char * argv[]){
         g_hash_of_document = NULL;
 
         ++i;
-     }
+    }
 
     delete g_phrases;
     delete g_k_mixture_model;
