@@ -135,7 +135,7 @@ typedef struct{
        m_n_0 = KMixtureModelMagicHeader.m_N - m_N_n_0;
        m_N_n_0, the number of documents which contains the word or phrase.
        (two word phrase) */
-    guint m_N_n_0;
+    guint32 m_N_n_0;
     guint32 m_n_1;
 
     /* maximum instances of the word or phrase (two word phrase)
