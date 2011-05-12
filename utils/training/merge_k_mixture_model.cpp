@@ -34,8 +34,6 @@ static bool merge_two_phrase_array( /* in */  FlexibleBigramPhraseArray first,
     /* avoid to do empty merge. */
     assert( NULL != first && NULL != second && NULL != merged );
 
-    merged = g_array_new(FALSE, FALSE, sizeof(KMixtureModelArrayItemWithToken));
-
     /* merge two arrays. */
     guint first_index, second_index = first_index = 0;
     KMixtureModelArrayItemWithToken * first_item,
@@ -113,7 +111,6 @@ static bool merge_magic_header( /* in & out */ KMixtureModelBigram * target,
     return true;
 }
 
-/* Note: must be called after the merge array items method. */
 static bool merge_array_headers( /* in & out */ KMixtureModelBigram * target,
                                  /* in */ KMixtureModelBigram * new_one){
 
@@ -128,7 +125,13 @@ static bool merge_array_headers( /* in & out */ KMixtureModelBigram * target,
 
         memset(&merged_array_header, 0, sizeof(KMixtureModelArrayHeader));
         assert(new_one->get_array_header(*token, new_array_header));
-        assert(target->get_array_header(*token, target_array_header));
+        bool exists_in_target = target->get_array_header(*token,
+                                                         target_array_header);
+        if ( !exists_in_target ){
+            target->set_array_header(*token, new_array_header);
+            continue;
+        }
+
         merged_array_header.m_WC = target_array_header.m_WC +
             new_array_header.m_WC;
         assert(target->set_array_header(*token, merged_array_header));
