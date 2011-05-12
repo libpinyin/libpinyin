@@ -46,7 +46,7 @@ void print_help(){
 }
 
 
-bool convert_document_to_hash(FILE * document){
+bool read_document(FILE * document){
     char * linebuf = NULL;
     size_t size = 0;
     phrase_token_t last_token, cur_token = last_token = 0;
@@ -68,8 +68,21 @@ bool convert_document_to_hash(FILE * document){
         if ( ! (search_result & SEARCH_OK) )
             token = 0;
 
+        g_free(phrase);
+        phrase = NULL;
+
         last_token = cur_token;
         cur_token = token;
+
+        /* skip null_token in second word. */
+        if ( null_token == cur_token )
+            continue;
+
+        /* skip pi-gram training. */
+        if ( null_token == last_token ){
+            if ( !g_train_pi_gram )
+                continue;
+        }
 
         /* remember the (last_token, cur_token) word pair. */
         gpointer value = NULL;
@@ -99,6 +112,8 @@ bool convert_document_to_hash(FILE * document){
                             GUINT_TO_POINTER(last_token),
                             hash_of_second_word);
     }
+
+    free(linebuf);
 
     return true;
 }
@@ -173,15 +188,9 @@ bool train_single_gram(phrase_token_t token,
     return true;
 }
 
-static void train_single_gram_wrapper(gpointer key, gpointer value,
-                                      gpointer user_data){
+static void hash_of_document_train_wrapper(gpointer key, gpointer value, gpointer user_data){
     phrase_token_t token = GPOINTER_TO_UINT(key);
     guint32 delta = 0;
-
-    if ( null_token == token ){
-        if ( !g_train_pi_gram )
-            return;
-    }
 
     KMixtureModelSingleGram * single_gram = NULL;
     bool exists = g_k_mixture_model->load(token, single_gram);
@@ -261,12 +270,12 @@ int main(int argc, char * argv[]){
             (g_int_hash, g_int_equal, NULL,
              (GDestroyNotify)g_hash_table_unref);
 
-        assert(convert_document_to_hash(document));
+        assert(read_document(document));
         fclose(document);
 
         /* train the document, and convert it to k mixture model. */
         g_hash_table_foreach(g_hash_of_document,
-                             train_single_gram_wrapper, NULL);
+                             hash_of_document_train_wrapper, NULL);
 
         g_hash_table_unref(g_hash_of_document);
         g_hash_of_document = NULL;
