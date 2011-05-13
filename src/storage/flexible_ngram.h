@@ -256,6 +256,7 @@ private:
 
     void reset(){
         if ( m_db ){
+            m_db->sync(m_db, 0);
             m_db->close(m_db, 0);
             m_db = NULL;
         }
