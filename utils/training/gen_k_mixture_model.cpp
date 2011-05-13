@@ -42,7 +42,7 @@ void print_help(){
     printf("                    [--maximum-ocurrs-allowed <INT>]\n");
     printf("                    [--maximum-increase-rates-allowed <FLOAT>]\n");
     printf("                    [--k-mixture-model-file <FILENAME>]\n");
-    printf("                    {<FILENAME>}+");
+    printf("                    {<FILENAME>}+\n");
 }
 
 

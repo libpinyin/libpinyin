@@ -19,11 +19,13 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+#include <locale.h>
 #include "pinyin.h"
 #include "k_mixture_model.h"
 
 void print_help(){
-    printf("merge_k_mixture_model <RESULT_FILENAME> {<SOURCE_FILENAME>}+\n");
+    printf("merge_k_mixture_model [--result-file <RESULT_FILENAME>]\n");
+    printf("                      {<SOURCE_FILENAME>}+\n");
 }
 
 
@@ -196,7 +198,7 @@ static bool merge_array_items( /* in & out */ KMixtureModelBigram * target,
 }
 
 bool merge_two_k_mixture_model( /* in & out */ KMixtureModelBigram * target,
-                                /* in */ KMixtureModelBigram * new_one  ){
+                                /* in */ KMixtureModelBigram * new_one ){
     assert(NULL != target);
     assert(NULL != new_one);
     return merge_array_items(target, new_one) &&
@@ -205,6 +207,36 @@ bool merge_two_k_mixture_model( /* in & out */ KMixtureModelBigram * target,
 }
 
 int main(int argc, char * argv[]){
+    int i = 1;
     const char * result_filename = NULL;
+
+    setlocale(LC_ALL, "");
+    while (i < argc) {
+        if ( strcmp("--help", argv[i]) == 0 ){
+            print_help();
+            exit(0);
+        } else if ( strcmp("--result-file", argv[i]) == 0 ){
+            if ( ++i >= argc ){
+                print_help();
+                exit(EINVAL);
+            }
+            result_filename = argv[i];
+        } else {
+            break;
+        }
+        ++i;
+    }
+
+    KMixtureModelBigram target(K_MIXTURE_MODEL_MAGIC_NUMBER);
+    target.attach(result_filename, ATTACH_READWRITE|ATTACH_CREATE);
+
+    while ( i < argc ){
+        const char * new_filename = argv[i];
+        KMixtureModelBigram new_one(K_MIXTURE_MODEL_MAGIC_NUMBER);
+        new_one.attach(new_filename, ATTACH_READONLY);
+        merge_two_k_mixture_model(&target, &new_one);
+        ++i;
+    }
+
     return 0;
 }
