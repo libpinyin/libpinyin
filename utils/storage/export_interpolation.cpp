@@ -27,15 +27,17 @@
 
 /* export interpolation model as textual format */
 
-void gen_unigram(FILE * output, FacadePhraseIndex * phrase_index);
-void gen_bigram(FILE * output, FacadePhraseIndex * phrase_index, Bigram * bigram);
+bool gen_unigram(FILE * output, FacadePhraseIndex * phrase_index);
+bool gen_bigram(FILE * output, FacadePhraseIndex * phrase_index, Bigram * bigram);
 
-void begin_data(FILE * output){
+bool begin_data(FILE * output){
     fprintf(output, "\\data model interpolation\n");
+    return true;
 }
 
-void end_data(FILE * output){
+bool end_data(FILE * output){
     fprintf(output, "\\end\n");
+    return true;
 }
 
 int main(int argc, char * argv[]){
@@ -66,7 +68,7 @@ int main(int argc, char * argv[]){
     return 0;
 }
 
-void gen_unigram(FILE * output, FacadePhraseIndex * phrase_index) {
+bool gen_unigram(FILE * output, FacadePhraseIndex * phrase_index) {
     fprintf(output, "\\1-gram\n");
     for ( size_t i = 0; i < PHRASE_INDEX_LIBRARY_COUNT; i++) {
 
@@ -91,9 +93,10 @@ void gen_unigram(FILE * output, FacadePhraseIndex * phrase_index) {
             g_free(phrase);
         }
     }
+    return true;
 }
 
-void gen_bigram(FILE * output, FacadePhraseIndex * phrase_index, Bigram * bigram){
+bool gen_bigram(FILE * output, FacadePhraseIndex * phrase_index, Bigram * bigram){
     fprintf(output, "\\2-gram\n");
 
     /* Retrieve all user items. */
@@ -127,4 +130,5 @@ void gen_bigram(FILE * output, FacadePhraseIndex * phrase_index, Bigram * bigram
     }
 
     g_array_free(items, TRUE);
+    return true;
 }
