@@ -29,8 +29,8 @@
 static PhraseLargeTable * g_phrases = NULL;
 
 void print_help(){
-    printf("gen_ngram [--skip-pi-gram-training]\n");
-    printf("          [--bigram-file <FILENAME>]\n");
+    printf("Usage: gen_ngram [--skip-pi-gram-training]\n");
+    printf("                 [--bigram-file <FILENAME>]\n");
 }
 
 int main(int argc, char * argv[]){

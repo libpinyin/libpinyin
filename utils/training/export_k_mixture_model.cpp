@@ -24,7 +24,7 @@
 #include "k_mixture_model.h"
 
 void print_help(){
-    printf("export_k_mixture_model [--k-mixture-model-file <FILENAME>]\n");
+    printf("Usage: export_k_mixture_model [--k-mixture-model-file <FILENAME>]\n");
 }
 
 bool print_k_mixture_model_magic_header(FILE * output,

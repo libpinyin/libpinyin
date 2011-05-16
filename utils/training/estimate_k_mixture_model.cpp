@@ -24,8 +24,8 @@
 #include "k_mixture_model.h"
 
 void print_help(){
-    printf("estimate_k_mixture_model [--bigram-file <FILENAME>]\n");
-    printf("                         [--deleted-bigram-file <FILENAME]\n");
+    printf("Usage: estimate_k_mixture_model [--bigram-file <FILENAME>]\n");
+    printf("                                [--deleted-bigram-file <FILENAME]\n");
 }
 
 parameter_t compute_interpolation(KMixtureModelSingleGram * deleted_bigram,

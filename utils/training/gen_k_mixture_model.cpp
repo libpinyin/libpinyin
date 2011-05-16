@@ -38,11 +38,11 @@ static bool g_train_pi_gram = true;
 
 
 void print_help(){
-    printf("gen_k_mixture_model [--skip-pi-gram-training]\n");
-    printf("                    [--maximum-ocurrs-allowed <INT>]\n");
-    printf("                    [--maximum-increase-rates-allowed <FLOAT>]\n");
-    printf("                    [--k-mixture-model-file <FILENAME>]\n");
-    printf("                    {<FILENAME>}+\n");
+    printf("Usage: gen_k_mixture_model [--skip-pi-gram-training]\n");
+    printf("                           [--maximum-ocurrs-allowed <INT>]\n");
+    printf("                           [--maximum-increase-rates-allowed <FLOAT>]\n");
+    printf("                           [--k-mixture-model-file <FILENAME>]\n");
+    printf("                           {<FILENAME>}+\n");
 }
 
 

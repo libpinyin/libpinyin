@@ -30,7 +30,7 @@ static guint32 g_prune_k = 3;
 static parameter_t g_prune_poss = 0.99;
 
 void print_help(){
-    printf("prune_k_mixture_model -k <INT> --CDF <FLOAT>  <FILENAME>\n");
+    printf("Usage: prune_k_mixture_model -k <INT> --CDF <FLOAT>  <FILENAME>\n");
 }
 
 bool prune_k_mixture_model(KMixtureModelMagicHeader * magic_header,

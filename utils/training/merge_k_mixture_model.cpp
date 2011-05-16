@@ -24,8 +24,8 @@
 #include "k_mixture_model.h"
 
 void print_help(){
-    printf("merge_k_mixture_model [--result-file <RESULT_FILENAME>]\n");
-    printf("                      {<SOURCE_FILENAME>}+\n");
+    printf("Usage: merge_k_mixture_model [--result-file <RESULT_FILENAME>]\n");
+    printf("                             {<SOURCE_FILENAME>}+\n");
 }
 
 
