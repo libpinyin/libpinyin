@@ -20,7 +20,8 @@ MAINTAINERCLEANFILES    = Makefile.in
 INCLUDES		= -I$(top_srcdir)/src \
 			  -I$(top_srcdir)/src/include \
 			  -I$(top_srcdir)/src/storage \
-                          -I$(top_srcdir)/src/lookup \
+              -I$(top_srcdir)/src/lookup \
+			  -I$(top_srcdir)/utils/storage \
 			  @GLIB2_CPPFLAGS@
 
 noinst_HEADERS		= k_mixture_model.h
@@ -32,7 +33,8 @@ noinst_PROGRAMS		= gen_ngram \
 			  estimate_interpolation \
 			  estimate_k_mixture_model \
 			  merge_k_mixture_model \
-			  prune_k_mixture_model
+			  prune_k_mixture_model \
+			  export_k_mixture_model
 
 gen_ngram_SOURCES	= gen_ngram.cpp
 
@@ -65,3 +67,7 @@ merge_k_mixture_model_LDADD = ../../src/libpinyin.la @GLIB2_LDFLAGS@
 prune_k_mixture_model_SOURCES = prune_k_mixture_model.cpp
 
 prune_k_mixture_model_LDADD = ../../src/libpinyin.la @GLIB2_LDFLAGS@
+
+export_k_mixture_model_SOURCES = export_k_mixture_model.cpp
+
+export_k_mixture_model_LDADD = ../storage/libtagutils.la ../../src/libpinyin.la @GLIB2_LDFLAGS@

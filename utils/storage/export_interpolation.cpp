@@ -30,12 +30,12 @@
 void gen_unigram(FILE * output, FacadePhraseIndex * phrase_index);
 void gen_bigram(FILE * output, FacadePhraseIndex * phrase_index, Bigram * bigram);
 
-void begin_data(FILE * file){
-    fprintf(file, "\\data model interpolation\n");
+void begin_data(FILE * output){
+    fprintf(output, "\\data model interpolation\n");
 }
 
-void end_data(FILE * file){
-    fprintf(file, "\\end\n");
+void end_data(FILE * output){
+    fprintf(output, "\\end\n");
 }
 
 int main(int argc, char * argv[]){
