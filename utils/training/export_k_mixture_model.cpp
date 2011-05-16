@@ -80,9 +80,10 @@ bool print_k_mixture_model_array_items(FILE * output,
             char * word2 = taglib_token_to_string(phrase_index, item->m_token);
 
             if (word1 && word2)
-                fprintf(output, "\\item %s %s count %d T %d N_n_0 %d Mr %d\n",
+                fprintf(output, "\\item %s %s count %d T %d N_n_0 %d n_1 %d Mr %d\n",
                         word1, word2, item->m_item.m_WC, item->m_item.m_WC,
-                        item->m_item.m_N_n_0, item->m_item.m_Mr);
+                        item->m_item.m_N_n_0, item->m_item.m_n_1,
+                        item->m_item.m_Mr);
 
             g_free(word1); g_free(word2);
         }
