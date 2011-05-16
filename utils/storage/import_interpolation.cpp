@@ -40,9 +40,6 @@ static GHashTable * required = NULL;
 static char * linebuf = NULL;
 static size_t len = 0;
 
-phrase_token_t string_to_token(PhraseLargeTable * phrases,
-                               const char * string);
-
 bool parse_unigram(FILE * input, PhraseLargeTable * phrases,
                    FacadePhraseIndex * phrase_index);
 
@@ -104,7 +101,7 @@ bool parse_unigram(FILE * input, PhraseLargeTable * phrases,
         case GRAM_1_ITEM_LINE:{
             /* handle \item in \1-gram */
             const char * string = (const char *) g_ptr_array_index(values, 0);
-            phrase_token_t token = string_to_token(phrases, string);
+            phrase_token_t token = taglib_string_to_token(phrases, string);
             char * value = NULL;
             assert(g_hash_table_lookup_extended(required, "count", NULL, (gpointer *)&value));
             glong count = atol(value);
@@ -140,9 +137,9 @@ bool parse_bigram(FILE * input, PhraseLargeTable * phrases,
             /* handle \item in \2-gram */
             /* two tokens */
             const char * string = (const char *) g_ptr_array_index(values, 0);
-            phrase_token_t token1 = string_to_token(phrases, string);
+            phrase_token_t token1 = taglib_string_to_token(phrases, string);
             string = (const char *) g_ptr_array_index(values, 1);
-            phrase_token_t token2 = string_to_token(phrases, string);
+            phrase_token_t token2 = taglib_string_to_token(phrases, string);
 
             /* tag: count */
             char * value = NULL;
@@ -261,42 +258,4 @@ int main(int argc, char * argv[]){
     phrase_index.load(2, chunk);
 
     return 0;
-}
-
-static phrase_token_t special_string_to_token(const char * string){
-    struct token_pair{
-        phrase_token_t token;
-        const char * string;
-    };
-
-    static const token_pair tokens [] = {
-        {sentence_start, "<start>"},
-        {0, NULL}
-    };
-
-    const token_pair * pair = tokens;
-    while (pair->string) {
-        if ( strcmp(string, pair->string ) == 0 ){
-            return pair->token;
-        }
-    }
-
-    fprintf(stderr, "error: unknown token:%s.\n", string);
-    return 0;
-}
-
-phrase_token_t string_to_token(PhraseLargeTable * phrases, const char * string){
-    phrase_token_t token = 0;
-    if ( string[0] == '<' ) {
-        return special_string_to_token(string);
-    }
-
-    glong phrase_len = g_utf8_strlen(string, -1);
-    utf16_t * phrase = g_utf8_to_utf16(string, -1, NULL, NULL, NULL);
-    int result = phrases->search(phrase_len, phrase, token);
-    if ( !(result & SEARCH_OK) )
-        fprintf(stderr, "error: unknown token:%s.\n", string);
-
-    g_free(phrase);
-    return token;
 }

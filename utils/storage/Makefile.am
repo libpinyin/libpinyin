@@ -33,10 +33,6 @@ gen_binary_files_SOURCES    = gen_binary_files.cpp
 
 gen_binary_files_LDADD      = ../../src/libpinyin.la @GLIB2_LDFLAGS@
 
-export_interpolation_SOURCES = export_interpolation.cpp
-
-export_interpolation_LDADD = ../../src/libpinyin.la @GLIB2_LDFLAGS@
-
 noinst_LTLIBRARIES        = libtagutils.la
 
 libtagutils_la_LDFLAGS    = -static
@@ -45,4 +41,8 @@ libtagutils_la_SOURCES    = tag_utility.cpp
 
 import_interpolation_SOURCES = import_interpolation.cpp
 
-import_interpolation_LDADD = ../../src/libpinyin.la @GLIB2_LDFLAGS@ ./libtagutils.la
+import_interpolation_LDADD = ./.libs/libtagutils.a ../../src/libpinyin.la @GLIB2_LDFLAGS@
+
+export_interpolation_SOURCES = export_interpolation.cpp
+
+export_interpolation_LDADD = ./.libs/libtagutils.a ../../src/libpinyin.la @GLIB2_LDFLAGS@

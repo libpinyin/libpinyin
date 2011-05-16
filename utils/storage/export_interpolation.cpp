@@ -19,18 +19,16 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+#include "pinyin.h"
 #include <stdio.h>
 #include <assert.h>
 #include <glib.h>
-#include "pinyin.h"
+#include "tag_utility.h"
 
 /* export interpolation model as textual format */
 
 void gen_unigram(FILE * output, FacadePhraseIndex * phrase_index);
 void gen_bigram(FILE * output, FacadePhraseIndex * phrase_index, Bigram * bigram);
-
-/* consider moving the following function to utils/storage/utility.h */
-char * token_to_string(FacadePhraseIndex * phrase_index, phrase_token_t token);
 
 void begin_data(FILE * file){
     fprintf(file, "\\data model interpolation\n");
@@ -86,7 +84,7 @@ void gen_unigram(FILE * output, FacadePhraseIndex * phrase_index) {
             assert( result == ERROR_OK);
 
             size_t freq = item.get_unigram_frequency();
-            char * phrase = token_to_string(phrase_index, j);
+            char * phrase = taglib_token_to_string(phrase_index, j);
             if ( phrase )
                 fprintf(output, "\\item %s count %ld\n", phrase, freq);
 
@@ -115,8 +113,8 @@ void gen_bigram(FILE * output, FacadePhraseIndex * phrase_index, Bigram * bigram
         for(size_t j = 0; j < array->len; j++) {
             BigramPhraseItemWithCount * item = &g_array_index(array, BigramPhraseItemWithCount, j);
 
-            char * word1 = token_to_string(phrase_index, token);
-            char * word2 = token_to_string(phrase_index, item->m_token);
+            char * word1 = taglib_token_to_string(phrase_index, token);
+            char * word2 = taglib_token_to_string(phrase_index, item->m_token);
             guint32 freq = item->m_count;
 
             if ( word1 && word2)
@@ -129,47 +127,4 @@ void gen_bigram(FILE * output, FacadePhraseIndex * phrase_index, Bigram * bigram
     }
 
     g_array_free(items, TRUE);
-}
-
-static const char * special_token_to_string(phrase_token_t token){
-    struct token_pair{
-        phrase_token_t token;
-        const char * string;
-    };
-
-    static const token_pair tokens [] = {
-        {sentence_start, "<start>"},
-        {0, NULL}
-    };
-
-    const token_pair * pair = tokens;
-    while (pair->token) {
-        if ( token == pair->token )
-            return pair->string;
-    }
-
-    fprintf(stderr, "error: unknown token:%d.\n", token);
-    return NULL;
-}
-
-char * token_to_string(FacadePhraseIndex * phrase_index, phrase_token_t token) {
-    PhraseItem item;
-    utf16_t buffer[MAX_PHRASE_LENGTH];
-
-    gchar * phrase;
-    /* deal with the special phrase index, for "<start>..." */
-    if ( PHRASE_INDEX_LIBRARY_INDEX(token) == 0 ) {
-        return g_strdup(special_token_to_string(token));
-    }
-
-    int result = phrase_index->get_phrase_item(token, item);
-    if (result != ERROR_OK) {
-        fprintf(stderr, "error: unknown token:%d.\n", token);
-        return NULL;
-    }
-
-    item.get_phrase_string(buffer);
-    guint8 length = item.get_phrase_length();
-    phrase = g_utf16_to_utf8(buffer, length, NULL, NULL, NULL);
-    return phrase;
 }

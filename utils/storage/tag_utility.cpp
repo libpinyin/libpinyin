@@ -1,8 +1,9 @@
+#include "pinyin.h"
+#include <glib.h>
+#include <stdio.h>
 #include <string.h>
 #include <assert.h>
-#include <glib.h>
 #include "tag_utility.h"
-
 
 /* internal taglib structure */
 struct tag_entry{
@@ -303,6 +304,84 @@ bool taglib_fini(){
     return true;
 }
 
-void test(){
-    assert(taglib_add_tag(2, "\\data", 1, "data", ""));
+static phrase_token_t taglib_special_string_to_token(const char * string){
+    struct token_pair{
+        phrase_token_t token;
+        const char * string;
+    };
+
+    static const token_pair tokens [] = {
+        {sentence_start, "<start>"},
+        {0, NULL}
+    };
+
+    const token_pair * pair = tokens;
+    while (pair->string) {
+        if ( strcmp(string, pair->string ) == 0 ){
+            return pair->token;
+        }
+    }
+
+    fprintf(stderr, "error: unknown token:%s.\n", string);
+    return 0;
+}
+
+phrase_token_t taglib_string_to_token(PhraseLargeTable * phrases, const char * string){
+    phrase_token_t token = 0;
+    if ( string[0] == '<' ) {
+        return taglib_special_string_to_token(string);
+    }
+
+    glong phrase_len = g_utf8_strlen(string, -1);
+    utf16_t * phrase = g_utf8_to_utf16(string, -1, NULL, NULL, NULL);
+    int result = phrases->search(phrase_len, phrase, token);
+    if ( !(result & SEARCH_OK) )
+        fprintf(stderr, "error: unknown token:%s.\n", string);
+
+    g_free(phrase);
+    return token;
+}
+
+static const char * taglib_special_token_to_string(phrase_token_t token){
+    struct token_pair{
+        phrase_token_t token;
+        const char * string;
+    };
+
+    static const token_pair tokens [] = {
+        {sentence_start, "<start>"},
+        {0, NULL}
+    };
+
+    const token_pair * pair = tokens;
+    while (pair->token) {
+        if ( token == pair->token )
+            return pair->string;
+    }
+
+    fprintf(stderr, "error: unknown token:%d.\n", token);
+    return NULL;
+}
+
+char * taglib_token_to_string(FacadePhraseIndex * phrase_index,
+                              phrase_token_t token) {
+    PhraseItem item;
+    utf16_t buffer[MAX_PHRASE_LENGTH];
+
+    gchar * phrase;
+    /* deal with the special phrase index, for "<start>..." */
+    if ( PHRASE_INDEX_LIBRARY_INDEX(token) == 0 ) {
+        return g_strdup(taglib_special_token_to_string(token));
+    }
+
+    int result = phrase_index->get_phrase_item(token, item);
+    if (result != ERROR_OK) {
+        fprintf(stderr, "error: unknown token:%d.\n", token);
+        return NULL;
+    }
+
+    item.get_phrase_string(buffer);
+    guint8 length = item.get_phrase_length();
+    phrase = g_utf16_to_utf8(buffer, length, NULL, NULL, NULL);
+    return phrase;
 }

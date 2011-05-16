@@ -22,6 +22,8 @@
 #ifndef TAG_UTILITY_H
 #define TAG_UTILITY_H
 
+#include "novel_types.h"
+
 /* Note: the optional tag has been removed from the first implementation.
  * Maybe the optional tag will be added back later.
  */
@@ -50,5 +52,17 @@ bool taglib_push_state();
 bool taglib_pop_state();
 
 bool taglib_fini();
+
+namespace pinyin{
+    class PhraseLargeTable;
+};
+
+using namespace pinyin;
+
+phrase_token_t taglib_string_to_token(PhraseLargeTable * phrases,
+                                      const char * string);
+
+char * taglib_token_to_string(FacadePhraseIndex * phrase_index,
+                              phrase_token_t token);
 
 #endif
