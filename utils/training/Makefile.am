@@ -34,6 +34,7 @@ noinst_PROGRAMS		= gen_ngram \
 			  estimate_k_mixture_model \
 			  merge_k_mixture_model \
 			  prune_k_mixture_model \
+			  import_k_mixture_model \
 			  export_k_mixture_model
 
 gen_ngram_SOURCES	= gen_ngram.cpp
@@ -67,6 +68,10 @@ merge_k_mixture_model_LDADD = ../../src/libpinyin.la @GLIB2_LDFLAGS@
 prune_k_mixture_model_SOURCES = prune_k_mixture_model.cpp
 
 prune_k_mixture_model_LDADD = ../../src/libpinyin.la @GLIB2_LDFLAGS@
+
+import_k_mixture_model_SOURCES = import_k_mixture_model.cpp
+
+import_k_mixture_model_LDADD = ../storage/libtagutils.la ../../src/libpinyin.la @GLIB2_LDFLAGS@
 
 export_k_mixture_model_SOURCES = export_k_mixture_model.cpp
 
