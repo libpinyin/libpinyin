@@ -141,5 +141,7 @@ int main(int argc, char * argv[]){
     print_k_mixture_model_array_headers(output, &bigram, &phrase_index);
     print_k_mixture_model_array_items(output, &bigram, &phrase_index);
 
+    end_data(output);
+
     return 0;
 }
