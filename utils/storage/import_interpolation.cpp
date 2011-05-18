@@ -144,7 +144,7 @@ bool parse_bigram(FILE * input, PhraseLargeTable * phrases,
             gpointer value = NULL;
             /* tag: count */
             assert(g_hash_table_lookup_extended(required, "count", NULL, &value));
-            glong count = atol((char *)value);
+            glong count = atol((const char *)value);
 
             if ( last_token != token1 ) {
                 if ( last_token && last_single_gram ) {
@@ -232,7 +232,11 @@ int main(int argc, char * argv[]){
     }
 
     //read "\data" line
-    assert(taglib_read(linebuf, line_type, values, required));
+    if ( !taglib_read(linebuf, line_type, values, required) ) {
+        fprintf(stderr, "error: interpolation model expected.\n");
+        exit(ENODATA);
+    }
+
     assert(line_type == BEGIN_LINE);
     char * value = NULL;
     assert(g_hash_table_lookup_extended(required, "model", NULL, (gpointer *)&value));
@@ -243,7 +247,7 @@ int main(int argc, char * argv[]){
 
     result = my_getline(input);
     if ( result != -1 )
-	parse_body(input, &phrases, &phrase_index, &bigram);
+        parse_body(input, &phrases, &phrase_index, &bigram);
 
     taglib_fini();
 

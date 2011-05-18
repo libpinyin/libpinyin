@@ -46,6 +46,10 @@ bool parse_unigram(FILE * input, PhraseLargeTable * phrases,
 bool parse_bigram(FILE * input, PhraseLargeTable * phrases,
                   KMixtureModelBigram * bigram);
 
+void print_help(){
+    printf("Usage: import_k_mixture_model [--k-mixture-model-file <FILENAME>]\n");
+}
+
 static ssize_t my_getline(FILE * input){
     ssize_t result = getline(&linebuf, &len, input);
     if ( result == -1 )
@@ -210,5 +214,78 @@ bool parse_bigram(FILE * input, PhraseLargeTable * phrases,
 }
 
 int main(int argc, char * argv[]){
+    int i = 1;
+    const char * k_mixture_model_filename = NULL;
+    FILE * input = stdin;
+
+    while ( i < argc ){
+        if ( strcmp ("--help", argv[i]) == 0 ){
+            print_help();
+            exit(0);
+        } else if ( strcmp ("--k-mixture-model-file", argv[i]) == 0 ){
+            if ( ++i > argc ){
+                print_help();
+                exit(EINVAL);
+            }
+            k_mixture_model_filename = argv[i];
+        } else {
+            print_help();
+            exit(EINVAL);
+        }
+    }
+
+    PhraseLargeTable phrases;
+
+    MemoryChunk * chunk = new MemoryChunk;
+    chunk->load("../../data/phrase_index.bin");
+    phrases.load(chunk);
+
+    KMixtureModelBigram bigram(K_MIXTURE_MODEL_MAGIC_NUMBER);
+    bigram.attach(k_mixture_model_filename, ATTACH_READONLY);
+
+    taglib_init();
+
+    values = g_ptr_array_new();
+    required = g_hash_table_new(g_str_hash, g_str_equal);
+
+    //enter "\data" line
+    assert(taglib_add_tag(BEGIN_LINE, "\\data", 0, "model:count:N", ""));
+    ssize_t result = my_getline(input);
+    if ( result == -1 ) {
+        fprintf(stderr, "empty file input.\n");
+        exit(ENODATA);
+    }
+
+    //read "\data" line
+    if ( !taglib_read(linebuf, line_type, values, required) ) {
+        fprintf(stderr, "error: k mixture model expected.\n");
+        exit(ENODATA);
+    }
+
+    assert(line_type == BEGIN_LINE);
+    gpointer value = NULL;
+    assert(g_hash_table_lookup_extended(required, "model", NULL, &value));
+    const char * model = (const char *)value;
+    if ( !( strcmp("k mixture model", model) == 0 ) ) {
+        fprintf(stderr, "error: k mixture model expected.\n");
+        exit(ENODATA);
+    }
+    assert(g_hash_table_lookup_extended(required, "count", NULL, &value));
+    glong count = atol((char *)value);
+    assert(g_hash_table_lookup_extended(required, "N", NULL, &value));
+    glong N = atol((char *) value);
+
+
+    KMixtureModelMagicHeader magic_header;
+    memset(&magic_header, 0, sizeof(KMixtureModelMagicHeader));
+    magic_header.m_WC =count; magic_header.m_N = N;
+    bigram.set_magic_header(magic_header);
+
+    result = my_getline(input);
+    if ( result != -1 )
+        parse_body(input, &phrases,  &bigram);
+
+    taglib_fini();
+
     return 0;
 }
