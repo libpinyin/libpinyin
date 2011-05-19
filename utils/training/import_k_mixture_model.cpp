@@ -241,7 +241,7 @@ int main(int argc, char * argv[]){
     phrases.load(chunk);
 
     KMixtureModelBigram bigram(K_MIXTURE_MODEL_MAGIC_NUMBER);
-    bigram.attach(k_mixture_model_filename, ATTACH_READONLY);
+    bigram.attach(k_mixture_model_filename, ATTACH_READWRITE|ATTACH_CREATE);
 
     taglib_init();
 
