@@ -21,20 +21,22 @@ INCLUDES                = -I$(top_srcdir)/src/include \
 
 noinst_HEADERS          = pinyin_large_table.h \
 			  pinyin_base.h \
-		          pinyin_phrase.h \
+		    	  pinyin_phrase.h \
 			  phrase_index.h \
-		          pinyin_zhuyin_map_data.h \
+		    	  pinyin_zhuyin_map_data.h \
 			  phrase_large_table.h \
 			  ngram.h \
-			  flexible_ngram.h
+			  flexible_ngram.h \
+			  tag_utility.h
 
 noinst_LTLIBRARIES      = libstorage.la
 
 libstorage_la_LDFLAGS	= -static
 
 libstorage_la_SOURCES    = pinyin_base.cpp \
-			  pinyin_large_table.cpp \
-			  phrase_index.cpp \
-			  phrase_large_table.cpp \
-			  ngram.cpp
+			   pinyin_large_table.cpp \
+			   phrase_index.cpp \
+			   phrase_large_table.cpp \
+			   ngram.cpp \
+			   tag_utility.cpp
 

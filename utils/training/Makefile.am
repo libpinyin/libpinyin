@@ -20,8 +20,7 @@ MAINTAINERCLEANFILES    = Makefile.in
 INCLUDES		= -I$(top_srcdir)/src \
 			  -I$(top_srcdir)/src/include \
 			  -I$(top_srcdir)/src/storage \
-              -I$(top_srcdir)/src/lookup \
-			  -I$(top_srcdir)/utils/storage \
+			  -I$(top_srcdir)/src/lookup \
 			  @GLIB2_CPPFLAGS@
 
 noinst_HEADERS		= k_mixture_model.h
@@ -72,12 +71,12 @@ prune_k_mixture_model_LDADD = ../../src/libpinyin.la @GLIB2_LDFLAGS@
 
 import_k_mixture_model_SOURCES = import_k_mixture_model.cpp
 
-import_k_mixture_model_LDADD = ../storage/libtagutils.la ../../src/libpinyin.la @GLIB2_LDFLAGS@
+import_k_mixture_model_LDADD = ../../src/libpinyin.la @GLIB2_LDFLAGS@
 
 export_k_mixture_model_SOURCES = export_k_mixture_model.cpp
 
-export_k_mixture_model_LDADD = ../storage/libtagutils.la ../../src/libpinyin.la @GLIB2_LDFLAGS@
+export_k_mixture_model_LDADD = ../../src/libpinyin.la @GLIB2_LDFLAGS@
 
 k_mixture_model_to_interpolation_SOURCES = k_mixture_model_to_interpolation.cpp
 
-k_mixture_model_to_interpolation_LDADD = ../storage/libtagutils.la ../../src/libpinyin.la @GLIB2_LDFLAGS@
+k_mixture_model_to_interpolation_LDADD = ../../src/libpinyin.la @GLIB2_LDFLAGS@

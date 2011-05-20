@@ -1,8 +1,10 @@
-#include "pinyin.h"
 #include <glib.h>
 #include <stdio.h>
 #include <string.h>
 #include <assert.h>
+#include "novel_types.h"
+#include "phrase_index.h"
+#include "phrase_large_table.h"
 #include "tag_utility.h"
 
 /* internal taglib structure */
