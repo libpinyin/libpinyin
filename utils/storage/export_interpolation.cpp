@@ -23,7 +23,6 @@
 #include <stdio.h>
 #include <assert.h>
 #include <glib.h>
-#include "tag_utility.h"
 
 /* export interpolation model as textual format */
 

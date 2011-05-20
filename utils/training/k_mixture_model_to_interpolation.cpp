@@ -20,7 +20,6 @@
  */
 
 #include "pinyin.h"
-#include "tag_utility.h"
 
 enum LINE_TYPE{
     BEGIN_LINE = 1,

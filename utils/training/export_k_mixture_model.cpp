@@ -20,7 +20,6 @@
  */
 
 #include "pinyin.h"
-#include "tag_utility.h"
 #include "k_mixture_model.h"
 
 void print_help(){
