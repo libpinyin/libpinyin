@@ -98,6 +98,8 @@ bool validate_bigram(KMixtureModelBigram * bigram){
             fprintf(stderr, "the sum differs from word count.\n");
             result = false;
         }
+
+        g_array_free(array, TRUE);
     }
 
     g_array_free(items, TRUE);
@@ -115,6 +117,7 @@ int main(int argc, char * argv[]){
         } else {
             k_mixture_model_filename = argv[i];
         }
+        ++i;
     }
 
     KMixtureModelBigram bigram(K_MIXTURE_MODEL_MAGIC_NUMBER);
