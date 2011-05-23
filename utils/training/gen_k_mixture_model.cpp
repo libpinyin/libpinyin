@@ -82,6 +82,7 @@ bool read_document(FILE * document){
         if ( null_token == last_token ){
             if ( !g_train_pi_gram )
                 continue;
+            last_token = sentence_start;
         }
 
         /* remember the (last_token, cur_token) word pair. */
@@ -91,7 +92,8 @@ bool read_document(FILE * document){
             (g_hash_of_document, GUINT_TO_POINTER(last_token),
              NULL, &value);
         if ( !lookup_result ){
-            hash_of_second_word = g_hash_table_new(g_int_hash, g_int_equal);
+            hash_of_second_word = g_hash_table_new
+                (g_direct_hash, g_direct_equal);
         } else {
             hash_of_second_word = (HashofSecondWord) value;
         }
@@ -144,6 +146,7 @@ static void train_word_pair(gpointer key, gpointer value,
             array_item.m_n_1 ++;
         array_item.m_Mr = std_lite::max(array_item.m_Mr, count);
         delta = count;
+        assert(single_gram->set_array_item(token, array_item));
     } else { /* item doesn't exist. */
         /* the same as above. */
         if ( count > g_maximum_occurs )
@@ -156,6 +159,7 @@ static void train_word_pair(gpointer key, gpointer value,
             array_item.m_n_1 = 1;
         array_item.m_Mr = count;
         delta = count;
+        assert(single_gram->insert_array_item(token, array_item));
     }
     /* save delta in the array header. */
     KMixtureModelArrayHeader array_header;
@@ -199,7 +203,11 @@ static void hash_of_document_train_wrapper(gpointer key, gpointer value, gpointe
     train_single_gram(token, single_gram, delta);
 
     KMixtureModelMagicHeader magic_header;
-    assert(g_k_mixture_model->get_magic_header(magic_header));
+    if (!g_k_mixture_model->get_magic_header(magic_header)){
+        /* the first time to access the new k mixture model file. */
+        memset(&magic_header, 0, sizeof(KMixtureModelMagicHeader));
+    }
+
     if ( magic_header.m_WC + delta < magic_header.m_WC ){
         fprintf(stderr, "the m_WC integer in magic header overflows.\n");
         return;
@@ -211,6 +219,13 @@ static void hash_of_document_train_wrapper(gpointer key, gpointer value, gpointe
     /* save the single gram. */
     assert(g_k_mixture_model->store(token, single_gram));
     delete single_gram;
+}
+
+static gboolean hash_of_document_free_wrapper(gpointer key, gpointer value, gpointer user_data){
+    phrase_token_t token = GPOINTER_TO_UINT(key);
+    HashofSecondWord second_word = (HashofSecondWord) value;
+    g_hash_table_unref(second_word);
+    return TRUE;
 }
 
 int main(int argc, char * argv[]){
@@ -266,9 +281,8 @@ int main(int argc, char * argv[]){
             exit(err_saved);
         }
 
-        g_hash_of_document = g_hash_table_new_full
-            (g_int_hash, g_int_equal, NULL,
-             (GDestroyNotify)g_hash_table_unref);
+        g_hash_of_document = g_hash_table_new
+            (g_direct_hash, g_direct_equal);
 
         assert(read_document(document));
         fclose(document);
@@ -277,6 +291,9 @@ int main(int argc, char * argv[]){
         g_hash_table_foreach(g_hash_of_document,
                              hash_of_document_train_wrapper, NULL);
 
+        /* free resources of g_hash_of_document */
+        g_hash_table_foreach_steal(g_hash_of_document,
+                                   hash_of_document_free_wrapper, NULL);
         g_hash_table_unref(g_hash_of_document);
         g_hash_of_document = NULL;
 
