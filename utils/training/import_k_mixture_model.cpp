@@ -231,6 +231,7 @@ int main(int argc, char * argv[]){
             print_help();
             exit(EINVAL);
         }
+        ++i;
     }
 
     PhraseLargeTable phrases;
