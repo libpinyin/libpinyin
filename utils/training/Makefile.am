@@ -35,7 +35,8 @@ noinst_PROGRAMS		= gen_ngram \
 			  prune_k_mixture_model \
 			  import_k_mixture_model \
 			  export_k_mixture_model \
-			  k_mixture_model_to_interpolation
+			  k_mixture_model_to_interpolation \
+			  validate_k_mixture_model
 
 gen_ngram_SOURCES	= gen_ngram.cpp
 
@@ -80,3 +81,7 @@ export_k_mixture_model_LDADD = ../../src/libpinyin.la @GLIB2_LDFLAGS@
 k_mixture_model_to_interpolation_SOURCES = k_mixture_model_to_interpolation.cpp
 
 k_mixture_model_to_interpolation_LDADD = ../../src/libpinyin.la @GLIB2_LDFLAGS@
+
+validate_k_mixture_model_SOURCES = validate_k_mixture_model.cpp
+
+validate_k_mixture_model_LDADD = ../../src/libpinyin.la @GLIB2_LDFLAGS@

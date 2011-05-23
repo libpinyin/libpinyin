@@ -48,7 +48,7 @@ bool print_k_mixture_model_array_headers(FILE * output,
     for (size_t i = 0; i < items->len; ++i) {
         phrase_token_t * token = &g_array_index(items, phrase_token_t, i);
         KMixtureModelArrayHeader array_header;
-        bigram->get_array_header(*token, array_header);
+        assert(bigram->get_array_header(*token, array_header));
         char * phrase = taglib_token_to_string(phrase_index, *token);
         if ( phrase )
             fprintf(output, "\\item %s count %d\n", phrase, array_header.m_WC);
