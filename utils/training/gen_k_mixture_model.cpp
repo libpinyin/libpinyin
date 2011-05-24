@@ -194,8 +194,8 @@ bool train_single_gram(HashofDocument hash_of_document,
     return true;
 }
 
-static bool train_second_word(HashofDocument hash_of_document,
-                              KMixtureModelBigram * bigram,
+static bool train_second_word(KMixtureModelBigram * bigram,
+                              HashofDocument hash_of_document,
                               phrase_token_t token){
     guint32 delta = 0;
 
@@ -290,7 +290,7 @@ int main(int argc, char * argv[]){
         g_hash_table_iter_init(&iter, hash_of_document);
         while (g_hash_table_iter_next(&iter, &key, &value)) {
             phrase_token_t token = GPOINTER_TO_UINT(key);
-            train_second_word(hash_of_document, &bigram, token);
+            train_second_word(&bigram, hash_of_document, token);
         }
 
         KMixtureModelMagicHeader magic_header;
