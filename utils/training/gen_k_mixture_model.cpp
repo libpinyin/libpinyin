@@ -216,7 +216,6 @@ static bool train_second_word(HashofDocument hash_of_document,
         return false;
     }
     magic_header.m_WC += delta;
-    magic_header.m_N ++;
     assert(bigram->set_magic_header(magic_header));
 
     /* save the single gram. */
@@ -293,6 +292,11 @@ int main(int argc, char * argv[]){
             phrase_token_t token = GPOINTER_TO_UINT(key);
             train_second_word(hash_of_document, &bigram, token);
         }
+
+        KMixtureModelMagicHeader magic_header;
+        assert(bigram.get_magic_header(magic_header));
+        magic_header.m_N ++;
+        assert(bigram.set_magic_header(magic_header));
 
         /* free resources of g_hash_of_document */
         g_hash_table_iter_init(&iter, hash_of_document);
