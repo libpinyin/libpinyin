@@ -319,9 +319,9 @@ static phrase_token_t taglib_special_string_to_token(const char * string){
 
     const token_pair * pair = tokens;
     while (pair->string) {
-        if ( strcmp(string, pair->string ) == 0 ){
+        if ( strcmp(string, pair->string ) == 0 )
             return pair->token;
-        }
+        pair++;
     }
 
     fprintf(stderr, "error: unknown token:%s.\n", string);
@@ -359,6 +359,7 @@ static const char * taglib_special_token_to_string(phrase_token_t token){
     while (pair->token) {
         if ( token == pair->token )
             return pair->string;
+        pair++;
     }
 
     fprintf(stderr, "error: unknown token:%d.\n", token);
