@@ -120,12 +120,8 @@ bool read_document(FILE * document){
     return true;
 }
 
-static void train_word_pair(gpointer key, gpointer value,
-                            gpointer user_data){
-    phrase_token_t token = GPOINTER_TO_UINT(key);
-    guint32 count = GPOINTER_TO_UINT(value);
-    KMixtureModelSingleGram * single_gram =
-        (KMixtureModelSingleGram *)user_data;
+static void train_word_pair(KMixtureModelSingleGram * single_gram,
+                            phrase_token_t token, guint32 count){
     KMixtureModelArrayItem array_item;
     guint32 delta = 0;
 
@@ -178,54 +174,55 @@ bool train_single_gram(phrase_token_t token,
     guint32 saved_array_header_WC = array_header.m_WC;
 
     HashofSecondWord hash_of_second_word = NULL;
-    gpointer value = NULL;
+    gpointer key, value = NULL;
     assert(g_hash_table_lookup_extended
            (g_hash_of_document, GUINT_TO_POINTER(token),
             NULL, &value));
     hash_of_second_word = (HashofSecondWord) value;
     assert(NULL != hash_of_second_word);
 
-    g_hash_table_foreach(hash_of_second_word, train_word_pair, single_gram);
+    /* train word pair */
+    GHashTableIter iter;
+    g_hash_table_iter_init(&iter, hash_of_second_word);
+    while (g_hash_table_iter_next(&iter, &key, &value)) {
+        phrase_token_t token = GPOINTER_TO_UINT(key);
+        guint32 count = GPOINTER_TO_UINT(value);
+        train_word_pair(single_gram, token, count);
+    }
 
     assert(single_gram->get_array_header(array_header));
     delta = array_header.m_WC - saved_array_header_WC;
     return true;
 }
 
-static void hash_of_document_train_wrapper(gpointer key, gpointer value, gpointer user_data){
-    phrase_token_t token = GPOINTER_TO_UINT(key);
+static bool train_second_word(KMixtureModelBigram * bigram, 
+                              phrase_token_t token){
     guint32 delta = 0;
 
     KMixtureModelSingleGram * single_gram = NULL;
-    bool exists = g_k_mixture_model->load(token, single_gram);
+    bool exists = bigram->load(token, single_gram);
     if ( !exists )
         single_gram = new KMixtureModelSingleGram;
     train_single_gram(token, single_gram, delta);
 
     KMixtureModelMagicHeader magic_header;
-    if (!g_k_mixture_model->get_magic_header(magic_header)){
+    if (!bigram->get_magic_header(magic_header)){
         /* the first time to access the new k mixture model file. */
         memset(&magic_header, 0, sizeof(KMixtureModelMagicHeader));
     }
 
     if ( magic_header.m_WC + delta < magic_header.m_WC ){
         fprintf(stderr, "the m_WC integer in magic header overflows.\n");
-        return;
+        return false;
     }
     magic_header.m_WC += delta;
     magic_header.m_N ++;
-    assert(g_k_mixture_model->set_magic_header(magic_header));
+    assert(bigram->set_magic_header(magic_header));
 
     /* save the single gram. */
-    assert(g_k_mixture_model->store(token, single_gram));
+    assert(bigram->store(token, single_gram));
     delete single_gram;
-}
-
-static gboolean hash_of_document_free_wrapper(gpointer key, gpointer value, gpointer user_data){
-    phrase_token_t token = GPOINTER_TO_UINT(key);
-    HashofSecondWord second_word = (HashofSecondWord) value;
-    g_hash_table_unref(second_word);
-    return TRUE;
+    return true;
 }
 
 int main(int argc, char * argv[]){
@@ -287,13 +284,23 @@ int main(int argc, char * argv[]){
         assert(read_document(document));
         fclose(document);
 
+        GHashTableIter iter;
+        gpointer key, value;
+
         /* train the document, and convert it to k mixture model. */
-        g_hash_table_foreach(g_hash_of_document,
-                             hash_of_document_train_wrapper, NULL);
+        g_hash_table_iter_init(&iter, g_hash_of_document);
+        while (g_hash_table_iter_next(&iter, &key, &value)) {
+            phrase_token_t token = GPOINTER_TO_UINT(key);
+            train_second_word(g_k_mixture_model, token);
+        }
 
         /* free resources of g_hash_of_document */
-        g_hash_table_foreach_steal(g_hash_of_document,
-                                   hash_of_document_free_wrapper, NULL);
+        g_hash_table_iter_init(&iter, g_hash_of_document);
+        while (g_hash_table_iter_next(&iter, &key, &value)) {
+            HashofSecondWord second_word = (HashofSecondWord) value;
+            g_hash_table_iter_steal(&iter);
+            g_hash_table_unref(second_word);
+        }
         g_hash_table_unref(g_hash_of_document);
         g_hash_of_document = NULL;
 
