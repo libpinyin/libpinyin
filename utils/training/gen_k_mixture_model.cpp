@@ -25,13 +25,10 @@
 #include <locale.h>
 #include "k_mixture_model.h"
 
-typedef GHashTable * HashofWordPair;
+typedef GHashTable * HashofDocument;
 typedef GHashTable * HashofSecondWord;
 
 /* Hash token of Hash token of word count. */
-static HashofWordPair g_hash_of_document = NULL;
-static PhraseLargeTable * g_phrases = NULL;
-static KMixtureModelBigram * g_k_mixture_model = NULL;
 static guint32 g_maximum_occurs = 20;
 static parameter_t g_maximum_increase_rates = 3.;
 static bool g_train_pi_gram = true;
@@ -46,7 +43,8 @@ void print_help(){
 }
 
 
-bool read_document(FILE * document){
+bool read_document(PhraseLargeTable * phrases, FILE * document,
+                   HashofDocument hash_of_document){
     char * linebuf = NULL;
     size_t size = 0;
     phrase_token_t last_token, cur_token = last_token = 0;
@@ -64,7 +62,7 @@ bool read_document(FILE * document){
             continue;
 
         phrase_token_t token = 0;
-        int search_result = g_phrases->search( phrase_len, phrase, token );
+        int search_result = phrases->search( phrase_len, phrase, token );
         if ( ! (search_result & SEARCH_OK) )
             token = 0;
 
@@ -89,7 +87,7 @@ bool read_document(FILE * document){
         gpointer value = NULL;
         HashofSecondWord hash_of_second_word = NULL;
         gboolean lookup_result = g_hash_table_lookup_extended
-            (g_hash_of_document, GUINT_TO_POINTER(last_token),
+            (hash_of_document, GUINT_TO_POINTER(last_token),
              NULL, &value);
         if ( !lookup_result ){
             hash_of_second_word = g_hash_table_new
@@ -110,7 +108,7 @@ bool read_document(FILE * document){
         g_hash_table_insert(hash_of_second_word,
                             GUINT_TO_POINTER(cur_token),
                             GUINT_TO_POINTER(count));
-        g_hash_table_insert(g_hash_of_document,
+        g_hash_table_insert(hash_of_document,
                             GUINT_TO_POINTER(last_token),
                             hash_of_second_word);
     }
@@ -164,8 +162,9 @@ static void train_word_pair(KMixtureModelSingleGram * single_gram,
     single_gram->set_array_header(array_header);
 }
 
-bool train_single_gram(phrase_token_t token,
+bool train_single_gram(HashofDocument hash_of_document,
                        KMixtureModelSingleGram * single_gram,
+                       phrase_token_t token,
                        guint32 & delta){
     assert(NULL != single_gram);
     delta = 0; /* delta in WC of single_gram. */
@@ -176,7 +175,7 @@ bool train_single_gram(phrase_token_t token,
     HashofSecondWord hash_of_second_word = NULL;
     gpointer key, value = NULL;
     assert(g_hash_table_lookup_extended
-           (g_hash_of_document, GUINT_TO_POINTER(token),
+           (hash_of_document, GUINT_TO_POINTER(token),
             NULL, &value));
     hash_of_second_word = (HashofSecondWord) value;
     assert(NULL != hash_of_second_word);
@@ -195,7 +194,8 @@ bool train_single_gram(phrase_token_t token,
     return true;
 }
 
-static bool train_second_word(KMixtureModelBigram * bigram, 
+static bool train_second_word(HashofDocument hash_of_document,
+                              KMixtureModelBigram * bigram,
                               phrase_token_t token){
     guint32 delta = 0;
 
@@ -203,7 +203,7 @@ static bool train_second_word(KMixtureModelBigram * bigram,
     bool exists = bigram->load(token, single_gram);
     if ( !exists )
         single_gram = new KMixtureModelSingleGram;
-    train_single_gram(token, single_gram, delta);
+    train_single_gram(hash_of_document, single_gram, token, delta);
 
     KMixtureModelMagicHeader magic_header;
     if (!bigram->get_magic_header(magic_header)){
@@ -260,13 +260,13 @@ int main(int argc, char * argv[]){
         ++i;
     }
 
-    g_phrases = new PhraseLargeTable;
+    PhraseLargeTable phrases;
     MemoryChunk * chunk = new MemoryChunk;
     chunk->load("../../data/phrase_index.bin");
-    g_phrases->load(chunk);
+    phrases.load(chunk);
 
-    g_k_mixture_model = new KMixtureModelBigram(K_MIXTURE_MODEL_MAGIC_NUMBER);
-    g_k_mixture_model->attach(k_mixture_model_filename, ATTACH_READWRITE|ATTACH_CREATE);
+    KMixtureModelBigram bigram(K_MIXTURE_MODEL_MAGIC_NUMBER);
+    bigram.attach(k_mixture_model_filename, ATTACH_READWRITE|ATTACH_CREATE);
 
     while ( i < argc ){
         const char * filename = argv[i];
@@ -278,37 +278,34 @@ int main(int argc, char * argv[]){
             exit(err_saved);
         }
 
-        g_hash_of_document = g_hash_table_new
+        HashofDocument hash_of_document = g_hash_table_new
             (g_direct_hash, g_direct_equal);
 
-        assert(read_document(document));
+        assert(read_document(&phrases, document, hash_of_document));
         fclose(document);
 
         GHashTableIter iter;
         gpointer key, value;
 
         /* train the document, and convert it to k mixture model. */
-        g_hash_table_iter_init(&iter, g_hash_of_document);
+        g_hash_table_iter_init(&iter, hash_of_document);
         while (g_hash_table_iter_next(&iter, &key, &value)) {
             phrase_token_t token = GPOINTER_TO_UINT(key);
-            train_second_word(g_k_mixture_model, token);
+            train_second_word(hash_of_document, &bigram, token);
         }
 
         /* free resources of g_hash_of_document */
-        g_hash_table_iter_init(&iter, g_hash_of_document);
+        g_hash_table_iter_init(&iter, hash_of_document);
         while (g_hash_table_iter_next(&iter, &key, &value)) {
             HashofSecondWord second_word = (HashofSecondWord) value;
             g_hash_table_iter_steal(&iter);
             g_hash_table_unref(second_word);
         }
-        g_hash_table_unref(g_hash_of_document);
-        g_hash_of_document = NULL;
+        g_hash_table_unref(hash_of_document);
+        hash_of_document = NULL;
 
         ++i;
     }
-
-    delete g_phrases;
-    delete g_k_mixture_model;
 
     return 0;
 }
