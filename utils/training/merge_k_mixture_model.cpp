@@ -114,35 +114,6 @@ static bool merge_magic_header( /* in & out */ KMixtureModelBigram * target,
     return true;
 }
 
-static bool merge_array_headers( /* in & out */ KMixtureModelBigram * target,
-                                 /* in */ KMixtureModelBigram * new_one){
-
-    GArray * new_items = g_array_new(FALSE, FALSE, sizeof(phrase_token_t));
-    new_one->get_all_items(new_items);
-
-    for ( size_t i = 0; i < new_items->len; ++i ){
-        phrase_token_t * token = &g_array_index(new_items, phrase_token_t, i);
-        KMixtureModelArrayHeader target_array_header;
-        KMixtureModelArrayHeader new_array_header;
-        KMixtureModelArrayHeader merged_array_header;
-
-        memset(&merged_array_header, 0, sizeof(KMixtureModelArrayHeader));
-        assert(new_one->get_array_header(*token, new_array_header));
-        bool exists_in_target = target->get_array_header(*token,
-                                                         target_array_header);
-        if ( !exists_in_target ){
-            target->set_array_header(*token, new_array_header);
-            continue;
-        }
-
-        merged_array_header.m_WC = target_array_header.m_WC +
-            new_array_header.m_WC;
-        assert(target->set_array_header(*token, merged_array_header));
-    }
-
-    return true;
-}
-
 static bool merge_array_items( /* in & out */ KMixtureModelBigram * target,
                                /* in */ KMixtureModelBigram * new_one ){
 
@@ -161,6 +132,19 @@ static bool merge_array_items( /* in & out */ KMixtureModelBigram * target,
             delete new_single_gram;
             continue;
         }
+
+        /* word count in array header in parallel with array items */
+        KMixtureModelArrayHeader target_array_header;
+        KMixtureModelArrayHeader new_array_header;
+        KMixtureModelArrayHeader merged_array_header;
+
+        assert(new_one->get_array_header(*token, new_array_header));
+        assert(target->get_array_header(*token, target_array_header));
+        memset(&merged_array_header, 0, sizeof(KMixtureModelArrayHeader));
+
+        merged_array_header.m_WC = target_array_header.m_WC +
+            new_array_header.m_WC;
+        /* end of word count in array header computing. */
 
         assert(NULL != target_single_gram);
         KMixtureModelSingleGram * merged_single_gram =
@@ -189,6 +173,7 @@ static bool merge_array_items( /* in & out */ KMixtureModelBigram * target,
             merged_single_gram->insert_array_item(item->m_token, item->m_item);
         }
 
+        assert(merged_single_gram->set_array_header(merged_array_header));
         assert(target->store(*token, merged_single_gram));
         delete merged_single_gram;
         g_array_free(merged_array, TRUE);
@@ -203,7 +188,6 @@ bool merge_two_k_mixture_model( /* in & out */ KMixtureModelBigram * target,
     assert(NULL != target);
     assert(NULL != new_one);
     return merge_array_items(target, new_one) &&
-        merge_array_headers(target, new_one) &&
         merge_magic_header(target, new_one);
 }
 
