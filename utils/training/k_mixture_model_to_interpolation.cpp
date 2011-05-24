@@ -135,7 +135,7 @@ bool parse_bigram(FILE * input, FILE * output){
             /* tag: count */
             assert(g_hash_table_lookup_extended(required, "count", NULL, &value));
             const char * count = (const char *)value;
-            fprintf(output, "\\item %s %s count %s", string1, string2, count);
+            fprintf(output, "\\item %s %s count %s\n", string1, string2, count);
             break;
         }
         case END_LINE:
