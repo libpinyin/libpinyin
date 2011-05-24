@@ -32,7 +32,6 @@ void print_help(){
 static bool merge_two_phrase_array( /* in */  FlexibleBigramPhraseArray first,
                              /* in */  FlexibleBigramPhraseArray second,
                              /* out */ FlexibleBigramPhraseArray & merged ){
-    merged = NULL;
     /* avoid to do empty merge. */
     assert( NULL != first && NULL != second && NULL != merged );
 
@@ -96,7 +95,9 @@ static bool merge_magic_header( /* in & out */ KMixtureModelBigram * target,
     KMixtureModelMagicHeader merged_magic_header;
 
     memset(&merged_magic_header, 0, sizeof(KMixtureModelMagicHeader));
-    assert(target->get_magic_header(target_magic_header));
+    if (!target->get_magic_header(target_magic_header)) {
+        memset(&target_magic_header, 0, sizeof(KMixtureModelMagicHeader));
+    }
     assert(new_one->get_magic_header(new_magic_header));
     if ( target_magic_header.m_WC + new_magic_header.m_WC <
          std_lite::max( target_magic_header.m_WC, new_magic_header.m_WC ) ){
