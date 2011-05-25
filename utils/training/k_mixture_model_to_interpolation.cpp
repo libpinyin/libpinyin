@@ -95,6 +95,9 @@ bool parse_unigram(FILE * input, FILE * output){
         case GRAM_1_ITEM_LINE: {
             /* handle \item in \1-gram */
             const char * string = (const char *) g_ptr_array_index(values, 0);
+            /* remove the "<start>" in the uni-gram of interpolation model */
+            if ( strcmp("<start>", string) == 0 )
+                break;
             gpointer value = NULL;
             assert(g_hash_table_lookup_extended(required, "count",
                                                 NULL, &value));
