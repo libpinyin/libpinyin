@@ -280,6 +280,7 @@ int main(int argc, char * argv[]){
 
         assert(read_document(&phrases, document, hash_of_document));
         fclose(document);
+        document = NULL;
 
         GHashTableIter iter;
         gpointer key, value;

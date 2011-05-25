@@ -117,6 +117,7 @@ typedef struct{
 
 typedef struct{
     /* the total number of instances of word W1. */
+    guint32 dummy[3];
     guint32 m_WC;
 } KMixtureModelArrayHeader;
 
