@@ -411,7 +411,7 @@ public:
 
         /* Iterate over the database, retrieving each record in turn. */
         while ((ret =  cursorp->c_get(cursorp, &key, &data, DB_NEXT)) == 0 ){
-            if (key.size > sizeof(phrase_token_t)){
+            if (key.size != sizeof(phrase_token_t)){
                 /* skip magic header. */
                 continue;
             }

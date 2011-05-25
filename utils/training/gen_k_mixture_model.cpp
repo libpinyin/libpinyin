@@ -121,7 +121,6 @@ bool read_document(PhraseLargeTable * phrases, FILE * document,
 static void train_word_pair(KMixtureModelSingleGram * single_gram,
                             phrase_token_t token, guint32 count){
     KMixtureModelArrayItem array_item;
-    guint32 delta = 0;
 
     bool exists = single_gram->get_array_item(token, array_item);
     if ( exists ) {
@@ -139,7 +138,6 @@ static void train_word_pair(KMixtureModelSingleGram * single_gram,
         if ( 1 == count )
             array_item.m_n_1 ++;
         array_item.m_Mr = std_lite::max(array_item.m_Mr, count);
-        delta = count;
         assert(single_gram->set_array_item(token, array_item));
     } else { /* item doesn't exist. */
         /* the same as above. */
@@ -152,13 +150,13 @@ static void train_word_pair(KMixtureModelSingleGram * single_gram,
         if ( 1 == count )
             array_item.m_n_1 = 1;
         array_item.m_Mr = count;
-        delta = count;
         assert(single_gram->insert_array_item(token, array_item));
     }
+
     /* save delta in the array header. */
     KMixtureModelArrayHeader array_header;
     single_gram->get_array_header(array_header);
-    array_header.m_WC += delta;
+    array_header.m_WC += count;
     single_gram->set_array_header(array_header);
 }
 
