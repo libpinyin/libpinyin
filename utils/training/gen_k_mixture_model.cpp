@@ -119,10 +119,10 @@ bool read_document(PhraseLargeTable * phrases, FILE * document,
 }
 
 static void train_word_pair(KMixtureModelSingleGram * single_gram,
-                            phrase_token_t token, guint32 count){
+                            phrase_token_t token2, guint32 count){
     KMixtureModelArrayItem array_item;
 
-    bool exists = single_gram->get_array_item(token, array_item);
+    bool exists = single_gram->get_array_item(token2, array_item);
     if ( exists ) {
         guint32 maximum_occurs_allowed = std_lite::max
             (g_maximum_occurs,
@@ -138,7 +138,7 @@ static void train_word_pair(KMixtureModelSingleGram * single_gram,
         if ( 1 == count )
             array_item.m_n_1 ++;
         array_item.m_Mr = std_lite::max(array_item.m_Mr, count);
-        assert(single_gram->set_array_item(token, array_item));
+        assert(single_gram->set_array_item(token2, array_item));
     } else { /* item doesn't exist. */
         /* the same as above. */
         if ( count > g_maximum_occurs )
@@ -150,7 +150,7 @@ static void train_word_pair(KMixtureModelSingleGram * single_gram,
         if ( 1 == count )
             array_item.m_n_1 = 1;
         array_item.m_Mr = count;
-        assert(single_gram->insert_array_item(token, array_item));
+        assert(single_gram->insert_array_item(token2, array_item));
     }
 
     /* save delta in the array header. */
@@ -162,7 +162,7 @@ static void train_word_pair(KMixtureModelSingleGram * single_gram,
 
 bool train_single_gram(HashofDocument hash_of_document,
                        KMixtureModelSingleGram * single_gram,
-                       phrase_token_t token,
+                       phrase_token_t token1,
                        guint32 & delta){
     assert(NULL != single_gram);
     delta = 0; /* delta in WC of single_gram. */
@@ -173,7 +173,7 @@ bool train_single_gram(HashofDocument hash_of_document,
     HashofSecondWord hash_of_second_word = NULL;
     gpointer key, value = NULL;
     assert(g_hash_table_lookup_extended
-           (hash_of_document, GUINT_TO_POINTER(token),
+           (hash_of_document, GUINT_TO_POINTER(token1),
             NULL, &value));
     hash_of_second_word = (HashofSecondWord) value;
     assert(NULL != hash_of_second_word);
@@ -182,9 +182,9 @@ bool train_single_gram(HashofDocument hash_of_document,
     GHashTableIter iter;
     g_hash_table_iter_init(&iter, hash_of_second_word);
     while (g_hash_table_iter_next(&iter, &key, &value)) {
-        phrase_token_t token = GPOINTER_TO_UINT(key);
+        phrase_token_t token2 = GPOINTER_TO_UINT(key);
         guint32 count = GPOINTER_TO_UINT(value);
-        train_word_pair(single_gram, token, count);
+        train_word_pair(single_gram, token2, count);
     }
 
     assert(single_gram->get_array_header(array_header));
@@ -194,14 +194,14 @@ bool train_single_gram(HashofDocument hash_of_document,
 
 static bool train_second_word(KMixtureModelBigram * bigram,
                               HashofDocument hash_of_document,
-                              phrase_token_t token){
+                              phrase_token_t token1){
     guint32 delta = 0;
 
     KMixtureModelSingleGram * single_gram = NULL;
-    bool exists = bigram->load(token, single_gram);
+    bool exists = bigram->load(token1, single_gram);
     if ( !exists )
         single_gram = new KMixtureModelSingleGram;
-    train_single_gram(hash_of_document, single_gram, token, delta);
+    train_single_gram(hash_of_document, single_gram, token1, delta);
 
     KMixtureModelMagicHeader magic_header;
     if (!bigram->get_magic_header(magic_header)){
@@ -217,7 +217,7 @@ static bool train_second_word(KMixtureModelBigram * bigram,
     assert(bigram->set_magic_header(magic_header));
 
     /* save the single gram. */
-    assert(bigram->store(token, single_gram));
+    assert(bigram->store(token1, single_gram));
     delete single_gram;
     return true;
 }
@@ -287,8 +287,8 @@ int main(int argc, char * argv[]){
         /* train the document, and convert it to k mixture model. */
         g_hash_table_iter_init(&iter, hash_of_document);
         while (g_hash_table_iter_next(&iter, &key, &value)) {
-            phrase_token_t token = GPOINTER_TO_UINT(key);
-            train_second_word(&bigram, hash_of_document, token);
+            phrase_token_t token1 = GPOINTER_TO_UINT(key);
+            train_second_word(&bigram, hash_of_document, token1);
         }
 
         KMixtureModelMagicHeader magic_header;
