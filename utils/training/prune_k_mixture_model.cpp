@@ -39,6 +39,7 @@ bool prune_k_mixture_model(KMixtureModelMagicHeader * magic_header,
 
     FlexibleBigramPhraseArray array = g_array_new(FALSE, FALSE, sizeof(KMixtureModelArrayItemWithToken));
     bigram->retrieve_all(array);
+
     for ( size_t i = 0; i < array->len; ++i) {
         KMixtureModelArrayItemWithToken * item = &g_array_index(array, KMixtureModelArrayItemWithToken, i);
         phrase_token_t token = item->m_token;
@@ -113,7 +114,7 @@ int main(int argc, char * argv[]){
     GArray * items = g_array_new(FALSE, FALSE, sizeof(phrase_token_t));
     bigram.get_all_items(items);
 
-    for ( size_t i; i < items->len; ++i ){
+    for ( size_t i = 0; i < items->len; ++i ){
         phrase_token_t * token = &g_array_index(items, phrase_token_t, i);
         KMixtureModelSingleGram * single_gram = NULL;
         bigram.load(*token, single_gram);
