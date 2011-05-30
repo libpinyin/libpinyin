@@ -36,7 +36,7 @@ static bool g_train_pi_gram = true;
 
 void print_help(){
     printf("Usage: gen_k_mixture_model [--skip-pi-gram-training]\n");
-    printf("                           [--maximum-ocurrs-allowed <INT>]\n");
+    printf("                           [--maximum-occurs-allowed <INT>]\n");
     printf("                           [--maximum-increase-rates-allowed <FLOAT>]\n");
     printf("                           [--k-mixture-model-file <FILENAME>]\n");
     printf("                           {<FILENAME>}+\n");
@@ -238,7 +238,7 @@ int main(int argc, char * argv[]){
             exit(0);
         } else if ( strcmp("--skip-pi-gram-training", argv[i]) == 0 ){
             g_train_pi_gram = false;
-        } else if ( strcmp("--maximum-ocurrs-allowed", argv[i]) == 0 ){
+        } else if ( strcmp("--maximum-occurs-allowed", argv[i]) == 0 ){
             if ( ++i >= argc ){
                 print_help();
                 exit(EINVAL);
