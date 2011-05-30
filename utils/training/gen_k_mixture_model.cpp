@@ -203,6 +203,11 @@ static bool train_second_word(KMixtureModelBigram * bigram,
         single_gram = new KMixtureModelSingleGram;
     train_single_gram(hash_of_document, single_gram, token1, delta);
 
+    if ( 0 == delta ){
+        delete single_gram;
+        return false;
+    }
+
     KMixtureModelMagicHeader magic_header;
     if (!bigram->get_magic_header(magic_header)){
         /* the first time to access the new k mixture model file. */
