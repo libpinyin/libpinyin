@@ -88,33 +88,37 @@ int main(int argc, char * argv[]){
 
 	last_token = cur_token;
 	cur_token = token;
-	if ( cur_token ){
-	    SingleGram * single_gram = NULL;
-	    if ( 0 == last_token ){
-		if (train_pi_gram)
-		    bigram.load(sentence_start, single_gram);
-	    } else
-		bigram.load(last_token, single_gram);
 
-	    if ( NULL == single_gram ){
-		single_gram = new SingleGram;
-	    }
-	    guint32 freq, total_freq;
-	    //increase freq
-	    if (single_gram->get_freq(cur_token, freq))
-                assert(single_gram->set_freq(cur_token, freq + 1));
-            else
-                assert(single_gram->insert_freq(cur_token, 1));
-	    //increase total freq
-	    single_gram->get_total_freq(total_freq);
-	    single_gram->set_total_freq(total_freq + 1);
-	    if ( 0 == last_token ){
-		if ( train_pi_gram )
-		    bigram.store(sentence_start, single_gram);
-	    }else
-		bigram.store(last_token, single_gram);
-	    delete single_gram;
-	}
+        /* skip null_token in second word. */
+        if ( null_token == cur_token )
+            continue;
+
+        /* skip pi-gram training. */
+        if ( null_token == last_token ){
+            if ( !train_pi_gram )
+                continue;
+            last_token = sentence_start;
+        }
+
+        /* train bi-gram */
+        SingleGram * single_gram = NULL;
+        bigram.load(last_token, single_gram);
+
+        if ( NULL == single_gram ){
+            single_gram = new SingleGram;
+        }
+        guint32 freq, total_freq;
+        //increase freq
+        if (single_gram->get_freq(cur_token, freq))
+            assert(single_gram->set_freq(cur_token, freq + 1));
+        else
+            assert(single_gram->insert_freq(cur_token, 1));
+        //increase total freq
+        single_gram->get_total_freq(total_freq);
+        single_gram->set_total_freq(total_freq + 1);
+        
+        bigram.store(last_token, single_gram);
+        delete single_gram;
     }
     free(linebuf);
 
