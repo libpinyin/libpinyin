@@ -85,6 +85,8 @@ bool gen_unigram(FILE * output, FacadePhraseIndex * phrase_index) {
             assert( result == ERROR_OK);
 
             size_t freq = item.get_unigram_frequency();
+            if ( 0 == freq )
+                continue;
             char * phrase = taglib_token_to_string(phrase_index, j);
             if ( phrase )
                 fprintf(output, "\\item %s count %ld\n", phrase, freq);
