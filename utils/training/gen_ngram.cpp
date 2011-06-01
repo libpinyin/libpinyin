@@ -106,15 +106,15 @@ int main(int argc, char * argv[]){
         if ( null_token == cur_token )
             continue;
 
+        //training uni-gram
+        phrase_index.add_unigram_frequency(cur_token, 1);
+
         /* skip pi-gram training. */
         if ( null_token == last_token ){
             if ( !train_pi_gram )
                 continue;
             last_token = sentence_start;
         }
-
-        //training uni-gram
-        phrase_index.add_unigram_frequency(cur_token, 1);
 
         //train bi-gram
         SingleGram * single_gram = NULL;
