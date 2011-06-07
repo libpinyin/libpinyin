@@ -33,8 +33,9 @@ bool print_k_mixture_model_magic_header(FILE * output,
         fprintf(stderr, "no magic header in k mixture model.\n");
         exit(ENODATA);
     }
-    fprintf(output, "\\data model \"k mixture model\" count %d N %d\n",
-           magic_header.m_WC, magic_header.m_N);
+    fprintf(output, "\\data model \"k mixture model\" count %d N %d "
+            "total_freq %d\n", magic_header.m_WC, magic_header.m_N,
+            magic_header.m_total_freq);
     return true;
 }
 
@@ -51,7 +52,8 @@ bool print_k_mixture_model_array_headers(FILE * output,
         assert(bigram->get_array_header(*token, array_header));
         char * phrase = taglib_token_to_string(phrase_index, *token);
         if ( phrase )
-            fprintf(output, "\\item %s count %d\n", phrase, array_header.m_WC);
+            fprintf(output, "\\item %s count %d freq %d\n",
+                    phrase, array_header.m_WC, array_header.m_freq);
 
         g_free(phrase);
     }
