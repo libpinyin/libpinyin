@@ -87,7 +87,7 @@ bool parse_body(FILE * input, FILE * output){
 bool parse_unigram(FILE * input, FILE * output){
     taglib_push_state();
 
-    assert(taglib_add_tag(GRAM_1_ITEM_LINE, "\\item", 1, "count", ""));
+    assert(taglib_add_tag(GRAM_1_ITEM_LINE, "\\item", 1, "freq", "count"));
 
     do {
         assert(taglib_read(linebuf, line_type, values, required));
@@ -99,10 +99,10 @@ bool parse_unigram(FILE * input, FILE * output){
             if ( strcmp("<start>", string) == 0 )
                 break;
             gpointer value = NULL;
-            assert(g_hash_table_lookup_extended(required, "count",
+            assert(g_hash_table_lookup_extended(required, "freq",
                                                 NULL, &value));
-            const char * count = (const char *) value;
-            fprintf(output, "\\item %s count %s\n", string, count);
+            const char * freq = (const char *) value;
+            fprintf(output, "\\item %s count %s\n", string, freq);
             break;
         }
         case END_LINE:
@@ -165,7 +165,8 @@ int main(int argc, char * argv[]){
     required = g_hash_table_new(g_str_hash, g_str_equal);
 
     //enter "\data" line
-    assert(taglib_add_tag(BEGIN_LINE, "\\data", 0, "model", "count:N"));
+    assert(taglib_add_tag(BEGIN_LINE, "\\data", 0, "model",
+                          "count:N:total_freq"));
     ssize_t result = my_getline(input);
     if ( result == -1 ) {
         fprintf(stderr, "empty file input.\n");
