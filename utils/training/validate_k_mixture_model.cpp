@@ -38,22 +38,36 @@ bool validate_unigram(KMixtureModelBigram * bigram){
         fprintf(stderr, "word count in magic header is unexpected zero.\n");
         return false;
     }
+    guint32 expected_total_freq = magic_header.m_total_freq;
+    if ( 0 == expected_total_freq ){
+        fprintf(stderr, "total freq in magic header is unexpected zero.\n");
+        return false;
+    }
+
     
     GArray * items = g_array_new(FALSE, FALSE, sizeof(phrase_token_t));
     bigram->get_all_items(items);
 
-    guint32 sum = 0;
+    guint32 sum = 0; guint32 total_freq = 0;
     for (size_t i = 0; i < items->len; ++i) {
         phrase_token_t * token = &g_array_index(items, phrase_token_t, i);
         KMixtureModelArrayHeader array_header;
         assert(bigram->get_array_header(*token, array_header));
         sum += array_header.m_WC;
+        total_freq += array_header.m_freq;
     }
 
     if ( sum != expected_sum ){
         fprintf(stderr, "word count in magic header:%d\n", expected_sum);
         fprintf(stderr, "sum of word count in array headers:%d\n", sum);
         fprintf(stderr, "the sum differs from word count.\n");
+        return false;
+    }
+    if ( total_freq != expected_total_freq ){
+        fprintf(stderr, "total freq in magic header:%d\n",
+                expected_total_freq);
+        fprintf(stderr, "sum of freqs in array headers:%d\n", total_freq);
+        fprintf(stderr, "the total freq differs from sum of freqs.\n");
         return false;
     }
 
@@ -79,10 +93,21 @@ bool validate_bigram(KMixtureModelBigram * bigram){
         assert(single_gram->get_array_header(array_header));
 
         guint32 expected_sum = array_header.m_WC;
+        guint32 freq = array_header.m_freq;
         if ( 0 == expected_sum ){
-            fprintf(stderr, "in the array header of token %d:\n", *token);
-            fprintf(stderr, "word count is unexpected zero.\n");
-            result = false;
+            if ( 0 != array->len ){
+                fprintf(stderr, "in the array header of token %d:\n", *token);
+                fprintf(stderr, "word count is zero but has array items.\n");
+                result = false;
+            }
+            if ( 0 != freq ){
+                continue;
+            } else {
+                fprintf(stderr, "in the array header of token %d:\n", *token);
+                fprintf(stderr, "both word count and freq are "
+                        "unexpected zero.\n");
+                result = false;
+            }
         }
 
         guint32 sum = 0;
