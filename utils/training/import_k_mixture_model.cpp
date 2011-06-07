@@ -94,7 +94,7 @@ bool parse_unigram(FILE * input, PhraseLargeTable * phrases,
                    KMixtureModelBigram * bigram){
     taglib_push_state();
 
-    assert(taglib_add_tag(GRAM_1_ITEM_LINE, "\\item", 1, "count", ""));
+    assert(taglib_add_tag(GRAM_1_ITEM_LINE, "\\item", 1, "count:freq", ""));
 
     do {
         assert(taglib_read(linebuf, line_type, values, required));
@@ -107,9 +107,13 @@ bool parse_unigram(FILE * input, PhraseLargeTable * phrases,
             assert(g_hash_table_lookup_extended(required, "count",
                                                 NULL, &value));
             glong count = atol((const char *)value);
+            assert(g_hash_table_lookup_extended(required, "freq",
+                                                NULL, &value));
+            glong freq = atol((const char *)value);
+
             KMixtureModelArrayHeader array_header;
             memset(&array_header, 0, sizeof(KMixtureModelArrayHeader));
-            array_header.m_WC = count;
+            array_header.m_WC = count; array_header.m_freq = freq;
             bigram->set_array_header(token, array_header);
             break;
         }
@@ -249,7 +253,7 @@ int main(int argc, char * argv[]){
     required = g_hash_table_new(g_str_hash, g_str_equal);
 
     //enter "\data" line
-    assert(taglib_add_tag(BEGIN_LINE, "\\data", 0, "model:count:N", ""));
+    assert(taglib_add_tag(BEGIN_LINE, "\\data", 0, "model:count:N:total_freq", ""));
     ssize_t result = my_getline(input);
     if ( result == -1 ) {
         fprintf(stderr, "empty file input.\n");
@@ -274,11 +278,13 @@ int main(int argc, char * argv[]){
     glong count = atol((char *)value);
     assert(g_hash_table_lookup_extended(required, "N", NULL, &value));
     glong N = atol((char *) value);
-
+    assert(g_hash_table_lookup_extended(required, "total_freq", NULL, &value));
+    glong total_freq = atol((char *)value);
 
     KMixtureModelMagicHeader magic_header;
     memset(&magic_header, 0, sizeof(KMixtureModelMagicHeader));
     magic_header.m_WC =count; magic_header.m_N = N;
+    magic_header.m_total_freq = total_freq;
     bigram.set_magic_header(magic_header);
 
     result = my_getline(input);
