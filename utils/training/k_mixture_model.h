@@ -113,11 +113,16 @@ typedef struct{
     guint32 m_WC;
     /* the total number of documents. */
     guint32 m_N;
+    /* the total freq of uni-gram. */
+    guint32 m_total_freq;
 } KMixtureModelMagicHeader;
 
 typedef struct{
+    /* dummy varibles */
+    guint32 dummy[2];
+    /* the freq of uni-gram. see m_total_freq in magic header also. */
+    guint32 m_freq;
     /* the total number of instances of word W1. */
-    guint32 dummy[3];
     guint32 m_WC;
 } KMixtureModelArrayHeader;
 
