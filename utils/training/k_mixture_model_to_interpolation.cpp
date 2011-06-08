@@ -101,8 +101,9 @@ bool parse_unigram(FILE * input, FILE * output){
             gpointer value = NULL;
             assert(g_hash_table_lookup_extended(required, "freq",
                                                 NULL, &value));
-            const char * freq = (const char *) value;
-            fprintf(output, "\\item %s count %s\n", string, freq);
+            glong freq = atol ((const char *) value);
+            if ( 0 != freq )
+                fprintf(output, "\\item %s count %d\n", string, freq);
             break;
         }
         case END_LINE:
