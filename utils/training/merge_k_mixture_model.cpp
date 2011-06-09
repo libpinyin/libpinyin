@@ -104,11 +104,19 @@ static bool merge_magic_header( /* in & out */ KMixtureModelBigram * target,
         fprintf(stderr, "the m_WC integer in magic header overflows.\n");
         return false;
     }
+    if ( target_magic_header.m_total_freq + new_magic_header.m_total_freq <
+         std_lite::max( target_magic_header.m_total_freq,
+                        new_magic_header.m_total_freq ) ){
+        fprintf(stderr, "the m_total_freq in magic header overflows.\n");
+        return false;
+    }
 
     merged_magic_header.m_WC = target_magic_header.m_WC +
         new_magic_header.m_WC;
     merged_magic_header.m_N = target_magic_header.m_N +
         new_magic_header.m_N;
+    merged_magic_header.m_total_freq = target_magic_header.m_total_freq +
+        new_magic_header.m_total_freq;
 
     assert(target->set_magic_header(merged_magic_header));
     return true;
@@ -144,6 +152,8 @@ static bool merge_array_items( /* in & out */ KMixtureModelBigram * target,
 
         merged_array_header.m_WC = target_array_header.m_WC +
             new_array_header.m_WC;
+        merged_array_header.m_freq = target_array_header.m_freq +
+            new_array_header.m_freq;
         /* end of word count in array header computing. */
 
         assert(NULL != target_single_gram);
