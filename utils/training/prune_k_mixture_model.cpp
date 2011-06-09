@@ -34,7 +34,8 @@ void print_help(){
 }
 
 bool prune_k_mixture_model(KMixtureModelMagicHeader * magic_header,
-                           KMixtureModelSingleGram * & bigram){
+                           KMixtureModelSingleGram * & bigram,
+                           FlexibleBigramPhraseArray removed_array){
     bool success;
 
     FlexibleBigramPhraseArray array = g_array_new(FALSE, FALSE, sizeof(KMixtureModelArrayItemWithToken));
@@ -58,21 +59,20 @@ bool prune_k_mixture_model(KMixtureModelMagicHeader * magic_header,
             bigram->remove_array_item(token, removed_item);
             assert( memcmp(&removed_item, &(item->m_item),
                            sizeof(KMixtureModelArrayItem)) == 0 );
-            KMixtureModelArrayHeader header;
-            bigram->get_array_header(header);
+
+            KMixtureModelArrayItemWithToken removed_item_with_token;
+            removed_item_with_token.m_token = token;
+            removed_item_with_token.m_item = removed_item;
+            g_array_append_val(removed_array, removed_item_with_token);
+
+            KMixtureModelArrayHeader array_header;
+            bigram->get_array_header(array_header);
             guint32 removed_count = removed_item.m_WC;
-            header.m_WC -= removed_count;
-            bigram->set_array_header(header);
+            array_header.m_WC -= removed_count;
+            bigram->set_array_header(array_header);
             magic_header->m_WC -= removed_count;
+            magic_header->m_total_freq -= removed_count;
         }
-    }
-
-    KMixtureModelArrayHeader header;
-    bigram->get_array_header(header);
-
-    if ( 0 == header.m_WC ){
-        delete bigram;
-        bigram = NULL;
     }
 
     return true;
@@ -119,13 +119,37 @@ int main(int argc, char * argv[]){
         KMixtureModelSingleGram * single_gram = NULL;
         bigram.load(*token, single_gram);
 
-        prune_k_mixture_model(&magic_header, single_gram);
+        FlexibleBigramPhraseArray removed_array = g_array_new(FALSE, FALSE, sizeof(KMixtureModelArrayItemWithToken));
 
-        if ( NULL == single_gram )
-            bigram.remove(*token);
-        else bigram.store(*token, single_gram);
+        prune_k_mixture_model(&magic_header, single_gram, removed_array);
+        bigram.store(*token, single_gram);
+
+        /* post processing for unigram reduce */
+        for (size_t m = 0; m < removed_array->len; ++m ){
+            KMixtureModelArrayItemWithToken * item =
+                &g_array_index(removed_array,
+                              KMixtureModelArrayItemWithToken, m);
+            KMixtureModelArrayHeader array_header;
+            assert(bigram.get_array_header(item->m_token, array_header));
+            array_header.m_freq -= item->m_item.m_WC;
+            assert(array_header.m_freq >= 0);
+            assert(bigram.set_array_header(item->m_token, array_header));
+        }
+
+        g_array_free(removed_array, TRUE);
+        removed_array = NULL;
     }
 
     bigram.set_magic_header(magic_header);
+
+    /* post processing clean up zero items */
+    KMixtureModelArrayHeader array_header;
+    for ( size_t i = 0; i < items->len; ++i ){
+        phrase_token_t * token = &g_array_index(items, phrase_token_t, i);
+        assert(bigram.get_array_header(*token, array_header));
+        if ( 0 == array_header.m_WC && 0 == array_header.m_freq )
+            assert(bigram.remove(*token));
+    }
+
     return 0;
 }
