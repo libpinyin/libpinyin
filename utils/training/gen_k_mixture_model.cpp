@@ -218,7 +218,7 @@ static bool train_second_word(KMixtureModelBigram * bigram,
         single_gram = new KMixtureModelSingleGram;
     train_single_gram(hash_of_document, single_gram, token1, delta);
 
-    if ( 0 == delta ){
+    if ( 0 == delta ){ /* Please consider maximum occurs allowed. */
         delete single_gram;
         return false;
     }
