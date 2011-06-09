@@ -124,6 +124,8 @@ int main(int argc, char * argv[]){
         prune_k_mixture_model(&magic_header, single_gram, removed_array);
         bigram.store(*token, single_gram);
 
+        delete single_gram;
+
         /* post processing for unigram reduce */
         for (size_t m = 0; m < removed_array->len; ++m ){
             KMixtureModelArrayItemWithToken * item =
