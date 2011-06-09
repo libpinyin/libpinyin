@@ -60,16 +60,14 @@ bool read_document(PhraseLargeTable * phrases, FILE * document,
         glong phrase_len = 0;
         utf16_t * phrase = g_utf8_to_utf16(linebuf, -1, NULL, &phrase_len, NULL);
 
-        if ( phrase_len == 0 )
-            continue;
-
         phrase_token_t token = 0;
-        int search_result = phrases->search( phrase_len, phrase, token );
-        if ( ! (search_result & SEARCH_OK) )
-            token = 0;
-
-        g_free(phrase);
-        phrase = NULL;
+        if ( 0 != phrase_len ) {
+            int search_result = phrases->search( phrase_len, phrase, token );
+            if ( ! (search_result & SEARCH_OK) )
+                token = 0;
+            g_free(phrase);
+            phrase = NULL;
+        }
 
         last_token = cur_token;
         cur_token = token;
