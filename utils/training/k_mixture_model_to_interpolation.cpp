@@ -102,6 +102,7 @@ bool parse_unigram(FILE * input, FILE * output){
             assert(g_hash_table_lookup_extended(required, "freq",
                                                 NULL, &value));
             glong freq = atol ((const char *) value);
+            /* ignore zero unigram freq item */
             if ( 0 != freq )
                 fprintf(output, "\\item %s count %d\n", string, freq);
             break;
