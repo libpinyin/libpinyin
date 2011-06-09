@@ -37,6 +37,7 @@ parameter_t compute_interpolation(KMixtureModelSingleGram * deleted_bigram,
 
     KMixtureModelMagicHeader magic_header;
     assert(unigram->get_magic_header(magic_header));
+    assert(0 != magic_header.m_total_freq);
 
     while (fabs(lambda - next_lambda) > epsilon){
         lambda = next_lambda;
@@ -69,9 +70,7 @@ parameter_t compute_interpolation(KMixtureModelSingleGram * deleted_bigram,
                 parameter_t elem_poss = 0;
                 KMixtureModelArrayHeader array_header;
                 if (unigram->get_array_header(token, array_header)){
-                    /* Note: optimize here? */
-                    assert(0 != magic_header.m_WC);
-                    elem_poss = array_header.m_WC / (parameter_t) magic_header.m_WC;
+                    elem_poss = array_header.m_freq / (parameter_t) magic_header.m_total_freq;
                 }
                 part_of_denominator = (1 - lambda) * elem_poss;
             }
