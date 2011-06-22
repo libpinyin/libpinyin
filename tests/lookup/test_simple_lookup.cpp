@@ -47,7 +47,7 @@ int main( int argc, char * argv[]){
     Bigram system_bigram;
     system_bigram.attach("../../data/bigram.db", ATTACH_READONLY);
     Bigram user_bigram;
-    user_bigram.attach("/tmp/bigram.db", ATTACH_CREATE|ATTACH_READWRITE);
+    user_bigram.attach(NULL, ATTACH_CREATE|ATTACH_READWRITE);
     
     PinyinLookup pinyin_lookup(&custom, &largetable, &phrase_index,
                                &system_bigram, &user_bigram);
