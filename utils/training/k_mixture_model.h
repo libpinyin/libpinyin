@@ -122,11 +122,8 @@ typedef struct{
 } KMixtureModelMagicHeader;
 
 typedef struct{
-    /* dummy varibles */
-    guint32 dummy[3];
     /* the total number of instances of word W1. */
     guint32 m_WC;
-    guint32 dummy2[3];
     /* the freq of uni-gram. see m_total_freq in magic header also. */
     guint32 m_freq;
 } KMixtureModelArrayHeader;

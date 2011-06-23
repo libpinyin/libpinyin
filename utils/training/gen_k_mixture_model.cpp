@@ -221,6 +221,10 @@ static bool train_second_word(KMixtureModelBigram * bigram,
         return false;
     }
 
+    /* save the single gram. */
+    assert(bigram->store(token1, single_gram));
+    delete single_gram;
+
     KMixtureModelMagicHeader magic_header;
     if (!bigram->get_magic_header(magic_header)){
         /* the first time to access the new k mixture model file. */
@@ -234,9 +238,6 @@ static bool train_second_word(KMixtureModelBigram * bigram,
     magic_header.m_WC += delta;
     assert(bigram->set_magic_header(magic_header));
 
-    /* save the single gram. */
-    assert(bigram->store(token1, single_gram));
-    delete single_gram;
     return true;
 }
 
@@ -252,7 +253,6 @@ static bool post_processing_unigram(KMixtureModelBigram * bigram,
         guint32 token = GPOINTER_TO_UINT(key);
         guint32 freq = GPOINTER_TO_UINT(value);
         KMixtureModelArrayHeader array_header;
-        memset(&array_header, 0, sizeof(KMixtureModelArrayHeader));
         bool result = bigram->get_array_header(token, array_header);
         array_header.m_freq += freq;
         total_freq += freq;
