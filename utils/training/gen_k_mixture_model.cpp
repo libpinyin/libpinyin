@@ -25,11 +25,12 @@
 #include <locale.h>
 #include "k_mixture_model.h"
 
+/* Hash token of Hash token of word count. */
 typedef GHashTable * HashofDocument;
 typedef GHashTable * HashofSecondWord;
+
 typedef GHashTable * HashofUnigram;
 
-/* Hash token of Hash token of word count. */
 static guint32 g_maximum_occurs = 20;
 static parameter_t g_maximum_increase_rates = 3.;
 static bool g_train_pi_gram = true;
