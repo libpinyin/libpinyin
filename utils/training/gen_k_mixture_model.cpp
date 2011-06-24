@@ -298,7 +298,7 @@ static bool post_processing_unigram(KMixtureModelBigram * bigram,
 
     KMixtureModelMagicHeader magic_header;
     assert(bigram->get_magic_header(magic_header));
-    if ( magic_header.m_total_freq + delta < magic_header.m_total_freq ){
+    if ( magic_header.m_total_freq + total_freq < magic_header.m_total_freq ){
         fprintf(stderr, "the m_total_freq in magic header overflows.\n");
         return false;
     }
