@@ -149,10 +149,10 @@ int main(int argc, char * argv[]){
         KMixtureModelArrayHeader deleted_array_header;
         assert(deleted_single_gram->get_array_header(deleted_array_header));
 
-        if ( 0 != array_header.m_WC && 0 != deleted_array_header.m_WC ) {
+        if ( 0 != deleted_array_header.m_WC ) {
             parameter_t lambda = compute_interpolation(deleted_single_gram, &unigram, single_gram);
 
-            printf("lambda:%f\n", lambda);
+            printf("token:%d lambda:%f\n", *token, lambda);
 
             lambda_sum += lambda;
             lambda_count ++;

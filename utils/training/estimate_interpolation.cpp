@@ -123,7 +123,7 @@ int main(int argc, char * argv[]){
 	
 	parameter_t lambda = compute_interpolation(deleted_single_gram, &phrase_index, single_gram);
 	
-	printf("lambda:%f\n", lambda);
+	printf("token:%d lambda:%f\n", *token, lambda);
 
 	lambda_sum += lambda;
 	lambda_count ++;
