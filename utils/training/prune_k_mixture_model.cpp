@@ -153,5 +153,7 @@ int main(int argc, char * argv[]){
             assert(bigram.remove(*token));
     }
 
+    g_array_free(items, TRUE);
+
     return 0;
 }
