@@ -176,7 +176,9 @@ int main(int argc, char * argv[]){
     size_t size = 0;
     ssize_t read;
     while( (read = getline(&linebuf, &size, stdin)) != -1 ){
-        linebuf[strlen(linebuf) - 1] = '\0';
+        if ( '\n' ==  linebuf[strlen(linebuf) - 1] ) {
+            linebuf[strlen(linebuf) - 1] = '\0';
+        }
 
         //check non-ucs2 characters
         const glong num_of_chars = g_utf8_strlen(linebuf, -1);
