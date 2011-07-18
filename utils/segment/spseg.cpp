@@ -184,6 +184,7 @@ int main(int argc, char * argv[]){
         utf16_t * sentence = g_utf8_to_utf16(linebuf, -1, NULL, &len, NULL);
         if ( len != num_of_chars ) {
             fprintf(stderr, "non-ucs2 characters encountered:%s.\n", linebuf);
+            printf("\n");
             continue;
         }
 
