@@ -26,3 +26,5 @@ py-compile
 mkinstalldirs
 libltdl
 *~
+*.o
+*.lo
