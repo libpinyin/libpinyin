@@ -37,10 +37,6 @@
  * such as ',', '.', '?', '!', <english>, and other punctuations.
  */
 
-PhraseLargeTable * g_phrase_table = NULL;
-FacadePhraseIndex * g_phrase_index = NULL;
-Bigram * g_system_bigram = NULL;
-Bigram * g_user_bigram = NULL;
 PhraseLookup * g_phrase_lookup = NULL;
 
 enum CONTEXT_STATE{
@@ -113,29 +109,28 @@ int main(int argc, char * argv[]){
     }
 
     //init phrase table
-    g_phrase_table = new PhraseLargeTable;
+    PhraseLargeTable phrase_table;
     MemoryChunk * chunk = new MemoryChunk;
     chunk->load("../../data/phrase_index.bin");
-    g_phrase_table->load(chunk);
+    phrase_table.load(chunk);
 
     //init phrase index
-    g_phrase_index = new FacadePhraseIndex;
+    FacadePhraseIndex phrase_index;
     chunk = new MemoryChunk;
     chunk->load("../../data/gb_char.bin");
-    g_phrase_index->load(1, chunk);
+    phrase_index.load(1, chunk);
     chunk = new MemoryChunk;
     chunk->load("../../data/gbk_char.bin");
-    g_phrase_index->load(2, chunk);
+    phrase_index.load(2, chunk);
 
     //init bi-gram
-    g_system_bigram = new Bigram;
-    g_system_bigram->attach("../../data/bigram.db", ATTACH_READONLY);
-    g_user_bigram = new Bigram;
-
+    Bigram system_bigram;
+    system_bigram.attach("../../data/bigram.db", ATTACH_READONLY);
+    Bigram user_bigram;
 
     //init phrase lookup
-    g_phrase_lookup = new PhraseLookup(g_phrase_table, g_phrase_index,
-                                       g_system_bigram, g_user_bigram);
+    g_phrase_lookup = new PhraseLookup(&phrase_table, &phrase_index,
+                                       &system_bigram, &user_bigram);
 
 
     CONTEXT_STATE state, next_state;
@@ -168,7 +163,7 @@ int main(int argc, char * argv[]){
         }
 
         state = CONTEXT_INIT;
-        bool result = g_phrase_table->search( 1, sentence, token);
+        bool result = phrase_table.search( 1, sentence, token);
         g_array_append_val( current_utf16, sentence[0]);
         if ( result & SEARCH_OK )
             state = CONTEXT_SEGMENTABLE;
@@ -176,7 +171,7 @@ int main(int argc, char * argv[]){
             state = CONTEXT_UNKNOWN;
 
         for ( int i = 1; i < num_of_chars; ++i) {
-            bool result = g_phrase_table->search( 1, sentence + i, token);
+            bool result = phrase_table.search( 1, sentence + i, token);
             if ( result & SEARCH_OK )
                 next_state = CONTEXT_SEGMENTABLE;
             else
@@ -215,6 +210,7 @@ int main(int argc, char * argv[]){
             printf("\n");
     }
 
+    delete g_phrase_lookup;
     /* print enter at file tail */
     printf("\n");
     g_array_free(current_utf16, TRUE);
