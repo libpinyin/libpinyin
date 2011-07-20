@@ -67,9 +67,9 @@ bool deal_with_segmentable(GArray * current_utf16){
     printf("\n");
 #endif
     g_phrase_lookup->convert_to_utf8(results, "\n", result_string);
-    if (result_string)
+    if (result_string) {
         printf("%s\n", result_string);
-    else {
+    } else {
         char * tmp_string = g_utf16_to_utf8
             ( (utf16_t *) current_utf16->data, current_utf16->len,
               NULL, NULL, NULL);
