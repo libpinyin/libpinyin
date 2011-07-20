@@ -70,11 +70,11 @@ bool deal_with_segmentable(GArray * current_utf16){
     if (result_string)
         printf("%s\n", result_string);
     else {
-        char * result_string = g_utf16_to_utf8
+        char * tmp_string = g_utf16_to_utf8
             ( (utf16_t *) current_utf16->data, current_utf16->len,
               NULL, NULL, NULL);
         fprintf(stderr, "Un-segmentable sentence encountered:%s.\n",
-                result_string);
+                tmp_string);
         g_array_free(results, TRUE);
         return false;
     }
