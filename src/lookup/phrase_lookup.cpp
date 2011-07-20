@@ -43,6 +43,23 @@ PhraseLookup::PhraseLookup(PhraseLargeTable * phrase_table,
     m_steps_content = g_ptr_array_new();
 }
 
+PhraseLookup::~PhraseLookup(){
+    //free m_steps_index
+    for ( size_t i = 0; i < m_steps_index->len; ++i){
+        GHashTable * table = (GHashTable *) g_ptr_array_index(m_steps_index, i);
+        g_hash_table_destroy(table);
+    }
+    g_ptr_array_free(m_steps_index, TRUE);
+    m_steps_index = NULL;
+
+    //free m_steps_content
+    for ( size_t i = 0; i < m_steps_content->len; ++i){
+        GArray * array = (GArray *) g_ptr_array_index(m_steps_content, i);
+        g_array_free(array, TRUE);
+    }
+    g_ptr_array_free(m_steps_content, TRUE);
+}
+
 bool PhraseLookup::get_best_match(int sentence_length, utf16_t sentence[],
                                   MatchResults & results){
     m_sentence_length = sentence_length;
