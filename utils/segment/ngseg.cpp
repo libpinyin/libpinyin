@@ -211,6 +211,7 @@ int main(int argc, char * argv[]){
     }
 
     delete g_phrase_lookup;
+    g_phrase_lookup = NULL;
     /* print enter at file tail */
     printf("\n");
     g_array_free(current_utf16, TRUE);

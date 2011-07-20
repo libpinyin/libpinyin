@@ -24,16 +24,15 @@
 #include <locale.h>
 #include "pinyin.h"
 
-PhraseLookup * g_phrase_lookup = NULL;
-
 void print_help(){
     printf("Usage: test_phrase_lookup\n");
 }
 
-bool try_phrase_lookup(utf16_t * utf16, glong utf16_len){
+bool try_phrase_lookup(PhraseLookup * phrase_lookup,
+                       utf16_t * utf16, glong utf16_len){
     char * result_string = NULL;
     MatchResults results = g_array_new(FALSE, FALSE, sizeof(phrase_token_t));
-    g_phrase_lookup->get_best_match(utf16_len, utf16, results);
+    phrase_lookup->get_best_match(utf16_len, utf16, results);
 #if 0
     for ( size_t i = 0; i < results->len; ++i) {
         phrase_token_t * token = &g_array_index(results, phrase_token_t, i);
@@ -43,7 +42,7 @@ bool try_phrase_lookup(utf16_t * utf16, glong utf16_len){
     }
     printf("\n");
 #endif
-    g_phrase_lookup->convert_to_utf8(results, "\n", result_string);
+    phrase_lookup->convert_to_utf8(results, "\n", result_string);
     if (result_string)
         printf("%s\n", result_string);
     else
@@ -91,8 +90,8 @@ int main(int argc, char * argv[]){
     Bigram user_bigram;
 
     //init phrase lookup
-    g_phrase_lookup = new PhraseLookup(&phrase_table, &phrase_index,
-                                       &system_bigram, &user_bigram);
+    PhraseLookup phrase_lookup(&phrase_table, &phrase_index,
+                               &system_bigram, &user_bigram);
 
     //try one sentence
     char * linebuf = NULL;
@@ -116,11 +115,10 @@ int main(int argc, char * argv[]){
             continue;
         }
 
-        try_phrase_lookup(sentence, len);
+        try_phrase_lookup(&phrase_lookup, sentence, len);
         g_free(sentence);
     }
 
-    delete g_phrase_lookup;
     free(linebuf);
     return 0;
 }
