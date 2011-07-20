@@ -21,8 +21,12 @@ INCLUDES                = -I$(top_srcdir)/src \
                           -I$(top_srcdir)/src/lookup \
                           @GLIB2_CPPFLAGS@
 
-noinst_PROGRAMS          = test_simple_lookup 
+noinst_PROGRAMS          = test_simple_lookup test_phrase_lookup
 
 test_simple_lookup_SOURCES = test_simple_lookup.cpp
 
 test_simple_lookup_LDADD   = ../../src/libpinyin.la @GLIB2_LDFLAGS@
+
+test_phrase_lookup_SOURCES = test_phrase_lookup.cpp
+
+test_phrase_lookup_LDADD   = ../../src/libpinyin.la @GLIB2_LDFLAGS@
