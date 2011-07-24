@@ -229,7 +229,8 @@ int main(int argc, char * argv[]){
         const char * new_filename = argv[i];
         KMixtureModelBigram new_one(K_MIXTURE_MODEL_MAGIC_NUMBER);
         new_one.attach(new_filename, ATTACH_READONLY);
-        merge_two_k_mixture_model(&target, &new_one);
+        if ( !merge_two_k_mixture_model(&target, &new_one) )
+            exit(EOVERFLOW);
         ++i;
     }
 
