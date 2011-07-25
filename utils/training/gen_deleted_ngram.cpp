@@ -58,11 +58,11 @@ int main(int argc, char * argv[]){
 	++i;
     }
     
-    g_phrases = new PhraseLargeTable;
+    PhraseLargeTable phrases;
     //init phrase lookup
-    MemoryChunk * chunk = new MemoryChunk;
-    chunk->load("../../data/phrase_index.bin");
-    g_phrases->load(chunk);
+    MemoryChunk * new_chunk = new MemoryChunk;
+    new_chunk->load("../../data/phrase_index.bin");
+    phrases.load(new_chunk);
 
     Bigram bigram;
     bigram.attach(bigram_filename, ATTACH_CREATE|ATTACH_READWRITE);
@@ -73,14 +73,15 @@ int main(int argc, char * argv[]){
     while( getline(&linebuf, &size, stdin) ){
 	if ( feof(stdin) )
 	    break;
-        linebuf[strlen(linebuf)-1] = '\0';
+        if ( '\n' == linebuf[strlen(linebuf)-1] )
+            linebuf[strlen(linebuf)-1] = '\0';
 
         glong phrase_len = 0;
         utf16_t * phrase = g_utf8_to_utf16(linebuf, -1, NULL, &phrase_len, NULL);
 
 	phrase_token_t token = 0;
         if ( 0 != phrase_len ) {
-            int result = g_phrases->search( phrase_len, phrase, token);
+            int result = phrases.search( phrase_len, phrase, token);
             if ( ! (result & SEARCH_OK) )
                 token = 0;
             g_free(phrase);
@@ -121,7 +122,7 @@ int main(int argc, char * argv[]){
         bigram.store(last_token, single_gram);
         delete single_gram;
     }
-    free(linebuf);
 
+    free(linebuf);
     return 0;
 }
