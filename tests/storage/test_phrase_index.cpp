@@ -93,7 +93,7 @@ int main(int argc, char * argv[]){
 
     FILE* infile = fopen("../../data/gb_char.table", "r");
     if ( NULL == infile ){
-	printf("open gb_char.table failed!\n");
+	fprintf(stderr, "open gb_char.table failed!\n");
 	exit(ENOENT);
     }
 
@@ -102,7 +102,7 @@ int main(int argc, char * argv[]){
 
     infile = fopen("../../data/gbk_char.table", "r");
     if ( NULL == infile ){
-	printf("open gbk_char.table failed!\n");
+	fprintf(stderr, "open gbk_char.table failed!\n");
 	exit(ENOENT);
     }
 

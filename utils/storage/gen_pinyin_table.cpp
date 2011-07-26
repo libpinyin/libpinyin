@@ -138,7 +138,8 @@ void feed_line (const char * phrase, const char * pinyin, const guint32 freq){
 	 *	where is the code which I don't want to touch. :-)
 	 */
 	if (new_phrase_ptr->length >= MAX_PHRASE_LENGTH ) {
-		printf("too long phrase:%s\t%s\t%d\n", phrase, pinyin, freq);
+		fprintf(stderr, "too long phrase:%s\t%s\t%d\n", phrase,
+			pinyin, freq);
 		free(new_phrase_ptr);
 		return;
 	}
@@ -160,7 +161,7 @@ void feed_line (const char * phrase, const char * pinyin, const guint32 freq){
     value_item.freq = freq;
     
     if(new_phrase_ptr->length != value_item.pinyin->len){
-	printf("error:phrase:%s\tpinyin:%s\n", phrase, pinyin);
+	fprintf(stderr, "error:phrase:%s\tpinyin:%s\n", phrase, pinyin);
 	return;
     }
 

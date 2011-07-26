@@ -30,7 +30,7 @@ int main( int argc, char * argv[]){
 
     FILE * gbfile = fopen("../../data/gb_char.table", "r");
     if ( gbfile == NULL ) {
-	printf("open gb_char.table failed!\n");
+	fprintf(stderr, "open gb_char.table failed!\n");
 	return 1;
     }
 
@@ -39,7 +39,7 @@ int main( int argc, char * argv[]){
 
     FILE * gbkfile = fopen("../../data/gbk_char.table","r");
     if ( gbkfile == NULL ) {
-	printf("open gb_char.table failed!\n");
+	fprintf(stderr, "open gb_char.table failed!\n");
 	return 1;
     }
     
@@ -50,7 +50,7 @@ int main( int argc, char * argv[]){
 
     FILE* infile = fopen("../../data/gb_char.table", "r");
     if ( NULL == infile ){
-	printf("open gb_char.table failed!\n");
+	fprintf(stderr, "open gb_char.table failed!\n");
 	exit(ENOENT);
     }
 
@@ -59,7 +59,7 @@ int main( int argc, char * argv[]){
 
     infile = fopen("../../data/gbk_char.table", "r");
     if ( NULL == infile ){
-	printf("open gbk_char.table failed!\n");
+	fprintf(stderr, "open gbk_char.table failed!\n");
 	exit(ENOENT);
     }
 
