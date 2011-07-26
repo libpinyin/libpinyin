@@ -28,28 +28,35 @@ int main(int argc, char * argv[]){
     PinyinLargeTable pinyinlargetable(&custom);
     PhraseLargeTable phraselargetable;
 
+    /* generate phrase index */
+    FacadePhraseIndex phrase_index;
+
     FILE * gbfile = fopen("../../data/gb_char.table", "r");
     if ( gbfile == NULL) {
 	fprintf(stderr, "open gb_char.table failed!");
-	return 1;
+	exit(ENOENT);
     }
 
     pinyinlargetable.load_text(gbfile);
 
     fseek(gbfile, 0L, SEEK_SET);
     phraselargetable.load_text(gbfile);
+    fseek(gbfile, 0L, SEEK_SET);
+    phrase_index.load_text(1, gbfile);
     fclose(gbfile);
 
     FILE * gbkfile = fopen("../../data/gbk_char.table","r");
     if ( gbkfile == NULL) {
 	fprintf(stderr, "open gb_char.table failed!");
-	return 1;
+        exit(ENOENT);
     }
     
     pinyinlargetable.load_text(gbkfile);
 
     fseek(gbkfile, 0L, SEEK_SET);
     phraselargetable.load_text(gbkfile);
+    fseek(gbkfile, 0L, SEEK_SET);
+    phrase_index.load_text(2, gbkfile);
     fclose(gbkfile);
 
     MemoryChunk * new_chunk = new MemoryChunk;
@@ -61,27 +68,6 @@ int main(int argc, char * argv[]){
     phraselargetable.store(new_chunk);
     new_chunk->save("../../data/phrase_index.bin");
     phraselargetable.load(new_chunk);
-
-    /* generate phrase index*/
-    FacadePhraseIndex phrase_index;
-
-    FILE* infile = fopen("../../data/gb_char.table", "r");
-    if ( NULL == infile ){
-	fprintf(stderr, "open gb_char.table failed!\n");
-	exit(ENOENT);
-    }
-
-    phrase_index.load_text(1, infile);
-    fclose(infile);
-
-    infile = fopen("../../data/gbk_char.table", "r");
-    if ( NULL == infile ){
-	fprintf(stderr, "open gbk_char.table failed!\n");
-	exit(ENOENT);
-    }
-
-    phrase_index.load_text(2, infile);
-    fclose(infile);
 
     phrase_index.compat();
 
