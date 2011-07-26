@@ -1,0 +1,16 @@
+CLEANUP_FILES = bigram.db gb_char.bin gbk_char.bin \
+	phrase_index.bin pinyin_index.bin
+
+clean:
+	cd data ; $(RM) $(CLEANUP_FILES) ; cd $(CURDIR)
+
+build:
+	cd utils/storage ; ./gen_binary_files ; cd $(CURDIR)
+	cd utils/storage ; ./import_interpolation < ../../data/interpolation.text ; cd $(CURDIR)
+
+prepare:
+	sed -i -e "s/#define LAMBDA_PARAMETER 0.588792/#define LAMBDA_PARAMETER @@LAMBDA_PARAMETER@@/" src/include/novel_types.h
+
+rebuild:
+	sed -i -e "s/@@LAMBDA_PARAMETER@@/$(LAMBDA_PARAMETER)/" src/include/novel_types.h
+	make
