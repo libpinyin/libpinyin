@@ -28,43 +28,29 @@ int main( int argc, char * argv[]){
     PinyinCustomSettings custom;
     PinyinLargeTable largetable(&custom);
 
+    FacadePhraseIndex phrase_index;
+
     FILE * gbfile = fopen("../../data/gb_char.table", "r");
     if ( gbfile == NULL ) {
 	fprintf(stderr, "open gb_char.table failed!\n");
-	return 1;
+	exit(ENOENT);
     }
 
     largetable.load_text(gbfile);
+    fseek(gbfile, 0L, SEEK_SET);
+    phrase_index.load_text(1, gbfile);
     fclose(gbfile);
 
     FILE * gbkfile = fopen("../../data/gbk_char.table","r");
     if ( gbkfile == NULL ) {
 	fprintf(stderr, "open gb_char.table failed!\n");
-	return 1;
+	exit(ENOENT);
     }
     
     largetable.load_text(gbkfile);
+    fseek(gbkfile, 0L, SEEK_SET);
+    phrase_index.load_text(2, gbkfile);
     fclose(gbkfile);
-
-    FacadePhraseIndex phrase_index;
-
-    FILE* infile = fopen("../../data/gb_char.table", "r");
-    if ( NULL == infile ){
-	fprintf(stderr, "open gb_char.table failed!\n");
-	exit(ENOENT);
-    }
-
-    phrase_index.load_text(1, infile);
-    fclose(infile);
-
-    infile = fopen("../../data/gbk_char.table", "r");
-    if ( NULL == infile ){
-	fprintf(stderr, "open gbk_char.table failed!\n");
-	exit(ENOENT);
-    }
-
-    phrase_index.load_text(2, infile);
-    fclose(infile);
 
     MemoryChunk* new_chunk = new MemoryChunk;
     largetable.store(new_chunk);
