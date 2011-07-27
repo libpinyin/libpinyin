@@ -54,6 +54,7 @@ static inline parameter_t compute_B(corpus_count_t N,
                                     corpus_count_t T,
                                     corpus_count_t n_0,
                                     corpus_count_t n_1){
+    /* Note: re-check this, to see if we can remove if statement. */
     /* Please consider B_2 is no less than 2 in paper. */
     if ( 0 == T - n_1 && 0 == N - n_0 - n_1 )
         return 2;

@@ -52,7 +52,16 @@ bool prune_k_mixture_model(KMixtureModelMagicHeader * magic_header,
                  item->m_item.m_n_1);
         }
 
-        assert(remained_poss >= 0);
+        /* wrong remained possibility. */
+        if (remained_poss < 0) {
+            fprintf(stderr, "wrong remained possibility is found.\n");
+            fprintf(stderr, "k:%d N:%d WC:%d n_0:%d n_1:%d\n",
+                    g_prune_k, magic_header->m_N, item->m_item.m_WC,
+                    magic_header->m_N - item->m_item.m_N_n_0,
+                    item->m_item.m_n_1);
+            exit(EDOM);
+        }
+
         if ( remained_poss < g_prune_poss ) {
             /* prune this word or phrase. */
             KMixtureModelArrayItem removed_item;
@@ -114,7 +123,14 @@ int main(int argc, char * argv[]){
     GArray * items = g_array_new(FALSE, FALSE, sizeof(phrase_token_t));
     bigram.get_all_items(items);
 
+    /* print prune progress */
+    size_t progress = 0; size_t onestep = items->len / 20;
     for ( size_t i = 0; i < items->len; ++i ){
+        if ( progress >= onestep ) {
+            progress = 0; printf("*");
+        }
+        progress ++;
+
         phrase_token_t * token = &g_array_index(items, phrase_token_t, i);
         KMixtureModelSingleGram * single_gram = NULL;
         bigram.load(*token, single_gram);
@@ -141,6 +157,8 @@ int main(int argc, char * argv[]){
         g_array_free(removed_array, TRUE);
         removed_array = NULL;
     }
+
+    printf("\n");
 
     bigram.set_magic_header(magic_header);
 
