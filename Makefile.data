@@ -11,4 +11,4 @@ build:
 rebuild:
 	git reset --hard
 	sed -i -e "s/#define LAMBDA_PARAMETER 0.588792/#define LAMBDA_PARAMETER $(LAMBDA_PARAMETER)/" src/include/novel_types.h
-	make > /dev/null
+	make  >/dev/null 2>/dev/null
