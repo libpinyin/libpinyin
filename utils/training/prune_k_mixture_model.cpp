@@ -127,7 +127,7 @@ int main(int argc, char * argv[]){
     size_t progress = 0; size_t onestep = items->len / 20;
     for ( size_t i = 0; i < items->len; ++i ){
         if ( progress >= onestep ) {
-            progress = 0; printf("*");
+            progress = 0; fprintf(stderr, "*");
         }
         progress ++;
 
@@ -158,7 +158,7 @@ int main(int argc, char * argv[]){
         removed_array = NULL;
     }
 
-    printf("\n");
+    fprintf(stderr, "\n");
 
     bigram.set_magic_header(magic_header);
 
