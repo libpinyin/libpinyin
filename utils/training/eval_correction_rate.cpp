@@ -194,5 +194,6 @@ int main(int argc, char * argv[]){
     g_array_free(tokens, TRUE);
     fclose(evals_file);
     free(linebuf);
+
     return 0;
 }

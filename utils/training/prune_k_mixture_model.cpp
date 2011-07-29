@@ -44,20 +44,24 @@ bool prune_k_mixture_model(KMixtureModelMagicHeader * magic_header,
     for ( size_t i = 0; i < array->len; ++i) {
         KMixtureModelArrayItemWithToken * item = &g_array_index(array, KMixtureModelArrayItemWithToken, i);
         phrase_token_t token = item->m_token;
-        parameter_t remained_poss = 1;
+        parameter_t remained_poss = 1; parameter_t one_poss = 0;
+        bool errors = false;
         for ( size_t k = 0; k < g_prune_k; ++k){
-            remained_poss -= compute_Pr_G_3_with_count
+            one_poss = compute_Pr_G_3_with_count
                 (k, magic_header->m_N, item->m_item.m_WC,
                  magic_header->m_N - item->m_item.m_N_n_0,
                  item->m_item.m_n_1);
+            if ( !(0 <= one_poss && one_poss <= 1) )
+                errors = true;
+            remained_poss -= one_poss;
         }
 
         if ( fabs(remained_poss) < DBL_EPSILON )
             remained_poss = 0.;
 
-        /* wrong remained possibility. */
-        if (remained_poss < 0) {
-            fprintf(stderr, "wrong remained possibility is found:%f.\n",
+        /* some wrong possibility. */
+        if ( errors || !(0 <= remained_poss && remained_poss <= 1) ) {
+            fprintf(stderr, "some wrong possibility is encountered:%f.\n",
                     remained_poss);
             fprintf(stderr, "k:%d N:%d WC:%d n_0:%d n_1:%d\n",
                     g_prune_k, magic_header->m_N, item->m_item.m_WC,
