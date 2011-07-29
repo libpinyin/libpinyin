@@ -52,9 +52,13 @@ bool prune_k_mixture_model(KMixtureModelMagicHeader * magic_header,
                  item->m_item.m_n_1);
         }
 
+        if ( fabs(remained_poss) < DBL_EPSILON )
+            remained_poss = 0.;
+
         /* wrong remained possibility. */
         if (remained_poss < 0) {
-            fprintf(stderr, "wrong remained possibility is found.\n");
+            fprintf(stderr, "wrong remained possibility is found:%f.\n",
+                    remained_poss);
             fprintf(stderr, "k:%d N:%d WC:%d n_0:%d n_1:%d\n",
                     g_prune_k, magic_header->m_N, item->m_item.m_WC,
                     magic_header->m_N - item->m_item.m_N_n_0,
