@@ -72,6 +72,38 @@ bool get_best_match(PinyinLookup * pinyin_lookup,
     return pinyin_lookup->get_best_match(pinyins, constraints, tokens);
 }
 
+bool do_one_test(PinyinLookup * pinyin_lookup,
+                 FacadePhraseIndex * phrase_index,
+                 TokenVector tokens){
+    bool retval = false;
+
+    PinyinKeyVector pinyins = g_array_new(FALSE, TRUE, sizeof(PinyinKey));
+    TokenVector guessed_tokens = g_array_new
+        (FALSE, TRUE, sizeof(phrase_token_t));
+
+    get_possible_pinyin(phrase_index, tokens, pinyins);
+    get_best_match(pinyin_lookup, pinyins, guessed_tokens);
+    /* compare the results */
+    char * sentence = NULL; char * guessed_sentence = NULL;
+    pinyin_lookup->convert_to_utf8(tokens, sentence);
+    pinyin_lookup->convert_to_utf8
+        (guessed_tokens, guessed_sentence);
+
+    if ( strcmp(sentence, guessed_sentence) != 0 ) {
+        fprintf(stderr, "test sentence:%s\n", sentence);
+        fprintf(stderr, "guessed sentence:%s\n", guessed_sentence);
+        fprintf(stderr, "the result mis-matches.\n");
+        retval = false;
+    } else {
+        retval = true;
+    }
+
+    g_free(sentence); g_free(guessed_sentence);
+    g_array_free(pinyins, TRUE);
+    g_array_free(guessed_tokens, TRUE);
+    return retval;
+}
+
 int main(int argc, char * argv[]){
     const char * evals_text = "../../data/evals.text";
 
@@ -114,9 +146,6 @@ int main(int argc, char * argv[]){
     size_t tested_count = 0; size_t passed_count = 0;
     char* linebuf = NULL; size_t size = 0;
     TokenVector tokens = g_array_new(FALSE, TRUE, sizeof(phrase_token_t));
-    TokenVector guessed_tokens = g_array_new
-        (FALSE, TRUE, sizeof(phrase_token_t));
-    PinyinKeyVector pinyins = g_array_new(FALSE, TRUE, sizeof(PinyinKey));
 
     phrase_token_t token;
     while( getline(&linebuf, &size, evals_file) ) {
@@ -139,24 +168,11 @@ int main(int argc, char * argv[]){
 
         if ( 0 == token ) {
             if ( tokens->len ) { /* one test. */
-                get_possible_pinyin(&phrase_index, tokens, pinyins);
-                get_best_match(&pinyin_lookup, pinyins, guessed_tokens);
-                /* compare the results */
-                char * sentence = NULL; char * guessed_sentence = NULL;
-                pinyin_lookup.convert_to_utf8(tokens, sentence);
-                pinyin_lookup.convert_to_utf8
-                    (guessed_tokens, guessed_sentence);
-
-                if (strcmp(sentence, guessed_sentence) != 0){
-                    fprintf(stderr, "test sentence:%s\n", sentence);
-                    fprintf(stderr, "guessed sentence:%s\n", guessed_sentence);
-                    fprintf(stderr, "the result mis-matches.\n");
-                    tested_count ++;
-                } else {
+                if ( do_one_test(&pinyin_lookup, &phrase_index, tokens) ) {
                     tested_count ++; passed_count ++;
+                } else {
+                    tested_count ++;
                 }
-
-                g_free(sentence); g_free(guessed_sentence);
                 g_array_set_size(tokens, 0);
             }
         } else {
@@ -164,9 +180,18 @@ int main(int argc, char * argv[]){
         }
     }
 
+    if ( tokens->len ) { /* one test. */
+        if ( do_one_test(&pinyin_lookup, &phrase_index, tokens) ) {
+            tested_count ++; passed_count ++;
+        } else {
+            tested_count ++;
+        }
+    }
+
     parameter_t rate = passed_count / (parameter_t) tested_count;
     printf("correction rate:%f\n", rate);
 
+    g_array_free(tokens, TRUE);
     fclose(evals_file);
     free(linebuf);
     return 0;
