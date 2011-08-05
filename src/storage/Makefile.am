@@ -19,7 +19,9 @@ INCLUDES                = -I$(top_srcdir)/src/include \
 			  -I$(top_srcdir)/src/storage \
 			  @GLIB2_CPPFLAGS@
 
-noinst_HEADERS          = pinyin_large_table.h \
+libpinyinincludedir	= $(includedir)/libpinyin-@LIBPINYIN_BINARY_VERSION@
+
+libpinyininclude_HEADERS= pinyin_large_table.h \
 			  pinyin_base.h \
 		    	  pinyin_phrase.h \
 			  phrase_index.h \
@@ -30,6 +32,8 @@ noinst_HEADERS          = pinyin_large_table.h \
 			  tag_utility.h
 
 noinst_LTLIBRARIES      = libstorage.la
+
+libstorage_la_CXXFLAGS	= "-fPIC"
 
 libstorage_la_LDFLAGS	= -static
 

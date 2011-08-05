@@ -30,11 +30,11 @@ INCLUDES                = -I$(top_srcdir)/src \
 			  -I$(top_srcdir)/src/lookup \
                           @GLIB2_CPPFLAGS@
 
-noinst_HEADERS		= pinyin.h
+libpinyinincludedir	= $(includedir)/libpinyin-@LIBPINYIN_BINARY_VERSION@
 
-noinst_LTLIBRARIES	= libpinyin.la
+libpinyininclude_HEADERS= pinyin.h
 
-libpinyin_la_LDFLAGS	= -static
+lib_LTLIBRARIES		= libpinyin.la
 
 libpinyin_la_SOURCES	= pinyin.cpp
 

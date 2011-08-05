@@ -8,6 +8,10 @@ AM_INIT_AUTOMAKE
 AC_CONFIG_SRCDIR([config.h.in])
 AC_CONFIG_HEADER([config.h])
 
+# Define a string for binary compatibility
+LIBPINYIN_BINARY_VERSION=0.3
+AC_SUBST(LIBPINYIN_BINARY_VERSION)
+
 # Checks for programs.
 AC_PROG_CXX
 AC_PROG_CC
