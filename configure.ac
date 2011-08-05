@@ -70,7 +70,8 @@ AC_CHECK_HEADER([db.h], [], AC_MSG_ERROR([Cannot find Berkeley DB library versio
 AC_SEARCH_LIBS([db_create], [db], [], AC_MSG_ERROR([Cannot find Berkeley DB library version 4]))
 
 
-AC_CONFIG_FILES([Makefile 
+AC_CONFIG_FILES([libpinyin.pc
+		 Makefile
 		 src/Makefile
                  src/include/Makefile
                  src/storage/Makefile
