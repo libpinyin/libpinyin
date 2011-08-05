@@ -26,8 +26,7 @@ binary_model_data	= gb_char.bin gbk_char.bin \
 
 MAINTAINERCLEANFILES	= Makefile.in
 
-EXTRA_DIST		= $(textual_model_data) \
-				$(binary_model_data)
+EXTRA_DIST		= $(textual_model_data)
 
 libpinyin_db_DATA 	= $(binary_model_data)
 
@@ -35,9 +34,7 @@ libpinyin_dbdir		= $(pkgdatadir)/data
 
 CLEANFILES		= $(binary_model_data)
 
-build-data: $(textual_model_data)
+$(binary_model_data): $(textual_model_data)
 	$(RM) $(binary_model_data)
-	cd ../utils/storage ; ./gen_binary_files ; cd -
-	cd ../utils/storage ; ./import_interpolation < ../../data/interpolation.text ; cd -
-
-$(binary_model_data): build-data
+	cd ../utils/storage ; ./gen_binary_files --table-dir $(abs_top_srcdir)/data; cd -
+	cd ../utils/storage ; ./import_interpolation < $(abs_top_srcdir)/data/interpolation.text ; cd -

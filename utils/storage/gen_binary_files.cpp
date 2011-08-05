@@ -20,9 +20,32 @@
  */
 
 #include <stdio.h>
+#include <locale.h>
 #include "pinyin.h"
 
+void print_help(){
+    printf("Usage: gen_binary_files --table-dir <DIRNAME>\n");
+}
+
 int main(int argc, char * argv[]){
+    int i = 1;
+    const char * table_dir = "../../data";
+
+    setlocale(LC_ALL, "");
+    while ( i < argc ){
+        if ( strcmp("--help", argv[i]) == 0 ){
+            print_help();
+            exit(0);
+        } else if ( strcmp("--table-dir", argv[i]) == 0){
+            if ( ++i >= argc ){
+                print_help();
+                exit(EINVAL);
+            }
+            table_dir = argv[i];
+        }
+        ++i;
+    }
+
     /* generate pinyin index*/
     PinyinCustomSettings custom;
     PinyinLargeTable pinyinlargetable(&custom);
@@ -31,7 +54,10 @@ int main(int argc, char * argv[]){
     /* generate phrase index */
     FacadePhraseIndex phrase_index;
 
-    FILE * gbfile = fopen("../../data/gb_char.table", "r");
+    gchar * filename = g_build_filename(table_dir, "gb_char.table", NULL);
+    FILE * gbfile = fopen(filename, "r");
+    g_free(filename);
+
     if ( gbfile == NULL) {
 	fprintf(stderr, "open gb_char.table failed!");
 	exit(ENOENT);
@@ -45,9 +71,12 @@ int main(int argc, char * argv[]){
     phrase_index.load_text(1, gbfile);
     fclose(gbfile);
 
-    FILE * gbkfile = fopen("../../data/gbk_char.table","r");
+    filename = g_build_filename(table_dir, "gbk_char.table", NULL);
+    FILE * gbkfile = fopen(filename, "r");
+    g_free(filename);
+
     if ( gbkfile == NULL) {
-	fprintf(stderr, "open gb_char.table failed!");
+        fprintf(stderr, "open gbk_char.table failed!");
         exit(ENOENT);
     }
     

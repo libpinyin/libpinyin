@@ -2,7 +2,7 @@ clean:
 	make -C data clean
 
 build:
-	make -C data build-data
+	make -C data
 
 rebuild:
 	git reset --hard
