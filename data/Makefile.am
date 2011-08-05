@@ -1,5 +1,5 @@
 ## Makefile.am -- Process this file with automake to produce Makefile.in
-## Copyright (C) 2007 Peng Wu
+## Copyright (C) 2011 Peng Wu
 ##
 ## This program is free software; you can redistribute it and/or modify
 ## it under the terms of the GNU General Public License as published by
@@ -15,14 +15,29 @@
 ## along with this program; if not, write to the Free Software
 ## Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
-EXTRA_DIST		= COPYING
 
-AUTOMAKE_OPTIONS 	= gnu
-SUBDIRS 		= src utils tests libltdl data
+textual_model_data	= interpolation.text \
+				gb_char.table gbk_char.table
 
-MAINTAINERCLEANFILES 	= Makefile.in 
+binary_model_data	= gb_char.bin gbk_char.bin \
+				phrase_index.bin pinyin_index.bin \
+				bigram.db
 
-CLEANFILES		= *.bak 
 
-ACLOCAL			= aclocal -I .
+MAINTAINERCLEANFILES	= Makefile.in
 
+EXTRA_DIST		= $(textual_model_data) \
+				$(binary_model_data)
+
+libpinyin_db_DATA 	= $(binary_model_data)
+
+libpinyin_dbdir		= $(pkgdatadir)/data
+
+CLEANFILES		= $(binary_model_data)
+
+build-data: $(textual_model_data)
+	$(RM) $(binary_model_data)
+	cd ../utils/storage ; ./gen_binary_files ; cd -
+	cd ../utils/storage ; ./import_interpolation < ../../data/interpolation.text ; cd -
+
+$(binary_model_data): build-data

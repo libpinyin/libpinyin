@@ -1,12 +1,8 @@
-CLEANUP_FILES = bigram.db gb_char.bin gbk_char.bin \
-	phrase_index.bin pinyin_index.bin
-
 clean:
-	cd data ; $(RM) $(CLEANUP_FILES) ; cd "$(CURDIR)"
+	make -C data clean
 
 build:
-	cd utils/storage ; ./gen_binary_files ; cd "$(CURDIR)"
-	cd utils/storage ; ./import_interpolation < ../../data/interpolation.text ; cd "$(CURDIR)"
+	make -C data build-data
 
 rebuild:
 	git reset --hard

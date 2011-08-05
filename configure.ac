@@ -72,6 +72,7 @@ AC_SEARCH_LIBS([db_create], [db], [], AC_MSG_ERROR([Cannot find Berkeley DB libr
 
 AC_CONFIG_FILES([libpinyin.pc
 		 Makefile
+		 data/Makefile
 		 src/Makefile
                  src/include/Makefile
                  src/storage/Makefile
