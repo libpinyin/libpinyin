@@ -128,12 +128,12 @@ int main(int argc, char * argv[]){
 
     //gb_char binary file
     MemoryChunk * chunk = new MemoryChunk;
-    chunk->load("../../data/gb_char.bin");
+    chunk->load("gb_char.bin");
     phrase_index.load(1, chunk);
 
     //gbk_char binary file
     chunk = new MemoryChunk;
-    chunk->load("../../data/gbk_char.bin");
+    chunk->load("gbk_char.bin");
     phrase_index.load(2, chunk);
 
     KMixtureModelBigram bigram(K_MIXTURE_MODEL_MAGIC_NUMBER);

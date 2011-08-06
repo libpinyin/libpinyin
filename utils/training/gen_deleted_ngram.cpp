@@ -36,7 +36,7 @@ void print_help(){
 int main(int argc, char * argv[]){
     int i = 1;
     bool train_pi_gram = true;
-    const char * bigram_filename = "../../data/deleted_bigram.db";
+    const char * bigram_filename = "deleted_bigram.db";
 
     setlocale(LC_ALL, "");
     while ( i < argc ){
@@ -61,7 +61,7 @@ int main(int argc, char * argv[]){
     PhraseLargeTable phrases;
     //init phrase lookup
     MemoryChunk * new_chunk = new MemoryChunk;
-    new_chunk->load("../../data/phrase_index.bin");
+    new_chunk->load("phrase_index.bin");
     phrases.load(new_chunk);
 
     Bigram bigram;

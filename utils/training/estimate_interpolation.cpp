@@ -93,19 +93,19 @@ int main(int argc, char * argv[]){
     
     //gb_char binary file
     MemoryChunk * chunk = new MemoryChunk;
-    chunk->load("../../data/gb_char.bin");
+    chunk->load("gb_char.bin");
     phrase_index.load(1, chunk);
     
     //gbk_char binary file
     chunk = new MemoryChunk;
-    chunk->load("../../data/gbk_char.bin");
+    chunk->load("gbk_char.bin");
     phrase_index.load(2, chunk);
 
     Bigram bigram;
-    bigram.attach("../../data/bigram.db", ATTACH_READONLY);
+    bigram.attach("bigram.db", ATTACH_READONLY);
 
     Bigram deleted_bigram;
-    deleted_bigram.attach("../../data/deleted_bigram.db", ATTACH_READONLY);
+    deleted_bigram.attach("deleted_bigram.db", ATTACH_READONLY);
 
     GArray * deleted_items = g_array_new(FALSE, FALSE, sizeof(phrase_token_t));
     deleted_bigram.get_all_items(deleted_items);

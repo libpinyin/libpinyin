@@ -345,7 +345,7 @@ int main(int argc, char * argv[]){
 
     PhraseLargeTable phrases;
     MemoryChunk * chunk = new MemoryChunk;
-    chunk->load("../../data/phrase_index.bin");
+    chunk->load("phrase_index.bin");
     phrases.load(chunk);
 
     KMixtureModelBigram bigram(K_MIXTURE_MODEL_MAGIC_NUMBER);

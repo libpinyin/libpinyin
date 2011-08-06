@@ -105,30 +105,30 @@ bool do_one_test(PinyinLookup * pinyin_lookup,
 }
 
 int main(int argc, char * argv[]){
-    const char * evals_text = "../../data/evals.text";
+    const char * evals_text = "evals.text";
 
     PinyinCustomSettings custom;
     PinyinLargeTable largetable(&custom);
 
     MemoryChunk * new_chunk = new MemoryChunk;
-    new_chunk->load("../../data/pinyin_index.bin");
+    new_chunk->load("pinyin_index.bin");
     largetable.load(new_chunk);
 
     FacadePhraseIndex phrase_index;
     new_chunk = new MemoryChunk;
-    new_chunk->load("../../data/gb_char.bin");
+    new_chunk->load("gb_char.bin");
     phrase_index.load(1, new_chunk);
     new_chunk = new MemoryChunk;
-    new_chunk->load("../../data/gbk_char.bin");
+    new_chunk->load("gbk_char.bin");
     phrase_index.load(2, new_chunk);
 
     PhraseLargeTable phrases;
     new_chunk = new MemoryChunk;
-    new_chunk->load("../../data/phrase_index.bin");
+    new_chunk->load("phrase_index.bin");
     phrases.load(new_chunk);
 
     Bigram system_bigram;
-    system_bigram.attach("../../data/bigram.db", ATTACH_READONLY);
+    system_bigram.attach("bigram.db", ATTACH_READONLY);
     Bigram user_bigram;
     user_bigram.attach(NULL, ATTACH_CREATE|ATTACH_READWRITE);
 

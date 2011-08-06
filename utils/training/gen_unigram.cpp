@@ -30,12 +30,12 @@ int main(int argc, char * argv[]){
     
     //gb_char binary file
     MemoryChunk * chunk = new MemoryChunk;
-    chunk->load("../../data/gb_char.bin");
+    chunk->load("gb_char.bin");
     phrase_index.load(1, chunk);
     
     //gbk_char binary file
     chunk = new MemoryChunk;
-    chunk->load("../../data/gbk_char.bin");
+    chunk->load("gbk_char.bin");
     phrase_index.load(2, chunk);
 
     PhraseIndexRange range;
@@ -57,12 +57,12 @@ int main(int argc, char * argv[]){
 
     MemoryChunk * new_chunk = new MemoryChunk;
     phrase_index.store(1, new_chunk);
-    new_chunk->save("../../data/gb_char.bin");
+    new_chunk->save("gb_char.bin");
     phrase_index.load(1, new_chunk);
 
     new_chunk = new MemoryChunk;
     phrase_index.store(2, new_chunk);
-    new_chunk->save("../../data/gbk_char.bin");
+    new_chunk->save("gbk_char.bin");
     phrase_index.load(2, new_chunk);
 
     return 0;

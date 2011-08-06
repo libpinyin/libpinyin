@@ -92,8 +92,8 @@ parameter_t compute_interpolation(KMixtureModelSingleGram * deleted_bigram,
 
 int main(int argc, char * argv[]){
     int i = 1;
-    const char * bigram_filename = "../../data/k_mixture_model_ngram.db";
-    const char * deleted_bigram_filename = "../../data/k_mixture_model_deleted_ngram.db";
+    const char * bigram_filename = "k_mixture_model_ngram.db";
+    const char * deleted_bigram_filename = "k_mixture_model_deleted_ngram.db";
 
     setlocale(LC_ALL, "");
     while ( i < argc ){
