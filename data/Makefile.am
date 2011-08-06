@@ -38,3 +38,8 @@ $(binary_model_data): $(textual_model_data)
 	$(RM) $(binary_model_data)
 	../utils/storage/gen_binary_files --table-dir $(top_srcdir)/data
 	../utils/storage/import_interpolation < $(top_srcdir)/data/interpolation.text
+
+rebuild:
+	git reset --hard
+	sed -i -e "s/#define LAMBDA_PARAMETER 0.588792/#define LAMBDA_PARAMETER $(LAMBDA_PARAMETER)/" ../src/include/novel_types.h
+	make -C .. >/dev/null 2>/dev/null
