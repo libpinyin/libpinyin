@@ -41,18 +41,18 @@ bool end_data(FILE * output){
 
 int main(int argc, char * argv[]){
     FILE * output = stdout;
-    const char * bigram_filename = "../../data/bigram.db";
+    const char * bigram_filename = "bigram.db";
 
     FacadePhraseIndex phrase_index;
 
     //gb_char binary file
     MemoryChunk * chunk = new MemoryChunk;
-    chunk->load("../../data/gb_char.bin");
+    chunk->load("gb_char.bin");
     phrase_index.load(1, chunk);
 
     //gbk_char binary file
     chunk = new MemoryChunk;
-    chunk->load("../../data/gbk_char.bin");
+    chunk->load("gbk_char.bin");
     phrase_index.load(2, chunk);
 
     Bigram bigram;

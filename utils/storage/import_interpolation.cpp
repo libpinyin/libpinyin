@@ -194,24 +194,24 @@ bool parse_bigram(FILE * input, PhraseLargeTable * phrases,
 
 int main(int argc, char * argv[]){
     FILE * input = stdin;
-    const char * bigram_filename = "../../data/bigram.db";
+    const char * bigram_filename = "bigram.db";
 
     PhraseLargeTable phrases;
 
     MemoryChunk * chunk = new MemoryChunk;
-    chunk->load("../../data/phrase_index.bin");
+    chunk->load("phrase_index.bin");
     phrases.load(chunk);
 
     FacadePhraseIndex phrase_index;
 
     //gb_char binary file
     chunk = new MemoryChunk;
-    chunk->load("../../data/gb_char.bin");
+    chunk->load("gb_char.bin");
     phrase_index.load(1, chunk);
 
     //gbk_char binary file
     chunk = new MemoryChunk;
-    chunk->load("../../data/gbk_char.bin");
+    chunk->load("gbk_char.bin");
     phrase_index.load(2, chunk);
 
     Bigram bigram;
@@ -252,12 +252,12 @@ int main(int argc, char * argv[]){
 
     chunk = new MemoryChunk;
     phrase_index.store(1, chunk);
-    chunk->save("../../data/gb_char.bin");
+    chunk->save("gb_char.bin");
     phrase_index.load(1, chunk);
 
     chunk = new MemoryChunk;
     phrase_index.store(2, chunk);
-    chunk->save("../../data/gbk_char.bin");
+    chunk->save("gbk_char.bin");
     phrase_index.load(2, chunk);
 
     return 0;

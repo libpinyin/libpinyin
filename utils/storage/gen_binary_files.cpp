@@ -29,7 +29,7 @@ void print_help(){
 
 int main(int argc, char * argv[]){
     int i = 1;
-    const char * table_dir = "../../data";
+    const char * table_dir = ".";
 
     setlocale(LC_ALL, "");
     while ( i < argc ){
@@ -90,24 +90,24 @@ int main(int argc, char * argv[]){
 
     MemoryChunk * new_chunk = new MemoryChunk;
     pinyinlargetable.store(new_chunk);
-    new_chunk->save("../../data/pinyin_index.bin");
+    new_chunk->save("pinyin_index.bin");
     pinyinlargetable.load(new_chunk);
     
     new_chunk = new MemoryChunk;
     phraselargetable.store(new_chunk);
-    new_chunk->save("../../data/phrase_index.bin");
+    new_chunk->save("phrase_index.bin");
     phraselargetable.load(new_chunk);
 
     phrase_index.compat();
 
     new_chunk = new MemoryChunk;
     phrase_index.store(1, new_chunk);
-    new_chunk->save("../../data/gb_char.bin");
+    new_chunk->save("gb_char.bin");
     phrase_index.load(1, new_chunk);
 
     new_chunk = new MemoryChunk;
     phrase_index.store(2, new_chunk);
-    new_chunk->save("../../data/gbk_char.bin");
+    new_chunk->save("gbk_char.bin");
     phrase_index.load(2, new_chunk);
     
     return 0;

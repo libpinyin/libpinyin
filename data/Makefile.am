@@ -36,5 +36,5 @@ CLEANFILES		= $(binary_model_data)
 
 $(binary_model_data): $(textual_model_data)
 	$(RM) $(binary_model_data)
-	cd ../utils/storage ; ./gen_binary_files --table-dir $(abs_top_srcdir)/data; cd -
-	cd ../utils/storage ; ./import_interpolation < $(abs_top_srcdir)/data/interpolation.text ; cd -
+	../utils/storage/gen_binary_files --table-dir $(top_srcdir)/data
+	../utils/storage/import_interpolation < $(top_srcdir)/data/interpolation.text

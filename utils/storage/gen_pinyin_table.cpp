@@ -72,7 +72,7 @@ gint phrase_item_compare(gconstpointer a, gconstpointer b){
 }
 
 int main(int argc, char * argv[]){  
-    char outfilename[1024]="temp.out";
+    char * outfilename = "temp.out";
     int phrase_index = 0;
     int i = 1;
 
@@ -94,7 +94,7 @@ int main(int argc, char * argv[]){
 		print_help();
                 exit(EINVAL);
             }
-	    strcpy( outfilename, argv[i]);
+	    outfilename = g_strdup(argv[i]);
 	} else {
 	    feed_file(argv[i]);
 	}
