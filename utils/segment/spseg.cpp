@@ -33,8 +33,6 @@
  * which contains non-ucs2 characters.
  */
 
-static PhraseLargeTable * g_phrases = NULL;
-
 struct SegmentStep{
     phrase_token_t m_handle;
     utf16_t * m_phrase;
@@ -78,7 +76,7 @@ bool segment(PhraseLargeTable * phrases, //Lookup Phrase
             utf16_t * cur_phrase = phrase + i;
 
             phrase_token_t token = 0;
-            int result = g_phrases->search(len, cur_phrase, token);
+            int result = phrases->search(len, cur_phrase, token);
             if ( !(result & SEARCH_OK) ){
                 token = 0;
                 if ( 1 != len )
@@ -151,26 +149,10 @@ int main(int argc, char * argv[]){
     }
 
     //init phrase table
-    g_phrases = new PhraseLargeTable;
-    FILE * gb_file = fopen("gb_char.table", "r");
-    if ( gb_file == NULL ){
-	fprintf(stderr, "can't open gb_char.table!\n");
-	exit(ENOENT);
-    }
-    g_phrases->load_text(gb_file);
-    fclose(gb_file);
-
-    FILE * gbk_file = fopen("gbk_char.table", "r");
-    if ( gbk_file == NULL ){
-	fprintf(stderr, "can't open gbk_char.table!\n");
-	exit(ENOENT);
-    }
-    g_phrases->load_text(gbk_file);
-    fclose(gbk_file);
-
+    PhraseLargeTable phrase_table;
     MemoryChunk * chunk = new MemoryChunk;
-    g_phrases->store(chunk);
-    g_phrases->load(chunk);
+    chunk->load("phrase_index.bin");
+    phrase_table.load(chunk);
 
     char * linebuf = NULL;
     size_t size = 0;
@@ -192,7 +174,7 @@ int main(int argc, char * argv[]){
 
         //do segment stuff
         GArray * strings = g_array_new(TRUE, TRUE, sizeof(SegmentStep));
-        segment(g_phrases, sentence, len, strings);
+        segment(&phrase_table, sentence, len, strings);
 
         //print out the split phrase
         for ( glong i = 0; i < strings->len; ++i ) {
