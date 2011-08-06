@@ -111,21 +111,21 @@ int main(int argc, char * argv[]){
     //init phrase table
     PhraseLargeTable phrase_table;
     MemoryChunk * chunk = new MemoryChunk;
-    chunk->load("../../data/phrase_index.bin");
+    chunk->load("phrase_index.bin");
     phrase_table.load(chunk);
 
     //init phrase index
     FacadePhraseIndex phrase_index;
     chunk = new MemoryChunk;
-    chunk->load("../../data/gb_char.bin");
+    chunk->load("gb_char.bin");
     phrase_index.load(1, chunk);
     chunk = new MemoryChunk;
-    chunk->load("../../data/gbk_char.bin");
+    chunk->load("gbk_char.bin");
     phrase_index.load(2, chunk);
 
     //init bi-gram
     Bigram system_bigram;
-    system_bigram.attach("../../data/bigram.db", ATTACH_READONLY);
+    system_bigram.attach("bigram.db", ATTACH_READONLY);
     Bigram user_bigram;
 
     //init phrase lookup

@@ -152,7 +152,7 @@ int main(int argc, char * argv[]){
 
     //init phrase table
     g_phrases = new PhraseLargeTable;
-    FILE * gb_file = fopen("../../data/gb_char.table", "r");
+    FILE * gb_file = fopen("gb_char.table", "r");
     if ( gb_file == NULL ){
 	fprintf(stderr, "can't open gb_char.table!\n");
 	exit(ENOENT);
@@ -160,7 +160,7 @@ int main(int argc, char * argv[]){
     g_phrases->load_text(gb_file);
     fclose(gb_file);
 
-    FILE * gbk_file = fopen("../../data/gbk_char.table", "r");
+    FILE * gbk_file = fopen("gbk_char.table", "r");
     if ( gbk_file == NULL ){
 	fprintf(stderr, "can't open gbk_char.table!\n");
 	exit(ENOENT);
