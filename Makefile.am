@@ -26,3 +26,5 @@ CLEANFILES		= *.bak
 
 ACLOCAL			= aclocal -I .
 
+pkgconfigdir = $(libdir)/pkgconfig
+pkgconfig_DATA = libpinyin.pc
