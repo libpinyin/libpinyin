@@ -60,8 +60,8 @@ static const PinyinToken __pinyin_initials[] =
     {"f", "ㄈ", 1, 1},
     {"h", "ㄏ", 1, 1},
     {"g", "ㄍ", 1, 1},
-    {"j", "ㄐ", 1, 1},
     {"k", "ㄎ", 1, 1},
+    {"j", "ㄐ", 1, 1},
     {"m", "ㄇ", 1, 1},
     {"n", "ㄋ", 1, 1},
     {"l", "ㄌ", 1, 1},
@@ -135,7 +135,7 @@ static const PinyinToken __pinyin_tones [] =
 static const PinyinTokenIndex __pinyin_initials_index[] =
 {
     //a     b      c      d     e       f      g      h      i      j      k      l      m 
-    {-1,0},{1,1}, {2,2}, {4,1}, {-1,0},{5,1}, {7,1}, {6,1}, {-1,0},{8,1}, {9,1}, {12,1},{10,1},
+    {-1,0},{1,1}, {2,2}, {4,1}, {-1,0},{5,1}, {7,1}, {6,1}, {-1,0},{9,1}, {8,1}, {12,1},{10,1},
     //n     o      p      q      r      s      t      u      v      w      x      y      z
     {11,1},{-1,0},{14,1},{15,1},{13,1},{16,2},{18,1},{-1,0},{-1,0},{19,1},{20,1},{21,1},{22,2}
 };
@@ -1381,7 +1381,11 @@ int pinyin_compare_initial (const PinyinCustomSettings &custom,
 
 	        (custom.use_ambiguities [PINYIN_AmbFoHe] && 
 		 ((lhs == PINYIN_Fo && rhs == PINYIN_He) ||
-		  (lhs == PINYIN_He && rhs == PINYIN_Fo)))
+		  (lhs == PINYIN_He && rhs == PINYIN_Fo))) ||
+
+		(custom.use_ambiguities [PINYIN_AmbGeKe] &&
+		 ((lhs == PINYIN_Ge && rhs == PINYIN_Ke) ||
+		  (lhs == PINYIN_Ke && rhs == PINYIN_Ge)))
 	    )
 	  return 0;
 	else return (lhs - rhs);

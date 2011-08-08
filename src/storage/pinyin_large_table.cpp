@@ -130,6 +130,8 @@ int PinyinBitmapIndexLevel::initial_level_search(int phrase_length,
 	MATCH(PINYIN_AmbNeLe, PINYIN_Ne, PINYIN_Le);
 	MATCH(PINYIN_AmbFoHe, PINYIN_Fo, PINYIN_He);
 	MATCH(PINYIN_AmbFoHe, PINYIN_He, PINYIN_Fo);
+        MATCH(PINYIN_AmbGeKe, PINYIN_Ge, PINYIN_Ke);
+        MATCH(PINYIN_AmbGeKe, PINYIN_Ke, PINYIN_Ge);
 
     case PINYIN_Le:
 	{
