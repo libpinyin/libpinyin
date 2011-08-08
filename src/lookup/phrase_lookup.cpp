@@ -27,6 +27,8 @@
 #include "ngram.h"
 #include "phrase_lookup.h"
 
+using namespace pinyin;
+
 const gfloat PhraseLookup::bigram_lambda;
 const gfloat PhraseLookup::unigram_lambda;
 

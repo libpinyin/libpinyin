@@ -24,6 +24,8 @@
 
 #include <assert.h>
 
+namespace pinyin{
+
 const int nbranch = 32;
 
 class DirectBranchIterator: public IBranchIterator{//for nitem <= nbranch
@@ -143,4 +145,5 @@ protected:
     void replay(int i);
 };
 
+};
 #endif

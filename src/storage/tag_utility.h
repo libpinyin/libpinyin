@@ -54,7 +54,8 @@ bool taglib_pop_state();
 bool taglib_fini();
 
 namespace pinyin{
-    class PhraseLargeTable;
+class PhraseLargeTable;
+class FacadePhraseIndex;
 };
 
 using namespace pinyin;

@@ -29,6 +29,8 @@
  *  @brief the definitions of phrase lookup related classes and structs.
  */
 
+namespace pinyin{
+
 class PhraseLookup{
 private:
     static const gfloat bigram_lambda = LAMBDA_PARAMETER;
@@ -78,6 +80,8 @@ public:
 
     /* Note: free the phrase by g_free */
     bool convert_to_utf8(MatchResults results, /* in */ const char * delimiter, /* out */ char * & result_string);
+};
+
 };
 
 #endif

@@ -134,5 +134,4 @@ public:
 
 };
 
-using namespace pinyin;
 #endif

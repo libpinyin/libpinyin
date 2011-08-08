@@ -723,6 +723,4 @@ int pinyin_compare_tone (const PinyinCustomSettings &custom,
 			 PinyinTone rhs);
 };
 
-using namespace pinyin;
-
 #endif

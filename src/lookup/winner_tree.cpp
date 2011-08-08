@@ -27,6 +27,8 @@
 #include "pinyin_lookup.h"
 #include "winner_tree.h"
 
+using namespace pinyin;
+
 WinnerTreeBranchIterator::WinnerTreeBranchIterator(WinnerTree & tree)
     :m_tree(tree), m_counter(0){
     m_max_value = m_tree.m_items[m_tree.get_winner()];

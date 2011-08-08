@@ -32,6 +32,8 @@
 #include "pinyin_lookup.h"
 #include "winner_tree.h"
 
+using namespace pinyin;
+
 const gfloat PinyinLookup::bigram_lambda;
 const gfloat PinyinLookup::unigram_lambda;
 

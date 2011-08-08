@@ -26,6 +26,8 @@
  *  @brief the definitions of common lookup related classes and structs.
  */
 
+namespace pinyin{
+
 typedef phrase_token_t lookup_key_t;
 
 struct lookup_value_t{
@@ -43,14 +45,12 @@ struct lookup_value_t{
     }
 };
 
-namespace pinyin{
-    class PinyinLargeTable;
-    class PhraseLargeTable;
-    class FacadePhraseIndex;
-    class Bigram;
-};
 
-using namespace pinyin;
+class PinyinLargeTable;
+class PhraseLargeTable;
+class FacadePhraseIndex;
+class Bigram;
+
 
 /* Note:
  *   LookupStepIndex:
@@ -68,4 +68,5 @@ typedef GHashTable * LookupStepIndex;
 /* Key: lookup_key_t, Value: int m, index to m_steps_content[i][m] */
 typedef GArray * LookupStepContent; /* array of lookup_value_t */
 
+};
 #endif

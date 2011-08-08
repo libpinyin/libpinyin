@@ -28,6 +28,8 @@
 #include "pinyin_base.h"
 #include "lookup.h"
 
+namespace pinyin{
+
 class WinnerTree;
 
 /** @file pinyin_lookup.h
@@ -139,4 +141,5 @@ public:
     bool destroy_pinyin_lookup(PhraseIndexRanges ranges);
 };
 
+};
 #endif

@@ -25,6 +25,8 @@
 #include "pinyin_phrase.h"
 #include "pinyin_large_table.h"
 
+using namespace pinyin;
+
 // Internal data definition
 
 /**

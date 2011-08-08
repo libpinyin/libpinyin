@@ -44,9 +44,9 @@
  * ++++++++++++++++++++++++++++++++++++++++++
  */
 
-class PinyinLookup;
-
 namespace pinyin{
+
+class PinyinLookup;
 
 /* Because this is not large,
  * Store this in user home directory.
@@ -185,7 +185,7 @@ public:
 };
 
 class FacadePhraseIndex{
-    friend class ::PinyinLookup;
+    friend class PinyinLookup;
 private:
     guint32 m_total_freq;
     SubPhraseIndex * m_sub_phrase_indices[PHRASE_INDEX_LIBRARY_COUNT];
@@ -264,11 +264,5 @@ public:
 };
  
 };
-
-using namespace pinyin;
-
-
-
-
 
 #endif

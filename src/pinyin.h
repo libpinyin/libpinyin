@@ -15,4 +15,6 @@
 /* training module */
 #include "flexible_ngram.h"
 
+using namespace pinyin;
+
 typedef struct _pinyin_context_t pinyin_context_t;

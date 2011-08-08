@@ -26,6 +26,8 @@
 #include "novel_types.h"
 #include "ngram.h"
 
+using namespace pinyin;
+
 struct SingleGramItem{
     phrase_token_t m_token;
     guint32 m_freq;

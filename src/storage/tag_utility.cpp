@@ -7,6 +7,8 @@
 #include "phrase_large_table.h"
 #include "tag_utility.h"
 
+using namespace pinyin;
+
 /* internal taglib structure */
 struct tag_entry{
     int m_line_type;

@@ -21,6 +21,8 @@
 
 #include "phrase_index.h"
 
+using namespace pinyin;
+
 bool PhraseItem::set_n_pronunciation(guint8 n_prouns){
     m_chunk.set_content(sizeof(guint8), &n_prouns, sizeof(guint8));
     return true;

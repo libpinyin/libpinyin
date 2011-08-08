@@ -294,6 +294,4 @@ class PhraseExactLessThanWithToken
 
 };
 
-using namespace pinyin;
-
 #endif
