@@ -22,7 +22,6 @@
 
 #include "pinyin.h"
 
-typedef MatchResults TokenVector;
 
 void print_help(){
     printf("Usage: eval_correction_rate\n");

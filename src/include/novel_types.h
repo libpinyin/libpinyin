@@ -144,4 +144,8 @@ typedef double parameter_t;
 
 #define LAMBDA_PARAMETER 0.588792
 
+/* Array of phrase_token_t */
+typedef GArray * TokenVector;
+typedef TokenVector MatchResults;
+
 #endif

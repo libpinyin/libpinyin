@@ -15,5 +15,4 @@
 /* training module */
 #include "flexible_ngram.h"
 
-typedef MatchResults TokenVector;
 typedef struct _pinyin_context_t pinyin_context_t;
