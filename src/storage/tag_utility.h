@@ -28,6 +28,8 @@
  * Maybe the optional tag will be added back later.
  */
 
+namespace pinyin{
+
 bool taglib_init();
 
 /* Note: most tags are separated by ',' or ':' . */
@@ -53,17 +55,16 @@ bool taglib_pop_state();
 
 bool taglib_fini();
 
-namespace pinyin{
+
 class PhraseLargeTable;
 class FacadePhraseIndex;
-};
-
-using namespace pinyin;
 
 phrase_token_t taglib_string_to_token(PhraseLargeTable * phrases,
                                       const char * string);
 
 char * taglib_token_to_string(FacadePhraseIndex * phrase_index,
                               phrase_token_t token);
+
+};
 
 #endif

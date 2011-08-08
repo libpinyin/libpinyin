@@ -7,7 +7,7 @@
 #include "phrase_large_table.h"
 #include "tag_utility.h"
 
-using namespace pinyin;
+namespace pinyin{
 
 /* internal taglib structure */
 struct tag_entry{
@@ -390,3 +390,5 @@ char * taglib_token_to_string(FacadePhraseIndex * phrase_index,
     phrase = g_utf16_to_utf8(buffer, length, NULL, NULL, NULL);
     return phrase;
 }
+
+};
