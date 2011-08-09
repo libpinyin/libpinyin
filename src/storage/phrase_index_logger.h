@@ -32,7 +32,7 @@
  *  Logger Record type: add/remove/modify
  *
  *  Add Record:    add/token/len/data chunk
- *  Remove Record: remove/token
+ *  Remove Record: remove/token/len/data chunk
  *  Modify Record: modify/token/old len/new len/old data chunk/new data chunk
  *
  */
@@ -107,8 +107,13 @@ public:
             break;
         }
         case LOG_REMOVE_RECORD:{
-            assert( NULL == oldone);
+            assert( NULL != oldone);
             assert( NULL == newone);
+            size_t len = 0;
+            m_chunk->get_content(offset, &len, sizeof(size_t));
+            offset += sizeof(size_t);
+            oldone->set_content(0, m_chunk->begin() + offset, len);
+            offset += len;
             break;
         }
         case LOG_MODIFY_RECORD:{
@@ -156,8 +161,14 @@ public:
             break;
         }
         case LOG_REMOVE_RECORD:{
-            assert(NULL == oldone);
+            assert(NULL != oldone);
             assert(NULL == newone);
+            /* use oldone chunk */
+            size_t len = oldone->size();
+            chunk.set_content(offset, &len, sizeof(size_t));
+            offset += sizeof(size_t);
+            chunk.set_content(offset, oldone->begin(), oldone->size());
+            offset += oldone->size();
             break;
         }
         case LOG_MODIFY_RECORD:{
