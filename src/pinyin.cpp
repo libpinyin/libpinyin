@@ -16,7 +16,10 @@ struct _pinyin_context_t{
     FacadePhraseIndex * m_phrase_index;
     Bigram * m_system_bigram;
     Bigram * m_user_bigram;
+
     PinyinLookup * m_pinyin_lookup;
+    MatchResults m_match_results;
+    CandidateConstraints m_constraints;
 
     BitmapPinyinValidator * m_validator;
     const char * m_system_dir;
