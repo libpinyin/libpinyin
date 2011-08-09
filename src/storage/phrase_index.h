@@ -28,8 +28,9 @@
 #include "pinyin_base.h"
 #include "pinyin_phrase.h"
 #include "memory_chunk.h"
+#include "phrase_index_logger.h"
 
-/*
+/**
  * Phrase Index File Format
  *
  * Indirect Index: Index by Token

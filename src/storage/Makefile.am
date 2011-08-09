@@ -25,6 +25,7 @@ libpinyininclude_HEADERS= pinyin_large_table.h \
 			  pinyin_base.h \
 		    	  pinyin_phrase.h \
 			  phrase_index.h \
+			  phrase_index_logger.h \
 		    	  pinyin_zhuyin_map_data.h \
 			  phrase_large_table.h \
 			  ngram.h \

@@ -6,6 +6,7 @@
 #include "pinyin_large_table.h"
 #include "phrase_large_table.h"
 #include "phrase_index.h"
+#include "phrase_index_logger.h"
 #include "ngram.h"
 #include "lookup.h"
 #include "pinyin_lookup.h"
