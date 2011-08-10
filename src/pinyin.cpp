@@ -37,7 +37,7 @@ bool pinyin_set_pinyin_keys(pinyin_context_t * context,
 
 
 /* the returned sentence should be freed by g_free(). */
-bool pinyin_get_guessed_setence(pinyin_context_t * context,
+bool pinyin_get_guessed_sentence(pinyin_context_t * context,
                                 char ** sentence);
 
 bool pinyin_parse_one(pinyin_context_t * context,

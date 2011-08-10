@@ -213,6 +213,32 @@ bool FacadePhraseIndex::unload(guint8 phrase_index){
     return true;
 }
 
+bool FacadePhraseIndex::diff(guint8 phrase_index, MemoryChunk * oldchunk,
+                             MemoryChunk * newlog){
+    SubPhraseIndex * & sub_phrases = m_sub_phrase_indices[phrase_index];
+    if ( !sub_phrases )
+        return false;
+
+    SubPhraseIndex old_sub_phrases;
+    old_sub_phrases.load(oldchunk, 0, oldchunk->size());
+    PhraseIndexLogger logger;
+
+    bool retval = sub_phrases->diff(&old_sub_phrases, &logger);
+    logger.store(newlog);
+    return retval;
+}
+
+bool FacadePhraseIndex::merge(guint8 phrase_index, MemoryChunk * log){
+    SubPhraseIndex * & sub_phrases = m_sub_phrase_indices[phrase_index];
+    if ( !sub_phrases )
+        return false;
+
+    PhraseIndexLogger logger;
+    logger.load(log);
+
+    return sub_phrases->merge(&logger);
+}
+
 bool SubPhraseIndex::load(MemoryChunk * chunk, 
 			  table_offset_t offset, table_offset_t end){
     //save the memory chunk

@@ -168,6 +168,10 @@ public:
     bool store(MemoryChunk * new_chunk, 
 	       table_offset_t offset, table_offset_t & end);
 
+    /* switch to logger format to reduce user storage */
+    bool diff(SubPhraseIndex * oldone, PhraseIndexLogger * logger);
+    bool merge(PhraseIndexLogger * logger);
+
     /* get token range in this sub phrase */
     int get_range(/* out */ PhraseIndexRange & range);
     
@@ -183,6 +187,7 @@ public:
      * from m_total_freq
      */
     int remove_phrase_item(phrase_token_t token, /* out */ PhraseItem * & item);
+
 };
 
 class FacadePhraseIndex{
@@ -210,6 +215,12 @@ public:
     bool load(guint8 phrase_index, MemoryChunk * chunk);
     bool store(guint8 phrase_index, MemoryChunk * new_chunk);
     bool unload(guint8 phrase_index);
+
+    /* load/store logger format.
+       the ownership of oldchunk and log is transfered to here. */
+    bool diff(guint8 phrase_index, MemoryChunk * oldchunk,
+              MemoryChunk * newlog);
+    bool merge(guint8 phrase_index, MemoryChunk * log);
 
     /* compat all SubPhraseIndex m_phrase_content memory usage.*/
     bool compat();
@@ -262,6 +273,7 @@ public:
 	m_total_freq -= item->get_unigram_frequency();
 	return result;
     }
+
 };
  
 };
