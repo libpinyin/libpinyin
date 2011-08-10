@@ -296,6 +296,79 @@ bool SubPhraseIndex::store(MemoryChunk * new_chunk,
     return true;
 }
 
+bool SubPhraseIndex::diff(SubPhraseIndex * oldone, PhraseIndexLogger * logger){
+    PhraseIndexRange oldrange, currange, range;
+    oldone->get_range(oldrange); get_range(currange);
+    range.m_range_begin = std_lite::min(oldrange.m_range_begin,
+                                        currange.m_range_begin);
+    range.m_range_end = std_lite::max(oldrange.m_range_end,
+                                     currange.m_range_end);
+    PhraseItem olditem, newitem;
+
+    for (phrase_token_t token = range.m_range_begin;
+         token < range.m_range_end; ++token ){
+        bool oldretval = ERROR_OK == oldone->get_phrase_item(token, olditem);
+        bool newretval = ERROR_OK == get_phrase_item(token, newitem);
+
+        if ( oldretval ){
+            if ( newretval ) { /* compare phrase item. */
+                if ( olditem == newitem )
+                    continue;
+                logger->append_record(LOG_MODIFY_RECORD, token,
+                                      &(olditem.m_chunk), &(newitem.m_chunk));
+            } else { /* remove phrase item. */
+                logger->append_record(LOG_REMOVE_RECORD, token,
+                                      &(olditem.m_chunk), NULL);
+            }
+        } else {
+            if ( newretval ){ /* add phrase item. */
+                logger->append_record(LOG_ADD_RECORD, token,
+                                      NULL, &(newitem.m_chunk));
+            } else { /* both empty. */
+                    /* do nothing. */
+            }
+        }
+    }
+
+    return true;
+}
+
+bool SubPhraseIndex::merge(PhraseIndexLogger * logger){
+    LOG_TYPE log_type; phrase_token_t token;
+    MemoryChunk oldchunk, newchunk;
+    PhraseItem olditem, newitem, * tmpitem;
+
+    while(logger->has_next_record()){
+        logger->next_record(log_type, token, &oldchunk, &newchunk);
+
+        switch(log_type){
+        case LOG_ADD_RECORD:{
+            assert( 0 == oldchunk.size() );
+            newitem.m_chunk.set_chunk(newchunk.begin(), newchunk.size(),
+                                      NULL);
+            add_phrase_item(token, &newitem);
+            break;
+        }
+        case LOG_REMOVE_RECORD:{
+            assert( 0 == newchunk.size() );
+            tmpitem = NULL;
+            remove_phrase_item(token, tmpitem);
+            olditem.m_chunk.set_chunk(oldchunk.begin(), oldchunk.size(),
+                                   NULL);
+            if (olditem != *tmpitem)
+                return false;
+            break;
+        }
+        case LOG_MODIFY_RECORD:{
+            TODO:
+            break;
+        }
+        default:
+            assert(false);
+        }
+    }
+}
+
 bool FacadePhraseIndex::load_text(guint8 phrase_index, FILE * infile){
     SubPhraseIndex * & sub_phrases = m_sub_phrase_indices[phrase_index];
     if ( !sub_phrases ){

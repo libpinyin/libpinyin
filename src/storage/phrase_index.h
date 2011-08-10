@@ -67,10 +67,12 @@ public:
 	memset(m_chunk.begin(), 0, m_chunk.size());
     }
 
-    PhraseItem(MemoryChunk chunk){
-	m_chunk = chunk;
-	assert ( m_chunk.size() >= phrase_item_header);
+#if 0
+    PhraseItem(MemoryChunk & chunk){
+        m_chunk.set_content(0, chunk->begin(), chunk->size());
+        assert ( m_chunk.size() >= phrase_item_header);
     }
+#endif
 
     /* functions */
     guint8 get_phrase_length(){
@@ -134,6 +136,17 @@ public:
      */
     void append_pronunciation(PinyinKey * pinyin, guint32 freq);
     void remove_nth_pronunciation(size_t index);
+
+    bool operator == (PhraseItem & rhs){
+        if (m_chunk.size() != rhs.m_chunk.size())
+            return false;
+        return memcmp(m_chunk.begin(), rhs.m_chunk.begin(),
+                      m_chunk.size()) == 0;
+    }
+
+    bool operator != (PhraseItem & rhs){
+        return ! (*this == rhs);
+    }
 };
 
 /*
