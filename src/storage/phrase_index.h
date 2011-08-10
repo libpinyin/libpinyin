@@ -191,8 +191,10 @@ public:
     /* Zero-gram */
     guint32 get_phrase_index_total_freq();
     int add_unigram_frequency(phrase_token_t token, guint32 delta);
-    /* get_phrase_item function can't modify the phrase item, 
-     * but can increment the freq of the special pronunciation.
+
+    /* get_phrase_item function can't modify the phrase item size,
+     * but can increment the freq of the special pronunciation,
+     * or change the content without size increasing.
      */
     int get_phrase_item(phrase_token_t token, PhraseItem & item);
     int add_phrase_item(phrase_token_t token, PhraseItem * item);

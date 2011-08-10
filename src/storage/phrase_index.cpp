@@ -336,7 +336,7 @@ bool SubPhraseIndex::diff(SubPhraseIndex * oldone, PhraseIndexLogger * logger){
 bool SubPhraseIndex::merge(PhraseIndexLogger * logger){
     LOG_TYPE log_type; phrase_token_t token;
     MemoryChunk oldchunk, newchunk;
-    PhraseItem olditem, newitem, * tmpitem;
+    PhraseItem olditem, newitem, item, * tmpitem;
 
     while(logger->has_next_record()){
         logger->next_record(log_type, token, &oldchunk, &newchunk);
@@ -353,14 +353,39 @@ bool SubPhraseIndex::merge(PhraseIndexLogger * logger){
             assert( 0 == newchunk.size() );
             tmpitem = NULL;
             remove_phrase_item(token, tmpitem);
+
             olditem.m_chunk.set_chunk(oldchunk.begin(), oldchunk.size(),
                                    NULL);
             if (olditem != *tmpitem)
                 return false;
+            delete tmpitem;
+
             break;
         }
         case LOG_MODIFY_RECORD:{
-            TODO:
+            get_phrase_item(token, item);
+            olditem.m_chunk.set_chunk(oldchunk.begin(), oldchunk.size(),
+                                      NULL);
+            newitem.m_chunk.set_chunk(newchunk.begin(), newchunk.size(),
+                                      NULL);
+            if (item != olditem)
+                return false;
+
+            if (newchunk.size() > item.m_chunk.size() ){ /* increase size. */
+                tmpitem = NULL;
+                remove_phrase_item(token, tmpitem);
+                assert(olditem == *tmpitem);
+                add_phrase_item(token, &newitem);
+                delete tmpitem;
+            } else { /* in place editing. */
+                /* newchunk.size() <= item.m_chunk.size() */
+                /* Hack here: we assume the behaviour of get_phrase_item
+                 * point to the actual data positon, so changes to item
+                 * will be saved in SubPhraseIndex immediately.
+                 */
+                memmove(item.m_chunk.begin(), newchunk.begin(),
+                        newchunk.size());
+            }
             break;
         }
         default:
