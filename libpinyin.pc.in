@@ -1,16 +1,16 @@
-prefix=@prefix@
-exec_prefix=@exec_prefix@
-libdir=@libdir@
-includedir=@includedir@
-datadir=@datadir@
-pkgdatadir=@datadir@/libpinyin
+prefix=@DIR_PREFIX@
+exec_prefix=${prefix}
+libdir=@DIR_LIBRARY@
+includedir=@DIR_INCLUDE@
+datadir=@DIR_SHARE@
+pkgdatadir=@DIR_SHARE@/libpinyin
 
-libpinyinincludedir=${includedir}/libpinyin-@LIBPINYIN_BINARY_VERSION@
 libpinyin_binary_version=@LIBPINYIN_BINARY_VERSION@
+libpinyinincludedir=${includedir}/libpinyin-${libpinyin_binary_version}
 
 Name: libpinyin
-Description: Library to deal with pinyin
-Version: @VERSION@
+Description: Library for intelligent conversion from Pinyin to Chinese characters
+Version: @LIBPINYIN_VERSION@
 Requires: glib-2.0
 Libs: -L${libdir} -lpinyin
-Cflags: -L${libpinyinincludedir}
+Cflags: -I${libpinyinincludedir}
