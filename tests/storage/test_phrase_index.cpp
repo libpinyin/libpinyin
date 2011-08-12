@@ -138,7 +138,7 @@ int main(int argc, char * argv[]){
 
     phrase_index_load.get_phrase_item(16777222, item2);
     assert(item2.get_phrase_length() == 1);
-    assert(item2.get_n_pronunciation() == 5);
+    assert(item2.get_n_pronunciation() == 6);
 
     return 0;
 }
