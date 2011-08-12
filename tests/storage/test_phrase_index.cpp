@@ -75,18 +75,18 @@ int main(int argc, char * argv[]){
     print_time(time, bench_times);
 
     {
-    PhraseItem item3;
-    phrase_index.get_phrase_item(1, item3);
-    item3.increase_pinyin_possibility(custom, &key1, 200);
-    assert(item3.get_pinyin_possibility(custom, &key1) == 0.5) ;
+        PhraseItem item3;
+        phrase_index.get_phrase_item(1, item3);
+        item3.increase_pinyin_possibility(custom, &key1, 200);
+        assert(item3.get_pinyin_possibility(custom, &key1) == 0.5) ;
     }
 
     {
-    PhraseItem item5;
-    phrase_index.get_phrase_item(1, item5);
-    gfloat poss = item5.get_pinyin_possibility(custom, &key1);
-    printf("pinyin poss:%f\n", poss);
-    assert(poss == 0.5);
+        PhraseItem item5;
+        phrase_index.get_phrase_item(1, item5);
+        gfloat poss = item5.get_pinyin_possibility(custom, &key1);
+        printf("pinyin poss:%f\n", poss);
+        assert(poss == 0.5);
     }
 
     FacadePhraseIndex phrase_index_load;
