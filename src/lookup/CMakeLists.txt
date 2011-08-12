@@ -14,7 +14,7 @@ set(
 )
 
 add_library(
-    liblookup
+    lookup
     STATIC
     ${LIBLOOKUP_SOURCES}
 )

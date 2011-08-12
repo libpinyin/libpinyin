@@ -23,13 +23,13 @@ set(
 )
 
 add_library(
-    libstorage
+    storage
     STATIC
     ${LIBSTORAGE_SOURCES}
 )
 
 target_link_libraries(
-    libstorage
+    storage
     ${GLIB2_LIBRARIES}
     ${BERKELEY_DB_LIBRARIES}
 )

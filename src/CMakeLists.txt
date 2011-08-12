@@ -16,8 +16,8 @@ add_library(
 
 target_link_libraries(
     libpinyin
-    libstorage
-    liblookup
+    storage
+    lookup
 )
 
 set_target_properties(
