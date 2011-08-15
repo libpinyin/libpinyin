@@ -18,6 +18,8 @@ struct _pinyin_context_t{
     Bigram * m_user_bigram;
 
     PinyinLookup * m_pinyin_lookup;
+    PhraseLookup * m_phrase_lookup;
+    PinyinKeyVector m_pinyins;
     MatchResults m_match_results;
     CandidateConstraints m_constraints;
 
@@ -32,6 +34,7 @@ void pinyin_fini(pinyin_context_t * context);
 /* copy from custom to context->m_custom. */
 bool pinyin_set_options(pinyin_context_t * context,
                         PinyinCustomSettings * custom);
+/* copy from pinyin_keys to m_pinyins. */
 bool pinyin_set_pinyin_keys(pinyin_context_t * context,
                             PinyinKeyVector pinyin_keys);
 
@@ -40,17 +43,24 @@ bool pinyin_set_pinyin_keys(pinyin_context_t * context,
 bool pinyin_get_guessed_sentence(pinyin_context_t * context,
                                 char ** sentence);
 
-bool pinyin_parse_one(pinyin_context_t * context,
-                      const char * onepinyin,
-                      PinyinKey * onekey);
-bool pinyin_parse_more(pinyin_context_t * context,
-                       const char * pinyins,
-                       PinyinKeyVector pinyin_keys);
+bool pinyin_parse_full(pinyin_context_t * context,
+                       const char * onepinyin,
+                       PinyinKey * onekey);
+bool pinyin_parse_more_fulls(pinyin_context_t * context,
+                             const char * pinyins,
+                             PinyinKeyVector pinyin_keys);
+
+bool pinyin_parse_double(pinyin_context_t * context,
+                         const char * onepinyin,
+                         PinyinKey * onekey);
+bool pinyin_parse_more_doubles(pinyin_context_t * context,
+                               const char * pinyins,
+                               PinyinKeyVector pinyin_keys);
 
 bool pinyin_get_candidates(pinyin_context_t * context,
                            size_t offset, TokenVector tokens);
 bool pinyin_choose_candidate(pinyin_context_t * context,
-                             size_t offset, phrase_token_t * token);
+                             size_t offset, phrase_token_t token);
 
 /* the returned word should be freed by g_free. */
 bool pinyin_translate_token(pinyin_context_t * context,
