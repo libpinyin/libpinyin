@@ -22,35 +22,39 @@
 #include <stdio.h>
 #include "pinyin.h"
 
-//increase all unigram frequency by one.
+
+/* increase all unigram frequency by a constant. */
 
 int main(int argc, char * argv[]){
 
     FacadePhraseIndex phrase_index;
     
-    //gb_char binary file
+    /* gb_char binary file */
     MemoryChunk * chunk = new MemoryChunk;
     chunk->load("gb_char.bin");
     phrase_index.load(1, chunk);
     
-    //gbk_char binary file
+    /* gbk_char binary file */
     chunk = new MemoryChunk;
     chunk->load("gbk_char.bin");
     phrase_index.load(2, chunk);
 
-    PhraseIndexRange range;
+    /* Note: please increase the value when corpus size becomes larger.
+     *  To avoid zero value when computing unigram frequency in float format.
+     */
+    guint32 freq = 1; PhraseIndexRange range;
     int result = phrase_index.get_range(1, range);
     if ( result == ERROR_OK ) {
-        for ( size_t i = range.m_range_begin; i <= range.m_range_end; ++i){
-            phrase_index.add_unigram_frequency(i, 1);
+        for ( size_t i = range.m_range_begin; i <= range.m_range_end; ++i ) {
+            phrase_index.add_unigram_frequency(i, freq);
         }
     }
 
-#if 0
-    int result = phrase_index.get_range(2, range);
+#if 1
+    result = phrase_index.get_range(2, range);
     if ( result == ERROR_OK ) {
-        for ( size_t i = range.m_range_begin; i <= range.m_range_end; ++i){
-            phrase_index.add_unigram_frequency(i, 1);
+        for ( size_t i = range.m_range_begin; i <= range.m_range_end; ++i ) {
+            phrase_index.add_unigram_frequency(i, freq);
         }
     }
 #endif
