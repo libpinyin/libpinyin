@@ -325,9 +325,9 @@ bool PinyinLookup::unigram_gen_next_step(int nstep, lookup_value_t * cur_step, p
     if (m_phrase_index->get_phrase_item(token, m_cache_phrase_item))
 	return false;
     size_t phrase_length = m_cache_phrase_item.get_phrase_length();
-    gfloat elem_poss = m_cache_phrase_item.get_unigram_frequency() / (gfloat)
+    gdouble elem_poss = m_cache_phrase_item.get_unigram_frequency() / (gdouble)
 	m_phrase_index->get_phrase_index_total_freq();
-    if ( elem_poss < FLT_EPSILON )
+    if ( elem_poss < DBL_EPSILON )
 	return false;
     gfloat pinyin_poss = m_cache_phrase_item.get_pinyin_possibility(*m_custom, pinyinkeys);
     if (pinyin_poss < FLT_EPSILON )
@@ -345,9 +345,10 @@ bool PinyinLookup::bigram_gen_next_step(int nstep, lookup_value_t * cur_step, ph
     if (m_phrase_index->get_phrase_item(token, m_cache_phrase_item))
 	return false;
     size_t phrase_length = m_cache_phrase_item.get_phrase_length();
-    gfloat unigram_poss = m_cache_phrase_item.get_unigram_frequency() / (gfloat)
-	m_phrase_index->get_phrase_index_total_freq();
-    if ( bigram_poss < FLT_EPSILON && unigram_poss < FLT_EPSILON )
+    gdouble unigram_poss = m_cache_phrase_item.get_unigram_frequency() /
+        (gdouble) m_phrase_index->get_phrase_index_total_freq();
+
+    if ( bigram_poss < FLT_EPSILON && unigram_poss < DBL_EPSILON )
 	return false;
     gfloat pinyin_poss = m_cache_phrase_item.get_pinyin_possibility(*m_custom, pinyinkeys);
     if ( pinyin_poss < FLT_EPSILON )
