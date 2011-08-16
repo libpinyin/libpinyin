@@ -26,6 +26,7 @@
 #ifndef PINYIN_BASE_H
 #define PINYIN_BASE_H
 
+#include <string.h>
 #include <glib.h>
 
 namespace pinyin{
@@ -634,14 +635,14 @@ public:
      *
      * @return the number of chars were actually used.
      */
-    virtual int parse_one_key (const PinyinValidator &validator, PinyinKey &key, const char *str, int len = -1) const = 0;
+    virtual int parse_one_key (const PinyinValidator &validator, PinyinKey &key, const char *str, int len) const = 0;
 
     /**
      * @brief Handy wrapper function of parse_one_key(), which accept a String object instead of char *.
      */
     int parse_one_key (const PinyinValidator &validator, PinyinKey &key, const char * &str) const
     {
-        return parse_one_key (validator, key, str, g_utf8_strlen (str, -1));
+        return parse_one_key (validator, key, str, strlen (str));
     }
 
     /**
@@ -670,7 +671,7 @@ class PinyinDefaultParser : public PinyinParser
 public: 
     virtual ~PinyinDefaultParser ();
 
-    virtual int parse_one_key (const PinyinValidator &validator, PinyinKey &key, const char *str, int len = -1) const;
+    virtual int parse_one_key (const PinyinValidator &validator, PinyinKey &key, const char *str, int len) const;
     virtual int parse (const PinyinValidator &validator, PinyinKeyVector & keys, PinyinKeyPosVector & poses, const char *str, int len = -1) const;
 
 public:
@@ -696,7 +697,7 @@ public:
 
     virtual ~PinyinShuangPinParser ();
 
-    virtual int parse_one_key (const PinyinValidator &validator, PinyinKey &key, const char *str, int len = -1) const;
+    virtual int parse_one_key (const PinyinValidator &validator, PinyinKey &key, const char *str, int len) const;
     virtual int parse (const PinyinValidator &validator, PinyinKeyVector &keys, PinyinKeyPosVector & poses, const char *str, int len = -1) const;
 
 public:
