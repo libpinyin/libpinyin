@@ -52,7 +52,16 @@ bool pinyin_set_pinyin_keys(pinyin_context_t * context,
 
 /* the returned sentence should be freed by g_free(). */
 bool pinyin_get_guessed_sentence(pinyin_context_t * context,
-                                char ** sentence);
+                                 char ** sentence){
+    bool retval = context->m_pinyin_lookup->get_best_match
+        (context->m_pinyin_keys, context->m_constraints,
+         context->m_match_results);
+
+    retval = context->m_pinyin_lookup->convert_to_utf8
+        (context->m_match_results, *sentence) && retval;
+
+    return retval;
+}
 
 bool pinyin_parse_full(pinyin_context_t * context,
                        const char * onepinyin,
@@ -104,9 +113,29 @@ bool pinyin_parse_more_doubles(pinyin_context_t * context,
 
 bool pinyin_get_candidates(pinyin_context_t * context,
                            size_t offset, TokenVector tokens);
+
 bool pinyin_choose_candidate(pinyin_context_t * context,
-                             size_t offset, phrase_token_t token);
-bool pinyin_clear_constraints(pinyin_context_t * context);
+                             size_t offset, phrase_token_t token){
+    bool retval = context->m_pinyin_lookup->add_constraint
+        (context->m_constraints, offset, token);
+
+    retval = context->m_pinyin_lookup->validate_constraint
+        (context->m_constraints, context->m_pinyin_keys) && retval;
+
+    return retval;
+}
+
+bool pinyin_clear_constraints(pinyin_context_t * context){
+    bool retval = true;
+    CandidateConstraints & constraints = context->m_constraints;
+
+    for ( size_t i = 0; i < constraints->len; ++i ) {
+        retval = context->m_pinyin_lookup->clear_constraint
+            (constraints, i) && retval;
+    }
+
+    return retval;
+}
 
 /* the returned word should be freed by g_free. */
 bool pinyin_translate_token(pinyin_context_t * context,
