@@ -29,12 +29,12 @@ int main( int argc, char * argv[]){
     PinyinCustomSettings custom;
     PinyinLargeTable largetable(&custom);
 
-    BitmapPinyinValidator validator;
-    validator.initialize(&largetable); 
-
     MemoryChunk * new_chunk = new MemoryChunk;
     new_chunk->load("../../data/pinyin_index.bin");
     largetable.load(new_chunk);
+
+    BitmapPinyinValidator validator;
+    validator.initialize(&largetable);
     
     FacadePhraseIndex phrase_index;
     new_chunk = new MemoryChunk;
