@@ -456,6 +456,18 @@ bool FacadePhraseIndex::load_text(guint8 phrase_index, FILE * infile){
     return true;
 }
 
+int FacadePhraseIndex::get_sub_phrase_range(guint8 & min_index,
+                                            guint8 & max_index){
+    min_index = PHRASE_INDEX_LIBRARY_COUNT; max_index = 0;
+    for ( guint8 i = 0; i < PHRASE_INDEX_LIBRARY_COUNT; ++i ){
+        if ( m_sub_phrase_indices[i] ) {
+            min_index = std_lite::min(min_index, i);
+            max_index = std_lite::max(max_index, i);
+        }
+    }
+    return ERROR_OK;
+}
+
 int FacadePhraseIndex::get_range(guint8 phrase_index, /* out */ PhraseIndexRange & range){
     SubPhraseIndex * sub_phrase = m_sub_phrase_indices[phrase_index];
     if ( !sub_phrase )

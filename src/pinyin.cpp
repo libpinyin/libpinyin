@@ -39,7 +39,7 @@ pinyin_context_t * pinyin_init(const char * systemdir, const char * userdir){
     context->m_pinyin_table = new PinyinLargeTable(&(context->m_custom));
     MemoryChunk * chunk = new MemoryChunk;
     gchar * filename = g_build_filename
-        (context->m_system_dir, "pinyin_index.bin");
+        (context->m_system_dir, "pinyin_index.bin", NULL);
     chunk->load(filename);
     context->m_pinyin_table->load(chunk);
 
@@ -49,32 +49,32 @@ pinyin_context_t * pinyin_init(const char * systemdir, const char * userdir){
 
     context->m_phrase_table = new PhraseLargeTable;
     chunk = new MemoryChunk;
-    filename = g_build_filename(context->m_system_dir, "phrase_index.bin");
+    filename = g_build_filename(context->m_system_dir, "phrase_index.bin", NULL);
     chunk->load(filename);
     context->m_phrase_table->load(chunk);
 
     context->m_phrase_index = new FacadePhraseIndex;
     MemoryChunk * log = new MemoryChunk; chunk = new MemoryChunk;
-    filename = g_build_filename(context->m_system_dir, "gb_char.bin");
+    filename = g_build_filename(context->m_system_dir, "gb_char.bin", NULL);
     chunk->load(filename);
     context->m_phrase_index->load(1, chunk);
-    filename = g_build_filename(context->m_user_dir, "gb_char.dbin");
+    filename = g_build_filename(context->m_user_dir, "gb_char.dbin", NULL);
     log->load(filename);
     context->m_phrase_index->merge(1, log);
 
     log = new MemoryChunk; chunk = new MemoryChunk;
-    filename = g_build_filename(context->m_system_dir, "gbk_char.bin");
+    filename = g_build_filename(context->m_system_dir, "gbk_char.bin", NULL);
     chunk->load(filename);
     context->m_phrase_index->load(2, chunk);
-    filename = g_build_filename(context->m_user_dir, "gbk_char.dbin");
+    filename = g_build_filename(context->m_user_dir, "gbk_char.dbin", NULL);
     log->load(filename);
     context->m_phrase_index->merge(2, log);
 
     context->m_system_bigram = new Bigram;
-    filename = g_build_filename(context->m_system_dir, "system.db");
+    filename = g_build_filename(context->m_system_dir, "system.db", NULL);
     context->m_system_bigram->attach(filename, ATTACH_READONLY);
     context->m_user_bigram = new Bigram;
-    filename = g_build_filename(context->m_user_dir, "user.db");
+    filename = g_build_filename(context->m_user_dir, "user.db", NULL);
     context->m_user_bigram->attach(filename, ATTACH_CREATE|ATTACH_READWRITE);
 
     context->m_pinyin_lookup = new PinyinLookup
@@ -238,8 +238,11 @@ bool pinyin_get_candidates(pinyin_context_t * context,
     size_t pinyin_len = context->m_pinyin_keys->len - offset;
 
     PhraseIndexRanges ranges;
-    size_t min_index = 1, max_index = 2;
     memset(ranges, 0, sizeof(ranges));
+
+    guint8 min_index, max_index;
+    assert( ERROR_OK == context->m_phrase_index->
+            get_sub_phrase_range(min_index, max_index));
 
     for (size_t m = min_index; m <= max_index; ++m) {
         ranges[m] = g_array_new(FALSE, FALSE, sizeof(PhraseIndexRange));
@@ -249,9 +252,19 @@ bool pinyin_get_candidates(pinyin_context_t * context,
 
     for (ssize_t i = pinyin_len; i >= 1; --i) {
         g_array_set_size(tokens, 0);
+
+        /* clear ranges. */
+        for ( size_t m = min_index; m <= max_index; ++m ) {
+            g_array_set_size(ranges[m], 0);
+        }
+
         /* do pinyin search. */
         int retval = context->m_pinyin_table->search
             (i, pinyin_keys, ranges);
+
+        if ( !(retval & SEARCH_OK) )
+            continue;
+
         /* reduce to a single GArray. */
         for (size_t m = min_index; m <= max_index; ++m) {
             g_array_append_vals(tokens, ranges[m]->data, ranges[m]->len);
@@ -274,6 +287,9 @@ bool pinyin_get_candidates(pinyin_context_t * context,
 
         /* copy out candidates. */
         g_array_append_vals(candidates, tokens->data, tokens->len);
+
+        if ( !(retval & SEARCH_CONTINUED) )
+            break;
     }
 
     g_array_free(tokens, TRUE);
@@ -331,17 +347,21 @@ bool pinyin_save(pinyin_context_t * context){
     MemoryChunk * oldchunk = new MemoryChunk;
     MemoryChunk * newlog = new MemoryChunk;
 
-    gchar * filename = g_build_filename(context->m_system_dir, "gb_char.bin");
+    gchar * filename = g_build_filename(context->m_system_dir,
+                                        "gb_char.bin", NULL);
     oldchunk->load(filename);
     context->m_phrase_index->diff(1, oldchunk, newlog);
-    filename = g_build_filename(context->m_user_dir, "gb_char.dbin");
+    filename = g_build_filename(context->m_user_dir,
+                                "gb_char.dbin", NULL);
     newlog->save(filename);
     delete newlog;
 
     oldchunk = new MemoryChunk; newlog = new MemoryChunk;
-    filename = g_build_filename(context->m_system_dir, "gbk_char.bin");
+    filename = g_build_filename(context->m_system_dir,
+                                "gbk_char.bin", NULL);
     context->m_phrase_index->diff(2, oldchunk, newlog);
-    filename = g_build_filename(context->m_user_dir, "gbk_char.dbin");
+    filename = g_build_filename(context->m_user_dir,
+                                "gbk_char.dbin", NULL);
     newlog->save(filename);
     delete newlog;
 

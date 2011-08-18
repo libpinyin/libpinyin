@@ -237,8 +237,11 @@ public:
               MemoryChunk * newlog);
     bool merge(guint8 phrase_index, MemoryChunk * log);
 
-    /* compat all SubPhraseIndex m_phrase_content memory usage.*/
+    /* compat all SubPhraseIndex m_phrase_content memory usage. */
     bool compat();
+
+    /* get all available sub phrase indices. */
+    int get_sub_phrase_range(guint8 & min_index, guint8 & max_index);
 
     /* get each sub phrase token range with phrase_index added */
     int get_range(guint8 phrase_index, /* out */ PhraseIndexRange & range);
