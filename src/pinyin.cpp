@@ -29,6 +29,7 @@ struct _pinyin_context_t{
     char * m_user_dir;
 };
 
+
 pinyin_context_t * pinyin_init(const char * systemdir, const char * userdir){
     pinyin_context_t * context = new pinyin_context_t;
 
@@ -133,7 +134,7 @@ bool pinyin_set_pinyin_keys(pinyin_context_t * context,
 
     g_array_set_size(context->m_constraints, context->m_pinyin_keys->len);
     for (size_t i = key_len; i < context->m_pinyin_keys->len; ++i ) {
-        lookup_constraint_t * constraint = 
+        lookup_constraint_t * constraint =
             &g_array_index(context->m_constraints, lookup_constraint_t, i);
         constraint->m_type = NO_CONSTRAINT;
     }
@@ -206,8 +207,82 @@ bool pinyin_parse_more_doubles(pinyin_context_t * context,
     return pinyin_len == parse_len;
 }
 
+static gint compare_token( gconstpointer lhs, gconstpointer rhs){
+    phrase_token_t token_lhs = *((phrase_token_t *)lhs);
+    phrase_token_t token_rhs = *((phrase_token_t *)rhs);
+    return token_lhs - token_rhs;
+}
+
+static gint compare_token_with_unigram_freq(gconstpointer lhs,
+                                            gconstpointer rhs,
+                                            gpointer user_data){
+    phrase_token_t token_lhs = *((phrase_token_t *)lhs);
+    phrase_token_t token_rhs = *((phrase_token_t *)rhs);
+    FacadePhraseIndex * phrase_index =
+        (FacadePhraseIndex *)user_data;
+
+    PhraseItem item;
+    phrase_index->get_phrase_item(token_lhs, item);
+    guint32 freq_lhs = item.get_unigram_frequency();
+    phrase_index->get_phrase_item(token_rhs, item);
+    guint32 freq_rhs = item.get_unigram_frequency();
+    return freq_lhs - freq_rhs;
+}
+
 bool pinyin_get_candidates(pinyin_context_t * context,
-                           size_t offset, TokenVector tokens);
+                           size_t offset, TokenVector candidates){
+    g_array_set_size(candidates, 0);
+
+    PinyinKey * pinyin_keys = &g_array_index
+        (context->m_pinyin_keys, PinyinKey, offset);
+    size_t pinyin_len = context->m_pinyin_keys->len - offset;
+
+    PhraseIndexRanges ranges;
+    size_t min_index = 1, max_index = 2;
+    memset(ranges, 0, sizeof(ranges));
+
+    for (size_t m = min_index; m <= max_index; ++m) {
+        ranges[m] = g_array_new(FALSE, FALSE, sizeof(PhraseIndexRange));
+    }
+
+    GArray * tokens = g_array_new(FALSE, FALSE, sizeof(PhraseIndexRange));
+
+    for (ssize_t i = pinyin_len; i >= 1; --i) {
+        g_array_set_size(tokens, 0);
+        /* do pinyin search. */
+        int retval = context->m_pinyin_table->search
+            (i, pinyin_keys, ranges);
+        /* reduce to a single GArray. */
+        for (size_t m = min_index; m <= max_index; ++m) {
+            g_array_append_vals(tokens, ranges[m]->data, ranges[m]->len);
+        }
+
+        g_array_sort(tokens, compare_token);
+        /* remove the duplicated items. */
+        phrase_token_t last_token = null_token;
+        for ( size_t n = 0; n < tokens->len; ++n) {
+            phrase_token_t token = g_array_index(tokens, phrase_token_t, n);
+            if ( last_token == token ){
+                g_array_remove_index(tokens, n);
+            }
+            last_token = token;
+        }
+
+        /* sort the candidates of the same length by uni-gram freqs. */
+        g_array_sort_with_data(tokens, compare_token_with_unigram_freq,
+                               context->m_phrase_index);
+
+        /* copy out candidates. */
+        g_array_append_vals(candidates, tokens->data, tokens->len);
+    }
+
+    g_array_free(tokens, TRUE);
+    for (size_t m = min_index; m <= max_index; ++m) {
+        g_array_free(ranges[m], TRUE);
+    }
+
+    return true;
+}
 
 bool pinyin_choose_candidate(pinyin_context_t * context,
                              size_t offset, phrase_token_t token){
@@ -280,7 +355,9 @@ bool pinyin_reset(pinyin_context_t * context){
     return true;
 }
 
-/** TODO: to be implemented.
+/**
+ *  TODO: to be implemented.
+ *    Note: prefix is the text before the pre-edit string.
  *  bool pinyin_get_guessed_sentence_with_prefix(...);
  *  bool pinyin_get_candidates_with_prefix(...);
  *  For context-dependent order of the candidates list.
