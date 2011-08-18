@@ -1,9 +1,6 @@
 #include "pinyin.h"
 
-/* Place holder for combining static libraries in sub-directories. */
-
 /* Note: will implement a glue layer for input method integration.
- * Refer to: fcitx-sunpinyin
  */
 
 struct _pinyin_context_t{
@@ -144,7 +141,6 @@ bool pinyin_set_pinyin_keys(pinyin_context_t * context,
 
     return true;
 }
-
 
 /* the returned sentence should be freed by g_free(). */
 bool pinyin_get_guessed_sentence(pinyin_context_t * context,
