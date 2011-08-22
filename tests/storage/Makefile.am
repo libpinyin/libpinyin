@@ -24,9 +24,11 @@ INCLUDES                = -I$(top_srcdir)/src \
 noinst_PROGRAMS          = test_parser \
 			   test_pinyin_index \
 			   test_phrase_index \
+			   test_phrase_index_logger \
 			   test_phrase_table \
 			   test_ngram \
 			   test_flexible_ngram
+
 
 test_parser_SOURCES    = test_parser.cpp
 
@@ -39,6 +41,10 @@ test_pinyin_index_LDADD      = ../../src/libpinyin.la @GLIB2_LDFLAGS@
 test_phrase_index_SOURCES = test_phrase_index.cpp
 
 test_phrase_index_LDADD = ../../src/libpinyin.la @GLIB2_LDFLAGS@
+
+test_phrase_index_logger_SOURCES = test_phrase_index_logger.cpp
+
+test_phrase_index_logger_LDADD = ../../src/libpinyin.la @GLIB2_LDFLAGS@
 
 test_phrase_table_SOURCES = test_phrase_table.cpp
 
