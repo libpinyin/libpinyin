@@ -31,6 +31,8 @@
  *  File Format
  *  Logger Record type: add/remove/modify
  *
+ *  Modify Header: header/null token/len/old data chunk/new data chunk
+ *
  *  Add Record:    add/token/len/data chunk
  *  Remove Record: remove/token/len/data chunk
  *  Modify Record: modify/token/old len/new len/old data chunk/new data chunk
@@ -41,8 +43,9 @@ namespace pinyin{
 
 enum LOG_TYPE{
     LOG_ADD_RECORD = 1,
-    LOG_REMOVE_RECORD = 2,
-    LOG_MODIFY_RECORD = 3
+    LOG_REMOVE_RECORD,
+    LOG_MODIFY_RECORD,
+    LOG_MODIFY_HEADER
 };
 
 class PhraseIndexLogger{
@@ -127,6 +130,19 @@ public:
             offset += newlen;
             break;
         }
+        case LOG_MODIFY_HEADER:{
+            assert(token == null_token);
+            size_t len = 0;
+            m_chunk->get_content(offset, &len, sizeof(size_t));
+            offset += sizeof(size_t);
+            oldone->set_content(0, ((char *)m_chunk->begin()) + offset,
+                                len);
+            offset += len;
+            newone->set_content(0, ((char *)m_chunk->begin()) + offset,
+                                len);
+            offset += len;
+            break;
+        }
         default:
             assert(false);
         }
@@ -178,9 +194,24 @@ public:
             chunk.set_content(offset, &newlen, sizeof(size_t));
             offset += sizeof(size_t);
             chunk.set_content(offset, oldone->begin(), oldone->size());
-            offset += oldone->size();
+            offset += oldlen;
             chunk.set_content(offset, newone->begin(), newone->size());
-            offset += newone->size();
+            offset += newlen;
+            break;
+        }
+        case LOG_MODIFY_HEADER:{
+            assert(NULL != oldone);
+            assert(NULL != newone);
+            assert(null_token == token);
+            size_t oldlen = oldone->size();
+            size_t newlen = newone->size();
+            assert(oldlen == newlen);
+            chunk.set_content(offset, &oldlen, sizeof(size_t));
+            offset += sizeof(size_t);
+            chunk.set_content(offset, oldone->begin(), oldone->size());
+            offset += oldlen;
+            chunk.set_content(offset, newone->begin(), newone->size());
+            offset += newlen;
             break;
         }
         default:

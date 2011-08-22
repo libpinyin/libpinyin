@@ -185,7 +185,8 @@ bool FacadePhraseIndex::load(guint8 phrase_index, MemoryChunk * chunk){
     if ( !sub_phrases ){
 	sub_phrases = new SubPhraseIndex;
     }
-    
+
+    m_total_freq -= sub_phrases->get_phrase_index_total_freq();
     bool retval = sub_phrases->load(chunk, 0, chunk->size());
     if ( !retval )
 	return retval;
@@ -233,10 +234,14 @@ bool FacadePhraseIndex::merge(guint8 phrase_index, MemoryChunk * log){
     if ( !sub_phrases )
         return false;
 
+    m_total_freq -= sub_phrases->get_phrase_index_total_freq();
     PhraseIndexLogger logger;
     logger.load(log);
 
-    return sub_phrases->merge(&logger);
+    bool retval = sub_phrases->merge(&logger);
+    m_total_freq += sub_phrases->get_phrase_index_total_freq();
+
+    return retval;
 }
 
 bool SubPhraseIndex::load(MemoryChunk * chunk, 
@@ -297,6 +302,16 @@ bool SubPhraseIndex::store(MemoryChunk * new_chunk,
 }
 
 bool SubPhraseIndex::diff(SubPhraseIndex * oldone, PhraseIndexLogger * logger){
+    /* diff the header */
+    MemoryChunk oldheader, newheader;
+    guint32 total_freq = oldone->get_phrase_index_total_freq();
+    oldheader.set_content(0, &total_freq, sizeof(guint32));
+    total_freq = get_phrase_index_total_freq();
+    newheader.set_content(0, &total_freq, sizeof(guint32));
+    logger->append_record(LOG_MODIFY_HEADER, null_token,
+                          &oldheader, &newheader);
+
+    /* diff phrase items */
     PhraseIndexRange oldrange, currange, range;
     oldone->get_range(oldrange); get_range(currange);
     range.m_range_begin = std_lite::min(oldrange.m_range_begin,
@@ -388,10 +403,23 @@ bool SubPhraseIndex::merge(PhraseIndexLogger * logger){
             }
             break;
         }
+        case LOG_MODIFY_HEADER:{
+            guint32 total_freq = get_phrase_index_total_freq();
+            guint32 tmp_freq = 0;
+            assert(null_token == token);
+            assert(oldchunk.size() == newchunk.size());
+            oldchunk.get_content(0, &tmp_freq, sizeof(guint32));
+            if (total_freq != tmp_freq)
+                return false;
+            newchunk.get_content(0, &tmp_freq, sizeof(guint32));
+            m_total_freq = tmp_freq;
+            break;
+        }
         default:
             assert(false);
         }
     }
+    return true;
 }
 
 bool FacadePhraseIndex::load_text(guint8 phrase_index, FILE * infile){

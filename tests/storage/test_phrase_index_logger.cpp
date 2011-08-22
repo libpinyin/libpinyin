@@ -22,7 +22,46 @@
 #include "pinyin.h"
 
 
+/* TODO: check whether gb_char.bin and gb_char2.bin should be the same. */
+
 int main(int argc, char * argv[]){
-    
+    FacadePhraseIndex phrase_index;
+    MemoryChunk * chunk = new MemoryChunk;
+    chunk->load("../../data/gb_char.bin");
+    phrase_index.load(1, chunk);
+
+    PhraseIndexRange range;
+    phrase_index.get_range(1, range);
+    for (size_t i = range.m_range_begin; i < range.m_range_end; ++i ) {
+        phrase_index.add_unigram_frequency(i, 1);
+    }
+
+    printf("total freq:%d\n", phrase_index.get_phrase_index_total_freq());
+
+    MemoryChunk * new_chunk = new MemoryChunk;
+    phrase_index.store(1, new_chunk);
+    new_chunk->save("/tmp/gb_char.bin");
+    delete new_chunk;
+
+    chunk = new MemoryChunk;
+    chunk->load("../../data/gb_char.bin");
+    new_chunk = new MemoryChunk;
+    phrase_index.diff(1, chunk, new_chunk);
+    new_chunk->save("/tmp/gb_char.dbin");
+    delete new_chunk;
+
+    chunk = new MemoryChunk;
+    chunk->load("../../data/gb_char.bin");
+    phrase_index.load(1, chunk);
+    new_chunk = new MemoryChunk;
+    new_chunk->load("/tmp/gb_char.dbin");
+    phrase_index.merge(1, new_chunk);
+    chunk = new MemoryChunk;
+    phrase_index.store(1, chunk);
+    chunk->save("/tmp/gb_char2.bin");
+    delete chunk;
+
+    printf("total freq:%d\n", phrase_index.get_phrase_index_total_freq());
+
     return 0;
 }
