@@ -119,7 +119,7 @@ public:
       return m_data_end;
     }
 
-    size_t size(){
+    size_t size() const{
 	return m_data_end - m_data_begin;
     }
     

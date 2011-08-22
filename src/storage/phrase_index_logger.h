@@ -98,9 +98,10 @@ public:
         m_chunk->get_content(offset, &token, sizeof(phrase_token_t));
         offset += sizeof(phrase_token_t);
 
+        oldone->set_size(0); newone->set_size(0);
+
         switch(log_type){
         case LOG_ADD_RECORD:{
-            oldone->set_size(0);
             size_t len = 0;
             m_chunk->get_content(offset, &len, sizeof(size_t));
             offset += sizeof(size_t);
@@ -109,7 +110,6 @@ public:
             break;
         }
         case LOG_REMOVE_RECORD:{
-            newone->set_size(0);
             size_t len = 0;
             m_chunk->get_content(offset, &len, sizeof(size_t));
             offset += sizeof(size_t);

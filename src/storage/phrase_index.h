@@ -137,14 +137,14 @@ public:
     void append_pronunciation(PinyinKey * pinyin, guint32 freq);
     void remove_nth_pronunciation(size_t index);
 
-    bool operator == (PhraseItem & rhs){
+    bool operator == (const PhraseItem & rhs) const{
         if (m_chunk.size() != rhs.m_chunk.size())
             return false;
         return memcmp(m_chunk.begin(), rhs.m_chunk.begin(),
                       m_chunk.size()) == 0;
     }
 
-    bool operator != (PhraseItem & rhs){
+    bool operator != (const PhraseItem & rhs) const{
         return ! (*this == rhs);
     }
 };

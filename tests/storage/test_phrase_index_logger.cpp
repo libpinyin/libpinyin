@@ -46,7 +46,7 @@ int main(int argc, char * argv[]){
     chunk = new MemoryChunk;
     chunk->load("../../data/gb_char.bin");
     new_chunk = new MemoryChunk;
-    phrase_index.diff(1, chunk, new_chunk);
+    assert(phrase_index.diff(1, chunk, new_chunk));
     new_chunk->save("/tmp/gb_char.dbin");
     delete new_chunk;
 
@@ -55,7 +55,7 @@ int main(int argc, char * argv[]){
     phrase_index.load(1, chunk);
     new_chunk = new MemoryChunk;
     new_chunk->load("/tmp/gb_char.dbin");
-    phrase_index.merge(1, new_chunk);
+    assert(phrase_index.merge(1, new_chunk));
     chunk = new MemoryChunk;
     phrase_index.store(1, chunk);
     chunk->save("/tmp/gb_char2.bin");
