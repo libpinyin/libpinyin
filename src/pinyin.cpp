@@ -355,6 +355,7 @@ bool pinyin_save(pinyin_context_t * context){
     oldchunk = new MemoryChunk; newlog = new MemoryChunk;
     filename = g_build_filename(context->m_system_dir,
                                 "gbk_char.bin", NULL);
+    oldchunk->load(filename);
     context->m_phrase_index->diff(2, oldchunk, newlog);
     filename = g_build_filename(context->m_user_dir,
                                 "gbk_char.dbin", NULL);

@@ -52,8 +52,8 @@ int main( int argc, char * argv[]){
     PinyinLookup pinyin_lookup(&custom, &largetable, &phrase_index,
                                &system_bigram, &user_bigram);
     
-    char* linebuf = (char *)malloc ( 1024 * sizeof (char) );
-    size_t size = 1024;
+    char* linebuf = NULL;
+    size_t size = 0;
     while( getline(&linebuf, &size, stdin) ){
         linebuf[strlen(linebuf)-1] = '\0';
 	if ( strcmp ( linebuf, "quit" ) == 0)

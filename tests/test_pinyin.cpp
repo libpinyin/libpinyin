@@ -23,5 +23,33 @@
 #include "pinyin.h"
 
 int main(int argc, char * argv[]){
+    pinyin_context_t * context =
+        pinyin_init("../data", "../data");
+
+    PinyinKeyVector pinyin_keys =
+        g_array_new(FALSE, FALSE, sizeof(PinyinKey));
+
+    char* linebuf = NULL;
+    size_t size = 0;
+    while( getline(&linebuf, &size, stdin) ){
+        linebuf[strlen(linebuf)-1] = '\0';
+        if ( strcmp ( linebuf, "quit" ) == 0)
+            break;
+
+        pinyin_parse_more_fulls(context, linebuf, pinyin_keys);
+        pinyin_set_pinyin_keys(context, pinyin_keys);
+        char * sentence = NULL;
+        pinyin_get_guessed_sentence(context, &sentence);
+        printf("%s\n", sentence);
+        g_free(sentence);
+
+        pinyin_train(context);
+        pinyin_reset(context);
+        pinyin_save(context);
+    }
+
+    pinyin_fini(context);
+    g_array_free(pinyin_keys, TRUE);
+    free(linebuf);
     return 0;
 }
