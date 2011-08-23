@@ -23,3 +23,15 @@ MAINTAINERCLEANFILES 	= Makefile.in
 CLEANFILES		= *.bak 
 
 ACLOCAL			= aclocal -I $(ac_aux_dir)
+
+INCLUDES                = -I$(top_srcdir)/src \
+                          -I$(top_srcdir)/src/include \
+                          -I$(top_srcdir)/src/storage \
+                          -I$(top_srcdir)/src/lookup \
+                          @GLIB2_CPPFLAGS@
+
+noinst_PROGRAMS         = test_pinyin
+
+test_pinyin_SOURCES	= test_pinyin.cpp
+
+test_pinyin_LDADD	= ../src/libpinyin.la @GLIB2_LDFLAGS@
