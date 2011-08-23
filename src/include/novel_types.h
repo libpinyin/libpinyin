@@ -42,7 +42,7 @@ typedef gunichar2 utf16_t;
 #define PHRASE_INDEX_LIBRARY_MASK 0x0F000000
 #define PHRASE_INDEX_LIBRARY_COUNT (1<<4)
 #define PHRASE_INDEX_LIBRARY_INDEX(token) ((token&PHRASE_INDEX_LIBRARY_MASK)>>24)
-#define PHRASE_INDEX_MAKE_TOKEN(phrase_index, token) \
+#define PHRASE_INDEX_MAKE_TOKEN(phrase_index, token)                    \
     ( ( (phrase_index<<24) & PHRASE_INDEX_LIBRARY_MASK)|(token & PHRASE_MASK))
 
 
@@ -51,8 +51,8 @@ typedef gunichar2 utf16_t;
  */
 
 struct PhraseIndexRange{
-      phrase_token_t m_range_begin;
-      phrase_token_t m_range_end; /* pass the last item like stl */
+    phrase_token_t m_range_begin;
+    phrase_token_t m_range_end; /* pass the last item like stl */
 };
 
 /*Array of PhraseIndexRange*/
@@ -106,8 +106,8 @@ enum ATTACH_FLAG{
  */
 
 struct BigramPhraseItem{
-  phrase_token_t m_token;
-  gfloat         m_freq; /* P(W2|W1) */
+    phrase_token_t m_token;
+    gfloat         m_freq; /* P(W2|W1) */
 };
 
 struct BigramPhraseItemWithCount{
@@ -125,9 +125,9 @@ typedef GArray * BigramPhraseWithCountArray; /* Array of BigramPhraseItemWithCou
  */
 
 enum AttachOption{
-  ATTACH_NEW_FILE = 1,
-  ATTACH_READ = 2,
-  ATTACH_READ_WRITE = 3
+    ATTACH_NEW_FILE = 1,
+    ATTACH_READ = 2,
+    ATTACH_READ_WRITE = 3
 };
 
 #define MAX_PHRASE_LENGTH 16

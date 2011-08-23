@@ -116,7 +116,7 @@ public:
     }
     
     void* end() const{
-      return m_data_end;
+        return m_data_end;
     }
 
     size_t size() const{
@@ -214,15 +214,15 @@ public:
 	/* free old data */
 	reset();
 
-    size_t file_size;
+        size_t file_size;
 	
 	FILE* file = fopen(filename, "r");
 	if ( !file )
 	    return false;
 
-    fseek(file, 0, SEEK_END);
-    file_size = ftell(file);
-    fseek(file, 0, SEEK_SET);
+        fseek(file, 0, SEEK_END);
+        file_size = ftell(file);
+        fseek(file, 0, SEEK_SET);
 
 	int data_len = file_size;
 	void* data = malloc(data_len);
