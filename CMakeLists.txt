@@ -21,8 +21,8 @@ project (${PACKAGE_NAME} CXX C)
 enable_testing()
 
 ######## Package information
-set (PACKAGE_URL http://http://code.google.com/p/libpinyin)
-set (PACKAGE_BUGREPORT http://code.google.com/p/libpinyin/issues/entry)
+set (PACKAGE_URL https://github.com/libpinyin/libpinyin)
+set (PACKAGE_BUGREPORT https://github.com/libpinyin/libpinyin/issues)
 set (LIBPINYIN_VERSION_MAJOR 0)
 set (LIBPINYIN_VERSION_MINOR 2)
 set (LIBPINYIN_VERSION_REVISION 99)
