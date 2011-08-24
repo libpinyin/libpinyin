@@ -29,8 +29,8 @@
 
 using namespace pinyin;
 
-const gfloat PhraseLookup::bigram_lambda;
-const gfloat PhraseLookup::unigram_lambda;
+const gfloat PhraseLookup::bigram_lambda = LAMBDA_PARAMETER;
+const gfloat PhraseLookup::unigram_lambda = 1 - LAMBDA_PARAMETER;
 
 PhraseLookup::PhraseLookup(PhraseLargeTable * phrase_table,
                            FacadePhraseIndex * phrase_index,

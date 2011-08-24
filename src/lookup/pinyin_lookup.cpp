@@ -34,8 +34,8 @@
 
 using namespace pinyin;
 
-const gfloat PinyinLookup::bigram_lambda;
-const gfloat PinyinLookup::unigram_lambda;
+const gfloat PinyinLookup::bigram_lambda = LAMBDA_PARAMETER;
+const gfloat PinyinLookup::unigram_lambda = 1 - LAMBDA_PARAMETER;
 
 PinyinLookup::PinyinLookup(PinyinCustomSettings * custom,
                            PinyinLargeTable * pinyin_table,

@@ -33,8 +33,8 @@ namespace pinyin{
 
 class PhraseLookup{
 private:
-    static const gfloat bigram_lambda = LAMBDA_PARAMETER;
-    static const gfloat unigram_lambda = 1 - LAMBDA_PARAMETER;
+    static const gfloat bigram_lambda;
+    static const gfloat unigram_lambda;
 
     PhraseItem m_cache_phrase_item;
 protected:
