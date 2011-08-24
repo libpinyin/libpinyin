@@ -31,9 +31,13 @@ int main(int argc, char * argv[]){
 
     char* linebuf = NULL;
     size_t size = 0;
-    while( getline(&linebuf, &size, stdin) ){
-        linebuf[strlen(linebuf)-1] = '\0';
-        if ( strcmp ( linebuf, "quit" ) == 0)
+    ssize_t read;
+    while( (read = getline(&linebuf, &size, stdin)) != -1 ){
+        if ( '\n' == linebuf[strlen(linebuf) - 1] ) {
+            linebuf[strlen(linebuf) - 1] = '\0';
+        }
+
+	if ( strcmp ( linebuf, "quit" ) == 0)
             break;
 
         pinyin_parse_more_fulls(context, linebuf, pinyin_keys);
