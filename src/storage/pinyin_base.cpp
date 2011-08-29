@@ -1068,7 +1068,7 @@ __default_parser_parse_recursive (const PinyinValidator &validator,
                 // A better seq was found.
                 if (remained_len != 0 && (remained_len + first_len) >= (best_remained_len + best_first_len) &&
                     (remained_keys <= best_remained_keys || best_remained_keys == 0)) {
-#if 0
+#if 1
                     if ((remained_len + first_len) > (best_remained_len + best_first_len) ||
                         remained_keys < best_remained_keys ||
                         best_remained_element->key.get_final () == PINYIN_ZeroFinal ||
@@ -1080,7 +1080,7 @@ __default_parser_parse_recursive (const PinyinValidator &validator,
                         best_remained_len = remained_len;
                         best_remained_keys = remained_keys;
                         best_remained_start = remained_start;
-#if 0
+#if 1
                     }
 #endif
                 }

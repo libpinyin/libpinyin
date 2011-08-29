@@ -377,5 +377,7 @@ bool pinyin_reset(pinyin_context_t * context){
  *    Note: prefix is the text before the pre-edit string.
  *  bool pinyin_get_guessed_sentence_with_prefix(...);
  *  bool pinyin_get_candidates_with_prefix(...);
+ *  bool phrase_segment(...);
+ *  bool pinyin_clear_constraint(...);
  *  For context-dependent order of the candidates list.
  */
