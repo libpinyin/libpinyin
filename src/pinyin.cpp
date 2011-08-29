@@ -307,6 +307,15 @@ bool pinyin_choose_candidate(pinyin_context_t * context,
     return retval;
 }
 
+bool pinyin_clear_constraint(pinyin_context_t * context, size_t offset){
+    CandidateConstraints & constraints = context->m_constraints;
+
+    bool retval = context->m_pinyin_lookup->clear_constraint
+        (constraints, offset);
+
+    return retval;
+}
+
 bool pinyin_clear_constraints(pinyin_context_t * context){
     bool retval = true;
     CandidateConstraints & constraints = context->m_constraints;
@@ -315,6 +324,24 @@ bool pinyin_clear_constraints(pinyin_context_t * context){
         retval = context->m_pinyin_lookup->clear_constraint
             (constraints, i) && retval;
     }
+
+    return retval;
+}
+
+bool phrase_segment(pinyin_context_t * context,
+                    const char * sentence,
+                    TokenVector tokens){
+
+    const glong num_of_chars = g_utf8_strlen(sentence, -1);
+    glong utf16_len = 0;
+    utf16_t * utf16 = g_utf8_to_utf16(sentence, -1, NULL, &utf16_len, NULL);
+
+    g_return_val_if_fail(num_of_chars == utf16_len, false);
+
+    bool retval = context->m_phrase_lookup->
+        get_best_match(utf16_len, utf16, tokens);
+
+    g_free(utf16);
 
     return retval;
 }
@@ -377,7 +404,5 @@ bool pinyin_reset(pinyin_context_t * context){
  *    Note: prefix is the text before the pre-edit string.
  *  bool pinyin_get_guessed_sentence_with_prefix(...);
  *  bool pinyin_get_candidates_with_prefix(...);
- *  bool phrase_segment(...);
- *  bool pinyin_clear_constraint(...);
  *  For context-dependent order of the candidates list.
  */

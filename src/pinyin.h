@@ -48,7 +48,12 @@ bool pinyin_get_candidates(pinyin_context_t * context,
 bool pinyin_choose_candidate(pinyin_context_t * context,
                              size_t offset, phrase_token_t token);
 
+bool pinyin_clear_constraint(pinyin_context_t * context,
+                             size_t offset);
 bool pinyin_clear_constraints(pinyin_context_t * context);
+
+bool phrase_segment(pinyin_context_t * context, const char * sentence,
+                    TokenVector tokens);
 bool pinyin_translate_token(pinyin_context_t * context,
                             phrase_token_t token, char ** word);
 
