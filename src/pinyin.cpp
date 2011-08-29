@@ -328,9 +328,9 @@ bool pinyin_clear_constraints(pinyin_context_t * context){
     return retval;
 }
 
-bool phrase_segment(pinyin_context_t * context,
-                    const char * sentence,
-                    TokenVector tokens){
+bool pinyin_phrase_segment(pinyin_context_t * context,
+                           const char * sentence,
+                           TokenVector tokens){
 
     const glong num_of_chars = g_utf8_strlen(sentence, -1);
     glong utf16_len = 0;
