@@ -28,6 +28,7 @@
 
 #include <string.h>
 #include <glib.h>
+#include "pinyin_custom.h"
 
 namespace pinyin{
 
@@ -64,8 +65,6 @@ struct PinyinKeyPos{
 typedef GArray* PinyinKeyVector; /* Array of PinyinKey */
 typedef GArray* PinyinKeyPosVector; /* Array of PinyinKeyPos */
 
-
-struct PinyinCustomSettings;
 
 /**
  * @brief enums of pinyin initial element.
@@ -197,98 +196,6 @@ enum PinyinZhuYinScheme
     ZHUYIN_ET       = 5,
     ZHUYIN_ET26     = 6,
     ZHUYIN_DEFAULT  = ZHUYIN_STANDARD
-};
-
-/**
- * @brief enums of pinyin ambiguities.
- *
- * Some pinyin element maybe confused by somebody,
- * We allow these ambiguities.
- */
-enum PinyinAmbiguity
-{
-    PINYIN_AmbAny= 0,
-    PINYIN_AmbZhiZi,
-    PINYIN_AmbChiCi,
-    PINYIN_AmbShiSi,
-    PINYIN_AmbNeLe,
-    PINYIN_AmbLeRi,
-    PINYIN_AmbFoHe,
-    PINYIN_AmbGeKe,
-    PINYIN_AmbAnAng,
-    PINYIN_AmbEnEng,
-    PINYIN_AmbInIng,
-    PINYIN_AmbLast = PINYIN_AmbInIng
-};
-
-/**
- * @brief Structure to hold pinyin custom settings.
- *
- * user can custom the behavor of libpinyin by these settings.
- */
-struct PinyinCustomSettings
-{
-    bool use_incomplete;
-        /**< allow incomplete pinyin key which only has inital. */
-
-    bool use_ambiguities [PINYIN_AmbLast + 1];
-        /**< allow ambiguous pinyin elements or not. */
-
-    PinyinCustomSettings ();
-
-    void set_use_incomplete (bool use) { use_incomplete = use; }
-    void set_use_ambiguities (PinyinAmbiguity amb, bool use)
-    {
-        if (amb == PINYIN_AmbAny)
-            for (size_t i=0; i<=PINYIN_AmbLast; ++i) use_ambiguities [i] = use;
-        else {
-            use_ambiguities [0] = false;
-		    use_ambiguities [static_cast<size_t>(amb)] = use;
-            for (size_t i=1; i<=PINYIN_AmbLast; ++i)
-                if (use_ambiguities [i]) {
-                    use_ambiguities [0] = true;
-                    break;
-                }
-        }
-    }
-
-    bool operator == (const PinyinCustomSettings &rhs) const
-    {
-        if (use_incomplete != rhs.use_incomplete)
-            return false;
-
-        for (size_t i=0; i <= PINYIN_AmbLast; ++i)
-            if (use_ambiguities [i] != rhs.use_ambiguities [i])
-                return false;
-
-        return true;
-    }
-
-    bool operator != (const PinyinCustomSettings &rhs) const
-    {
-        return !(*this == rhs);
-    }
-
-    guint32 to_value () const
-    {
-        guint32 val = 0;
-
-        if (use_incomplete) val |= 1;
-
-        for (size_t i=0; i <= PINYIN_AmbLast; ++i)
-            if (use_ambiguities [i])
-                val |= (1 << (i+1));
-
-        return val;
-    }
-
-    void from_value (guint32 val)
-    {
-        use_incomplete = ((val & 1) != 0);
-
-        for (size_t i=0; i <= PINYIN_AmbLast; ++i)
-            use_ambiguities [i] = ((val & (1 << (i+1))) != 0);
-    }
 };
 
 /**
