@@ -19,7 +19,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#include "pinyin.h"
+#include "pinyin_internal.h"
 
 
 /* TODO: check whether gb_char.bin and gb_char2.bin should be the same. */

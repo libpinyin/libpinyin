@@ -22,7 +22,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <locale.h>
-#include "pinyin.h"
+#include "pinyin_internal.h"
 
 /* n-gram based sentence segment. */
 

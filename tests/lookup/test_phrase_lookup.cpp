@@ -22,7 +22,7 @@
 
 #include <stdio.h>
 #include <locale.h>
-#include "pinyin.h"
+#include "pinyin_internal.h"
 
 void print_help(){
     printf("Usage: test_phrase_lookup\n");

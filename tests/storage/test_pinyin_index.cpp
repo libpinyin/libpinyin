@@ -1,7 +1,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <sys/time.h>
-#include "pinyin.h"
+#include "pinyin_internal.h"
 
 size_t bench_times = 1000;
 

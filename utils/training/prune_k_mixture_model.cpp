@@ -23,7 +23,7 @@
 
 #include <errno.h>
 #include <locale.h>
-#include "pinyin.h"
+#include "pinyin_internal.h"
 #include "k_mixture_model.h"
 
 static guint32 g_prune_k = 3;

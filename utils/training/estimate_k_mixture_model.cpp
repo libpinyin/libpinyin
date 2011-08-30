@@ -20,7 +20,7 @@
  */
 
 #include <locale.h>
-#include "pinyin.h"
+#include "pinyin_internal.h"
 #include "k_mixture_model.h"
 
 void print_help(){

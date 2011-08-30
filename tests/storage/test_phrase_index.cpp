@@ -2,7 +2,7 @@
 #include <sys/time.h>
 #include <errno.h>
 #include <glib.h>
-#include "pinyin.h"
+#include "pinyin_internal.h"
 
 size_t bench_times = 100000;
 

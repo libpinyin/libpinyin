@@ -25,7 +25,7 @@
 #include <locale.h>
 #include <math.h>
 #include <glib.h>
-#include "pinyin.h"
+#include "pinyin_internal.h"
 
 parameter_t compute_interpolation(SingleGram * deleted_bigram,
 				  FacadePhraseIndex * unigram,

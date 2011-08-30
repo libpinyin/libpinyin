@@ -21,7 +21,7 @@
 
 #include <stdio.h>
 #include <locale.h>
-#include "pinyin.h"
+#include "pinyin_internal.h"
 
 void print_help(){
     printf("Usage: gen_binary_files --table-dir <DIRNAME>\n");

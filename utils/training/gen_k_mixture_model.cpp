@@ -20,9 +20,9 @@
  */
 
 
-#include "pinyin.h"
 #include <glib.h>
 #include <locale.h>
+#include "pinyin_internal.h"
 #include "k_mixture_model.h"
 
 /* Hash token of Hash token of word count. */

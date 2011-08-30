@@ -1,4 +1,4 @@
-#include "pinyin.h"
+#include "pinyin_internal.h"
 
 int main(int argc, char * argv[]) {
     FlexibleSingleGram<guint32, guint32> single_gram;

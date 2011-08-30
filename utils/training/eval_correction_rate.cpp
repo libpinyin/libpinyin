@@ -20,7 +20,7 @@
  */
 
 
-#include "pinyin.h"
+#include "pinyin_internal.h"
 
 
 void print_help(){

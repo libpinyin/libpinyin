@@ -21,7 +21,7 @@
 
 #include <stdio.h>
 #include <glib.h>
-#include "pinyin.h"
+#include "pinyin_internal.h"
 
 enum LINE_TYPE{
     BEGIN_LINE = 1,

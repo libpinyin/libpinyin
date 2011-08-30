@@ -19,10 +19,12 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#include "pinyin.h"
+
 #include <stdio.h>
 #include <assert.h>
 #include <glib.h>
+#include "pinyin_internal.h"
+
 
 /* export interpolation model as textual format */
 

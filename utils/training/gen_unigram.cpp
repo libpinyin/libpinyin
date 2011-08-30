@@ -20,7 +20,7 @@
  */
 
 #include <stdio.h>
-#include "pinyin.h"
+#include "pinyin_internal.h"
 
 
 /* increase all unigram frequency by a constant. */
