@@ -18,6 +18,8 @@
 AUTOMAKE_OPTIONS 	= gnu
 SUBDIRS 		= include storage lookup
 
+EXTRA_DIST		= libpinyin.ver
+
 MAINTAINERCLEANFILES 	= Makefile.in 
 
 CLEANFILES		= *.bak 
@@ -32,18 +34,20 @@ INCLUDES                = -I$(top_srcdir)/src \
 
 libpinyinincludedir	= $(includedir)/libpinyin-@LIBPINYIN_BINARY_VERSION@
 
-libpinyininclude_HEADERS= pinyin.h \
-			  pinyin_internal.h
+libpinyininclude_HEADERS= pinyin.h
 
-lib_LTLIBRARIES		= libpinyin.la \
-			  libpinyin_internal.la
+noinst_HEADERS		= pinyin_internal.h
+
+lib_LTLIBRARIES		= libpinyin.la
+
+noinst_LTLIBRARIES	= libpinyin_internal.la
 
 libpinyin_la_SOURCES	= pinyin.cpp
 
 libpinyin_la_LIBADD	= storage/libstorage.la lookup/liblookup.la
 
-libpinyin_la_LDFLAGS	= -Wl,--version-script=libpinyin.ver \
-				-version-info "0:3:0"
+libpinyin_la_LDFLAGS	= -Wl,--version-script=$(srcdir)/libpinyin.ver \
+			  -version-info "0:3:0"
 
 libpinyin_internal_la_SOURCES	= pinyin_internal.cpp
 

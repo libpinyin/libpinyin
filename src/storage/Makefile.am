@@ -21,8 +21,10 @@ INCLUDES                = -I$(top_srcdir)/src/include \
 
 libpinyinincludedir	= $(includedir)/libpinyin-@LIBPINYIN_BINARY_VERSION@
 
-libpinyininclude_HEADERS= pinyin_large_table.h \
-			  pinyin_base.h \
+libpinyininclude_HEADERS= pinyin_custom.h \
+			  pinyin_base.h
+
+noinst_HEADERS		= pinyin_large_table.h \
 		    	  pinyin_phrase.h \
 			  phrase_index.h \
 			  phrase_index_logger.h \
@@ -31,6 +33,7 @@ libpinyininclude_HEADERS= pinyin_large_table.h \
 			  ngram.h \
 			  flexible_ngram.h \
 			  tag_utility.h
+
 
 noinst_LTLIBRARIES      = libstorage.la
 
