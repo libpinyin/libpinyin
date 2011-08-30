@@ -30,6 +30,8 @@
 #include <limits.h>
 #include <glib.h>
 
+namespace pinyin{
+
 typedef guint32 phrase_token_t;
 typedef gunichar2 utf16_t;
 
@@ -147,5 +149,7 @@ typedef double parameter_t;
 /* Array of phrase_token_t */
 typedef GArray * TokenVector;
 typedef TokenVector MatchResults;
+
+};
 
 #endif

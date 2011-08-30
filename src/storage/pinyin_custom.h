@@ -19,8 +19,13 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 #ifndef PINYIN_CUSTOM_H
 #define PINYIN_CUSTOM_H
+
+
+namespace pinyin{
+
 
 /**
  * @brief enums of pinyin ambiguities.
@@ -112,6 +117,8 @@ struct PinyinCustomSettings
         for (size_t i=0; i <= PINYIN_AmbLast; ++i)
             use_ambiguities [i] = ((val & (1 << (i+1))) != 0);
     }
+};
+
 };
 
 #endif

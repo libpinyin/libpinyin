@@ -27,6 +27,8 @@
 #include <stdlib.h>
 #include "stl_lite.h"
 
+namespace pinyin{
+
 /*  for unmanaged mode
  *  m_free_func == free , when memory is allocated by malloc
  *  m_free_func == NULL,
@@ -253,6 +255,8 @@ public:
 	fclose(file);
 	return true;
     }
+};
+
 };
 
 #endif
