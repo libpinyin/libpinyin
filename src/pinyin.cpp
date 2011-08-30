@@ -1,7 +1,6 @@
 #include "pinyin.h"
 
-/* Note: will implement a glue layer for input method integration.
- */
+/* a glue layer for input method integration. */
 
 struct _pinyin_context_t{
     PinyinCustomSettings m_custom;

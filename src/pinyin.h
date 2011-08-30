@@ -43,6 +43,8 @@
 
 using namespace pinyin;
 
+extern "C" {
+
 typedef struct _pinyin_context_t pinyin_context_t;
 
 pinyin_context_t * pinyin_init(const char * systemdir, const char * userdir);
@@ -86,5 +88,7 @@ bool pinyin_translate_token(pinyin_context_t * context,
 bool pinyin_train(pinyin_context_t * context);
 bool pinyin_save(pinyin_context_t * context);
 bool pinyin_reset(pinyin_context_t * context);
+
+}
 
 #endif
