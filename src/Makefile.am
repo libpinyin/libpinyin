@@ -32,10 +32,16 @@ INCLUDES                = -I$(top_srcdir)/src \
 
 libpinyinincludedir	= $(includedir)/libpinyin-@LIBPINYIN_BINARY_VERSION@
 
-libpinyininclude_HEADERS= pinyin.h
+libpinyininclude_HEADERS= pinyin.h \
+			  pinyin_internal.h
 
-lib_LTLIBRARIES		= libpinyin.la
+lib_LTLIBRARIES		= libpinyin.la \
+			  libpinyin_internal.la
 
 libpinyin_la_SOURCES	= pinyin.cpp
 
 libpinyin_la_LIBADD	= storage/libstorage.la lookup/liblookup.la
+
+libpinyin_internal_la_SOURCES	= pinyin_internal.cpp
+
+libpinyin_internal_la_LIBADD	= storage/libstorage.la lookup/liblookup.la

@@ -1,4 +1,5 @@
 #include "pinyin.h"
+#include "pinyin_internal.h"
 
 /* a glue layer for input method integration. */
 
