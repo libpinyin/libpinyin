@@ -27,8 +27,8 @@ noinst_PROGRAMS		= spseg ngseg
 
 spseg_SOURCES		= spseg.cpp
 
-spseg_LDADD		= @GLIB2_LDFLAGS@ ../../src/libpinyin.la
+spseg_LDADD		= ../../src/libpinyin_internal.la @GLIB2_LDFLAGS@
 
 ngseg_SOURCES		= ngseg.cpp
 
-ngseg_LDADD		= @GLIB2_LDFLAGS@ ../../src/libpinyin.la
+ngseg_LDADD		= ../../src/libpinyin_internal.la @GLIB2_LDFLAGS@

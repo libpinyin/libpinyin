@@ -42,6 +42,9 @@ libpinyin_la_SOURCES	= pinyin.cpp
 
 libpinyin_la_LIBADD	= storage/libstorage.la lookup/liblookup.la
 
+libpinyin_la_LDFLAGS	= -Wl,--version-script=libpinyin.ver \
+				-version-info "0:3:0"
+
 libpinyin_internal_la_SOURCES	= pinyin_internal.cpp
 
 libpinyin_internal_la_LIBADD	= storage/libstorage.la lookup/liblookup.la

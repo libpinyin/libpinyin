@@ -1,0 +1,24 @@
+LIBPINYIN {
+    global:
+        pinyin_choose_candidate;
+        pinyin_clear_constraint;
+        pinyin_clear_constraints;
+        pinyin_fini;
+        pinyin_get_candidates;
+        pinyin_get_guessed_sentence;
+        pinyin_init;
+        pinyin_parse_double;
+        pinyin_parse_more_doubles;
+        pinyin_parse_full;
+        pinyin_parse_more_fulls;
+        pinyin_phrase_segment;
+        pinyin_reset;
+        pinyin_save;
+        pinyin_set_options;
+        pinyin_set_pinyin_keys;
+        pinyin_train;
+        pinyin_translate_token;
+
+    local:
+	*;
+};

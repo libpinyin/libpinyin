@@ -25,16 +25,16 @@ noinst_PROGRAMS          = gen_pinyin_table gen_binary_files export_interpolatio
 
 gen_pinyin_table_SOURCES    = gen_pinyin_table.cpp
 
-gen_pinyin_table_LDADD      = ../../src/libpinyin.la @GLIB2_LDFLAGS@
+gen_pinyin_table_LDADD      = ../../src/libpinyin_internal.la @GLIB2_LDFLAGS@
 
 gen_binary_files_SOURCES    = gen_binary_files.cpp
 
-gen_binary_files_LDADD      = ../../src/libpinyin.la @GLIB2_LDFLAGS@
+gen_binary_files_LDADD      = ../../src/libpinyin_internal.la @GLIB2_LDFLAGS@
 
 import_interpolation_SOURCES = import_interpolation.cpp
 
-import_interpolation_LDADD = ../../src/libpinyin.la @GLIB2_LDFLAGS@
+import_interpolation_LDADD = ../../src/libpinyin_internal.la @GLIB2_LDFLAGS@
 
 export_interpolation_SOURCES = export_interpolation.cpp
 
-export_interpolation_LDADD = ../../src/libpinyin.la @GLIB2_LDFLAGS@
+export_interpolation_LDADD = ../../src/libpinyin_internal.la @GLIB2_LDFLAGS@

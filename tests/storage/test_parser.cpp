@@ -26,7 +26,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "pinyin.h"
+#include "pinyin_internal.h"
 
 static const char *help_msg =
     "Too few argument!\n"
