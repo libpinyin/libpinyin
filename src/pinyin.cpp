@@ -72,7 +72,7 @@ pinyin_context_t * pinyin_init(const char * systemdir, const char * userdir){
     context->m_system_bigram->attach(filename, ATTACH_READONLY);
     context->m_user_bigram = new Bigram;
     filename = g_build_filename(context->m_user_dir, "user.db", NULL);
-    context->m_user_bigram->attach(filename, ATTACH_CREATE|ATTACH_READWRITE);
+    context->m_user_bigram->load_db(filename);
 
     context->m_pinyin_lookup = new PinyinLookup
         ( &(context->m_custom), context->m_pinyin_table,
@@ -388,6 +388,9 @@ bool pinyin_save(pinyin_context_t * context){
                                 "gbk_char.dbin", NULL);
     newlog->save(filename);
     delete newlog;
+
+    filename = g_build_filename(context->m_user_dir, "user.db", NULL);
+    context->m_user_bigram->save_db(filename);
 
     return true;
 }
