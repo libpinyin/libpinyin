@@ -29,7 +29,6 @@
 #include "pinyin_internal.h"
 
 static const char *help_msg =
-    "Too few argument!\n"
     "Usage:\n"
     "  test-parser [options]\n\n"
     "  -i            Use incomplete pinyin.\n"
@@ -50,6 +49,10 @@ static const char *help_msg =
     "                zy-et\n"
     "                zy-et26\n";
 
+void print_help(){
+    printf(help_msg);
+}
+
 int main (int argc, char * argv [])
 {
     NullPinyinValidator validator;
@@ -68,7 +71,7 @@ int main (int argc, char * argv [])
         if (++i >= argc) break;
 
         if ( !strcmp("-h", argv [i]) || !strcmp ("--help", argv [i]) ) {
-            printf(help_msg);
+            print_help ();
             return 0;
         }
 
@@ -96,6 +99,26 @@ int main (int argc, char * argv [])
                 parser = new PinyinShuangPinParser (SHUANG_PIN_ABC);
             else if (!strcmp (argv[i], "sp-liushi"))
                 parser = new PinyinShuangPinParser (SHUANG_PIN_LIUSHI);
+            if (!strcmp (argv[i], "zy") || !strcmp (argv[i], "zy-standard") || !strcmp (argv[i], "zy-default"))
+                parser = new PinyinZhuYinParser ();
+            else if (!strcmp (argv[i], "zy-hsu"))
+                parser = new PinyinZhuYinParser (ZHUYIN_HSU);
+            else if (!strcmp (argv[i], "zy-ibm"))
+                parser = new PinyinZhuYinParser (ZHUYIN_IBM);
+            else if (!strcmp (argv[i], "zy-gin-yieh"))
+                parser = new PinyinZhuYinParser (ZHUYIN_GIN_YIEH);
+            else if (!strcmp (argv[i], "zy-et"))
+                parser = new PinyinZhuYinParser (ZHUYIN_ET);
+            else if (!strcmp (argv[i], "zy-et26"))
+                parser = new PinyinZhuYinParser (ZHUYIN_ET26);
+            else if (!strcmp (argv[i], "zy-zhuyin"))
+                parser = new PinyinZhuYinParser (ZHUYIN_ZHUYIN);
+            else {
+                fprintf(stderr, "Unknown Parser:%s.\n", argv[i]);
+                print_help();
+                exit(EINVAL);
+            }
+
             continue;
         }
 
