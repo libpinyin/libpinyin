@@ -618,6 +618,57 @@ public:
     using PinyinParser::parse;
 };
 
+/**
+ * @brief Class to parse ZhuYin input string
+ *
+ * Several keyboard scheme are supported:
+ * * ZHUYIN_ZHUYIN    Parse original ZhuYin string, such as ㄅㄧㄢ
+ * * ZHUYIN_STANDARD  Standard ZhuYin keyboard, which maps 1 to Bo(ㄅ), q to Po(ㄆ) etc.
+ * * ZHUYIN_HSU       Hsu ZhuYin keyboard, which uses a-z (except q) chars.
+ * * ZHUYIN_IBM       IBM ZhuYin keyboard, which maps 1 to Bo(ㄅ), 2 to Po(ㄆ) etc.
+ * * ZHUYIN_GIN_YIEH  Gin-Yieh ZhuYin keyboard.
+ * * ZHUYIN_ET        Eten (倚天) ZhuYin keyboard.
+ * * ZHUYIN_ET26      Eten (倚天) ZhuYin keyboard, which only uses a-z chars.
+ *
+ * In order to enable upper-level input method to display intermediate inputted string in ZhuYin chars,
+ * ZhuYin parser may return invalid keys, so that PinyinKey::get_key_zhuyin_string() can be called for
+ * each of these keys to get the intermediate inputted ZhuYin string.
+ *
+ * UTF-8 string is used in ZhuYin Parser, because the requirement of supporting original ZhuYin strings.
+ * So that the length of inputted string is calculated in number of utf8 chars instead of bytes.
+ */
+class PinyinZhuYinParser : public PinyinParser
+{
+    PinyinZhuYinScheme m_scheme;
+
+public:
+    /**
+     * Constructor 
+     *
+     * @param scheme the predefined ZhuYIn scheme to be used.
+     */
+    PinyinZhuYinParser (PinyinZhuYinScheme scheme = ZHUYIN_DEFAULT);
+
+    virtual ~PinyinZhuYinParser ();
+
+    virtual int parse_one_key (const PinyinValidator &validator, PinyinKey &key, const char *str, int len = -1) const;
+    virtual int parse (const PinyinValidator &validator, PinyinKeyVector &keys, PinyinKeyPosVector & poses, const char *str, int len = -1) const;
+
+public:
+    void set_scheme (PinyinZhuYinScheme scheme);
+    PinyinZhuYinScheme get_scheme () const;
+
+private:
+    bool get_keys (PinyinKey keys[], gunichar ch) const;
+
+    int pack_keys (PinyinKey &key, const PinyinValidator &validator, const PinyinKey keys[][3]) const;
+
+public:
+    using PinyinParser::parse_one_key;
+    using PinyinParser::parse;
+};
+
+
 int pinyin_compare_initial (const PinyinCustomSettings &custom,
 			    PinyinInitial lhs,
 			    PinyinInitial rhs);
@@ -629,6 +680,7 @@ int pinyin_compare_final (const PinyinCustomSettings &custom,
 int pinyin_compare_tone (const PinyinCustomSettings &custom,
 			 PinyinTone lhs,
 			 PinyinTone rhs);
+
 };
 
 #endif

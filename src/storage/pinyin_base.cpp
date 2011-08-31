@@ -755,7 +755,7 @@ PinyinParser::normalize (PinyinKey &key)
 {
     static const PinyinReplaceRulePair rules [] = 
     {
-#if 0
+#if 1
         {PINYIN_ZeroInitial, PINYIN_I,    PINYIN_Yi, PINYIN_I},
         {PINYIN_ZeroInitial, PINYIN_Ia,   PINYIN_Yi, PINYIN_A},
         {PINYIN_ZeroInitial, PINYIN_Ian,  PINYIN_Yi, PINYIN_An},
@@ -1135,7 +1135,7 @@ PinyinDefaultParser::parse (const PinyinValidator &validator, PinyinKeyVector & 
 
     DefaultParserCache cache = g_array_new (FALSE, TRUE, sizeof (DefaultParserCacheElement));
     g_array_set_size(cache, len);
-    for ( size_t index = 0 ; index < len ; index++){
+    for ( int index = 0 ; index < len ; index++){
 	DefaultParserCacheElement * element =
 	    &g_array_index(cache,DefaultParserCacheElement, index);
 	*element = elm;	
@@ -1350,6 +1350,298 @@ PinyinShuangPinParser::get_scheme (PinyinInitial initial_map[27], PinyinFinal fi
         final_map [i][0] = m_final_map [i][0];
         final_map [i][1] = m_final_map [i][1];
     }
+}
+
+PinyinZhuYinParser::PinyinZhuYinParser (PinyinZhuYinScheme scheme)
+    : m_scheme (scheme)
+{
+}
+
+PinyinZhuYinParser::~PinyinZhuYinParser ()
+{
+}
+
+int
+PinyinZhuYinParser::parse_one_key (const PinyinValidator &validator, PinyinKey &key, const char *str, int len) const
+{
+    PinyinKey candkeys[4][3];
+    gunichar ch;
+
+    if (len < 0) len = g_utf8_strlen (str, -1);
+
+    for (int i= 0; i < 4 && i < len; ++i) {
+        ch = g_utf8_get_char (str);
+        if (!get_keys (candkeys[i], ch))
+            break;
+        str = g_utf8_next_char (str);
+    }
+
+    return pack_keys (key, validator, candkeys);
+}
+
+int
+PinyinZhuYinParser::parse (const PinyinValidator &validator, PinyinKeyVector & keys, PinyinKeyPosVector & poses, const char *str, int len) const
+{
+    g_array_set_size(keys, 0);
+    g_array_set_size(poses, 0);
+
+    if (!str || !len || ! (*str)) return 0;
+
+    int used_len = 0;
+ 
+    PinyinKey key;
+    PinyinKeyPos pos;
+ 
+    if (len < 0) len = g_utf8_strlen (str, -1);
+
+    while (used_len < len) {
+        if (g_utf8_get_char (str) == ' ') {
+            ++used_len;
+            str = g_utf8_next_char (str);
+            continue;
+        }
+
+        int one_len = parse_one_key (validator, key, str, len);
+
+        if (one_len) {
+            pos.set_pos (used_len);
+            pos.set_length (one_len);
+            g_array_append_val (keys, key);
+            g_array_append_val (poses, pos);
+        } else {
+            break;
+        }
+
+        /* utf8 next n chars. */
+        for ( int i = 0; i < one_len; ++i ) {
+            str = g_utf8_next_char (str);
+        }
+        used_len += one_len;
+    }
+
+    return used_len;
+}
+
+void
+PinyinZhuYinParser::set_scheme (PinyinZhuYinScheme scheme)
+{
+    m_scheme = scheme;
+}
+
+PinyinZhuYinScheme
+PinyinZhuYinParser::get_scheme () const
+{
+    return m_scheme;
+}
+
+bool
+PinyinZhuYinParser::get_keys (PinyinKey keys[], gunichar ch) const
+{
+    if (m_scheme == ZHUYIN_ZHUYIN) {
+        if (ch == 0x20 || ch == 0x02C9) keys [0].set_tone (PINYIN_First);
+        else if (ch == 0x02CA) keys [0].set_tone (PINYIN_Second);
+        else if (ch == 0x02C7) keys [0].set_tone (PINYIN_Third);
+        else if (ch == 0x02CB) keys [0].set_tone (PINYIN_Fourth);
+        else if (ch == 0x02D9) keys [0].set_tone (PINYIN_Fifth);
+        else if (ch >= 0x3105 && ch <= 0x3129) {
+            keys[0] = __zhuyin_zhuyin_map[ch - 0x3105][0];
+            keys[1] = __zhuyin_zhuyin_map[ch - 0x3105][1];
+            keys[2] = __zhuyin_zhuyin_map[ch - 0x3105][2];
+        }
+    } else if (ch >= 0x20 && ch <= 0x7D) {
+        keys[0] = __zhuyin_maps[m_scheme][ch - 0x20][0];
+        keys[1] = __zhuyin_maps[m_scheme][ch - 0x20][1];
+        keys[2] = __zhuyin_maps[m_scheme][ch - 0x20][2];
+    } else {
+        keys[0].clear ();
+        keys[1].clear ();
+        keys[2].clear ();
+    }
+
+    return !keys[0].is_empty ();
+}
+
+struct ZhuYinFinalReplaceRulePair
+{
+    PinyinFinal final1;
+    PinyinFinal final2;
+    PinyinFinal new_final;
+};
+
+class ZhuYinFinalReplaceRulePairLessThan
+{
+public:
+    bool operator () (const ZhuYinFinalReplaceRulePair &lhs, const ZhuYinFinalReplaceRulePair &rhs) const {
+        if (lhs.final1 < rhs.final1) return true;
+        if (lhs.final1 > rhs.final1) return false;
+        return lhs.final2 < rhs.final2;
+    }
+};
+
+int
+PinyinZhuYinParser::pack_keys (PinyinKey &key, const PinyinValidator &validator, const PinyinKey keys[][3]) const
+{
+    static const ZhuYinFinalReplaceRulePair final_rules [] =
+    {
+        {PINYIN_I, PINYIN_A,   PINYIN_Ia},
+        {PINYIN_I, PINYIN_An,  PINYIN_Ian},
+        {PINYIN_I, PINYIN_Ang, PINYIN_Iang},
+        {PINYIN_I, PINYIN_Ao,  PINYIN_Iao},
+        {PINYIN_I, PINYIN_Ea,  PINYIN_Ie},
+        {PINYIN_I, PINYIN_En,  PINYIN_In},
+        {PINYIN_I, PINYIN_Eng, PINYIN_Ing},
+        {PINYIN_I, PINYIN_O,   PINYIN_I},
+        {PINYIN_I, PINYIN_Ou,  PINYIN_Iu},
+        {PINYIN_U, PINYIN_A,   PINYIN_Ua},
+        {PINYIN_U, PINYIN_Ai,  PINYIN_Uai},
+        {PINYIN_U, PINYIN_An,  PINYIN_Uan},
+        {PINYIN_U, PINYIN_Ang, PINYIN_Uang},
+        {PINYIN_U, PINYIN_Ei,  PINYIN_Ui},
+        {PINYIN_U, PINYIN_En,  PINYIN_Un},
+        {PINYIN_U, PINYIN_Eng, PINYIN_Ueng},
+        {PINYIN_U, PINYIN_O,   PINYIN_Uo},
+        {PINYIN_V, PINYIN_An,  PINYIN_Van},
+        {PINYIN_V, PINYIN_Ea,  PINYIN_Ve},
+        {PINYIN_V, PINYIN_En,  PINYIN_Vn},
+        {PINYIN_V, PINYIN_Eng, PINYIN_Iong}
+    };
+
+    static const ZhuYinFinalReplaceRulePair *final_rules_start = final_rules;
+    static const ZhuYinFinalReplaceRulePair *final_rules_end   = final_rules + sizeof(final_rules)/sizeof(ZhuYinFinalReplaceRulePair);
+
+    PinyinInitial initial;
+    PinyinFinal   final1;
+    PinyinFinal   final2;
+    PinyinTone    tone;
+
+    PinyinKey     best_key;
+    int           best_used_keys = 0;
+    int           best_score     = -1;
+    bool          best_key_valid = false;
+
+    size_t        num;
+    size_t        size [4];
+    size_t        possibles [4];
+
+    for (num=0; !keys[num][0].is_empty () && num<4; ++num) {
+        for (size[num]=0; !keys[num][size[num]].is_empty () && size[num]<3; ++size[num]);
+
+        possibles[num] = (num > 0 ? possibles[num-1] : 1) * size[num];
+    }
+
+    while (num) {
+        for (size_t i=0; i<possibles[num-1]; ++i) {
+            size_t  n         = i;
+            int     score     = 1;
+            int     used_keys = 0;
+
+            initial = PINYIN_ZeroInitial;
+            final1 = final2 = PINYIN_ZeroFinal;
+            tone = PINYIN_ZeroTone;
+
+            for (size_t t=0; t<num; ++t) {
+                size_t idx = n % size[t];
+                n /= size[t];
+
+                if (keys[t][idx].get_initial () && !initial) {
+                    initial = keys[t][idx].get_initial ();
+                    if (final1) score = 0;
+                } else if (keys[t][idx].get_final () && !(final1 && final2)) {
+                    if (!final1) final1 = keys[t][idx].get_final ();
+                    else if (!final2) final2 = keys[t][idx].get_final ();
+                } else if (keys[t][idx].get_tone () && !tone) {
+                    tone = keys[t][idx].get_tone ();
+                } else {
+                    break;
+                }
+
+                used_keys = t+1;
+
+                // No initial and final allowed after tone key.
+                if (tone) break;
+            }
+
+            // A better candidate has been found.
+            if (best_score > score)
+                continue;
+
+            // Is it possible?
+            if (!initial && !final1 && !final2)
+                continue;
+
+            if (final1 && final2) {
+                if (final2 == PINYIN_I || final2 == PINYIN_U || final2 == PINYIN_V)
+                    std_lite::swap (final1, final2);
+ 
+                // Invalid finals.
+                if (final1 != PINYIN_I && final1 != PINYIN_U && final1 != PINYIN_V)
+                    continue;
+ 
+                // In such case, there must be no initial,
+                // otherwise it's illegal.
+                if (final1 == PINYIN_I && final2 == PINYIN_O) {
+                    if (!initial) {
+                        initial = PINYIN_Yi;
+                        final1 = PINYIN_O;
+                        final2 = PINYIN_ZeroFinal;
+                    } else {
+                        continue;
+                    }
+                } else {
+                    ZhuYinFinalReplaceRulePair fp;
+                    fp.final1 = final1;
+                    fp.final2 = final2;
+ 
+                    const ZhuYinFinalReplaceRulePair *p =
+                        std_lite::lower_bound (final_rules_start, final_rules_end, fp, ZhuYinFinalReplaceRulePairLessThan ());
+ 
+                    // It's invalid that got two finals but they are not in our rules
+                    if (p != final_rules_end && p->final1 == fp.final1 && p->final2 == fp.final2)
+                        final1 = p->new_final;
+                    else
+                        continue; 
+ 
+                    if (final1 == PINYIN_Ueng && initial)
+                        final1 = PINYIN_Ong;
+                }
+            } else if ((initial == PINYIN_Zhi || initial == PINYIN_Chi || initial == PINYIN_Shi ||
+                        initial == PINYIN_Zi  || initial == PINYIN_Ci  || initial == PINYIN_Si  ||
+                        initial == PINYIN_Ri) && !final1) {
+                final1 = PINYIN_I;
+            }
+
+            key.set (initial, final1, tone);
+            PinyinParser::normalize (key);
+
+            bool key_valid;
+            if (best_score < score ||
+                (best_score == score &&
+                 (best_used_keys < used_keys ||
+                  ((key_valid = validator (key)) && !best_key_valid)))) {
+
+                best_key = key;
+                best_used_keys = used_keys;
+                best_score = score;
+                best_key_valid = key_valid;
+
+                // Break loop if a valid key with tone has been found.
+                if (key_valid && final1 && tone) {
+                    num = 0;
+                    break;
+                }
+            }
+        }
+
+        if (num > (size_t)best_used_keys)
+            num = best_used_keys;
+        else
+            break;
+    }
+
+    // CAUTION: The best key maybe not a valid key
+    key = best_key;
+    // pos.set_length (best_used_keys);
+    return best_used_keys;
 }
 
 namespace pinyin{
