@@ -7,6 +7,7 @@
 
 namespace std_lite{
 
+
   /**
    *  @brief This does what you think it does.
    *  @param  a  A thing of arbitrary type.
@@ -48,6 +49,24 @@ namespace std_lite{
       return __a;
     }
 
+
+  /**
+   *  @brief Swaps two values.
+   *  @ingroup mutating_algorithms
+   *  @param  __a  A thing of arbitrary type.
+   *  @param  __b  Another thing of arbitrary type.
+   *  @return   Nothing.
+   */
+  template<typename _Tp>
+    inline void
+      swap(_Tp& __a, _Tp& __b)
+      {
+          _Tp __tmp = __a;
+          __a = __b;
+          __b = __tmp;
+      }
+
+
   /**
    *  This is one of the @link s20_3_1_base functor base classes@endlink.
    */
@@ -60,7 +79,7 @@ namespace std_lite{
       typedef _Arg2 second_argument_type;  ///< the type of the second argument
       typedef _Result result_type;         ///< type of the return type
     };
-  /** @}  */
+
 
   /// pair holds two objects of arbitrary type.
   template<class _T1, class _T2>
