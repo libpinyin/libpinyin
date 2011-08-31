@@ -21,7 +21,15 @@ INCLUDES                = -I$(top_srcdir)/src \
                           -I$(top_srcdir)/src/lookup \
                           @GLIB2_CPPFLAGS@
 
-noinst_PROGRAMS          = gen_pinyin_table gen_binary_files export_interpolation import_interpolation
+noinst_PROGRAMS          = gen_zhuyin_map \
+			   gen_pinyin_table \
+			   gen_binary_files \
+			   export_interpolation \
+			   import_interpolation
+
+gen_zhuyin_map_SOURCES      = gen_zhuyin_map.cpp
+
+gen_zhuyin_map_LDADD        = ../../src/libpinyin_internal.la @GLIB2_LDFLAGS@
 
 gen_pinyin_table_SOURCES    = gen_pinyin_table.cpp
 
