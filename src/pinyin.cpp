@@ -18,11 +18,6 @@ struct _pinyin_context_t{
 
     PinyinLookup * m_pinyin_lookup;
     PhraseLookup * m_phrase_lookup;
-#if 0
-    PinyinKeyVector m_pinyin_keys;
-    MatchResults m_match_results;
-    CandidateConstraints m_constraints;
-#endif
 
     char * m_system_dir;
     char * m_user_dir;
@@ -85,14 +80,6 @@ pinyin_context_t * pinyin_init(const char * systemdir, const char * userdir){
         (context->m_phrase_table, context->m_phrase_index,
          context->m_system_bigram, context->m_user_bigram);
 
-#if 0
-    context->m_pinyin_keys = g_array_new(FALSE, FALSE, sizeof(PinyinKey));
-    context->m_match_results = g_array_new
-        (FALSE, FALSE, sizeof(phrase_token_t));
-    context->m_constraints = g_array_new
-        (FALSE, FALSE, sizeof(lookup_constraint_t));
-#endif
-
     return context;
 }
 
@@ -107,18 +94,38 @@ void pinyin_fini(pinyin_context_t * context){
     delete context->m_pinyin_lookup;
     delete context->m_phrase_lookup;
 
-
-#if 0
-    g_array_free(context->m_pinyin_keys, true);
-    g_array_free(context->m_match_results, true);
-    g_array_free(context->m_constraints, true);
-#endif
-
     g_free(context->m_system_dir);
     g_free(context->m_user_dir);
 
     delete context;
 }
+
+bool pinyin_alloc_auxiliary_arrays(pinyin_context_t * context,
+                                   PinyinKeyVector * pinyin_keys,
+                                   CandidateConstraints * constraints,
+                                   MatchResults * match_results){
+
+    *pinyin_keys = g_array_new(FALSE, FALSE, sizeof(PinyinKey));
+    *constraints = g_array_new(FALSE, FALSE, sizeof(lookup_constraint_t));
+    *match_results = g_array_new(FALSE, FALSE, sizeof(phrase_token_t));
+
+    return true;
+}
+
+bool pinyin_free_auxiliary_arrays(pinyin_context_t * context,
+                                  PinyinKeyVector * pinyin_keys,
+                                  CandidateConstraints * constraints,
+                                  MatchResults * match_results){
+    g_array_free(*pinyin_keys, true);
+    *pinyin_keys = NULL;
+    g_array_free(*constraints, true);
+    *constraints = NULL;
+    g_array_free(*match_results, true);
+    *match_results = NULL;
+
+    return true;
+}
+
 
 /* copy from custom to context->m_custom. */
 bool pinyin_set_options(pinyin_context_t * context,
@@ -415,12 +422,14 @@ bool pinyin_save(pinyin_context_t * context){
     return true;
 }
 
-bool pinyin_reset(pinyin_context_t * context){
-#if 0
-    g_array_set_size(context->m_pinyin_keys, 0);
-    g_array_set_size(context->m_match_results, 0);
-    g_array_set_size(context->m_constraints, 0);
-#endif
+bool pinyin_reset(pinyin_context_t * context,
+                  PinyinKeyVector pinyin_keys,
+                  CandidateConstraints constraints,
+                  MatchResults match_results){
+
+    g_array_set_size(pinyin_keys, 0);
+    g_array_set_size(constraints, 0);
+    g_array_set_size(match_results, 0);
 
     /* TODO: to be implemented. */
     return true;

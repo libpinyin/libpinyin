@@ -19,6 +19,8 @@ LIBPINYIN {
         pinyin_update_constraints;
         pinyin_train;
         pinyin_translate_token;
+        pinyin_alloc_auxiliary_arrays;
+        pinyin_free_auxiliary_arrays;
 
     local:
 	*;

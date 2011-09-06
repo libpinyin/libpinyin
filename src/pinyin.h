@@ -37,6 +37,15 @@ typedef struct _pinyin_context_t pinyin_context_t;
 pinyin_context_t * pinyin_init(const char * systemdir, const char * userdir);
 void pinyin_fini(pinyin_context_t * context);
 
+bool pinyin_alloc_auxiliary_arrays(pinyin_context_t * context,
+                                   PinyinKeyVector * pinyin_keys,
+                                   CandidateConstraints * constraints,
+                                   MatchResults * match_results);
+bool pinyin_free_auxiliary_arrays(pinyin_context_t * context,
+                                  PinyinKeyVector * pinyin_keys,
+                                  CandidateConstraints * constraints,
+                                  MatchResults * match_results);
+
 bool pinyin_set_options(pinyin_context_t * context,
                         PinyinCustomSettings * custom);
 
@@ -94,7 +103,10 @@ bool pinyin_train(pinyin_context_t * context,
                   CandidateConstraints constraints,
                   MatchResults match_results);
 bool pinyin_save(pinyin_context_t * context);
-bool pinyin_reset(pinyin_context_t * context);
+bool pinyin_reset(pinyin_context_t * context,
+                  PinyinKeyVector pinyin_keys,
+                  CandidateConstraints constraints,
+                  MatchResults match_results);
 
 }
 

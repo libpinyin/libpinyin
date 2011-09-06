@@ -27,8 +27,12 @@ int main(int argc, char * argv[]){
     pinyin_context_t * context =
         pinyin_init("../data", "../data");
 
-    PinyinKeyVector pinyin_keys =
-        g_array_new(FALSE, FALSE, sizeof(PinyinKey));
+    PinyinKeyVector pinyin_keys = NULL;
+    CandidateConstraints constraints = NULL;
+    MatchResults match_results = NULL;
+
+    pinyin_alloc_auxiliary_arrays
+        (context, &pinyin_keys, &constraints, &match_results);
 
     char* linebuf = NULL;
     size_t size = 0;
@@ -42,17 +46,20 @@ int main(int argc, char * argv[]){
             break;
 
         pinyin_parse_more_fulls(context, linebuf, pinyin_keys);
-        pinyin_set_pinyin_keys(context, pinyin_keys);
         char * sentence = NULL;
-        pinyin_get_guessed_sentence(context, &sentence);
+        pinyin_get_guessed_tokens(context, pinyin_keys, constraints,
+                                  match_results);
+        pinyin_get_sentence (context, match_results, &sentence);
         printf("%s\n", sentence);
         g_free(sentence);
 
-        pinyin_train(context);
-        pinyin_reset(context);
+        pinyin_train(context, pinyin_keys, constraints, match_results);
+        pinyin_reset(context, pinyin_keys, constraints, match_results);
         pinyin_save(context);
     }
 
+    pinyin_free_auxiliary_arrays
+        (context, &pinyin_keys, &constraints, &match_results);
     pinyin_fini(context);
     g_array_free(pinyin_keys, TRUE);
     free(linebuf);

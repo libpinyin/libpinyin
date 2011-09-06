@@ -56,8 +56,6 @@ int main(int argc, char * argv[]){
         }
         printf("\n");
 
-        pinyin_train(context);
-        pinyin_reset(context);
         pinyin_save(context);
     }
 
