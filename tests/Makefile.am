@@ -31,7 +31,8 @@ INCLUDES                = -I$(top_srcdir)/src \
                           @GLIB2_CPPFLAGS@
 
 noinst_PROGRAMS         = test_pinyin \
-			  test_phrase
+			  test_phrase \
+			  test_chewing
 
 test_pinyin_SOURCES	= test_pinyin.cpp
 
@@ -40,3 +41,7 @@ test_pinyin_LDADD	= ../src/libpinyin.la @GLIB2_LDFLAGS@
 test_phrase_SOURCES	= test_phrase.cpp
 
 test_phrase_LDADD	= ../src/libpinyin.la @GLIB2_LDFLAGS@
+
+test_chewing_SOURCES	= test_chewing.cpp
+
+test_chewing_LDADD	= ../src/libpinyin.la @GLIB2_LDFLAGS@

@@ -9,6 +9,7 @@ struct _pinyin_context_t{
     BitmapPinyinValidator m_validator;
     PinyinDefaultParser * m_default_parser;
     PinyinShuangPinParser * m_shuang_pin_parser;
+    PinyinZhuYinParser * m_chewing_parser;
 
     PinyinLargeTable * m_pinyin_table;
     PhraseLargeTable * m_phrase_table;
@@ -40,6 +41,7 @@ pinyin_context_t * pinyin_init(const char * systemdir, const char * userdir){
     context->m_validator.initialize(context->m_pinyin_table);
     context->m_default_parser = new PinyinDefaultParser;
     context->m_shuang_pin_parser = new PinyinShuangPinParser;
+    context->m_chewing_parser = new PinyinZhuYinParser;
 
     context->m_phrase_table = new PhraseLargeTable;
     chunk = new MemoryChunk;
@@ -86,6 +88,7 @@ pinyin_context_t * pinyin_init(const char * systemdir, const char * userdir){
 void pinyin_fini(pinyin_context_t * context){
     delete context->m_default_parser;
     delete context->m_shuang_pin_parser;
+    delete context->m_chewing_parser;
     delete context->m_pinyin_table;
     delete context->m_phrase_table;
     delete context->m_phrase_index;
@@ -222,6 +225,31 @@ bool pinyin_parse_more_doubles(pinyin_context_t * context,
     g_array_free(poses, TRUE);
     return pinyin_len == parse_len;
 }
+
+bool pinyin_parse_chewing(pinyin_context_t * context,
+                          const char * onechewing,
+                          PinyinKey * onekey){
+    int chewing_len = strlen(onechewing);
+    int parse_len = context->m_chewing_parser->parse_one_key
+        ( context->m_validator, *onekey, onechewing, chewing_len );
+    return chewing_len == parse_len;
+}
+
+bool pinyin_parse_more_chewing(pinyin_context_t * context,
+                               const char * chewings,
+                               PinyinKeyVector * pinyin_keys){
+    int chewing_len = strlen(chewings);
+    PinyinKeyPosVector poses;
+    poses = g_array_new(FALSE, FALSE, sizeof(PinyinKeyPos));
+
+    int parse_len = context->m_chewing_parser->parse
+        ( context->m_validator, pinyin_keys,
+          poses, chewings, chewing_len);
+
+    g_array_free(poses, TRUE);
+    return pinyin_len == parse_len;
+}
+
 
 static gint compare_token( gconstpointer lhs, gconstpointer rhs){
     phrase_token_t token_lhs = *((phrase_token_t *)lhs);

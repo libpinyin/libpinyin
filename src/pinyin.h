@@ -72,8 +72,14 @@ bool pinyin_parse_double(pinyin_context_t * context,
                          const char * onepinyin,
                          PinyinKey * onekey);
 bool pinyin_parse_more_doubles(pinyin_context_t * context,
-                               const char * onepinyin,
+                               const char * pinyins,
                                PinyinKeyVector pinyin_keys);
+bool pinyin_parse_chewing(pinyin_context_t * context,
+                          const char * onechewing,
+                          PinyinKey * onekey);
+bool pinyin_parse_more_chewing(pinyin_context_t * context,
+                               const char * chewings,
+                               PinyinKeyVector * pinyin_keys);
 
 bool pinyin_get_candidates(pinyin_context_t * context,
                            size_t offset,
