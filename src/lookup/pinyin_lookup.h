@@ -63,7 +63,6 @@ struct lookup_constraint_t{
     };
 };
 
-typedef GArray * CandidateConstraints; /* Array of lookup_constraint_t */
 
 /* Note:
  *   winner tree for beam search.

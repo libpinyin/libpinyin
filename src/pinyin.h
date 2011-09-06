@@ -39,11 +39,20 @@ void pinyin_fini(pinyin_context_t * context);
 
 bool pinyin_set_options(pinyin_context_t * context,
                         PinyinCustomSettings * custom);
-bool pinyin_set_pinyin_keys(pinyin_context_t * context,
-                            PinyinKeyVector pinyin_keys);
 
-bool pinyin_get_guessed_sentence(pinyin_context_t * context,
-                                 char ** sentence);
+bool pinyin_update_constraints(pinyin_context_t * context,
+                               PinyinKeyVector pinyin_keys,
+                               CandidateConstraints constraints);
+
+bool pinyin_get_guessed_tokens(pinyin_context_t * context,
+                               PinyinKeyVector pinyin_keys,
+                               CandidateConstraints constraints,
+                               MatchResults match_results);
+
+bool pinyin_get_sentence(pinyin_context_t * context,
+                         MatchResults match_results,
+                         char ** sentence);
+
 bool pinyin_parse_full(pinyin_context_t * context,
                        const char * onepinyin,
                        PinyinKey * onekey);
@@ -58,13 +67,21 @@ bool pinyin_parse_more_doubles(pinyin_context_t * context,
                                PinyinKeyVector pinyin_keys);
 
 bool pinyin_get_candidates(pinyin_context_t * context,
-                           size_t offset, TokenVector candidates);
+                           size_t offset,
+                           PinyinKeyVector pinyin_keys,
+                           TokenVector candidates);
+
 bool pinyin_choose_candidate(pinyin_context_t * context,
-                             size_t offset, phrase_token_t token);
+                             size_t offset,
+                             PinyinKeyVector pinyin_keys,
+                             CandidateConstraints constraints,
+                             phrase_token_t token);
 
 bool pinyin_clear_constraint(pinyin_context_t * context,
-                             size_t offset);
-bool pinyin_clear_constraints(pinyin_context_t * context);
+                             size_t offset,
+                             CandidateConstraints constraints);
+bool pinyin_clear_constraints(pinyin_context_t * context,
+                              CandidateConstraints constraints);
 
 bool pinyin_phrase_segment(pinyin_context_t * context,
                            const char * sentence,
@@ -72,7 +89,10 @@ bool pinyin_phrase_segment(pinyin_context_t * context,
 bool pinyin_translate_token(pinyin_context_t * context,
                             phrase_token_t token, char ** word);
 
-bool pinyin_train(pinyin_context_t * context);
+bool pinyin_train(pinyin_context_t * context,
+                  PinyinKeyVector pinyin_keys,
+                  CandidateConstraints constraints,
+                  MatchResults match_results);
 bool pinyin_save(pinyin_context_t * context);
 bool pinyin_reset(pinyin_context_t * context);
 

@@ -150,6 +150,9 @@ typedef double parameter_t;
 typedef GArray * TokenVector;
 typedef TokenVector MatchResults;
 
+/* Array of lookup_constraint_t */
+typedef GArray * CandidateConstraints;
+
 };
 
 #endif
