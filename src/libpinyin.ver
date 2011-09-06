@@ -5,7 +5,8 @@ LIBPINYIN {
         pinyin_clear_constraints;
         pinyin_fini;
         pinyin_get_candidates;
-        pinyin_get_guessed_sentence;
+        pinyin_get_guessed_tokens;
+        pinyin_get_sentence;
         pinyin_init;
         pinyin_parse_double;
         pinyin_parse_more_doubles;
@@ -15,7 +16,7 @@ LIBPINYIN {
         pinyin_reset;
         pinyin_save;
         pinyin_set_options;
-        pinyin_set_pinyin_keys;
+        pinyin_update_constraints;
         pinyin_train;
         pinyin_translate_token;
 
