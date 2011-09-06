@@ -28,11 +28,12 @@ int main(int argc, char * argv[]){
         pinyin_init("../data", "../data");
 
     PinyinKeyVector pinyin_keys = NULL;
+    PinyinKeyPosVector pinyin_poses = NULL;
     CandidateConstraints constraints = NULL;
     MatchResults match_results = NULL;
 
     pinyin_alloc_auxiliary_arrays
-        (context, &pinyin_keys, &constraints, &match_results);
+        (context, &pinyin_keys, &pinyin_poses, &constraints, &match_results);
 
     char* linebuf = NULL;
     size_t size = 0;
@@ -45,7 +46,7 @@ int main(int argc, char * argv[]){
 	if ( strcmp ( linebuf, "quit" ) == 0)
             break;
 
-        pinyin_parse_more_fulls(context, linebuf, pinyin_keys);
+        pinyin_parse_more_fulls(context, linebuf, pinyin_keys, pinyin_poses);
         pinyin_update_constraints(context, pinyin_keys, constraints);
         pinyin_get_guessed_tokens(context, pinyin_keys, constraints,
                                   match_results);
@@ -61,7 +62,7 @@ int main(int argc, char * argv[]){
     }
 
     pinyin_free_auxiliary_arrays
-        (context, &pinyin_keys, &constraints, &match_results);
+        (context, &pinyin_keys, &pinyin_poses, &constraints, &match_results);
     pinyin_fini(context);
     free(linebuf);
     return 0;
