@@ -46,9 +46,11 @@ int main(int argc, char * argv[]){
             break;
 
         pinyin_parse_more_fulls(context, linebuf, pinyin_keys);
-        char * sentence = NULL;
+        pinyin_update_constraints(context, pinyin_keys, constraints);
         pinyin_get_guessed_tokens(context, pinyin_keys, constraints,
                                   match_results);
+
+        char * sentence = NULL;
         pinyin_get_sentence (context, match_results, &sentence);
         printf("%s\n", sentence);
         g_free(sentence);
@@ -61,7 +63,6 @@ int main(int argc, char * argv[]){
     pinyin_free_auxiliary_arrays
         (context, &pinyin_keys, &constraints, &match_results);
     pinyin_fini(context);
-    g_array_free(pinyin_keys, TRUE);
     free(linebuf);
     return 0;
 }

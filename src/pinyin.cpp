@@ -116,11 +116,11 @@ bool pinyin_free_auxiliary_arrays(pinyin_context_t * context,
                                   PinyinKeyVector * pinyin_keys,
                                   CandidateConstraints * constraints,
                                   MatchResults * match_results){
-    g_array_free(*pinyin_keys, true);
+    g_array_free(*pinyin_keys, TRUE);
     *pinyin_keys = NULL;
-    g_array_free(*constraints, true);
+    g_array_free(*constraints, TRUE);
     *constraints = NULL;
-    g_array_free(*match_results, true);
+    g_array_free(*match_results, TRUE);
     *match_results = NULL;
 
     return true;
@@ -135,11 +135,11 @@ bool pinyin_set_options(pinyin_context_t * context,
     return true;
 }
 
-/* copy from pinyin_keys to m_pinyin_keys. */
+
 bool pinyin_update_constraints(pinyin_context_t * context,
                                PinyinKeyVector pinyin_keys,
                                CandidateConstraints constraints){
-    size_t key_len = pinyin_keys->len;
+    size_t key_len = constraints->len;
     g_array_set_size(constraints, pinyin_keys->len);
     for (size_t i = key_len; i < pinyin_keys->len; ++i ) {
         lookup_constraint_t * constraint =
