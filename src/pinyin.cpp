@@ -105,10 +105,12 @@ void pinyin_fini(pinyin_context_t * context){
 
 bool pinyin_alloc_auxiliary_arrays(pinyin_context_t * context,
                                    PinyinKeyVector * pinyin_keys,
+                                   PinyinKeyPosVector * pinyin_poses,
                                    CandidateConstraints * constraints,
                                    MatchResults * match_results){
 
     *pinyin_keys = g_array_new(FALSE, FALSE, sizeof(PinyinKey));
+    *pinyin_poses = g_array_new(FALSE, FALSE, sizeof(PinyinKeyPos));
     *constraints = g_array_new(FALSE, FALSE, sizeof(lookup_constraint_t));
     *match_results = g_array_new(FALSE, FALSE, sizeof(phrase_token_t));
 
@@ -117,10 +119,13 @@ bool pinyin_alloc_auxiliary_arrays(pinyin_context_t * context,
 
 bool pinyin_free_auxiliary_arrays(pinyin_context_t * context,
                                   PinyinKeyVector * pinyin_keys,
+                                  PinyinKeyPosVector * pinyin_poses,
                                   CandidateConstraints * constraints,
                                   MatchResults * match_results){
     g_array_free(*pinyin_keys, TRUE);
     *pinyin_keys = NULL;
+    g_array_free(*pinyin_poses, TRUE);
+    *pinyin_poses = NULL;
     g_array_free(*constraints, TRUE);
     *constraints = NULL;
     g_array_free(*match_results, TRUE);
@@ -189,16 +194,14 @@ bool pinyin_parse_full(pinyin_context_t * context,
 
 bool pinyin_parse_more_fulls(pinyin_context_t * context,
                              const char * pinyins,
-                             PinyinKeyVector pinyin_keys){
+                             PinyinKeyVector pinyin_keys,
+                             PinyinKeyPosVector pinyin_poses){
     int pinyin_len = strlen(pinyins);
-    PinyinKeyPosVector poses;
-    poses = g_array_new(FALSE, FALSE, sizeof(PinyinKeyPos));
 
     int parse_len = context->m_default_parser->parse
         ( context->m_validator, pinyin_keys,
-          poses, pinyins, pinyin_len);
+          pinyin_poses, pinyins, pinyin_len);
 
-    g_array_free(poses, TRUE);
     return pinyin_len == parse_len;
 }
 
@@ -213,16 +216,14 @@ bool pinyin_parse_double(pinyin_context_t * context,
 
 bool pinyin_parse_more_doubles(pinyin_context_t * context,
                                const char * pinyins,
-                               PinyinKeyVector pinyin_keys){
+                               PinyinKeyVector pinyin_keys,
+                               PinyinKeyPosVector pinyin_poses){
     int pinyin_len = strlen(pinyins);
-    PinyinKeyPosVector poses;
-    poses = g_array_new(FALSE, FALSE, sizeof(PinyinKeyPos));
 
     int parse_len = context->m_shuang_pin_parser->parse
         ( context->m_validator, pinyin_keys,
-          poses, pinyins, pinyin_len);
+          pinyin_poses, pinyins, pinyin_len);
 
-    g_array_free(poses, TRUE);
     return pinyin_len == parse_len;
 }
 
@@ -237,16 +238,14 @@ bool pinyin_parse_chewing(pinyin_context_t * context,
 
 bool pinyin_parse_more_chewings(pinyin_context_t * context,
                                 const char * chewings,
-                                PinyinKeyVector pinyin_keys){
+                                PinyinKeyVector pinyin_keys,
+                                PinyinKeyPosVector pinyin_poses){
     int chewing_len = strlen(chewings);
-    PinyinKeyPosVector poses;
-    poses = g_array_new(FALSE, FALSE, sizeof(PinyinKeyPos));
 
     int parse_len = context->m_chewing_parser->parse
         ( context->m_validator, pinyin_keys,
-          poses, chewings, chewing_len);
+          pinyin_poses, chewings, chewing_len);
 
-    g_array_free(poses, TRUE);
     return chewing_len == parse_len;
 }
 

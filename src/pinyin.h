@@ -39,10 +39,12 @@ void pinyin_fini(pinyin_context_t * context);
 
 bool pinyin_alloc_auxiliary_arrays(pinyin_context_t * context,
                                    PinyinKeyVector * pinyin_keys,
+                                   PinyinKeyPosVector * pinyin_poses,
                                    CandidateConstraints * constraints,
                                    MatchResults * match_results);
 bool pinyin_free_auxiliary_arrays(pinyin_context_t * context,
                                   PinyinKeyVector * pinyin_keys,
+                                  PinyinKeyPosVector * pinyin_poses,
                                   CandidateConstraints * constraints,
                                   MatchResults * match_results);
 
@@ -67,19 +69,22 @@ bool pinyin_parse_full(pinyin_context_t * context,
                        PinyinKey * onekey);
 bool pinyin_parse_more_fulls(pinyin_context_t * context,
                              const char * pinyins,
-                             PinyinKeyVector pinyin_keys);
+                             PinyinKeyVector pinyin_keys,
+                             PinyinKeyPosVector pinyin_poses);
 bool pinyin_parse_double(pinyin_context_t * context,
                          const char * onepinyin,
                          PinyinKey * onekey);
 bool pinyin_parse_more_doubles(pinyin_context_t * context,
                                const char * pinyins,
-                               PinyinKeyVector pinyin_keys);
+                               PinyinKeyVector pinyin_keys,
+                               PinyinKeyPosVector pinyin_poses);
 bool pinyin_parse_chewing(pinyin_context_t * context,
                           const char * onechewing,
                           PinyinKey * onekey);
 bool pinyin_parse_more_chewings(pinyin_context_t * context,
                                 const char * chewings,
-                                PinyinKeyVector pinyin_keys);
+                                PinyinKeyVector pinyin_keys,
+                                PinyinKeyPosVector pinyin_poses);
 
 bool pinyin_get_candidates(pinyin_context_t * context,
                            size_t offset,
