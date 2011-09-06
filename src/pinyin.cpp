@@ -235,9 +235,9 @@ bool pinyin_parse_chewing(pinyin_context_t * context,
     return chewing_len == parse_len;
 }
 
-bool pinyin_parse_more_chewing(pinyin_context_t * context,
-                               const char * chewings,
-                               PinyinKeyVector * pinyin_keys){
+bool pinyin_parse_more_chewings(pinyin_context_t * context,
+                                const char * chewings,
+                                PinyinKeyVector pinyin_keys){
     int chewing_len = strlen(chewings);
     PinyinKeyPosVector poses;
     poses = g_array_new(FALSE, FALSE, sizeof(PinyinKeyPos));
@@ -247,7 +247,7 @@ bool pinyin_parse_more_chewing(pinyin_context_t * context,
           poses, chewings, chewing_len);
 
     g_array_free(poses, TRUE);
-    return pinyin_len == parse_len;
+    return chewing_len == parse_len;
 }
 
 
