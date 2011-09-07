@@ -102,27 +102,27 @@ public:
 
         switch(log_type){
         case LOG_ADD_RECORD:{
-            size_t len = 0;
-            m_chunk->get_content(offset, &len, sizeof(size_t));
-            offset += sizeof(size_t);
+            guint16 len = 0;
+            m_chunk->get_content(offset, &len, sizeof(guint16));
+            offset += sizeof(guint16);
             newone->set_content(0, ((char *)m_chunk->begin()) + offset, len);
             offset += len;
             break;
         }
         case LOG_REMOVE_RECORD:{
-            size_t len = 0;
-            m_chunk->get_content(offset, &len, sizeof(size_t));
-            offset += sizeof(size_t);
+            guint16 len = 0;
+            m_chunk->get_content(offset, &len, sizeof(guint16));
+            offset += sizeof(guint16);
             oldone->set_content(0, ((char *)m_chunk->begin()) + offset, len);
             offset += len;
             break;
         }
         case LOG_MODIFY_RECORD:{
-            size_t oldlen = 0, newlen = 0;
-            m_chunk->get_content(offset, &oldlen, sizeof(size_t));
-            offset += sizeof(size_t);
-            m_chunk->get_content(offset, &newlen, sizeof(size_t));
-            offset += sizeof(size_t);
+            guint16 oldlen = 0, newlen = 0;
+            m_chunk->get_content(offset, &oldlen, sizeof(guint16));
+            offset += sizeof(guint16);
+            m_chunk->get_content(offset, &newlen, sizeof(guint16));
+            offset += sizeof(guint16);
             oldone->set_content(0, ((char *)m_chunk->begin()) + offset,
                                 oldlen);
             offset += oldlen;
@@ -132,9 +132,9 @@ public:
         }
         case LOG_MODIFY_HEADER:{
             assert(token == null_token);
-            size_t len = 0;
-            m_chunk->get_content(offset, &len, sizeof(size_t));
-            offset += sizeof(size_t);
+            guint16 len = 0;
+            m_chunk->get_content(offset, &len, sizeof(guint16));
+            offset += sizeof(guint16);
             oldone->set_content(0, ((char *)m_chunk->begin()) + offset,
                                 len);
             offset += len;
@@ -166,9 +166,9 @@ public:
             assert( NULL == oldone );
             assert( NULL != newone );
             /* use newone chunk */
-            size_t len = newone->size();
-            chunk.set_content(offset, &len, sizeof(size_t));
-            offset += sizeof(size_t);
+            guint16 len = newone->size();
+            chunk.set_content(offset, &len, sizeof(guint16));
+            offset += sizeof(guint16);
             chunk.set_content(offset, newone->begin(), newone->size());
             offset += newone->size();
             break;
@@ -177,9 +177,9 @@ public:
             assert(NULL != oldone);
             assert(NULL == newone);
             /* use oldone chunk */
-            size_t len = oldone->size();
-            chunk.set_content(offset, &len, sizeof(size_t));
-            offset += sizeof(size_t);
+            guint16 len = oldone->size();
+            chunk.set_content(offset, &len, sizeof(guint16));
+            offset += sizeof(guint16);
             chunk.set_content(offset, oldone->begin(), oldone->size());
             offset += oldone->size();
             break;
@@ -187,12 +187,12 @@ public:
         case LOG_MODIFY_RECORD:{
             assert(NULL != oldone);
             assert(NULL != newone);
-            size_t oldlen = oldone->size();
-            size_t newlen = newone->size();
-            chunk.set_content(offset, &oldlen, sizeof(size_t));
-            offset += sizeof(size_t);
-            chunk.set_content(offset, &newlen, sizeof(size_t));
-            offset += sizeof(size_t);
+            guint16 oldlen = oldone->size();
+            guint16 newlen = newone->size();
+            chunk.set_content(offset, &oldlen, sizeof(guint16));
+            offset += sizeof(guint16);
+            chunk.set_content(offset, &newlen, sizeof(guint16));
+            offset += sizeof(guint16);
             chunk.set_content(offset, oldone->begin(), oldone->size());
             offset += oldlen;
             chunk.set_content(offset, newone->begin(), newone->size());
@@ -203,11 +203,11 @@ public:
             assert(NULL != oldone);
             assert(NULL != newone);
             assert(null_token == token);
-            size_t oldlen = oldone->size();
-            size_t newlen = newone->size();
+            guint16 oldlen = oldone->size();
+            guint16 newlen = newone->size();
             assert(oldlen == newlen);
-            chunk.set_content(offset, &oldlen, sizeof(size_t));
-            offset += sizeof(size_t);
+            chunk.set_content(offset, &oldlen, sizeof(guint16));
+            offset += sizeof(guint16);
             chunk.set_content(offset, oldone->begin(), oldone->size());
             offset += oldlen;
             chunk.set_content(offset, newone->begin(), newone->size());
