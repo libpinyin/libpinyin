@@ -1,6 +1,6 @@
 Name:           libpinyin
 Version:        @VERSION@
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Library to deal with pinyin
 
 License:        GPLv2+
@@ -21,6 +21,14 @@ Requires:       %{name} = %{version}-%{release}
 %description    devel
 The %{name}-devel package contains libraries and header files for
 developing applications that use %{name}.
+
+
+%package        data
+Summary:        data files for %{name}
+Requires:       %{name} = %{version}-%{release}
+
+%description data
+The %{name}-data package contains data files.
 
 
 %prep
@@ -47,7 +55,6 @@ find $RPM_BUILD_ROOT -name '*.la' -exec rm -f {} ';'
 %doc AUTHORS COPYING README
 %{_libdir}/*.so.*
 %dir %{_datadir}/libpinyin
-%{_datadir}/libpinyin/data
 
 %files devel
 %doc
@@ -55,7 +62,13 @@ find $RPM_BUILD_ROOT -name '*.la' -exec rm -f {} ';'
 %{_libdir}/*.so
 %{_libdir}/pkgconfig/libpinyin.pc
 
+%files data
+%doc
+%{_datadir}/libpinyin/data
 
 %changelog
+* Thu Sep 08 2011  Peng Wu <pwu@redhat.com> - 0.2.99-2
+- Split data sub package
+
 * Wed Aug 31 2011  Peng Wu <alexepico@gmail.com> - 0.2.99-1
 - Initial version
