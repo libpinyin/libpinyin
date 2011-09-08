@@ -2,8 +2,6 @@
 
 aclocal
 
-libtoolize --force
-
 autoheader
 
 automake -a

@@ -18,7 +18,7 @@
 EXTRA_DIST		= COPYING
 
 AUTOMAKE_OPTIONS 	= gnu
-SUBDIRS 		= src utils tests libltdl data
+SUBDIRS 		= src utils tests data
 
 MAINTAINERCLEANFILES 	= Makefile.in 
 
