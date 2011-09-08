@@ -34,19 +34,19 @@ extern "C" {
 
 typedef struct _pinyin_context_t pinyin_context_t;
 
+typedef struct {
+    pinyin_context_t * m_context;
+    PinyinKeyVector m_pinyin_keys;
+    PinyinKeyPosVector m_pinyin_poses;
+    CandidateConstraints m_constraints;
+    MatchResults m_match_results;
+} pinyin_instance_t;
+
 pinyin_context_t * pinyin_init(const char * systemdir, const char * userdir);
 void pinyin_fini(pinyin_context_t * context);
 
-bool pinyin_alloc_auxiliary_arrays(pinyin_context_t * context,
-                                   PinyinKeyVector * pinyin_keys,
-                                   PinyinKeyPosVector * pinyin_poses,
-                                   CandidateConstraints * constraints,
-                                   MatchResults * match_results);
-bool pinyin_free_auxiliary_arrays(pinyin_context_t * context,
-                                  PinyinKeyVector * pinyin_keys,
-                                  PinyinKeyPosVector * pinyin_poses,
-                                  CandidateConstraints * constraints,
-                                  MatchResults * match_results);
+pinyin_instance_t * pinyin_get_instance(pinyin_context_t * context);
+void pinyin_release_instance(pinyin_instance_t * instance);
 
 bool pinyin_set_options(pinyin_context_t * context,
                         PinyinCustomSettings * custom);

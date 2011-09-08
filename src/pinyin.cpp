@@ -103,11 +103,11 @@ void pinyin_fini(pinyin_context_t * context){
     delete context;
 }
 
-bool pinyin_alloc_auxiliary_arrays(pinyin_context_t * context,
-                                   PinyinKeyVector * pinyin_keys,
-                                   PinyinKeyPosVector * pinyin_poses,
-                                   CandidateConstraints * constraints,
-                                   MatchResults * match_results){
+static bool pinyin_alloc_auxiliary_arrays(pinyin_context_t * context,
+                                          PinyinKeyVector * pinyin_keys,
+                                          PinyinKeyPosVector * pinyin_poses,
+                                          CandidateConstraints * constraints,
+                                          MatchResults * match_results){
 
     *pinyin_keys = g_array_new(FALSE, FALSE, sizeof(PinyinKey));
     *pinyin_poses = g_array_new(FALSE, FALSE, sizeof(PinyinKeyPos));
@@ -117,11 +117,11 @@ bool pinyin_alloc_auxiliary_arrays(pinyin_context_t * context,
     return true;
 }
 
-bool pinyin_free_auxiliary_arrays(pinyin_context_t * context,
-                                  PinyinKeyVector * pinyin_keys,
-                                  PinyinKeyPosVector * pinyin_poses,
-                                  CandidateConstraints * constraints,
-                                  MatchResults * match_results){
+static bool pinyin_free_auxiliary_arrays(pinyin_context_t * context,
+                                         PinyinKeyVector * pinyin_keys,
+                                         PinyinKeyPosVector * pinyin_poses,
+                                         CandidateConstraints * constraints,
+                                         MatchResults * match_results){
     g_array_free(*pinyin_keys, TRUE);
     *pinyin_keys = NULL;
     g_array_free(*pinyin_poses, TRUE);
@@ -134,6 +134,25 @@ bool pinyin_free_auxiliary_arrays(pinyin_context_t * context,
     return true;
 }
 
+pinyin_instance_t * pinyin_get_instance(pinyin_context_t * context){
+    pinyin_instance_t * instance = new pinyin_instance_t;
+    instance->m_context = context;
+    pinyin_alloc_auxiliary_arrays
+        (instance->m_context, &(instance->m_pinyin_keys),
+         &(instance->m_pinyin_poses),
+         &(instance->m_constraints),
+         &(instance->m_match_results));
+    return instance;
+}
+
+void pinyin_release_instance(pinyin_instance_t * instance){
+    pinyin_free_auxiliary_arrays
+        (instance->m_context, &(instance->m_pinyin_keys),
+         &(instance->m_pinyin_poses),
+         &(instance->m_constraints),
+         &(instance->m_match_results));
+    delete instance;
+}
 
 /* copy from custom to context->m_custom. */
 bool pinyin_set_options(pinyin_context_t * context,
