@@ -27,13 +27,7 @@ int main(int argc, char * argv[]){
     pinyin_context_t * context =
         pinyin_init("../data", "../data");
 
-    PinyinKeyVector pinyin_keys = NULL;
-    PinyinKeyPosVector pinyin_poses = NULL;
-    CandidateConstraints constraints = NULL;
-    MatchResults match_results = NULL;
-
-    pinyin_alloc_auxiliary_arrays
-        (context, &pinyin_keys, &pinyin_poses, &constraints, &match_results);
+    pinyin_instance_t * instance = pinyin_get_instance(context);
 
     char* linebuf = NULL;
     size_t size = 0;
@@ -46,23 +40,20 @@ int main(int argc, char * argv[]){
 	if ( strcmp ( linebuf, "quit" ) == 0)
             break;
 
-        pinyin_parse_more_fulls(context, linebuf, pinyin_keys, pinyin_poses);
-        pinyin_update_constraints(context, pinyin_keys, constraints);
-        pinyin_get_guessed_tokens(context, pinyin_keys, constraints,
-                                  match_results);
+        pinyin_parse_more_fulls(instance, linebuf);
+        pinyin_guess_sentence(instance);
 
         char * sentence = NULL;
-        pinyin_get_sentence (context, match_results, &sentence);
+        pinyin_get_sentence (instance, &sentence);
         printf("%s\n", sentence);
         g_free(sentence);
 
-        pinyin_train(context, pinyin_keys, constraints, match_results);
-        pinyin_reset(context, pinyin_keys, constraints, match_results);
+        pinyin_train(instance);
+        pinyin_reset(instance);
         pinyin_save(context);
     }
 
-    pinyin_free_auxiliary_arrays
-        (context, &pinyin_keys, &pinyin_poses, &constraints, &match_results);
+    pinyin_release_instance(instance);
     pinyin_fini(context);
     free(linebuf);
     return 0;

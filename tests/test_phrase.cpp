@@ -27,8 +27,7 @@ int main(int argc, char * argv[]){
     pinyin_context_t * context =
         pinyin_init("../data", "../data");
 
-    TokenVector tokens =
-        g_array_new(FALSE, FALSE, sizeof(phrase_token_t));
+    pinyin_instance_t * instance = pinyin_get_instance(context);
 
     char* linebuf = NULL;
     size_t size = 0;
@@ -41,7 +40,9 @@ int main(int argc, char * argv[]){
 	if ( strcmp ( linebuf, "quit" ) == 0)
             break;
 
-        pinyin_phrase_segment(context, linebuf, tokens);
+        pinyin_phrase_segment(instance, linebuf);
+        MatchResults & tokens = instance->m_match_results;
+
         for ( size_t i = 0; i < tokens->len; ++i ){
             phrase_token_t token = g_array_index
                 (tokens, phrase_token_t, i);
@@ -50,7 +51,7 @@ int main(int argc, char * argv[]){
                 continue;
 
             char * word = NULL;
-            pinyin_translate_token(context, token, &word);
+            pinyin_translate_token(instance, token, &word);
             printf("%s\t", word);
             g_free(word);
         }
@@ -59,8 +60,8 @@ int main(int argc, char * argv[]){
         pinyin_save(context);
     }
 
+    pinyin_release_instance(instance);
     pinyin_fini(context);
-    g_array_free(tokens, TRUE);
     free(linebuf);
     return 0;
 }
