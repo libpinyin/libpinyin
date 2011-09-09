@@ -27,7 +27,7 @@ int main(int argc, char * argv[]){
     pinyin_context_t * context =
         pinyin_init("../data", "../data");
 
-    pinyin_instance_t * instance = pinyin_get_instance(context);
+    pinyin_instance_t * instance = pinyin_alloc_instance(context);
 
     char* linebuf = NULL;
     size_t size = 0;
@@ -40,7 +40,7 @@ int main(int argc, char * argv[]){
 	if ( strcmp ( linebuf, "quit" ) == 0)
             break;
 
-        pinyin_parse_more_fulls(instance, linebuf);
+        pinyin_parse_more_full_pinyins(instance, linebuf);
         pinyin_guess_sentence(instance);
 
         char * sentence = NULL;
@@ -53,7 +53,7 @@ int main(int argc, char * argv[]){
         pinyin_save(context);
     }
 
-    pinyin_release_instance(instance);
+    pinyin_free_instance(instance);
     pinyin_fini(context);
     free(linebuf);
     return 0;
