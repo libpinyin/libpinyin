@@ -494,24 +494,6 @@ bool PinyinLookup::train_result(PinyinKeyVector keys, CandidateConstraints const
     return true;
 }
 
-bool PinyinLookup::convert_to_utf8(MatchResults results, /* out */ char * & result_string){
-    result_string = g_strdup("");
-    for ( size_t i = 0; i < results->len; ++i){
-	phrase_token_t * token = &g_array_index(results, phrase_token_t, i);
-	if ( null_token == *token )
-	    continue;
-	m_phrase_index->get_phrase_item(*token, m_cache_phrase_item);
-	utf16_t buffer[MAX_PHRASE_LENGTH];
-	m_cache_phrase_item.get_phrase_string(buffer);
-	guint8 length = m_cache_phrase_item.get_phrase_length();
-	gchar * phrase = g_utf16_to_utf8(buffer, length, NULL, NULL, NULL);
-	char * tmp = result_string;
-	result_string = g_strconcat(result_string, phrase, NULL);
-	g_free(tmp); g_free(phrase);
-    }
-    return true;
-}
-
 bool PinyinLookup::add_constraint(CandidateConstraints constraints, size_t index, phrase_token_t token){
     if ( m_phrase_index->get_phrase_item(token, m_cache_phrase_item) )
 	return false;

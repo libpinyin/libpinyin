@@ -126,8 +126,15 @@ public:
     
     bool train_result(PinyinKeyVector keys, CandidateConstraints constraints, MatchResults & results);
 
-    bool convert_to_utf8(MatchResults results, /* out */ char * & result_string);
+    bool convert_to_utf8(MatchResults results,
+                         /* in */ const char * delimiter,
+                         /* out */ char * & result_string)
+    {
+        return pinyin::convert_to_utf8(m_phrase_index, results,
+                                       delimiter, result_string);
+    }
 
+    /* user interactions */
     bool add_constraint(CandidateConstraints constraints, size_t index, phrase_token_t token);
 
     bool clear_constraint(CandidateConstraints constraints, size_t index);

@@ -32,4 +32,7 @@ liblookup_la_CXXFLAGS	= "-fPIC"
 
 liblookup_la_LDFLAGS	= -static
 
-liblookup_la_SOURCES	= pinyin_lookup.cpp winner_tree.cpp phrase_lookup.cpp
+liblookup_la_SOURCES	= pinyin_lookup.cpp \
+			  winner_tree.cpp \
+			  phrase_lookup.cpp \
+			  lookup.cpp

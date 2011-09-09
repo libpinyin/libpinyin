@@ -79,7 +79,13 @@ public:
     bool get_best_match(int sentence_length, utf16_t sentence[], MatchResults & results);
 
     /* Note: free the phrase by g_free */
-    bool convert_to_utf8(MatchResults results, /* in */ const char * delimiter, /* out */ char * & result_string);
+    bool convert_to_utf8(MatchResults results,
+                         /* in */ const char * delimiter,
+                         /* out */ char * & result_string)
+    {
+        return pinyin::convert_to_utf8(m_phrase_index, results,
+                                       delimiter, result_string);
+    }
 };
 
 };

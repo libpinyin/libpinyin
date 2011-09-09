@@ -280,28 +280,3 @@ bool PhraseLookup::final_step(MatchResults & results ){
     //no need to reverse the result
     return true;
 }
-
-bool PhraseLookup::convert_to_utf8(MatchResults results, /* in */ const char * delimiter, /* out */ char * & result_string){
-    //init variables
-    if ( NULL == delimiter )
-        delimiter = "";
-    result_string = NULL;
-
-    for ( size_t i = 0; i < results->len; ++i ){
-        phrase_token_t * token = &g_array_index(results, phrase_token_t, i);
-        if ( null_token == *token )
-            continue;
-        m_phrase_index->get_phrase_item(*token, m_cache_phrase_item);
-        utf16_t buffer[MAX_PHRASE_LENGTH];
-        m_cache_phrase_item.get_phrase_string(buffer);
-        guint8 length = m_cache_phrase_item.get_phrase_length();
-        gchar * phrase = g_utf16_to_utf8(buffer, length, NULL, NULL, NULL);
-        char * tmp = result_string;
-        if ( NULL == result_string )
-            result_string = g_strdup(phrase);
-        else
-            result_string = g_strconcat(result_string, delimiter, phrase, NULL);
-        g_free(tmp); g_free(phrase);
-    }
-    return true;
-}

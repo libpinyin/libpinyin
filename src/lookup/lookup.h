@@ -68,5 +68,10 @@ typedef GHashTable * LookupStepIndex;
 /* Key: lookup_key_t, Value: int m, index to m_steps_content[i][m] */
 typedef GArray * LookupStepContent; /* array of lookup_value_t */
 
+bool convert_to_utf8(FacadePhraseIndex * phrase_index,
+                     MatchResults match_results,
+                     /* in */ const char * delimiter,
+                     /* out */ char * & result_string);
+
 };
 #endif
