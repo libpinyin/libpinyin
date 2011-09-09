@@ -45,80 +45,61 @@ typedef struct {
 pinyin_context_t * pinyin_init(const char * systemdir, const char * userdir);
 void pinyin_fini(pinyin_context_t * context);
 
-pinyin_instance_t * pinyin_get_instance(pinyin_context_t * context);
-void pinyin_release_instance(pinyin_instance_t * instance);
-
 bool pinyin_set_options(pinyin_context_t * context,
                         PinyinCustomSettings * custom);
 
-bool pinyin_update_constraints(pinyin_context_t * context,
-                               PinyinKeyVector pinyin_keys,
-                               CandidateConstraints constraints);
+pinyin_instance_t * pinyin_get_instance(pinyin_context_t * context);
+void pinyin_release_instance(pinyin_instance_t * instance);
 
-bool pinyin_get_guessed_tokens(pinyin_context_t * context,
-                               PinyinKeyVector pinyin_keys,
-                               CandidateConstraints constraints,
-                               MatchResults match_results);
+static bool pinyin_update_constraints(pinyin_instance_t * instance);
 
-bool pinyin_get_sentence(pinyin_context_t * context,
-                         MatchResults match_results,
+bool pinyin_get_guessed_tokens(pinyin_instance_t * instance,
+                               MatchResults * match_results);
+
+bool pinyin_phrase_segment(pinyin_instance_t * instance,
+                           const char * sentence);
+
+bool pinyin_get_sentence(pinyin_instance_t * instance,
                          char ** sentence);
 
-bool pinyin_parse_full(pinyin_context_t * context,
+bool pinyin_parse_full(pinyin_instance_t * instance,
                        const char * onepinyin,
                        PinyinKey * onekey);
-bool pinyin_parse_more_fulls(pinyin_context_t * context,
-                             const char * pinyins,
-                             PinyinKeyVector pinyin_keys,
-                             PinyinKeyPosVector pinyin_poses);
-bool pinyin_parse_double(pinyin_context_t * context,
+bool pinyin_parse_more_fulls(pinyin_instance_t * instance,
+                             const char * pinyins);
+
+bool pinyin_parse_double(pinyin_instance_t * instance,
                          const char * onepinyin,
                          PinyinKey * onekey);
-bool pinyin_parse_more_doubles(pinyin_context_t * context,
-                               const char * pinyins,
-                               PinyinKeyVector pinyin_keys,
-                               PinyinKeyPosVector pinyin_poses);
-bool pinyin_parse_chewing(pinyin_context_t * context,
+
+bool pinyin_parse_more_doubles(pinyin_instance_t * instance,
+                               const char * pinyins);
+
+bool pinyin_parse_chewing(pinyin_instance_t * instance,
                           const char * onechewing,
                           PinyinKey * onekey);
-bool pinyin_parse_more_chewings(pinyin_context_t * context,
-                                const char * chewings,
-                                PinyinKeyVector pinyin_keys,
-                                PinyinKeyPosVector pinyin_poses);
+bool pinyin_parse_more_chewings(pinyin_instance_t * instance,
+                                const char * chewings);
 
-bool pinyin_get_candidates(pinyin_context_t * context,
+bool pinyin_get_candidates(pinyin_instance_t * instance,
                            size_t offset,
-                           PinyinKeyVector pinyin_keys,
                            TokenVector candidates);
 
-bool pinyin_choose_candidate(pinyin_context_t * context,
+bool pinyin_choose_candidate(pinyin_instance_t * instance,
                              size_t offset,
-                             PinyinKeyVector pinyin_keys,
-                             CandidateConstraints constraints,
                              phrase_token_t token);
 
-bool pinyin_clear_constraint(pinyin_context_t * context,
-                             size_t offset,
-                             CandidateConstraints constraints);
-bool pinyin_clear_constraints(pinyin_context_t * context,
-                              CandidateConstraints constraints);
+bool pinyin_clear_constraint(pinyin_instance_t * instance,
+                             size_t offset);
+bool pinyin_clear_constraints(pinyin_instance_t * instance);
 
-bool pinyin_phrase_segment(pinyin_context_t * context,
-                           const char * sentence,
-                           TokenVector tokens);
-bool pinyin_translate_token(pinyin_context_t * context,
+bool pinyin_translate_token(pinyin_instance_t * instance,
                             phrase_token_t token, char ** word);
 
-bool pinyin_train(pinyin_context_t * context,
-                  PinyinKeyVector pinyin_keys,
-                  CandidateConstraints constraints,
-                  MatchResults match_results);
-bool pinyin_save(pinyin_context_t * context);
-bool pinyin_reset(pinyin_context_t * context,
-                  PinyinKeyVector pinyin_keys,
-                  CandidateConstraints constraints,
-                  MatchResults match_results);
+bool pinyin_train(pinyin_instance_t * instance);
+bool pinyin_save(pinyin_instance_t * instance);
+bool pinyin_reset(pinyin_instance_t * instance);
 
-}
+};
 
 #endif
