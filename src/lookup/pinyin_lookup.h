@@ -127,11 +127,10 @@ public:
     bool train_result(PinyinKeyVector keys, CandidateConstraints constraints, MatchResults & results);
 
     bool convert_to_utf8(MatchResults results,
-                         /* in */ const char * delimiter,
                          /* out */ char * & result_string)
     {
         return pinyin::convert_to_utf8(m_phrase_index, results,
-                                       delimiter, result_string);
+                                       NULL, result_string);
     }
 
     /* user interactions */

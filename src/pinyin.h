@@ -43,6 +43,7 @@ typedef struct {
 } pinyin_instance_t;
 
 pinyin_context_t * pinyin_init(const char * systemdir, const char * userdir);
+bool pinyin_save(pinyin_context_t * context);
 void pinyin_fini(pinyin_context_t * context);
 
 bool pinyin_set_options(pinyin_context_t * context,
@@ -51,10 +52,7 @@ bool pinyin_set_options(pinyin_context_t * context,
 pinyin_instance_t * pinyin_get_instance(pinyin_context_t * context);
 void pinyin_release_instance(pinyin_instance_t * instance);
 
-static bool pinyin_update_constraints(pinyin_instance_t * instance);
-
-bool pinyin_get_guessed_tokens(pinyin_instance_t * instance,
-                               MatchResults * match_results);
+bool pinyin_guess_sentence(pinyin_instance_t * instance);
 
 bool pinyin_phrase_segment(pinyin_instance_t * instance,
                            const char * sentence);
@@ -71,7 +69,6 @@ bool pinyin_parse_more_fulls(pinyin_instance_t * instance,
 bool pinyin_parse_double(pinyin_instance_t * instance,
                          const char * onepinyin,
                          PinyinKey * onekey);
-
 bool pinyin_parse_more_doubles(pinyin_instance_t * instance,
                                const char * pinyins);
 
@@ -97,7 +94,6 @@ bool pinyin_translate_token(pinyin_instance_t * instance,
                             phrase_token_t token, char ** word);
 
 bool pinyin_train(pinyin_instance_t * instance);
-bool pinyin_save(pinyin_instance_t * instance);
 bool pinyin_reset(pinyin_instance_t * instance);
 
 };

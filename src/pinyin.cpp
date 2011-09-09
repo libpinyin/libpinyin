@@ -85,6 +85,35 @@ pinyin_context_t * pinyin_init(const char * systemdir, const char * userdir){
     return context;
 }
 
+bool pinyin_save(pinyin_context_t * context){
+    MemoryChunk * oldchunk = new MemoryChunk;
+    MemoryChunk * newlog = new MemoryChunk;
+
+    gchar * filename = g_build_filename(context->m_system_dir,
+                                        "gb_char.bin", NULL);
+    oldchunk->load(filename);
+    context->m_phrase_index->diff(1, oldchunk, newlog);
+    filename = g_build_filename(context->m_user_dir,
+                                "gb_char.dbin", NULL);
+    newlog->save(filename);
+    delete newlog;
+
+    oldchunk = new MemoryChunk; newlog = new MemoryChunk;
+    filename = g_build_filename(context->m_system_dir,
+                                "gbk_char.bin", NULL);
+    oldchunk->load(filename);
+    context->m_phrase_index->diff(2, oldchunk, newlog);
+    filename = g_build_filename(context->m_user_dir,
+                                "gbk_char.dbin", NULL);
+    newlog->save(filename);
+    delete newlog;
+
+    filename = g_build_filename(context->m_user_dir, "user.db", NULL);
+    context->m_user_bigram->save_db(filename);
+
+    return true;
+}
+
 void pinyin_fini(pinyin_context_t * context){
     delete context->m_default_parser;
     delete context->m_shuang_pin_parser;
@@ -103,57 +132,6 @@ void pinyin_fini(pinyin_context_t * context){
     delete context;
 }
 
-static bool pinyin_alloc_auxiliary_arrays(pinyin_context_t * context,
-                                          PinyinKeyVector * pinyin_keys,
-                                          PinyinKeyPosVector * pinyin_poses,
-                                          CandidateConstraints * constraints,
-                                          MatchResults * match_results){
-
-    *pinyin_keys = g_array_new(FALSE, FALSE, sizeof(PinyinKey));
-    *pinyin_poses = g_array_new(FALSE, FALSE, sizeof(PinyinKeyPos));
-    *constraints = g_array_new(FALSE, FALSE, sizeof(lookup_constraint_t));
-    *match_results = g_array_new(FALSE, FALSE, sizeof(phrase_token_t));
-
-    return true;
-}
-
-static bool pinyin_free_auxiliary_arrays(pinyin_context_t * context,
-                                         PinyinKeyVector * pinyin_keys,
-                                         PinyinKeyPosVector * pinyin_poses,
-                                         CandidateConstraints * constraints,
-                                         MatchResults * match_results){
-    g_array_free(*pinyin_keys, TRUE);
-    *pinyin_keys = NULL;
-    g_array_free(*pinyin_poses, TRUE);
-    *pinyin_poses = NULL;
-    g_array_free(*constraints, TRUE);
-    *constraints = NULL;
-    g_array_free(*match_results, TRUE);
-    *match_results = NULL;
-
-    return true;
-}
-
-pinyin_instance_t * pinyin_get_instance(pinyin_context_t * context){
-    pinyin_instance_t * instance = new pinyin_instance_t;
-    instance->m_context = context;
-    pinyin_alloc_auxiliary_arrays
-        (instance->m_context, &(instance->m_pinyin_keys),
-         &(instance->m_pinyin_poses),
-         &(instance->m_constraints),
-         &(instance->m_match_results));
-    return instance;
-}
-
-void pinyin_release_instance(pinyin_instance_t * instance){
-    pinyin_free_auxiliary_arrays
-        (instance->m_context, &(instance->m_pinyin_keys),
-         &(instance->m_pinyin_poses),
-         &(instance->m_constraints),
-         &(instance->m_match_results));
-    delete instance;
-}
-
 /* copy from custom to context->m_custom. */
 bool pinyin_set_options(pinyin_context_t * context,
                         PinyinCustomSettings * custom){
@@ -163,9 +141,35 @@ bool pinyin_set_options(pinyin_context_t * context,
 }
 
 
-bool pinyin_update_constraints(pinyin_context_t * context,
-                               PinyinKeyVector pinyin_keys,
-                               CandidateConstraints constraints){
+pinyin_instance_t * pinyin_get_instance(pinyin_context_t * context){
+    pinyin_instance_t * instance = new pinyin_instance_t;
+    instance->m_context = context;
+
+    instance->m_pinyin_keys = g_array_new(FALSE, FALSE, sizeof(PinyinKey));
+    instance->m_pinyin_poses = g_array_new(FALSE, FALSE, sizeof(PinyinKeyPos));
+    instance->m_constraints = g_array_new
+        (FALSE, FALSE, sizeof(lookup_constraint_t));
+    instance->m_match_results =
+        g_array_new(FALSE, FALSE, sizeof(phrase_token_t));
+
+    return instance;
+}
+
+void pinyin_release_instance(pinyin_instance_t * instance){
+    g_array_free(instance->m_pinyin_keys, TRUE);
+    g_array_free(instance->m_pinyin_poses, TRUE);
+    g_array_free(instance->m_constraints, TRUE);
+    g_array_free(instance->m_match_results, TRUE);
+
+    delete instance;
+}
+
+
+static bool pinyin_update_constraints(pinyin_instance_t * instance){
+    pinyin_context_t * & context = instance->m_context;
+    PinyinKeyVector & pinyin_keys = instance->m_pinyin_keys;
+    CandidateConstraints & constraints = instance->m_constraints;
+
     size_t key_len = constraints->len;
     g_array_set_size(constraints, pinyin_keys->len);
     for (size_t i = key_len; i < pinyin_keys->len; ++i ) {
@@ -181,89 +185,112 @@ bool pinyin_update_constraints(pinyin_context_t * context,
 }
 
 
-bool pinyin_get_guessed_tokens(pinyin_context_t * context,
-                               PinyinKeyVector pinyin_keys,
-                               CandidateConstraints constraints,
-                               MatchResults match_results){
-    bool retval = context->m_pinyin_lookup->get_best_match
-        (pinyin_keys, constraints, match_results);
+bool pinyin_guess_sentence(pinyin_instance_t * instance){
+    pinyin_context_t * & context = instance->m_context;
 
+    pinyin_update_constraints(instance);
+    bool retval = context->m_pinyin_lookup->get_best_match
+        (instance->m_pinyin_keys,
+         instance->m_constraints,
+         instance->m_match_results);
+
+    return retval;
+}
+
+bool pinyin_phrase_segment(pinyin_instance_t * instance,
+                           const char * sentence){
+    pinyin_context_t * & context = instance->m_context;
+
+    const glong num_of_chars = g_utf8_strlen(sentence, -1);
+    glong utf16_len = 0;
+    utf16_t * utf16 = g_utf8_to_utf16(sentence, -1, NULL, &utf16_len, NULL);
+
+    g_return_val_if_fail(num_of_chars == utf16_len, false);
+
+    bool retval = context->m_phrase_lookup->get_best_match
+        (utf16_len, utf16, instance->m_match_results);
+
+    g_free(utf16);
     return retval;
 }
 
 /* the returned sentence should be freed by g_free(). */
-bool pinyin_get_sentence(pinyin_context_t * context,
-                         MatchResults match_results,
+bool pinyin_get_sentence(pinyin_instance_t * instance,
                          char ** sentence){
+    pinyin_context_t * & context = instance->m_context;
 
-    bool retval = context->m_pinyin_lookup->convert_to_utf8
-        (match_results, *sentence);
+    bool retval = pinyin::convert_to_utf8
+        (context->m_phrase_index, instance->m_match_results,
+         NULL, *sentence);
 
     return retval;
 }
 
-bool pinyin_parse_full(pinyin_context_t * context,
+bool pinyin_parse_full(pinyin_instance_t * instance,
                        const char * onepinyin,
                        PinyinKey * onekey){
+    pinyin_context_t * & context = instance->m_context;
+
     int pinyin_len = strlen(onepinyin);
     int parse_len = context->m_default_parser->parse_one_key
         ( context->m_validator, *onekey, onepinyin, pinyin_len);
     return pinyin_len == parse_len;
 }
 
-bool pinyin_parse_more_fulls(pinyin_context_t * context,
-                             const char * pinyins,
-                             PinyinKeyVector pinyin_keys,
-                             PinyinKeyPosVector pinyin_poses){
+bool pinyin_parse_more_fulls(pinyin_instance_t * instance,
+                             const char * pinyins){
+    pinyin_context_t * & context = instance->m_context;
     int pinyin_len = strlen(pinyins);
 
     int parse_len = context->m_default_parser->parse
-        ( context->m_validator, pinyin_keys,
-          pinyin_poses, pinyins, pinyin_len);
+        ( context->m_validator, instance->m_pinyin_keys,
+          instance->m_pinyin_poses, pinyins, pinyin_len);
 
     return pinyin_len == parse_len;
 }
 
-bool pinyin_parse_double(pinyin_context_t * context,
+bool pinyin_parse_double(pinyin_instance_t * instance,
                          const char * onepinyin,
                          PinyinKey * onekey){
+    pinyin_context_t * & context = instance->m_context;
+
     int pinyin_len = strlen(onepinyin);
     int parse_len = context->m_shuang_pin_parser->parse_one_key
         ( context->m_validator, *onekey, onepinyin, pinyin_len);
     return pinyin_len == parse_len;
 }
 
-bool pinyin_parse_more_doubles(pinyin_context_t * context,
-                               const char * pinyins,
-                               PinyinKeyVector pinyin_keys,
-                               PinyinKeyPosVector pinyin_poses){
+bool pinyin_parse_more_doubles(pinyin_instance_t * instance,
+                               const char * pinyins){
+    pinyin_context_t * & context = instance->m_context;
     int pinyin_len = strlen(pinyins);
 
     int parse_len = context->m_shuang_pin_parser->parse
-        ( context->m_validator, pinyin_keys,
-          pinyin_poses, pinyins, pinyin_len);
+        ( context->m_validator, instance->m_pinyin_keys,
+          instance->m_pinyin_poses, pinyins, pinyin_len);
 
     return pinyin_len == parse_len;
 }
 
-bool pinyin_parse_chewing(pinyin_context_t * context,
+bool pinyin_parse_chewing(pinyin_instance_t * instance,
                           const char * onechewing,
                           PinyinKey * onekey){
+    pinyin_context_t * & context = instance->m_context;
+
     int chewing_len = strlen(onechewing);
     int parse_len = context->m_chewing_parser->parse_one_key
         ( context->m_validator, *onekey, onechewing, chewing_len );
     return chewing_len == parse_len;
 }
 
-bool pinyin_parse_more_chewings(pinyin_context_t * context,
-                                const char * chewings,
-                                PinyinKeyVector pinyin_keys,
-                                PinyinKeyPosVector pinyin_poses){
+bool pinyin_parse_more_chewings(pinyin_instance_t * instance,
+                                const char * chewings){
+    pinyin_context_t * & context = instance->m_context;
     int chewing_len = strlen(chewings);
 
     int parse_len = context->m_chewing_parser->parse
-        ( context->m_validator, pinyin_keys,
-          pinyin_poses, chewings, chewing_len);
+        ( context->m_validator, instance->m_pinyin_keys,
+          instance->m_pinyin_poses, chewings, chewing_len);
 
     return chewing_len == parse_len;
 }
@@ -291,10 +318,11 @@ static gint compare_token_with_unigram_freq(gconstpointer lhs,
     return freq_lhs - freq_rhs;
 }
 
-bool pinyin_get_candidates(pinyin_context_t * context,
+bool pinyin_get_candidates(pinyin_instance_t * instance,
                            size_t offset,
-                           PinyinKeyVector pinyin_keys,
                            TokenVector candidates){
+    pinyin_context_t * & context = instance->m_context;
+    PinyinKeyVector & pinyin_keys = instance->m_pinyin_keys;
     g_array_set_size(candidates, 0);
 
     PinyinKey * keys = &g_array_index
@@ -364,62 +392,46 @@ bool pinyin_get_candidates(pinyin_context_t * context,
     return true;
 }
 
-bool pinyin_choose_candidate(pinyin_context_t * context,
+bool pinyin_choose_candidate(pinyin_instance_t * instance,
                              size_t offset,
-                             PinyinKeyVector pinyin_keys,
-                             CandidateConstraints constraints,
                              phrase_token_t token){
+    pinyin_context_t * & context = instance->m_context;
+
     bool retval = context->m_pinyin_lookup->add_constraint
-        (constraints, offset, token);
+        (instance->m_constraints, offset, token);
 
     retval = context->m_pinyin_lookup->validate_constraint
-        (constraints, pinyin_keys) && retval;
+        (instance->m_constraints, instance->m_pinyin_keys) && retval;
 
     return retval;
 }
 
-bool pinyin_clear_constraint(pinyin_context_t * context,
-                             size_t offset,
-                             CandidateConstraints constraints){
+bool pinyin_clear_constraint(pinyin_instance_t * instance,
+                             size_t offset){
+    pinyin_context_t * & context = instance->m_context;
+
     bool retval = context->m_pinyin_lookup->clear_constraint
-        (constraints, offset);
+        (instance->m_constraints, offset);
 
     return retval;
 }
 
-bool pinyin_clear_constraints(pinyin_context_t * context,
-                              CandidateConstraints constraints){
+bool pinyin_clear_constraints(pinyin_instance_t * instance){
+    pinyin_context_t * & context = instance->m_context;
     bool retval = true;
 
-    for ( size_t i = 0; i < constraints->len; ++i ) {
+    for ( size_t i = 0; i < instance->m_constraints->len; ++i ) {
         retval = context->m_pinyin_lookup->clear_constraint
-            (constraints, i) && retval;
+            (instance->m_constraints, i) && retval;
     }
 
     return retval;
 }
 
-bool pinyin_phrase_segment(pinyin_context_t * context,
-                           const char * sentence,
-                           MatchResults match_results){
-
-    const glong num_of_chars = g_utf8_strlen(sentence, -1);
-    glong utf16_len = 0;
-    utf16_t * utf16 = g_utf8_to_utf16(sentence, -1, NULL, &utf16_len, NULL);
-
-    g_return_val_if_fail(num_of_chars == utf16_len, false);
-
-    bool retval = context->m_phrase_lookup->
-        get_best_match(utf16_len, utf16, match_results);
-
-    g_free(utf16);
-
-    return retval;
-}
-
 /* the returned word should be freed by g_free. */
-bool pinyin_translate_token(pinyin_context_t * context,
+bool pinyin_translate_token(pinyin_instance_t * instance,
                             phrase_token_t token, char ** word){
+    pinyin_context_t * & context = instance->m_context;
     PhraseItem item;
     utf16_t buffer[MAX_PHRASE_LENGTH];
 
@@ -430,54 +442,22 @@ bool pinyin_translate_token(pinyin_context_t * context,
     return retval;
 }
 
-bool pinyin_train(pinyin_context_t * context,
-                  PinyinKeyVector pinyin_keys,
-                  CandidateConstraints constraints,
-                  MatchResults match_results){
+bool pinyin_train(pinyin_instance_t * instance){
+    pinyin_context_t * & context = instance->m_context;
+
     bool retval = context->m_pinyin_lookup->train_result
-        (pinyin_keys, constraints, match_results);
+        (instance->m_pinyin_keys, instance->m_constraints,
+         instance->m_match_results);
+
     return retval;
 }
 
-bool pinyin_save(pinyin_context_t * context){
-    MemoryChunk * oldchunk = new MemoryChunk;
-    MemoryChunk * newlog = new MemoryChunk;
+bool pinyin_reset(pinyin_instance_t * instance){
+    g_array_set_size(instance->m_pinyin_keys, 0);
+    g_array_set_size(instance->m_pinyin_poses, 0);
+    g_array_set_size(instance->m_constraints, 0);
+    g_array_set_size(instance->m_match_results, 0);
 
-    gchar * filename = g_build_filename(context->m_system_dir,
-                                        "gb_char.bin", NULL);
-    oldchunk->load(filename);
-    context->m_phrase_index->diff(1, oldchunk, newlog);
-    filename = g_build_filename(context->m_user_dir,
-                                "gb_char.dbin", NULL);
-    newlog->save(filename);
-    delete newlog;
-
-    oldchunk = new MemoryChunk; newlog = new MemoryChunk;
-    filename = g_build_filename(context->m_system_dir,
-                                "gbk_char.bin", NULL);
-    oldchunk->load(filename);
-    context->m_phrase_index->diff(2, oldchunk, newlog);
-    filename = g_build_filename(context->m_user_dir,
-                                "gbk_char.dbin", NULL);
-    newlog->save(filename);
-    delete newlog;
-
-    filename = g_build_filename(context->m_user_dir, "user.db", NULL);
-    context->m_user_bigram->save_db(filename);
-
-    return true;
-}
-
-bool pinyin_reset(pinyin_context_t * context,
-                  PinyinKeyVector pinyin_keys,
-                  CandidateConstraints constraints,
-                  MatchResults match_results){
-
-    g_array_set_size(pinyin_keys, 0);
-    g_array_set_size(constraints, 0);
-    g_array_set_size(match_results, 0);
-
-    /* TODO: to be implemented. */
     return true;
 }
 
