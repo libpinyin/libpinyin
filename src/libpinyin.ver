@@ -1,28 +1,27 @@
 LIBPINYIN {
     global:
+        pinyin_init;
+        pinyin_save;
+        pinyin_fini;
+        pinyin_set_options;
+        pinyin_get_instance;
+        pinyin_release_instance;
+        pinyin_guess_sentence;
+        pinyin_phrase_segment;
+        pinyin_get_sentence;
+        pinyin_parse_full;
+        pinyin_parse_more_fulls;
+        pinyin_parse_double;
+        pinyin_parse_more_doubles;
+        pinyin_parse_chewing;
+        pinyin_parse_more_chewings;
+        pinyin_get_candidates;
         pinyin_choose_candidate;
         pinyin_clear_constraint;
         pinyin_clear_constraints;
-        pinyin_fini;
-        pinyin_get_candidates;
-        pinyin_get_guessed_tokens;
-        pinyin_get_sentence;
-        pinyin_init;
-        pinyin_parse_double;
-        pinyin_parse_more_doubles;
-        pinyin_parse_full;
-        pinyin_parse_more_fulls;
-        pinyin_phrase_segment;
-        pinyin_reset;
-        pinyin_save;
-        pinyin_set_options;
-        pinyin_update_constraints;
-        pinyin_train;
         pinyin_translate_token;
-        pinyin_alloc_auxiliary_arrays;
-        pinyin_free_auxiliary_arrays;
-        pinyin_parse_chewing;
-        pinyin_parse_more_chewings;
+        pinyin_train;
+        pinyin_reset;
 
     local:
 	*;
