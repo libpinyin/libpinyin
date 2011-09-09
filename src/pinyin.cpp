@@ -141,7 +141,7 @@ bool pinyin_set_options(pinyin_context_t * context,
 }
 
 
-pinyin_instance_t * pinyin_get_instance(pinyin_context_t * context){
+pinyin_instance_t * pinyin_alloc_instance(pinyin_context_t * context){
     pinyin_instance_t * instance = new pinyin_instance_t;
     instance->m_context = context;
 
@@ -155,7 +155,7 @@ pinyin_instance_t * pinyin_get_instance(pinyin_context_t * context){
     return instance;
 }
 
-void pinyin_release_instance(pinyin_instance_t * instance){
+void pinyin_free_instance(pinyin_instance_t * instance){
     g_array_free(instance->m_pinyin_keys, TRUE);
     g_array_free(instance->m_pinyin_poses, TRUE);
     g_array_free(instance->m_constraints, TRUE);
@@ -226,9 +226,9 @@ bool pinyin_get_sentence(pinyin_instance_t * instance,
     return retval;
 }
 
-bool pinyin_parse_full(pinyin_instance_t * instance,
-                       const char * onepinyin,
-                       PinyinKey * onekey){
+bool pinyin_parse_full_pinyin(pinyin_instance_t * instance,
+                              const char * onepinyin,
+                              PinyinKey * onekey){
     pinyin_context_t * & context = instance->m_context;
 
     int pinyin_len = strlen(onepinyin);
@@ -237,8 +237,8 @@ bool pinyin_parse_full(pinyin_instance_t * instance,
     return pinyin_len == parse_len;
 }
 
-bool pinyin_parse_more_fulls(pinyin_instance_t * instance,
-                             const char * pinyins){
+bool pinyin_parse_more_full_pinyins(pinyin_instance_t * instance,
+                                    const char * pinyins){
     pinyin_context_t * & context = instance->m_context;
     int pinyin_len = strlen(pinyins);
 
@@ -249,9 +249,9 @@ bool pinyin_parse_more_fulls(pinyin_instance_t * instance,
     return pinyin_len == parse_len;
 }
 
-bool pinyin_parse_double(pinyin_instance_t * instance,
-                         const char * onepinyin,
-                         PinyinKey * onekey){
+bool pinyin_parse_double_pinyin(pinyin_instance_t * instance,
+                                const char * onepinyin,
+                                PinyinKey * onekey){
     pinyin_context_t * & context = instance->m_context;
 
     int pinyin_len = strlen(onepinyin);
@@ -260,8 +260,8 @@ bool pinyin_parse_double(pinyin_instance_t * instance,
     return pinyin_len == parse_len;
 }
 
-bool pinyin_parse_more_doubles(pinyin_instance_t * instance,
-                               const char * pinyins){
+bool pinyin_parse_more_double_pinyins(pinyin_instance_t * instance,
+                                      const char * pinyins){
     pinyin_context_t * & context = instance->m_context;
     int pinyin_len = strlen(pinyins);
 

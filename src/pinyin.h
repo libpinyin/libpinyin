@@ -49,8 +49,8 @@ void pinyin_fini(pinyin_context_t * context);
 bool pinyin_set_options(pinyin_context_t * context,
                         PinyinCustomSettings * custom);
 
-pinyin_instance_t * pinyin_get_instance(pinyin_context_t * context);
-void pinyin_release_instance(pinyin_instance_t * instance);
+pinyin_instance_t * pinyin_alloc_instance(pinyin_context_t * context);
+void pinyin_free_instance(pinyin_instance_t * instance);
 
 bool pinyin_guess_sentence(pinyin_instance_t * instance);
 
@@ -60,16 +60,16 @@ bool pinyin_phrase_segment(pinyin_instance_t * instance,
 bool pinyin_get_sentence(pinyin_instance_t * instance,
                          char ** sentence);
 
-bool pinyin_parse_full(pinyin_instance_t * instance,
-                       const char * onepinyin,
-                       PinyinKey * onekey);
-bool pinyin_parse_more_fulls(pinyin_instance_t * instance,
+bool pinyin_parse_full_pinyin(pinyin_instance_t * instance,
+                              const char * onepinyin,
+                              PinyinKey * onekey);
+bool pinyin_parse_more_full_pinyins(pinyin_instance_t * instance,
                              const char * pinyins);
 
-bool pinyin_parse_double(pinyin_instance_t * instance,
-                         const char * onepinyin,
-                         PinyinKey * onekey);
-bool pinyin_parse_more_doubles(pinyin_instance_t * instance,
+bool pinyin_parse_double_pinyin(pinyin_instance_t * instance,
+                                const char * onepinyin,
+                                PinyinKey * onekey);
+bool pinyin_parse_more_double_pinyins(pinyin_instance_t * instance,
                                const char * pinyins);
 
 bool pinyin_parse_chewing(pinyin_instance_t * instance,
