@@ -75,10 +75,9 @@ void PhraseItem::increase_pinyin_possibility(PinyinCustomSettings & custom,
 	    i * ( phrase_length * sizeof(PinyinKey) + sizeof(guint32) );
 	guint32 * freq = (guint32 *)(pinyin_begin + phrase_length * sizeof(PinyinKey));
 	total_freq += *freq;
-	if ( 0 == pinyin_compare_with_ambiguities(custom,
-						  (PinyinKey *)pinyin_begin,
-						  pinyin_keys,
-						  phrase_length)){
+	if ( 0 == pinyin_compare_with_ambiguities
+             (custom, pinyin_keys,
+              (PinyinKey *)pinyin_begin, phrase_length) ){
 	    //protect against total_freq overflow.
 	    if ( delta > 0 && total_freq > total_freq + delta )
 		return;

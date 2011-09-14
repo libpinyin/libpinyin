@@ -1652,57 +1652,71 @@ int pinyin_compare_initial (const PinyinCustomSettings &custom,
 			    PinyinInitial lhs,
 			    PinyinInitial rhs)
 {
-	if ((lhs == rhs) ||
-		(custom.use_ambiguities [PINYIN_AmbZhiZi] &&
-		 ((lhs == PINYIN_Zhi && rhs == PINYIN_Zi) ||
-		  (lhs == PINYIN_Zi && rhs == PINYIN_Zhi))) ||
-			  
-		(custom.use_ambiguities [PINYIN_AmbChiCi] &&
-		 ((lhs == PINYIN_Chi && rhs == PINYIN_Ci) ||
-		  (lhs == PINYIN_Ci && rhs == PINYIN_Chi))) ||
-			  
-		(custom.use_ambiguities [PINYIN_AmbShiSi] &&
-		 ((lhs == PINYIN_Shi && rhs == PINYIN_Si) ||
-		  (lhs == PINYIN_Si && rhs == PINYIN_Shi))) ||
+    if ((lhs == rhs) ||
 
-	        (custom.use_ambiguities [PINYIN_AmbLeRi] && 
-		 ((lhs == PINYIN_Le && rhs == PINYIN_Ri) ||
-		  (lhs == PINYIN_Ri && rhs == PINYIN_Le))) ||
+        (custom.use_ambiguities [PINYIN_AmbCiChi] &&
+         (lhs == PINYIN_Ci && rhs == PINYIN_Chi)) ||
+        (custom.use_ambiguities [PINYIN_AmbChiCi] &&
+         (lhs == PINYIN_Chi && rhs == PINYIN_Ci)) ||
 
-	        (custom.use_ambiguities [PINYIN_AmbNeLe] && 
-		 ((lhs == PINYIN_Ne && rhs == PINYIN_Le) ||
-		  (lhs == PINYIN_Le && rhs == PINYIN_Ne))) ||
+        (custom.use_ambiguities [PINYIN_AmbZiZhi] &&
+         (lhs == PINYIN_Zi && rhs == PINYIN_Zhi)) ||
+        (custom.use_ambiguities [PINYIN_AmbZhiZi] &&
+         (lhs == PINYIN_Zhi && rhs == PINYIN_Zi)) ||
 
-	        (custom.use_ambiguities [PINYIN_AmbFoHe] && 
-		 ((lhs == PINYIN_Fo && rhs == PINYIN_He) ||
-		  (lhs == PINYIN_He && rhs == PINYIN_Fo))) ||
+        (custom.use_ambiguities [PINYIN_AmbSiShi] &&
+         (lhs == PINYIN_Si && rhs == PINYIN_Shi)) ||
+        (custom.use_ambiguities [PINYIN_AmbShiSi] &&
+         (lhs == PINYIN_Shi && rhs == PINYIN_Si)) ||
 
-		(custom.use_ambiguities [PINYIN_AmbGeKe] &&
-		 ((lhs == PINYIN_Ge && rhs == PINYIN_Ke) ||
-		  (lhs == PINYIN_Ke && rhs == PINYIN_Ge)))
-	    )
-	  return 0;
-	else return (lhs - rhs);
+        (custom.use_ambiguities [PINYIN_AmbLeNe] &&
+         (lhs == PINYIN_Le && rhs == PINYIN_Ne)) ||
+        (custom.use_ambiguities [PINYIN_AmbNeLe] &&
+         (lhs == PINYIN_Ne && rhs == PINYIN_Le)) ||
+
+        (custom.use_ambiguities [PINYIN_AmbLeRi] &&
+         (lhs == PINYIN_Le && rhs == PINYIN_Ri)) ||
+        (custom.use_ambiguities [PINYIN_AmbRiLe] &&
+         (lhs == PINYIN_Ri && rhs == PINYIN_Le)) ||
+
+        (custom.use_ambiguities [PINYIN_AmbFoHe] &&
+         (lhs == PINYIN_Fo && rhs == PINYIN_He)) ||
+        (custom.use_ambiguities [PINYIN_AmbHeFo] &&
+         (lhs == PINYIN_He && rhs == PINYIN_Fo)) ||
+
+        (custom.use_ambiguities [PINYIN_AmbGeKe] &&
+         (lhs == PINYIN_Ge && rhs == PINYIN_Ke)) ||
+        (custom.use_ambiguities [PINYIN_AmbKeGe] &&
+         (lhs == PINYIN_Ke && rhs == PINYIN_Ge))
+        )
+        return 0;
+    else return (lhs - rhs);
 }
 
 int pinyin_compare_final (const PinyinCustomSettings &custom,
 			  PinyinFinal lhs,
 			  PinyinFinal rhs)
 {
-    if(((lhs == rhs) ||
-        (custom.use_ambiguities [PINYIN_AmbAnAng] &&
-         ((lhs == PINYIN_An && rhs == PINYIN_Ang) ||
-          (lhs == PINYIN_Ang && rhs == PINYIN_An))) ||
-              
-        (custom.use_ambiguities [PINYIN_AmbEnEng] &&
-         ((lhs == PINYIN_En && rhs == PINYIN_Eng) ||
-          (lhs == PINYIN_Eng && rhs == PINYIN_En))) ||
-              
-         (custom.use_ambiguities [PINYIN_AmbInIng] &&
-         ((lhs == PINYIN_In && rhs == PINYIN_Ing) ||
-          (lhs == PINYIN_Ing && rhs == PINYIN_In)))))
+    if((lhs == rhs) ||
+
+       (custom.use_ambiguities [PINYIN_AmbAnAng] &&
+        (lhs == PINYIN_An && rhs == PINYIN_Ang)) ||
+       (custom.use_ambiguities [PINYIN_AmbAngAn] &&
+        (lhs == PINYIN_Ang && rhs == PINYIN_An)) ||
+
+       (custom.use_ambiguities [PINYIN_AmbEnEng] &&
+        (lhs == PINYIN_En && rhs == PINYIN_Eng)) ||
+       (custom.use_ambiguities [PINYIN_AmbEngEn] &&
+        (lhs == PINYIN_Eng && rhs == PINYIN_En)) ||
+
+       (custom.use_ambiguities [PINYIN_AmbInIng] &&
+        (lhs == PINYIN_In && rhs == PINYIN_Ing)) ||
+       (custom.use_ambiguities [PINYIN_AmbIngIn] &&
+        (lhs == PINYIN_Ing && rhs == PINYIN_In))
+       )
         return 0;
-    else if (custom.use_incomplete && (lhs == PINYIN_ZeroFinal || rhs == PINYIN_ZeroFinal))
+    else if (custom.use_incomplete &&
+             (lhs == PINYIN_ZeroFinal || rhs == PINYIN_ZeroFinal))
         return 0;
     else return (lhs - rhs);
 }

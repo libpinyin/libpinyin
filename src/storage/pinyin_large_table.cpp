@@ -103,8 +103,8 @@ int PinyinBitmapIndexLevel::initial_level_search(int phrase_length,
 
 #define MATCH(AMBIGUITY, ORIGIN, ANOTHER)  case ORIGIN:			\
     {                                                                   \
-	result |= final_level_search((PinyinInitial)first_key.m_initial,\
-				    phrase_length, keys, ranges);		\
+	result |= final_level_search((PinyinInitial)first_key.m_initial, \
+                                     phrase_length, keys, ranges);      \
 	if ( custom.use_ambiguities [AMBIGUITY] ){			\
 	    result |= final_level_search(ANOTHER,			\
 					 phrase_length, keys, ranges);	\
@@ -119,28 +119,28 @@ int PinyinBitmapIndexLevel::initial_level_search(int phrase_length,
     PinyinCustomSettings &  custom= *m_custom;
     
     switch(first_key.m_initial){
-	
-	MATCH(PINYIN_AmbZhiZi, PINYIN_Zi, PINYIN_Zhi);
-	MATCH(PINYIN_AmbZhiZi, PINYIN_Zhi, PINYIN_Zi);
-	MATCH(PINYIN_AmbChiCi, PINYIN_Ci, PINYIN_Chi);
+
+	MATCH(PINYIN_AmbCiChi, PINYIN_Ci, PINYIN_Chi);
 	MATCH(PINYIN_AmbChiCi, PINYIN_Chi, PINYIN_Ci);
-	MATCH(PINYIN_AmbShiSi, PINYIN_Si, PINYIN_Shi);
+	MATCH(PINYIN_AmbZiZhi, PINYIN_Zi, PINYIN_Zhi);
+	MATCH(PINYIN_AmbZhiZi, PINYIN_Zhi, PINYIN_Zi);
+	MATCH(PINYIN_AmbSiShi, PINYIN_Si, PINYIN_Shi);
 	MATCH(PINYIN_AmbShiSi, PINYIN_Shi, PINYIN_Si);
-	MATCH(PINYIN_AmbLeRi, PINYIN_Ri, PINYIN_Le);
+	MATCH(PINYIN_AmbRiLe, PINYIN_Ri, PINYIN_Le);
 	MATCH(PINYIN_AmbNeLe, PINYIN_Ne, PINYIN_Le);
 	MATCH(PINYIN_AmbFoHe, PINYIN_Fo, PINYIN_He);
-	MATCH(PINYIN_AmbFoHe, PINYIN_He, PINYIN_Fo);
+	MATCH(PINYIN_AmbHeFo, PINYIN_He, PINYIN_Fo);
         MATCH(PINYIN_AmbGeKe, PINYIN_Ge, PINYIN_Ke);
-        MATCH(PINYIN_AmbGeKe, PINYIN_Ke, PINYIN_Ge);
+        MATCH(PINYIN_AmbKeGe, PINYIN_Ke, PINYIN_Ge);
 
     case PINYIN_Le:
 	{
 	    result |= final_level_search((PinyinInitial)first_key.m_initial, 
-					phrase_length, keys, ranges);  
-	    if ( custom.use_ambiguities [PINYIN_AmbLeRi] )		
+                                         phrase_length, keys, ranges);
+	    if ( custom.use_ambiguities [PINYIN_AmbLeRi] )
 		result |= final_level_search(PINYIN_Ri, phrase_length,
 					     keys, ranges);	
-	    if ( custom.use_ambiguities [PINYIN_AmbNeLe] )		
+	    if ( custom.use_ambiguities [PINYIN_AmbLeNe] )
 		result |= final_level_search(PINYIN_Ne, phrase_length, 
 					     keys, ranges);
 	    return result;
@@ -161,15 +161,15 @@ int PinyinBitmapIndexLevel::final_level_search(PinyinInitial initial,
 					       /* out */ PhraseIndexRanges ranges) const{
 #define MATCH(AMBIGUITY, ORIGIN, ANOTHER) case ORIGIN: 	                \
     {								        \
-	result = tone_level_search(initial,(PinyinFinal) first_key.m_final,\
-				   phrase_length, keys, ranges);		\
+	result = tone_level_search(initial,(PinyinFinal) first_key.m_final, \
+				   phrase_length, keys, ranges);        \
 	if ( custom.use_ambiguities [AMBIGUITY] ){			\
 	    result |= tone_level_search(initial, ANOTHER,		\
 					phrase_length, keys, ranges);	\
 	}								\
 	return result;							\
     }
-    
+
     int result = SEARCH_NONE;
     PinyinKey& first_key = keys[0];
     PinyinCustomSettings &  custom= *m_custom;
@@ -187,12 +187,12 @@ int PinyinBitmapIndexLevel::final_level_search(PinyinInitial initial,
 	}
 	
 	MATCH(PINYIN_AmbAnAng, PINYIN_An, PINYIN_Ang);
-	MATCH(PINYIN_AmbAnAng, PINYIN_Ang, PINYIN_An);
+	MATCH(PINYIN_AmbAngAn, PINYIN_Ang, PINYIN_An);
 	MATCH(PINYIN_AmbEnEng, PINYIN_En, PINYIN_Eng);
-	MATCH(PINYIN_AmbEnEng, PINYIN_Eng, PINYIN_En);
+	MATCH(PINYIN_AmbEngEn, PINYIN_Eng, PINYIN_En);
 	MATCH(PINYIN_AmbInIng, PINYIN_In, PINYIN_Ing);
-	MATCH(PINYIN_AmbInIng, PINYIN_Ing, PINYIN_In);
-	
+	MATCH(PINYIN_AmbIngIn, PINYIN_Ing, PINYIN_In);
+
     default:
 	{
 	    return tone_level_search(initial,(PinyinFinal)first_key.m_final, 

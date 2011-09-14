@@ -36,17 +36,27 @@ namespace pinyin{
 enum PinyinAmbiguity
 {
     PINYIN_AmbAny= 0,
-    PINYIN_AmbZhiZi,
+    PINYIN_AmbCiChi,
     PINYIN_AmbChiCi,
+    PINYIN_AmbZiZhi,
+    PINYIN_AmbZhiZi,
+    PINYIN_AmbSiShi,
     PINYIN_AmbShiSi,
+    PINYIN_AmbLeNe,
     PINYIN_AmbNeLe,
-    PINYIN_AmbLeRi,
     PINYIN_AmbFoHe,
+    PINYIN_AmbHeFo,
+    PINYIN_AmbLeRi,
+    PINYIN_AmbRiLe,
+    PINYIN_AmbKeGe,
     PINYIN_AmbGeKe,
     PINYIN_AmbAnAng,
+    PINYIN_AmbAngAn,
     PINYIN_AmbEnEng,
+    PINYIN_AmbEngEn,
     PINYIN_AmbInIng,
-    PINYIN_AmbLast = PINYIN_AmbInIng
+    PINYIN_AmbIngIn,
+    PINYIN_AmbLast = PINYIN_AmbIngIn
 };
 
 /**
