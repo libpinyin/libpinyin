@@ -98,9 +98,8 @@ inline void compute_lower_value(const PinyinCustomSettings &custom,
 	//deal with initial
 	sel = aKey.m_initial;
 	for( k = aKey.m_initial - 1; k >= PINYIN_ZeroInitial; k--){
-	    if ( 0 != pinyin_compare_initial(custom, 
-					     (PinyinInitial)k, 
-					     (PinyinInitial)aKey.m_initial) )
+	    if ( 0 != pinyin_compare_initial
+                 (custom, (PinyinInitial)aKey.m_initial, (PinyinInitial)k) )
 		break;
 	    else
 		sel = k;
@@ -109,9 +108,8 @@ inline void compute_lower_value(const PinyinCustomSettings &custom,
 	//deal with final
 	sel = aKey.m_final;
 	for( k = aKey.m_final - 1; k >= PINYIN_ZeroFinal; k--){
-	    if ( 0 != pinyin_compare_final(custom,
-					   (PinyinFinal)k,
-					   (PinyinFinal)aKey.m_final) )
+	    if ( 0 != pinyin_compare_final
+                 (custom, (PinyinFinal)aKey.m_final, (PinyinFinal)k) )
 		break;
 	    else
 		sel = k;
@@ -120,9 +118,8 @@ inline void compute_lower_value(const PinyinCustomSettings &custom,
 	//deal with tone
 	sel = aKey.m_tone;
 	for( k = aKey.m_tone - 1; k >= PINYIN_ZeroTone; k--){
-	    if ( 0 != pinyin_compare_tone(custom,
-					  (PinyinTone)k, 
-					  (PinyinTone)aKey.m_tone) )
+	    if ( 0 != pinyin_compare_tone
+                 (custom, (PinyinTone)aKey.m_tone, (PinyinTone)k) )
 		break;
 	    else
 	    sel = k;
@@ -147,7 +144,8 @@ inline void compute_upper_value(const PinyinCustomSettings &custom,
 	//deal with initial
 	sel = aKey.m_initial;
 	for( k = aKey.m_initial + 1; k <= PINYIN_LastInitial; k++){
-	    if ( 0 != pinyin_compare_initial(custom, (PinyinInitial)k, (PinyinInitial)aKey.m_initial) )
+	    if ( 0 != pinyin_compare_initial
+                 (custom, (PinyinInitial)aKey.m_initial, (PinyinInitial)k) )
 		break;
 	    else
 		sel = k;
@@ -156,7 +154,8 @@ inline void compute_upper_value(const PinyinCustomSettings &custom,
 	//deal with final
 	sel = aKey.m_final;
 	for( k = aKey.m_final + 1; k <= PINYIN_LastFinal; k++){
-	    if ( 0 != pinyin_compare_final(custom, (PinyinFinal)k, (PinyinFinal)aKey.m_final) )
+	    if ( 0 != pinyin_compare_final
+                 (custom, (PinyinFinal)aKey.m_final, (PinyinFinal)k) )
 		break;
 	    else
 		sel = k;
@@ -165,7 +164,8 @@ inline void compute_upper_value(const PinyinCustomSettings &custom,
 	//deal with tone
 	sel = aKey.m_tone;
 	for( k = aKey.m_tone + 1; k <= PINYIN_LastTone; k++){
-	    if ( 0 != pinyin_compare_tone(custom, (PinyinTone)k, (PinyinTone)aKey.m_tone) )
+	    if ( 0 != pinyin_compare_tone
+                 (custom, (PinyinTone)aKey.m_tone, (PinyinTone)k) )
 		break;
 	    else
 		sel = k;
