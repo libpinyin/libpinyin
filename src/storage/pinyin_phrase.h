@@ -27,16 +27,6 @@
 
 namespace pinyin{
 
-/*
-static inline int pinyin_utility_sign(int value){
-  if(value > 0)
-    return 1;
-  else if (value < 0)
-    return -1;
-  else return 0;
-}
-*/
-
 inline int pinyin_exact_compare(const PinyinKey key_lhs[], 
 				const PinyinKey key_rhs[],
 				int phrase_length){
@@ -197,29 +187,6 @@ public:
     }
 };
 
-/*
-//just need less than  mode
-//this method mainly used in pinyin lookup
-template<int phrase_length>
-class PhraseCompareWithAmbiguities
-    : public std_lite::binary_function <const PinyinIndexItem <phrase_length>,
-				   const PinyinIndexItem <phrase_length>, int>
-{
-    const PinyinCustomSettings & m_custom;
-public:
-    PhraseCompareWithAmbiguities<phrase_length>
-	(const PinyinCustomSettings & custom):m_custom(custom){}
-
-    int operator () (const PinyinIndexItem<phrase_length> &lhs,
-                      const PinyinIndexItem<phrase_length> &rhs) const{
-      PinyinKey * key_lhs = (PinyinKey *) lhs.m_keys;
-      PinyinKey * key_rhs = (PinyinKey *) rhs.m_keys;
-      return pinyin_compare_with_ambiguities(m_custom, 
-					     key_lhs, key_rhs, phrase_length);
-    }
-};
-*/
-
 //for find the element in the phrase array
 template<int phrase_length>
 class PhraseExactCompare
@@ -236,29 +203,6 @@ public:
   }
 };
 
-/*
-//for find the element in the phrase array
-template<int phrase_length>
-class PhraseExactCompareWithToken
-  : public std_lite::binary_function <const PinyinIndexItem<phrase_length>
-				 ,const PinyinIndexItem<phrase_length>, int>
-{
-public:
-  int operator () (const PinyinIndexItem<phrase_length> &lhs,
-		   const PinyinIndexItem<phrase_length> &rhs) const{
-    PinyinKey * key_lhs = (PinyinKey *) lhs.m_keys;
-    PinyinKey * key_rhs = (PinyinKey *) rhs.m_keys;
-    
-    phrase_token_t token_lhs = lhs.m_token;
-    phrase_token_t token_rhs = rhs.m_token;
-    
-    int result = pinyin_exact_compare(key_lhs, key_rhs, phrase_length);
-    if ( !result )
-	return result;
-    return pinyin_utility_sign(token_lhs - token_rhs);
-  }
-};
-*/
 
 template<int phrase_length>
 class PhraseExactLessThan
@@ -274,23 +218,6 @@ class PhraseExactLessThan
     return 0 > m_compare(lhs, rhs);
   }
 };
-
-/*
-template<int phrase_length>
-class PhraseExactLessThanWithToken
-    : public std_lite::binary_function <const PinyinIndexItem<phrase_length>
-				   ,const PinyinIndexItem<phrase_length>,
-    bool>
-{
- private:
-  PhraseExactCompareWithToken<phrase_length> m_compare;
- public:
-  bool operator () (const PinyinIndexItem<phrase_length> &lhs,
-		   const PinyinIndexItem<phrase_length> &rhs) const{
-    return 0 > m_compare(lhs, rhs);
-  }
-};
-*/
 
 };
 
