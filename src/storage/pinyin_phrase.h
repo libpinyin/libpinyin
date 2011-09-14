@@ -187,7 +187,27 @@ public:
     }
 };
 
+
 //for find the element in the phrase array
+template<int phrase_length>
+inline int phrase_exact_compare(const PinyinIndexItem<phrase_length> &lhs,
+                                const PinyinIndexItem<phrase_length> &rhs)
+{
+    PinyinKey * key_lhs = (PinyinKey *) lhs.m_keys;
+    PinyinKey * key_rhs = (PinyinKey *) rhs.m_keys;
+    return pinyin_exact_compare(key_lhs, key_rhs, phrase_length);
+}
+
+template<int phrase_length>
+inline bool phrase_exact_less_than(const PinyinIndexItem<phrase_length> &lhs,
+                                   const PinyinIndexItem<phrase_length> &rhs)
+{
+    return 0 > phrase_exact_compare<phrase_length>(lhs, rhs);
+}
+
+
+#if 0
+
 template<int phrase_length>
 class PhraseExactCompare
   : public std_lite::binary_function <const PinyinIndexItem<phrase_length>
@@ -218,6 +238,8 @@ class PhraseExactLessThan
     return 0 > m_compare(lhs, rhs);
   }
 };
+
+#endif
 
 };
 

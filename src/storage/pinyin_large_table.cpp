@@ -327,18 +327,21 @@ int PinyinLengthIndexLevel::search( int phrase_length,
 
 template<size_t phrase_length>
 int PinyinArrayIndexLevel<phrase_length>::search(/* in */ PinyinCustomSettings * custom, /* in */ PinyinKey keys[], /* out */ PhraseIndexRanges ranges){
-  PhraseExactLessThan<phrase_length> m_lessthan;
   PinyinIndexItem<phrase_length> * chunk_begin, * chunk_end;
   chunk_begin = (PinyinIndexItem<phrase_length> *)m_chunk.begin();
   chunk_end = (PinyinIndexItem<phrase_length> *)m_chunk.end();
+
   //do the search
   PinyinKey left_keys[phrase_length], right_keys[phrase_length];
   compute_lower_value(*custom, keys, left_keys, phrase_length);
   compute_upper_value(*custom, keys, right_keys, phrase_length);
+
   PinyinIndexItem<phrase_length> left(left_keys, -1), right(right_keys, -1);
 
-  PinyinIndexItem<phrase_length> * begin = std_lite::lower_bound(chunk_begin, chunk_end, left, m_lessthan);
-  PinyinIndexItem<phrase_length> * end = std_lite::upper_bound(chunk_begin, chunk_end, right, m_lessthan);
+  PinyinIndexItem<phrase_length> * begin = std_lite::lower_bound
+      (chunk_begin, chunk_end, left, phrase_exact_less_than<phrase_length>);
+  PinyinIndexItem<phrase_length> * end = std_lite::upper_bound
+      (chunk_begin, chunk_end, right, phrase_exact_less_than<phrase_length>);
 
   return convert(custom, keys, begin, end, ranges);
 }
@@ -474,7 +477,6 @@ int PinyinLengthIndexLevel::remove_index( int phrase_length, /* in */ PinyinKey 
 
 template<size_t phrase_length>
 int PinyinArrayIndexLevel<phrase_length>::add_index(/* in */ PinyinKey keys[], /* in */ phrase_token_t token){
-    PhraseExactLessThan<phrase_length> m_lessthan;
     PinyinIndexItem<phrase_length> * buf_begin, * buf_end;
 
     PinyinIndexItem<phrase_length> new_elem(keys, token);
@@ -482,7 +484,8 @@ int PinyinArrayIndexLevel<phrase_length>::add_index(/* in */ PinyinKey keys[], /
     buf_end = (PinyinIndexItem<phrase_length> *) m_chunk.end();
 
     std_lite::pair<PinyinIndexItem<phrase_length> *, PinyinIndexItem<phrase_length> *> range;
-    range = std_lite::equal_range(buf_begin, buf_end, new_elem, m_lessthan);
+    range = std_lite::equal_range
+        (buf_begin, buf_end, new_elem, phrase_exact_less_than<phrase_length>);
 
     PinyinIndexItem<phrase_length> * cur_elem;
     for ( cur_elem = range.first; 
@@ -502,7 +505,6 @@ int PinyinArrayIndexLevel<phrase_length>::add_index(/* in */ PinyinKey keys[], /
 
 template<size_t phrase_length>
 int PinyinArrayIndexLevel<phrase_length>::remove_index(/* in */ PinyinKey keys[], /* in */ phrase_token_t token){
-    PhraseExactLessThan<phrase_length> m_lessthan;
     PinyinIndexItem<phrase_length> * buf_begin, * buf_end;
 
     PinyinIndexItem<phrase_length> remove_elem(keys, token);
@@ -510,7 +512,9 @@ int PinyinArrayIndexLevel<phrase_length>::remove_index(/* in */ PinyinKey keys[]
     buf_end = (PinyinIndexItem<phrase_length> *) m_chunk.end();
 
     std_lite::pair<PinyinIndexItem<phrase_length> *, PinyinIndexItem<phrase_length> *> range;
-    range = std_lite::equal_range(buf_begin, buf_end, remove_elem, m_lessthan);
+    range = std_lite::equal_range
+        (buf_begin, buf_end, remove_elem,
+         phrase_exact_less_than<phrase_length>);
 
     PinyinIndexItem<phrase_length> * cur_elem;
     for ( cur_elem = range.first; 
