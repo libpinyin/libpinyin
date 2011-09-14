@@ -588,16 +588,6 @@ static const PinyinKey (*__zhuyin_maps []) [3] = {
 
 
 //////////////////////////////////////////////////////////////////////////////
-// implementation of PinyinCustomSettings
-
-PinyinCustomSettings::PinyinCustomSettings ()
-    : use_incomplete (true)
-{
-    for (size_t i=0; i<=PINYIN_AmbLast; ++i)
-        use_ambiguities [i] = false;
-}
-
-//////////////////////////////////////////////////////////////////////////////
 // implementation of PinyinKey
 
 const guint16 PinyinKey::min_value = 0;

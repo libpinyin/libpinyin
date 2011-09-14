@@ -72,7 +72,12 @@ struct PinyinCustomSettings
     bool use_ambiguities [PINYIN_AmbLast + 1];
         /**< allow ambiguous pinyin elements or not. */
 
-    PinyinCustomSettings ();
+    PinyinCustomSettings ()
+        :use_incomplete (true)
+    {
+        for (size_t i=0; i<=PINYIN_AmbLast; ++i)
+            use_ambiguities [i] = false;
+    }
 
     void set_use_incomplete (bool use) { use_incomplete = use; }
     void set_use_ambiguities (PinyinAmbiguity amb, bool use)
