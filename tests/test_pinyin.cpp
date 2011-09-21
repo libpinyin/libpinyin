@@ -45,7 +45,8 @@ int main(int argc, char * argv[]){
 
         char * sentence = NULL;
         pinyin_get_sentence (instance, &sentence);
-        printf("%s\n", sentence);
+        if (sentence)
+            printf("%s\n", sentence);
         g_free(sentence);
 
         pinyin_train(instance);
