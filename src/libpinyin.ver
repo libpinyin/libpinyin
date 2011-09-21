@@ -22,6 +22,7 @@ LIBPINYIN {
         pinyin_translate_token;
         pinyin_train;
         pinyin_reset;
+        _ZNK6pinyin9PinyinKey*;
 
     local:
 	*;
