@@ -63,20 +63,20 @@ bool pinyin_get_sentence(pinyin_instance_t * instance,
 bool pinyin_parse_full_pinyin(pinyin_instance_t * instance,
                               const char * onepinyin,
                               PinyinKey * onekey);
-bool pinyin_parse_more_full_pinyins(pinyin_instance_t * instance,
-                             const char * pinyins);
+size_t pinyin_parse_more_full_pinyins(pinyin_instance_t * instance,
+                                      const char * pinyins);
 
 bool pinyin_parse_double_pinyin(pinyin_instance_t * instance,
                                 const char * onepinyin,
                                 PinyinKey * onekey);
-bool pinyin_parse_more_double_pinyins(pinyin_instance_t * instance,
-                               const char * pinyins);
+size_t pinyin_parse_more_double_pinyins(pinyin_instance_t * instance,
+                                        const char * pinyins);
 
 bool pinyin_parse_chewing(pinyin_instance_t * instance,
                           const char * onechewing,
                           PinyinKey * onekey);
-bool pinyin_parse_more_chewings(pinyin_instance_t * instance,
-                                const char * chewings);
+size_t pinyin_parse_more_chewings(pinyin_instance_t * instance,
+                                  const char * chewings);
 
 bool pinyin_get_candidates(pinyin_instance_t * instance,
                            size_t offset,

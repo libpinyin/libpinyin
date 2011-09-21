@@ -237,8 +237,8 @@ bool pinyin_parse_full_pinyin(pinyin_instance_t * instance,
     return pinyin_len == parse_len;
 }
 
-bool pinyin_parse_more_full_pinyins(pinyin_instance_t * instance,
-                                    const char * pinyins){
+size_t pinyin_parse_more_full_pinyins(pinyin_instance_t * instance,
+                                      const char * pinyins){
     pinyin_context_t * & context = instance->m_context;
     int pinyin_len = strlen(pinyins);
 
@@ -246,7 +246,7 @@ bool pinyin_parse_more_full_pinyins(pinyin_instance_t * instance,
         ( context->m_validator, instance->m_pinyin_keys,
           instance->m_pinyin_poses, pinyins, pinyin_len);
 
-    return pinyin_len == parse_len;
+    return parse_len;
 }
 
 bool pinyin_parse_double_pinyin(pinyin_instance_t * instance,
@@ -260,8 +260,8 @@ bool pinyin_parse_double_pinyin(pinyin_instance_t * instance,
     return pinyin_len == parse_len;
 }
 
-bool pinyin_parse_more_double_pinyins(pinyin_instance_t * instance,
-                                      const char * pinyins){
+size_t pinyin_parse_more_double_pinyins(pinyin_instance_t * instance,
+                                        const char * pinyins){
     pinyin_context_t * & context = instance->m_context;
     int pinyin_len = strlen(pinyins);
 
@@ -269,7 +269,7 @@ bool pinyin_parse_more_double_pinyins(pinyin_instance_t * instance,
         ( context->m_validator, instance->m_pinyin_keys,
           instance->m_pinyin_poses, pinyins, pinyin_len);
 
-    return pinyin_len == parse_len;
+    return parse_len;
 }
 
 bool pinyin_parse_chewing(pinyin_instance_t * instance,
@@ -283,8 +283,8 @@ bool pinyin_parse_chewing(pinyin_instance_t * instance,
     return chewing_len == parse_len;
 }
 
-bool pinyin_parse_more_chewings(pinyin_instance_t * instance,
-                                const char * chewings){
+size_t pinyin_parse_more_chewings(pinyin_instance_t * instance,
+                                  const char * chewings){
     pinyin_context_t * & context = instance->m_context;
     int chewing_len = strlen(chewings);
 
@@ -292,7 +292,7 @@ bool pinyin_parse_more_chewings(pinyin_instance_t * instance,
         ( context->m_validator, instance->m_pinyin_keys,
           instance->m_pinyin_poses, chewings, chewing_len);
 
-    return chewing_len == parse_len;
+    return parse_len;
 }
 
 
