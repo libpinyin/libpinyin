@@ -745,7 +745,7 @@ PinyinParser::normalize (PinyinKey &key)
 {
     static const PinyinReplaceRulePair rules [] = 
     {
-#if 1
+#if 0
         {PINYIN_ZeroInitial, PINYIN_I,    PINYIN_Yi, PINYIN_I},
         {PINYIN_ZeroInitial, PINYIN_Ia,   PINYIN_Yi, PINYIN_A},
         {PINYIN_ZeroInitial, PINYIN_Ian,  PINYIN_Yi, PINYIN_An},
