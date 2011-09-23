@@ -35,7 +35,10 @@ pinyin_context_t * pinyin_init(const char * systemdir, const char * userdir){
     MemoryChunk * chunk = new MemoryChunk;
     gchar * filename = g_build_filename
         (context->m_system_dir, "pinyin_index.bin", NULL);
-    chunk->load(filename);
+    if (!chunk->load(filename)) {
+      fprintf(stderr, "open %s failed!\n", filename);
+      exit(ENOENT);
+    }
     context->m_pinyin_table->load(chunk);
 
     context->m_validator.initialize(context->m_pinyin_table);
