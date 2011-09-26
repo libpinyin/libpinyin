@@ -44,6 +44,10 @@ typedef struct {
 
 pinyin_context_t * pinyin_init(const char * systemdir, const char * userdir);
 bool pinyin_save(pinyin_context_t * context);
+bool pinyin_set_double_pinyin_scheme(pinyin_context_t * context,
+                                     PinyinShuangPinScheme scheme);
+bool pinyin_set_chewing_scheme(pinyin_context_t * context,
+                               PinyinZhuYinScheme scheme);
 void pinyin_fini(pinyin_context_t * context);
 
 bool pinyin_set_options(pinyin_context_t * context,

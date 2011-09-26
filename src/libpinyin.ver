@@ -2,6 +2,8 @@ LIBPINYIN {
     global:
         pinyin_init;
         pinyin_save;
+        pinyin_set_double_pinyin_scheme;
+        pinyin_set_chewing_scheme;
         pinyin_fini;
         pinyin_set_options;
         pinyin_alloc_instance;

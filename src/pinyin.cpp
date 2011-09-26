@@ -150,6 +150,19 @@ bool pinyin_save(pinyin_context_t * context){
     return true;
 }
 
+bool pinyin_set_double_pinyin_scheme(pinyin_context_t * context,
+                                     PinyinShuangPinScheme scheme){
+    context->m_shuang_pin_parser->set_scheme(scheme);
+    return true;
+}
+
+bool pinyin_set_chewing_scheme(pinyin_context_t * context,
+                               PinyinZhuYinScheme scheme){
+    context->m_chewing_parser->set_scheme(scheme);
+    return true;
+}
+
+
 void pinyin_fini(pinyin_context_t * context){
     delete context->m_default_parser;
     delete context->m_shuang_pin_parser;
