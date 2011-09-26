@@ -67,7 +67,7 @@ pinyin_context_t * pinyin_init(const char * systemdir, const char * userdir){
     context->m_phrase_index->merge(2, log);
 
     context->m_system_bigram = new Bigram;
-    filename = g_build_filename(context->m_system_dir, "system.db", NULL);
+    filename = g_build_filename(context->m_system_dir, "bigram.db", NULL);
     context->m_system_bigram->attach(filename, ATTACH_READONLY);
     context->m_user_bigram = new Bigram;
     filename = g_build_filename(context->m_user_dir, "user.db", NULL);

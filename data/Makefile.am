@@ -34,6 +34,10 @@ libpinyin_dbdir		= $(pkgdatadir)/data
 
 CLEANFILES		= $(binary_model_data)
 
+$(textual_model_data):
+	wget https://github.com/downloads/libpinyin/libpinyin/model.text.tar.gz
+	tar xvf model.text.tar.gz
+
 $(binary_model_data): $(textual_model_data)
 	$(RM) $(binary_model_data)
 	../utils/storage/gen_binary_files --table-dir $(top_srcdir)/data
