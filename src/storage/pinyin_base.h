@@ -173,14 +173,20 @@ enum PinyinTone
  */
 enum PinyinShuangPinScheme
 {
+#if 0
     SHUANG_PIN_STONE      = 0,
+#endif
     SHUANG_PIN_ZRM        = 1,
     SHUANG_PIN_MS         = 2,
     SHUANG_PIN_ZIGUANG    = 3,
     SHUANG_PIN_ABC        = 4,
+#if 0
     SHUANG_PIN_LIUSHI     = 5,
-    SHUANG_PIN_CUSTOMIZED = 6,
-    SHUANG_PIN_DEFAULT    = SHUANG_PIN_ZRM
+#endif
+    SHUANG_PIN_PYJJ       = 6,
+    SHUANG_PIN_XHE        = 7,
+    SHUANG_PIN_CUSTOMIZED = 30,        /* for user's keyboard */
+    SHUANG_PIN_DEFAULT    = SHUANG_PIN_MS
 };
 
 /**

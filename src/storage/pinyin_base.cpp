@@ -150,7 +150,7 @@ static const PinyinTokenIndex __pinyin_finals_index[] =
     {22,1},{23,3},{-1,0},{-1,0},{-1,0},{-1,0},{-1,0},{26,10},{36,4},{-1,0},{-1,0},{-1,0},{-1,0}
 };
 
-
+#if 0
 
 static const PinyinInitial __shuang_pin_stone_initial_map [] =
 {
@@ -214,6 +214,7 @@ static const PinyinFinal __shuang_pin_stone_final_map [][2] =
     { PINYIN_ZeroFinal, PINYIN_ZeroFinal },   // ;
 };
 
+#endif
 
 static const PinyinInitial __shuang_pin_zrm_initial_map [] =
 {
@@ -466,6 +467,7 @@ static const PinyinFinal __shuang_pin_abc_final_map [][2] =
     { PINYIN_ZeroFinal, PINYIN_ZeroFinal },   // ;
 };
 
+#if 0
 
 static const PinyinInitial __shuang_pin_liushi_initial_map [] =
 {
@@ -528,6 +530,134 @@ static const PinyinFinal __shuang_pin_liushi_final_map [][2] =
     { PINYIN_Iao, PINYIN_ZeroFinal },         // Z
     { PINYIN_ZeroFinal, PINYIN_ZeroFinal },   // ;
 };
+
+#endif
+
+static const PinyinInitial __shuang_pin_pyjj_initial_map [] =
+{
+    PINYIN_ZeroInitial,    // A
+    PINYIN_Bo,             // B
+    PINYIN_Ci,             // C
+    PINYIN_De,             // D
+    PINYIN_ZeroInitial,    // E
+    PINYIN_Fo,             // F
+    PINYIN_Ge,             // G
+    PINYIN_He,             // H
+    PINYIN_Shi,            // I
+    PINYIN_Ji,             // J
+    PINYIN_Ke,             // K
+    PINYIN_Le,             // L
+    PINYIN_Mo,             // M
+    PINYIN_Ne,             // N
+    PINYIN_ZeroInitial,    // O
+    PINYIN_Po,             // P
+    PINYIN_Qi,             // Q
+    PINYIN_Ri,             // R
+    PINYIN_Si,             // S
+    PINYIN_Te,             // T
+    PINYIN_Chi,            // U
+    PINYIN_Zhi,            // V
+    PINYIN_Wu,             // W
+    PINYIN_Xi,             // X
+    PINYIN_Yi,             // Y
+    PINYIN_Zi,             // Z
+    PINYIN_ZeroInitial,    // ;
+};
+
+static const PinyinFinal __shuang_pin_pyjj_final_map [][2] =
+{
+    { PINYIN_A,   PINYIN_ZeroFinal },         // A
+    { PINYIN_Ia,  PINYIN_Ua        },         // B
+    { PINYIN_Uan, PINYIN_ZeroFinal },         // C
+    { PINYIN_Ao,  PINYIN_ZeroFinal },         // D
+    { PINYIN_E,   PINYIN_ZeroFinal },         // E
+    { PINYIN_An,  PINYIN_ZeroFinal },         // F
+    { PINYIN_Ang, PINYIN_ZeroFinal },         // G
+    { PINYIN_Iang,PINYIN_Uang      },         // H
+    { PINYIN_I,   PINYIN_ZeroFinal },         // I
+    { PINYIN_Ian, PINYIN_ZeroFinal },         // J
+    { PINYIN_Iao, PINYIN_ZeroFinal },         // K
+    { PINYIN_In,  PINYIN_ZeroFinal },         // L
+    { PINYIN_Ie,  PINYIN_ZeroFinal },         // M
+    { PINYIN_Iu,  PINYIN_ZeroFinal },         // N
+    { PINYIN_Uo,  PINYIN_O         },         // O
+    { PINYIN_Ou,  PINYIN_ZeroFinal },         // P
+    { PINYIN_Er,  PINYIN_Ing       },         // Q
+    { PINYIN_En,  PINYIN_ZeroFinal },         // R
+    { PINYIN_Ai,  PINYIN_ZeroFinal },         // S
+    { PINYIN_Eng, PINYIN_Ng        },         // T
+    { PINYIN_U,   PINYIN_ZeroFinal },         // U
+    { PINYIN_V,   PINYIN_Ui        },         // V
+    { PINYIN_Ei,  PINYIN_ZeroFinal },         // W
+    { PINYIN_Uai, PINYIN_Ue        },         // X
+    { PINYIN_Ong, PINYIN_Iong      },         // Y
+    { PINYIN_Un,  PINYIN_ZeroFinal },         // Z
+    { PINYIN_ZeroFinal, PINYIN_ZeroFinal },   // ;
+};
+
+static const PinyinInitial __shuang_pin_xhe_initial_map [] =
+{
+    PINYIN_ZeroInitial,    // A
+    PINYIN_Bo,             // B
+    PINYIN_Ci,             // C
+    PINYIN_De,             // D
+    PINYIN_ZeroInitial,    // E
+    PINYIN_Fo,             // F
+    PINYIN_Ge,             // G
+    PINYIN_He,             // H
+    PINYIN_Chi,            // I
+    PINYIN_Ji,             // J
+    PINYIN_Ke,             // K
+    PINYIN_Le,             // L
+    PINYIN_Mo,             // M
+    PINYIN_Ne,             // N
+    PINYIN_ZeroInitial,    // O
+    PINYIN_Po,             // P
+    PINYIN_Qi,             // Q
+    PINYIN_Ri,             // R
+    PINYIN_Si,             // S
+    PINYIN_Te,             // T
+    PINYIN_Shi,            // U
+    PINYIN_Zhi,            // V
+    PINYIN_Wu,             // W
+    PINYIN_Xi,             // X
+    PINYIN_Yi,             // Y
+    PINYIN_Zi,             // Z
+    PINYIN_ZeroInitial,    // ;
+};
+
+static const PinyinFinal __shuang_pin_xhe_final_map [][2] =
+{
+    { PINYIN_A,   PINYIN_ZeroFinal },         // A
+    { PINYIN_In,  PINYIN_ZeroFinal },         // B
+    { PINYIN_Ao,  PINYIN_ZeroFinal },         // C
+    { PINYIN_Ai,  PINYIN_ZeroFinal },         // D
+    { PINYIN_E,   PINYIN_ZeroFinal },         // E
+    { PINYIN_En,  PINYIN_ZeroFinal },         // F
+    { PINYIN_Eng, PINYIN_Ng        },         // G
+    { PINYIN_Ang, PINYIN_ZeroFinal },         // H
+    { PINYIN_I,   PINYIN_ZeroFinal },         // I
+    { PINYIN_An,  PINYIN_ZeroFinal },         // J
+    { PINYIN_Uai, PINYIN_Ing       },         // K
+    { PINYIN_Iang,PINYIN_Uang      },         // L
+    { PINYIN_Ian, PINYIN_ZeroFinal },         // M
+    { PINYIN_Iao, PINYIN_ZeroFinal },         // N
+    { PINYIN_Uo,  PINYIN_O         },         // O
+    { PINYIN_Ie,  PINYIN_ZeroFinal },         // P
+    { PINYIN_Iu,  PINYIN_ZeroFinal },         // Q
+    { PINYIN_Uan, PINYIN_Er        },         // R
+    { PINYIN_Ong, PINYIN_Iong      },         // S
+    { PINYIN_Ue,  PINYIN_ZeroFinal },         // T
+    { PINYIN_U,   PINYIN_ZeroFinal },         // U
+    { PINYIN_V,   PINYIN_Ui        },         // V
+    { PINYIN_Ei,  PINYIN_ZeroFinal },         // W
+    { PINYIN_Ia,  PINYIN_Ua        },         // X
+    { PINYIN_Un,  PINYIN_ZeroFinal },         // Y
+    { PINYIN_Ou,  PINYIN_ZeroFinal },         // Z
+    { PINYIN_ZeroFinal, PINYIN_ZeroFinal },   // ;
+};
+
+
 
 static const size_t    __zhuyin_zhuyin_map_start_char = 0x3105;
 static const size_t    __zhuyin_zhuyin_map_tone_start_idx = 37;
@@ -1298,27 +1428,37 @@ void
 PinyinShuangPinParser::set_scheme (PinyinShuangPinScheme scheme)
 {
     switch (scheme) {
-        case SHUANG_PIN_STONE:
-            set_scheme (__shuang_pin_stone_initial_map, __shuang_pin_stone_final_map);
-            break;
-        case SHUANG_PIN_ZRM:
-            set_scheme (__shuang_pin_zrm_initial_map, __shuang_pin_zrm_final_map);
-            break;
-        case SHUANG_PIN_MS:
-            set_scheme (__shuang_pin_ms_initial_map, __shuang_pin_ms_final_map);
-            break;
-        case SHUANG_PIN_ZIGUANG:
-            set_scheme (__shuang_pin_ziguang_initial_map, __shuang_pin_ziguang_final_map);
-            break;
-        case SHUANG_PIN_ABC:
-            set_scheme (__shuang_pin_abc_initial_map, __shuang_pin_abc_final_map);
-            break;
-        case SHUANG_PIN_LIUSHI:
-            set_scheme (__shuang_pin_liushi_initial_map, __shuang_pin_liushi_final_map);
-            break;
-        default:
-            set_scheme (__shuang_pin_zrm_initial_map, __shuang_pin_zrm_final_map);
-            return;
+#if 0
+    case SHUANG_PIN_STONE:
+        set_scheme (__shuang_pin_stone_initial_map, __shuang_pin_stone_final_map);
+        break;
+#endif
+    case SHUANG_PIN_ZRM:
+        set_scheme (__shuang_pin_zrm_initial_map, __shuang_pin_zrm_final_map);
+        break;
+    case SHUANG_PIN_MS:
+        set_scheme (__shuang_pin_ms_initial_map, __shuang_pin_ms_final_map);
+        break;
+    case SHUANG_PIN_ZIGUANG:
+        set_scheme (__shuang_pin_ziguang_initial_map, __shuang_pin_ziguang_final_map);
+        break;
+    case SHUANG_PIN_ABC:
+        set_scheme (__shuang_pin_abc_initial_map, __shuang_pin_abc_final_map);
+        break;
+#if 0
+    case SHUANG_PIN_LIUSHI:
+        set_scheme (__shuang_pin_liushi_initial_map, __shuang_pin_liushi_final_map);
+        break;
+#endif
+    case SHUANG_PIN_PYJJ:
+        set_scheme (__shuang_pin_pyjj_initial_map, __shuang_pin_pyjj_final_map);
+        break;
+    case SHUANG_PIN_XHE:
+        set_scheme (__shuang_pin_xhe_initial_map, __shuang_pin_xhe_final_map);
+        break;
+    default:
+        set_scheme (SHUANG_PIN_DEFAULT);
+        return;
     }
 }
 

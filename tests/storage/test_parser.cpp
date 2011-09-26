@@ -35,12 +35,18 @@ static const char *help_msg =
     "  -f table      Use specified pinyin table file.\n"
     "  -p parser     Use specified parser instead of Default.\n"
     "                parser could be:\n"
+#if 0
     "                sp-stone\n"
+#endif
     "                sp-zrm\n"
     "                sp-ms\n"
     "                sp-ziguang\n"
     "                sp-abc\n"
+#if 0
     "                sp-liushi\n"
+#endif
+    "                sp-pyjj\n"
+    "                sp-xhe\n"
     "                zy-zhuyin\n"
     "                zy-standard\n"
     "                zy-hsu\n"
@@ -87,8 +93,10 @@ int main (int argc, char * argv [])
             }
             if (!strcmp (argv[i], "sp") || !strcmp (argv[i], "sp-default"))
                 parser = new PinyinShuangPinParser ();
+#if 0
             else if (!strcmp (argv[i], "sp-stone"))
                 parser = new PinyinShuangPinParser (SHUANG_PIN_STONE);
+#endif
             else if (!strcmp (argv[i], "sp-zrm"))
                 parser = new PinyinShuangPinParser (SHUANG_PIN_ZRM);
             else if (!strcmp (argv[i], "sp-ms"))
@@ -97,8 +105,14 @@ int main (int argc, char * argv [])
                 parser = new PinyinShuangPinParser (SHUANG_PIN_ZIGUANG);
             else if (!strcmp (argv[i], "sp-abc"))
                 parser = new PinyinShuangPinParser (SHUANG_PIN_ABC);
+#if 0
             else if (!strcmp (argv[i], "sp-liushi"))
                 parser = new PinyinShuangPinParser (SHUANG_PIN_LIUSHI);
+#endif
+            else if (!strcmp (argv[i], "sp-pyjj"))
+                parser = new PinyinShuangPinParser (SHUANG_PIN_PYJJ);
+            else if (!strcmp (argv[i], "sp-xhe"))
+                parser = new PinyinShuangPinParser (SHUANG_PIN_XHE);
             if (!strcmp (argv[i], "zy") || !strcmp (argv[i], "zy-standard") || !strcmp (argv[i], "zy-default"))
                 parser = new PinyinZhuYinParser ();
             else if (!strcmp (argv[i], "zy-hsu"))
