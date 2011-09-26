@@ -1,3 +1,27 @@
+/* 
+ *  libpinyin
+ *  Library to deal with pinyin.
+ *  
+ *  Copyright (C) 2011 Peng Wu <alexepico@gmail.com>
+ *  
+ *  This program is free software; you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation; either version 2 of the License, or
+ *  (at your option) any later version.
+ * 
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ *  GNU General Public License for more details.
+ *  
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program; if not, write to the Free Software
+ *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+ */
+
+
+
+
 #include "pinyin.h"
 #include "pinyin_internal.h"
 
@@ -36,8 +60,8 @@ pinyin_context_t * pinyin_init(const char * systemdir, const char * userdir){
     gchar * filename = g_build_filename
         (context->m_system_dir, "pinyin_index.bin", NULL);
     if (!chunk->load(filename)) {
-      fprintf(stderr, "open %s failed!\n", filename);
-      exit(ENOENT);
+        fprintf(stderr, "open %s failed!\n", filename);
+        return NULL;
     }
     context->m_pinyin_table->load(chunk);
 
@@ -49,13 +73,19 @@ pinyin_context_t * pinyin_init(const char * systemdir, const char * userdir){
     context->m_phrase_table = new PhraseLargeTable;
     chunk = new MemoryChunk;
     filename = g_build_filename(context->m_system_dir, "phrase_index.bin", NULL);
-    chunk->load(filename);
+    if (!chunk->load(filename)) {
+        fprintf(stderr, "open %s failed!\n", filename);
+        return NULL;
+    }
     context->m_phrase_table->load(chunk);
 
     context->m_phrase_index = new FacadePhraseIndex;
     MemoryChunk * log = new MemoryChunk; chunk = new MemoryChunk;
     filename = g_build_filename(context->m_system_dir, "gb_char.bin", NULL);
-    chunk->load(filename);
+    if (!chunk->load(filename)) {
+        fprintf(stderr, "open %s failed!\n", filename);
+        return NULL;
+    }
     context->m_phrase_index->load(1, chunk);
     filename = g_build_filename(context->m_user_dir, "gb_char.dbin", NULL);
     log->load(filename);
@@ -63,7 +93,10 @@ pinyin_context_t * pinyin_init(const char * systemdir, const char * userdir){
 
     log = new MemoryChunk; chunk = new MemoryChunk;
     filename = g_build_filename(context->m_system_dir, "gbk_char.bin", NULL);
-    chunk->load(filename);
+    if (!chunk->load(filename)) {
+        fprintf(stderr, "open %s failed!\n", filename);
+        return NULL;
+    }
     context->m_phrase_index->load(2, chunk);
     filename = g_build_filename(context->m_user_dir, "gbk_char.dbin", NULL);
     log->load(filename);

@@ -41,10 +41,6 @@ int main(int argc, char * argv[]){
             break;
         }
         
-        if (linebuf[0] == '\0') {
-            continue;
-        }
-
         pinyin_parse_more_full_pinyins(instance, linebuf);
         pinyin_guess_sentence(instance);
 
