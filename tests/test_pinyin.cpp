@@ -37,9 +37,8 @@ int main(int argc, char * argv[]){
             linebuf[strlen(linebuf) - 1] = '\0';
         }
 
-        if ( strcmp ( linebuf, "quit" ) == 0) {
+        if ( strcmp ( linebuf, "quit" ) == 0)
             break;
-        }
         
         pinyin_parse_more_full_pinyins(instance, linebuf);
         pinyin_guess_sentence(instance);

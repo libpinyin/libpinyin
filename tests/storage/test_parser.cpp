@@ -113,7 +113,7 @@ int main (int argc, char * argv [])
                 parser = new PinyinShuangPinParser (SHUANG_PIN_PYJJ);
             else if (!strcmp (argv[i], "sp-xhe"))
                 parser = new PinyinShuangPinParser (SHUANG_PIN_XHE);
-            if (!strcmp (argv[i], "zy") || !strcmp (argv[i], "zy-standard") || !strcmp (argv[i], "zy-default"))
+            else if (!strcmp (argv[i], "zy") || !strcmp (argv[i], "zy-standard") || !strcmp (argv[i], "zy-default"))
                 parser = new PinyinZhuYinParser ();
             else if (!strcmp (argv[i], "zy-hsu"))
                 parser = new PinyinZhuYinParser (ZHUYIN_HSU);
