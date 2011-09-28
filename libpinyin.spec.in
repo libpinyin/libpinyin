@@ -1,6 +1,6 @@
 Name:           libpinyin
 Version:        @VERSION@
-Release:        2%{?dist}
+Release:        1%{?dist}
 Summary:        Library to deal with pinyin
 
 License:        GPLv2+
@@ -11,7 +11,8 @@ BuildRequires:  db4-devel, glib2-devel
 #Requires:       
 
 %description
-The libpinyin project aims to provide the algorithms core for intelligent sentence-based Chinese pinyin input methods.
+The libpinyin project aims to provide the algorithms core
+for intelligent sentence-based Chinese pinyin input methods.
 
 
 %package        devel
@@ -24,7 +25,7 @@ developing applications that use %{name}.
 
 
 %package        data
-Summary:        data files for %{name}
+Summary:        Data files for %{name}
 Requires:       %{name} = %{version}-%{release}
 
 %description data
@@ -58,6 +59,7 @@ find $RPM_BUILD_ROOT -name '*.la' -exec rm -f {} ';'
 
 %files devel
 %doc
+%dir %{_includedir}/libpinyin-0.3
 %{_includedir}/libpinyin-0.3/*
 %{_libdir}/*.so
 %{_libdir}/pkgconfig/libpinyin.pc
@@ -67,6 +69,9 @@ find $RPM_BUILD_ROOT -name '*.la' -exec rm -f {} ';'
 %{_datadir}/libpinyin/data
 
 %changelog
+* Wed Sep 28 2011  Peng Wu <pwu@redhat.com> - 0.2.99.1-1
+- Update to 0.2.99.1
+
 * Thu Sep 08 2011  Peng Wu <pwu@redhat.com> - 0.2.99-2
 - Split data sub package
 
