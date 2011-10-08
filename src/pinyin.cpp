@@ -364,7 +364,8 @@ static gint compare_token_with_unigram_freq(gconstpointer lhs,
     guint32 freq_lhs = item.get_unigram_frequency();
     phrase_index->get_phrase_item(token_rhs, item);
     guint32 freq_rhs = item.get_unigram_frequency();
-    return freq_lhs - freq_rhs;
+
+    return -(freq_lhs - freq_rhs); /* in descendant order */
 }
 
 bool pinyin_get_candidates(pinyin_instance_t * instance,
@@ -389,7 +390,7 @@ bool pinyin_get_candidates(pinyin_instance_t * instance,
         ranges[m] = g_array_new(FALSE, FALSE, sizeof(PhraseIndexRange));
     }
 
-    GArray * tokens = g_array_new(FALSE, FALSE, sizeof(PhraseIndexRange));
+    GArray * tokens = g_array_new(FALSE, FALSE, sizeof(phrase_token_t));
 
     for (ssize_t i = pinyin_len; i >= 1; --i) {
         g_array_set_size(tokens, 0);
@@ -408,7 +409,14 @@ bool pinyin_get_candidates(pinyin_instance_t * instance,
 
         /* reduce to a single GArray. */
         for (size_t m = min_index; m <= max_index; ++m) {
-            g_array_append_vals(tokens, ranges[m]->data, ranges[m]->len);
+            for (size_t n = 0; n < ranges[m]->len; ++n) {
+                PhraseIndexRange * range =
+                    &g_array_index(ranges[m], PhraseIndexRange, n);
+                for (size_t k = range->m_range_begin;
+                     k < range->m_range_end; ++k) {
+                    g_array_append_val(tokens, k);
+                }
+            }
         }
 
         g_array_sort(tokens, compare_token);
@@ -418,6 +426,7 @@ bool pinyin_get_candidates(pinyin_instance_t * instance,
             phrase_token_t token = g_array_index(tokens, phrase_token_t, n);
             if ( last_token == token ){
                 g_array_remove_index(tokens, n);
+                n--;
             }
             last_token = token;
         }
