@@ -122,6 +122,9 @@ pinyin_context_t * pinyin_init(const char * systemdir, const char * userdir){
 }
 
 bool pinyin_save(pinyin_context_t * context){
+    if (!context->m_user_dir)
+        return FALSE;
+
     MemoryChunk * oldchunk = new MemoryChunk;
     MemoryChunk * newlog = new MemoryChunk;
 
@@ -254,7 +257,7 @@ bool pinyin_phrase_segment(pinyin_instance_t * instance,
     glong utf16_len = 0;
     utf16_t * utf16 = g_utf8_to_utf16(sentence, -1, NULL, &utf16_len, NULL);
 
-    g_return_val_if_fail(num_of_chars == utf16_len, false);
+    g_return_val_if_fail(num_of_chars == utf16_len, FALSE);
 
     bool retval = context->m_phrase_lookup->get_best_match
         (utf16_len, utf16, instance->m_match_results);
@@ -514,6 +517,9 @@ bool pinyin_translate_token(pinyin_instance_t * instance,
 }
 
 bool pinyin_train(pinyin_instance_t * instance){
+    if (!instance->m_context->m_user_dir)
+        return FALSE;
+
     pinyin_context_t * & context = instance->m_context;
 
     bool retval = context->m_pinyin_lookup->train_result
