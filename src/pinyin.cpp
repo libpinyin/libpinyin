@@ -344,6 +344,11 @@ size_t pinyin_parse_more_chewings(pinyin_instance_t * instance,
     return parse_len;
 }
 
+/* internal definition */
+typedef struct {
+    pinyin_context_t * m_context;
+    PinyinKey * m_pinyin_keys;
+} compare_context;
 
 static gint compare_token( gconstpointer lhs, gconstpointer rhs){
     phrase_token_t token_lhs = *((phrase_token_t *)lhs);
@@ -356,14 +361,18 @@ static gint compare_token_with_unigram_freq(gconstpointer lhs,
                                             gpointer user_data){
     phrase_token_t token_lhs = *((phrase_token_t *)lhs);
     phrase_token_t token_rhs = *((phrase_token_t *)rhs);
-    FacadePhraseIndex * phrase_index =
-        (FacadePhraseIndex *)user_data;
+    compare_context * context = (compare_context *)user_data;
+    FacadePhraseIndex * phrase_index = context->m_context->m_phrase_index;
+    PinyinCustomSettings & custom = context->m_context->m_custom;
+    PinyinKey * pinyin_keys = context->m_pinyin_keys;
 
     PhraseItem item;
     phrase_index->get_phrase_item(token_lhs, item);
-    guint32 freq_lhs = item.get_unigram_frequency();
+    guint32 freq_lhs = item.get_unigram_frequency() *
+        item.get_pinyin_possibility(custom, pinyin_keys) * 256;
     phrase_index->get_phrase_item(token_rhs, item);
-    guint32 freq_rhs = item.get_unigram_frequency();
+    guint32 freq_rhs = item.get_unigram_frequency() *
+        item.get_pinyin_possibility(custom, pinyin_keys) * 256;
 
     return -(freq_lhs - freq_rhs); /* in descendant order */
 }
@@ -378,6 +387,10 @@ bool pinyin_get_candidates(pinyin_instance_t * instance,
     PinyinKey * keys = &g_array_index
         (pinyin_keys, PinyinKey, offset);
     size_t pinyin_len = pinyin_keys->len - offset;
+
+    compare_context comp_context;
+    comp_context.m_context = context;
+    comp_context.m_pinyin_keys = keys;
 
     PhraseIndexRanges ranges;
     memset(ranges, 0, sizeof(ranges));
@@ -433,7 +446,7 @@ bool pinyin_get_candidates(pinyin_instance_t * instance,
 
         /* sort the candidates of the same length by uni-gram freqs. */
         g_array_sort_with_data(tokens, compare_token_with_unigram_freq,
-                               context->m_phrase_index);
+                               &comp_context);
 
         /* copy out candidates. */
         g_array_append_vals(candidates, tokens->data, tokens->len);
