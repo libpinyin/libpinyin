@@ -134,7 +134,7 @@ public:
     }
 
     /* user interactions */
-    bool add_constraint(CandidateConstraints constraints, size_t index, phrase_token_t token);
+    guint8 add_constraint(CandidateConstraints constraints, size_t index, phrase_token_t token);
 
     bool clear_constraint(CandidateConstraints constraints, size_t index);
 

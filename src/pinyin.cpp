@@ -466,18 +466,18 @@ bool pinyin_get_candidates(pinyin_instance_t * instance,
     return true;
 }
 
-bool pinyin_choose_candidate(pinyin_instance_t * instance,
-                             size_t offset,
-                             phrase_token_t token){
+guint8 pinyin_choose_candidate(pinyin_instance_t * instance,
+                               size_t offset,
+                               phrase_token_t token){
     pinyin_context_t * & context = instance->m_context;
 
-    bool retval = context->m_pinyin_lookup->add_constraint
+    guint8 len = context->m_pinyin_lookup->add_constraint
         (instance->m_constraints, offset, token);
 
-    retval = context->m_pinyin_lookup->validate_constraint
-        (instance->m_constraints, instance->m_pinyin_keys) && retval;
+    bool retval = context->m_pinyin_lookup->validate_constraint
+        (instance->m_constraints, instance->m_pinyin_keys) && len;
 
-    return retval;
+    return len;
 }
 
 bool pinyin_clear_constraint(pinyin_instance_t * instance,

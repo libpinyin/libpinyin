@@ -494,13 +494,13 @@ bool PinyinLookup::train_result(PinyinKeyVector keys, CandidateConstraints const
     return true;
 }
 
-bool PinyinLookup::add_constraint(CandidateConstraints constraints, size_t index, phrase_token_t token){
+guint8 PinyinLookup::add_constraint(CandidateConstraints constraints, size_t index, phrase_token_t token){
     if ( m_phrase_index->get_phrase_item(token, m_cache_phrase_item) )
-	return false;
+	return 0;
 
     size_t phrase_length = m_cache_phrase_item.get_phrase_length();
     if ( index + phrase_length > constraints->len )
-	return false;
+	return 0;
 
     for ( size_t i = index; i < index + phrase_length ; ++i ){
 	clear_constraint(constraints, i);
@@ -515,7 +515,7 @@ bool PinyinLookup::add_constraint(CandidateConstraints constraints, size_t index
 	constraint->m_type = CONSTRAINT_NOSEARCH;
 	constraint->m_constraint_step = index;
     }
-	return true;
+    return phrase_length;
 }
 
 bool PinyinLookup::clear_constraint(CandidateConstraints constraints, size_t index){
