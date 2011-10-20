@@ -92,6 +92,9 @@ struct PinyinCustomSettings
     bool use_incomplete;
     /**< allow incomplete pinyin key which only has inital. */
 
+    bool use_tone;
+    /**< allow pinyin tone. */
+
     bool use_ambiguities [PINYIN_AmbLast + 1];
     /**< allow ambiguous pinyin elements or not. */
 
@@ -99,7 +102,7 @@ struct PinyinCustomSettings
     /**< allow pinyin corrections or not. */
 
     PinyinCustomSettings ()
-        :use_incomplete (true)
+        :use_incomplete (true), use_tone (true)
     {
         for (size_t i=0; i<=PINYIN_AmbLast; ++i)
             use_ambiguities [i] = false;
@@ -108,6 +111,7 @@ struct PinyinCustomSettings
     }
 
     void set_use_incomplete (bool use) { use_incomplete = use; }
+    void set_use_tone (bool use) { use_tone = use; }
     void set_use_ambiguities (PinyinAmbiguity amb, bool use)
     {
         if (amb == PINYIN_AmbAny)
@@ -147,6 +151,9 @@ struct PinyinCustomSettings
         if (use_incomplete != rhs.use_incomplete)
             return false;
 
+        if (use_tone != rhs.use_tone)
+            return false;
+
         for (i=0; i <= PINYIN_AmbLast; ++i)
             if (use_ambiguities [i] != rhs.use_ambiguities [i])
                 return false;
@@ -169,14 +176,15 @@ struct PinyinCustomSettings
         size_t i;
 
         if (use_incomplete) val |= 1;
+        if (use_tone) val |= (1 << 1);
 
         for (i=0; i <= PINYIN_AmbLast; ++i)
             if (use_ambiguities [i])
-                val |= (1 << (i + 1));
+                val |= (1 << (i + 2));
 
         for (i=0; i <= PINYIN_CorrectLast; ++i)
             if (use_corrections [i])
-                val |= (1 << (i + PINYIN_AmbLast + 2 ));
+                val |= (1 << (i + PINYIN_AmbLast + 3 ));
 
         return val;
     }
@@ -184,13 +192,14 @@ struct PinyinCustomSettings
     void from_value (guint32 val)
     {
         size_t i;
-        use_incomplete = ((val & 1) != 0);
+        use_incomplete = (val & 1) != 0;
+        use_tone = (val & (1 << 1)) != 0;
 
         for (i=0; i <= PINYIN_AmbLast; ++i)
-            use_ambiguities [i] = (val & (1 << (i + 1))) != 0;
+            use_ambiguities [i] = (val & (1 << (i + 2))) != 0;
 
         for (i=0; i <= PINYIN_CorrectLast; ++i)
-            use_corrections [i] = (val & (1 << (i + PINYIN_AmbLast + 2))) != 0;
+            use_corrections [i] = (val & (1 << (i + PINYIN_AmbLast + 3))) != 0;
     }
 };
 
