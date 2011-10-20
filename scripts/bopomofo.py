@@ -4,6 +4,7 @@
 # libpinyin - Library to deal with pinyin.
 #
 # Copyright (c) 2007-2008 Peng Huang <shawn.p.huang@gmail.com>
+# Copyright (c) 2010 BYVoid <byvoid1@gmail.com>
 # Copyright (C) 2011 Peng Wu <alexepico@gmail.com>
 #
 # This program is free software; you can redistribute it and/or modify
@@ -33,7 +34,7 @@ const static gunichar bopomofo_char[] = {
 };
 '''
 
-bopomofo_pinyin_map = {
+BOPOMOFO_PINYIN_MAP = {
     "ㄅ" : "b",
     "ㄅㄚ" : "ba",
     "ㄅㄛ" : "bo",
@@ -466,9 +467,9 @@ bopomofo_pinyin_map = {
     "ㄩㄥ" : "yong",
 }
 
-pinyin_bopomofo_map = dict([(v, k) for k, v in bopomofo_pinyin_map.items()])
+PINYIN_BOPOMOFO_MAP = dict([(v, k) for k, v in BOPOMOFO_PINYIN_MAP.items()])
 
-sheng_yun_bopomofo_map = {
+SHENG_YUN_BOPOMOFO_MAP = {
     "b" : "ㄅ",
     "p" : "ㄆ",
     "m" : "ㄇ",
