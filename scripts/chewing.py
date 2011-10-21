@@ -21,53 +21,53 @@
 
 
 ASCII_CHEWING_SHENGMU_MAP = {
-    "CHEWING_B":"ㄅ",
-    "CHEWING_C":"ㄘ",
-    "CHEWING_CH":"ㄔ",
-    "CHEWING_D":"ㄉ",
-    "CHEWING_F":"ㄈ",
-    "CHEWING_H":"ㄏ",
-    "CHEWING_G":"ㄍ",
-    "CHEWING_K":"ㄎ",
-    "CHEWING_J":"ㄐ",
-    "CHEWING_M":"ㄇ",
-    "CHEWING_N":"ㄋ",
-    "CHEWING_L":"ㄌ",
-    "CHEWING_R":"ㄖ",
-    "CHEWING_P":"ㄆ",
-    "CHEWING_Q":"ㄑ",
-    "CHEWING_S":"ㄙ",
-    "CHEWING_SH":"ㄕ",
-    "CHEWING_T":"ㄊ",
-    "CHEWING_X":"ㄒ",
-    "CHEWING_Z":"ㄗ",
-    "CHEWING_ZH":"ㄓ",
+    "CHEWING_B" : "ㄅ",
+    "CHEWING_C" : "ㄘ",
+    "CHEWING_CH" : "ㄔ",
+    "CHEWING_D" : "ㄉ",
+    "CHEWING_F" : "ㄈ",
+    "CHEWING_H" : "ㄏ",
+    "CHEWING_G" : "ㄍ",
+    "CHEWING_K" : "ㄎ",
+    "CHEWING_J" : "ㄐ",
+    "CHEWING_M" : "ㄇ",
+    "CHEWING_N" : "ㄋ",
+    "CHEWING_L" : "ㄌ",
+    "CHEWING_R" : "ㄖ",
+    "CHEWING_P" : "ㄆ",
+    "CHEWING_Q" : "ㄑ",
+    "CHEWING_S" : "ㄙ",
+    "CHEWING_SH" : "ㄕ",
+    "CHEWING_T" : "ㄊ",
+    "CHEWING_X" : "ㄒ",
+    "CHEWING_Z" : "ㄗ",
+    "CHEWING_ZH" : "ㄓ",
 }
 
-CHEWING_ASCII_SHENGMU_MAP = dict([(v, k) for k, v in ASCII_CHEWING_SHENGMU_MAP])
+CHEWING_ASCII_SHENGMU_MAP = dict([(v, k) for k, v in ASCII_CHEWING_SHENGMU_MAP.items()])
 
 ASCII_CHEWING_MIDDLE_MAP = {
-    "CHEWING_I":"ㄧ",
-    "CHEWING_U":"ㄨ",
-    "CHEWING_V":"ㄩ",
+    "CHEWING_I" : "ㄧ",
+    "CHEWING_U" : "ㄨ",
+    "CHEWING_V" : "ㄩ",
 }
 
-CHEWING_ASCII_MIDDLE_MAP = dict([(v, k) for k, v in ASCII_CHEWING_MIDDLE_MAP])
+CHEWING_ASCII_MIDDLE_MAP = dict([(v, k) for k, v in ASCII_CHEWING_MIDDLE_MAP.items()])
 
 ASCII_CHEWING_YUNMU_MAP = {
-    "CHEWING_A":"ㄚ",
-    "CHEWING_AI":"ㄞ",
-    "CHEWING_AN":"ㄢ",
-    "CHEWING_ANG":"ㄤ",
-    "CHEWING_AO":"ㄠ",
-    "CHEWING_E":"ㄜ",
-    "CHEWING_EI":"ㄟ",
-    "CHEWING_EN":"ㄣ",
-    "CHEWING_ENG":"ㄥ",
-    "CHEWING_ER":"ㄦ",
-    "CHEWING_NG":"ㄫ",
-    "CHEWING_O":"ㄛ",
-    "CHEWING_OU":"ㄡ",
+    "CHEWING_A" : "ㄚ",
+    "CHEWING_AI" : "ㄞ",
+    "CHEWING_AN" : "ㄢ",
+    "CHEWING_ANG" : "ㄤ",
+    "CHEWING_AO" : "ㄠ",
+    "CHEWING_E" : "ㄜ",
+    "CHEWING_EI" : "ㄟ",
+    "CHEWING_EN" : "ㄣ",
+    "CHEWING_ENG" : "ㄥ",
+    "CHEWING_ER" : "ㄦ",
+    "CHEWING_NG" : "ㄫ",
+    "CHEWING_O" : "ㄛ",
+    "CHEWING_OU" : "ㄡ",
 }
 
-CHEWING_ASCII_YUNMU_MAP = dict([(v, k) for k, v in ASCII_CHEWING_YUNMU_MAP])
+CHEWING_ASCII_YUNMU_MAP = dict([(v, k) for k, v in ASCII_CHEWING_YUNMU_MAP.items()])

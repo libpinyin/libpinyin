@@ -465,6 +465,7 @@ BOPOMOFO_PINYIN_MAP = {
     "ㄩㄢ" : "yuan",
     "ㄩㄣ" : "yun",
     "ㄩㄥ" : "yong",
+    "ㄫ" : "ng",
 }
 
 PINYIN_BOPOMOFO_MAP = dict([(v, k) for k, v in BOPOMOFO_PINYIN_MAP.items()])
