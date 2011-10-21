@@ -22,9 +22,11 @@
 
 import pinyin
 import bopomofo
+import chewing
+from fuzzy import *
 
 def check_pinyin_chewing_map():
-    for pinyin_key in pinyin.PINYIN_DICT:
+    for pinyin_key in pinyin.PINYIN_DICT.keys():
         if pinyin_key in bopomofo.PINYIN_BOPOMOFO_MAP.keys():
             pass
         else:
