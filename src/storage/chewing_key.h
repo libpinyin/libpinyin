@@ -96,7 +96,9 @@ enum ChewingFinal
     CHEWING_O    = 13,        /* "ㄛ". */
     PINYIN_ONG   = 14,        /* "ueng". */
     CHEWING_OU   = 15,        /* "ㄡ". */
-    CHEWING_LAST_FINAL = CHEWING_OU,
+    PINYIN_IN    = 16,        /* "ien". */
+    PINYIN_ING   = 17,        /* "ieng". */
+    CHEWING_LAST_FINAL = CHEWING_ING,
     CHEWING_NUMBER_OF_FINALS = CHEWING_LAST_FINAL + 1
 };
 
@@ -120,7 +122,7 @@ struct ChewingKey
 {
     guint16 m_initial : 5;
     guint16 m_middle  : 2;
-    guint16 m_final   : 4;
+    guint16 m_final   : 5;
     guint16 m_tone    : 3;
 };
 

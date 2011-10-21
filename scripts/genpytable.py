@@ -59,11 +59,21 @@ def get_chewing(pinyin_key):
             middle = chewing.CHEWING_ASCII_MIDDLE_MAP[char]
         if char in chewing.CHEWING_ASCII_FINAL_MAP:
             final = chewing.CHEWING_ASCII_FINAL_MAP[char]
-        if char == "ㄜ":
+        if char == "ㄜ": #merge "ㄝ" and "ㄜ"
             final = "CHEWING_E"
 
+    #handle "ueng"/"ong"
     if middle == "CHEWING_U" and final == "CHEWING_ENG":
         middle, final = "CHEWING_ZERO_MIDDLE", "PINYIN_ONG"
+
+    #handle "ien"/"in"
+    if middle == "CHEWING_I" and final == "CHEWING_EN":
+        middle, final = "CHEWING_ZERO_MIDDLE", "PINYIN_IN"
+
+    #handle "ieng"/"ing"
+    if middle == "CHEWING_I" and final == "CHEWING_ENG":
+        middle, final = "CHEWING_ZERO_MIDDLE", "PINYIN_ING"
+
     return initial, middle, final
 
 
