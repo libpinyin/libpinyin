@@ -20,7 +20,7 @@
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 
-ASCII_CHEWING_SHENGMU_MAP = {
+ASCII_CHEWING_INITIAL_MAP = {
     "CHEWING_B" : "ㄅ",
     "CHEWING_C" : "ㄘ",
     "CHEWING_CH" : "ㄔ",
@@ -44,7 +44,7 @@ ASCII_CHEWING_SHENGMU_MAP = {
     "CHEWING_ZH" : "ㄓ",
 }
 
-CHEWING_ASCII_SHENGMU_MAP = dict([(v, k) for k, v in ASCII_CHEWING_SHENGMU_MAP.items()])
+CHEWING_ASCII_INITIAL_MAP = dict([(v, k) for k, v in ASCII_CHEWING_INITIAL_MAP.items()])
 
 ASCII_CHEWING_MIDDLE_MAP = {
     "CHEWING_I" : "ㄧ",
@@ -54,7 +54,7 @@ ASCII_CHEWING_MIDDLE_MAP = {
 
 CHEWING_ASCII_MIDDLE_MAP = dict([(v, k) for k, v in ASCII_CHEWING_MIDDLE_MAP.items()])
 
-ASCII_CHEWING_YUNMU_MAP = {
+ASCII_CHEWING_FINAL_MAP = {
     "CHEWING_A" : "ㄚ",
     "CHEWING_AI" : "ㄞ",
     "CHEWING_AN" : "ㄢ",
@@ -70,4 +70,4 @@ ASCII_CHEWING_YUNMU_MAP = {
     "CHEWING_OU" : "ㄡ",
 }
 
-CHEWING_ASCII_YUNMU_MAP = dict([(v, k) for k, v in ASCII_CHEWING_YUNMU_MAP.items()])
+CHEWING_ASCII_FINAL_MAP = dict([(v, k) for k, v in ASCII_CHEWING_FINAL_MAP.items()])
