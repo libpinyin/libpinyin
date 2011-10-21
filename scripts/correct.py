@@ -65,6 +65,8 @@ auto_correct_ext = [
     ("yun", "yven", "PINYIN_CORRECT_UEN_TO_UN | PINYIN_CORRECT_V_TO_U"),
 ]
 
+
+'''
 fuzzy_shengmu = [
     ("c", "ch"),
     ("ch", "c"),
@@ -89,8 +91,5 @@ fuzzy_yunmu = [
     ("eng", "en"),
     ("in", "ing"),
     ("ing", "in"),
-    ("ian", "iang"),
-    ("iang", "ian"),
-    ("uan", "uang"),
-    ("uang", "uan"),
 ]
+'''

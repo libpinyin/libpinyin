@@ -23,7 +23,7 @@
 import pinyin
 import bopomofo
 import chewing
-from fuzzy import *
+from correct import *
 
 
 def check_pinyin_chewing_map():
@@ -34,12 +34,24 @@ def check_pinyin_chewing_map():
             print("pinyin %s has no chewing mapping", pinyin_key)
 
 def get_chewing(pinyin_key):
-    initial = 'CHEWING_ZERO_INITIAL'
-    middle = 'CHEWING_ZERO_MIDDLE'
-    final = 'CHEWING_ZERO_FINAL'
+    initial, middle, final = \
+        'CHEWING_ZERO_INITIAL', 'CHEWING_ZERO_MIDDLE', 'CHEWING_ZERO_FINAL'
     assert pinyin_key != None
     assert pinyin_key in bopomofo.PINYIN_BOPOMOFO_MAP
+
+    #handle 'w' and 'y'
+    if pinyin_key[0] == 'w':
+        initial = 'PINYIN_W'
+    if pinyin_key[0] == 'y':
+        initial = 'PINYIN_Y'
+
+    #get chewing string
     bopomofo_str = bopomofo.PINYIN_BOPOMOFO_MAP[pinyin_key]
+
+    #handle 'ci', 'chi', 'si', 'shi', 'zi', 'zhi', 'ri'
+    if pinyin_key in {'ci', 'chi', 'si', 'shi', 'zi', 'zhi', 'ri'}:
+        middle = "CHEWING_I"
+    #normal process
     for char in bopomofo_str:
         if char in chewing.CHEWING_ASCII_INITIAL_MAP:
             initial = chewing.CHEWING_ASCII_INITIAL_MAP[char]
@@ -47,6 +59,11 @@ def get_chewing(pinyin_key):
             middle = chewing.CHEWING_ASCII_MIDDLE_MAP[char]
         if char in chewing.CHEWING_ASCII_FINAL_MAP:
             final = chewing.CHEWING_ASCII_FINAL_MAP[char]
+        if char == "ㄜ":
+            final = "CHEWING_E"
+
+    if middle == "CHEWING_U" and final == "CHEWING_ENG":
+        middle, final = "CHEWING_ZERO_MIDDLE", "PINYIN_ONG"
     return initial, middle, final
 
 

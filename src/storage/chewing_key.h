@@ -86,7 +86,7 @@ enum ChewingFinal
     CHEWING_AN   = 3,         /* "ㄢ". */
     CHEWING_ANG  = 4,         /* "ㄤ". */
     CHEWING_AO   = 5,         /* "ㄠ". */
-    CHEWING_E    = 6,         /* "ㄜ". */
+    CHEWING_E    = 6,         /* "ㄝ" and "ㄜ". */
     INVALID_EA   = 7,         /* Invalid Pinyin/Chewing. */
     CHEWING_EI   = 8,         /* "ㄟ". */
     CHEWING_EN   = 9,         /* "ㄣ". */
@@ -94,7 +94,7 @@ enum ChewingFinal
     CHEWING_ER   = 11,        /* "ㄦ". */
     CHEWING_NG   = 12,        /* "ㄫ". */
     CHEWING_O    = 13,        /* "ㄛ". */
-    PINYIN_ONG   = 14,        /* "eng". */
+    PINYIN_ONG   = 14,        /* "ueng". */
     CHEWING_OU   = 15,        /* "ㄡ". */
     CHEWING_LAST_FINAL = CHEWING_OU,
     CHEWING_NUMBER_OF_FINALS = CHEWING_LAST_FINAL + 1

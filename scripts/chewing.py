@@ -60,7 +60,7 @@ ASCII_CHEWING_FINAL_MAP = {
     "CHEWING_AN" : "ㄢ",
     "CHEWING_ANG" : "ㄤ",
     "CHEWING_AO" : "ㄠ",
-    "CHEWING_E" : "ㄜ",
+    "CHEWING_E" : "ㄝ",  # merge "ㄝ" and "ㄜ"
     "CHEWING_EI" : "ㄟ",
     "CHEWING_EN" : "ㄣ",
     "CHEWING_ENG" : "ㄥ",
