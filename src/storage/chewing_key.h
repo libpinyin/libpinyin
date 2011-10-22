@@ -98,7 +98,7 @@ enum ChewingFinal
     CHEWING_OU   = 15,        /* "ㄡ". */
     PINYIN_IN    = 16,        /* "ien". */
     PINYIN_ING   = 17,        /* "ieng". */
-    CHEWING_LAST_FINAL = CHEWING_ING,
+    CHEWING_LAST_FINAL = PINYIN_ING,
     CHEWING_NUMBER_OF_FINALS = CHEWING_LAST_FINAL + 1
 };
 

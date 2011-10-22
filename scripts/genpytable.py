@@ -66,6 +66,10 @@ def get_chewing(pinyin_key):
     if middle == "CHEWING_U" and final == "CHEWING_ENG":
         middle, final = "CHEWING_ZERO_MIDDLE", "PINYIN_ONG"
 
+    #handle "veng"/"iong"
+    if middle == "CHEWING_V" and final == "CHEWING_ENG":
+        middle, final = "CHEWING_I", "PINYIN_ONG"
+
     #handle "ien"/"in"
     if middle == "CHEWING_I" and final == "CHEWING_EN":
         middle, final = "CHEWING_ZERO_MIDDLE", "PINYIN_IN"
@@ -82,5 +86,5 @@ if __name__ == "__main__":
     #pre-check here
     check_pinyin_chewing_map()
     #dump
-    for pinyin_key in pinyin.PINYIN_DICT.keys():
+    for pinyin_key in sorted(pinyin.PINYIN_DICT.keys()):
         print (pinyin_key, get_chewing(pinyin_key))
