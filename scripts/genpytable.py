@@ -62,21 +62,19 @@ def get_chewing(pinyin_key):
         if char == "ㄜ": #merge "ㄝ" and "ㄜ"
             final = "CHEWING_E"
 
-    #handle "ueng"/"ong"
-    if middle == "CHEWING_U" and final == "CHEWING_ENG":
-        middle, final = "CHEWING_ZERO_MIDDLE", "PINYIN_ONG"
+    post_process_rules = {
+        #handle "ueng"/"ong"
+        ("CHEWING_U", "CHEWING_ENG"):("CHEWING_ZERO_MIDDLE", "PINYIN_ONG"),
+        #handle "veng"/"iong"
+        ("CHEWING_V", "CHEWING_ENG"):("CHEWING_I", "PINYIN_ONG"),
+        #handle "ien"/"in"
+        ("CHEWING_I", "CHEWING_EN"):("CHEWING_ZERO_MIDDLE", "PINYIN_IN"),
+        #handle "ieng"/"ing"
+        ("CHEWING_I", "CHEWING_ENG"):("CHEWING_ZERO_MIDDLE", "PINYIN_ING"),
+        }
 
-    #handle "veng"/"iong"
-    if middle == "CHEWING_V" and final == "CHEWING_ENG":
-        middle, final = "CHEWING_I", "PINYIN_ONG"
-
-    #handle "ien"/"in"
-    if middle == "CHEWING_I" and final == "CHEWING_EN":
-        middle, final = "CHEWING_ZERO_MIDDLE", "PINYIN_IN"
-
-    #handle "ieng"/"ing"
-    if middle == "CHEWING_I" and final == "CHEWING_ENG":
-        middle, final = "CHEWING_ZERO_MIDDLE", "PINYIN_ING"
+    if (middle, final) in post_process_rules:
+        (middle, final) = post_process_rules[(middle, final)]
 
     return initial, middle, final
 
