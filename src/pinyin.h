@@ -28,7 +28,7 @@
 #include "pinyin_custom.h"
 #include "pinyin_base.h"
 #include "chewing_key.h"
-#include "chewing_custom.h"
+#include "pinyin_custom2.h"
 
 using namespace pinyin;
 

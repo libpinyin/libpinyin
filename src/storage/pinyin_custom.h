@@ -67,16 +67,6 @@ enum PinyinAmbiguity
 
 enum PinyinCorrection{
     PINYIN_CorrectAny = 0,
-#if 0
-    PINYIN_CorrectZeroInitial,
-    PINYIN_CorrectGNtoNG,
-    PINYIN_CorrectMGtoNG,
-    PINYIN_CorrectIOUtoIU,
-    PINYIN_CorrectUEItoUI,
-    PINYIN_CorrectUENtoUN,
-    PINYIN_CorrectUEtoVE,
-    PINYIN_CorrectONtoONG,
-#endif
     PINYIN_CorrectVtoU,
     PINYIN_CorrectLast = PINYIN_CorrectVtoU,
 };

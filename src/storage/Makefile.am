@@ -24,7 +24,7 @@ libpinyinincludedir	= $(includedir)/libpinyin-@LIBPINYIN_BINARY_VERSION@
 libpinyininclude_HEADERS= pinyin_custom.h \
 			  pinyin_base.h \
 			  chewing_key.h \
-			  chewing_custom.h
+			  pinyin_custom2.h
 
 noinst_HEADERS		= pinyin_large_table.h \
 		    	  pinyin_phrase.h \
