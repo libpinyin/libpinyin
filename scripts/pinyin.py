@@ -126,7 +126,7 @@ for pinyin, id in PINYIN_DICT.items ():
     ID_PINYIN_DICT[id] = pinyin
 
 SHENGMU_DICT = {
-    "" : 0, "b" : 1, "p" : 2, "m" : 3, "f" : 4, "d" : 5,
+    "b" : 1, "p" : 2, "m" : 3, "f" : 4, "d" : 5,
     "t" : 6, "n" : 7, "l" : 8, "g" : 9, "k" : 10, "h" : 11,
     "j" : 12, "q" : 13, "x" : 14, "zh" : 15, "ch" : 16, "sh" : 17,
     "r" : 18, "z" : 19, "c" : 20, "s" : 21, "y" : 22, "w" : 23

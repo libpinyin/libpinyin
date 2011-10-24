@@ -24,6 +24,12 @@
 
 namespace pinyin{
 
+enum PinyinTableFlag{
+    IS_CHEWING = 1,
+    IS_PINYIN = 1 << 2,
+    PINYIN_INCOMPLETE = 1 << 3,
+    CHEWING_INCOMPLETE = 1 << 4,
+};
 
 /**
  * @brief enums of pinyin ambiguities.
@@ -33,7 +39,7 @@ namespace pinyin{
  */
 enum PinyinAmbiguityBeta{
     PINYIN_AMB_ANY = 0,
-    PINYIN_AMB_C_Ch,
+    PINYIN_AMB_C_Ch ,
     PINYIN_AMB_Z_Zh,
     PINYIN_AMB_S_Sh,
     PINYIN_AMB_L_N ,
