@@ -3,7 +3,6 @@
 #
 # libpinyin - Library to deal with pinyin.
 #
-# Copyright (c) 2007-2008 Peng Huang <shawn.p.huang@gmail.com>
 # Copyright (C) 2011 Peng Wu <alexepico@gmail.com>
 #
 # This program is free software; you can redistribute it and/or modify
@@ -32,6 +31,14 @@ def check_pinyin_chewing_map():
             pass
         else:
             print("pinyin %s has no chewing mapping", pinyin_key)
+
+'''
+    for pinyin_key in bopomofo.PINYIN_BOPOMOFO_MAP.keys():
+        if pinyin_key in pinyin.PINYIN_DICT.keys():
+            pass
+        else:
+            print(pinyin_key, get_chewing(pinyin_key))
+'''
 
 def get_chewing(pinyin_key):
     initial, middle, final = \
@@ -83,6 +90,7 @@ def get_chewing(pinyin_key):
 if __name__ == "__main__":
     #pre-check here
     check_pinyin_chewing_map()
+
     #dump
-    for pinyin_key in sorted(pinyin.PINYIN_DICT.keys()):
+    for pinyin_key in sorted(bopomofo.PINYIN_BOPOMOFO_MAP.keys()):
         print (pinyin_key, get_chewing(pinyin_key))

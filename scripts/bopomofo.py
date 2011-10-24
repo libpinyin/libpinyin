@@ -3,7 +3,6 @@
 #
 # libpinyin - Library to deal with pinyin.
 #
-# Copyright (c) 2007-2008 Peng Huang <shawn.p.huang@gmail.com>
 # Copyright (c) 2010 BYVoid <byvoid1@gmail.com>
 # Copyright (C) 2011 Peng Wu <alexepico@gmail.com>
 #
