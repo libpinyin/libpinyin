@@ -121,9 +121,6 @@ PINYIN_DICT = {
 
 PINYIN_LIST = PINYIN_DICT.keys ()
 
-ID_PINYIN_DICT = {}
-for pinyin, id in PINYIN_DICT.items ():
-    ID_PINYIN_DICT[id] = pinyin
 
 SHENGMU_DICT = {
     "b" : 1, "p" : 2, "m" : 3, "f" : 4, "d" : 5,
@@ -131,13 +128,22 @@ SHENGMU_DICT = {
     "j" : 12, "q" : 13, "x" : 14, "zh" : 15, "ch" : 16, "sh" : 17,
     "r" : 18, "z" : 19, "c" : 20, "s" : 21, "y" : 22, "w" : 23
 }
+
 SHENGMU_LIST = SHENGMU_DICT.keys ()
 
-ID_SHENGMU_DICT = {}
 
+YUNMU_DICT = {
+    "a" : 1, "ai" : 2, "an" : 3, "ang" : 4, "ao" : 5,
+    "e" : 6, "ei" : 7, "en" : 8, "eng" : 9, "er" : 10,
+    "i" : 11, "ia" : 12, "ian" : 13, "iang" : 14, "iao" : 15,
+    "ie" : 16, "in" : 17, "ing" : 18, "iong" : 19, "iu" : 20,
+    "o" : 21, "ong" : 22, "ou" : 23, "u" : 24, "ua" : 25,
+    "uai" : 26, "uan" : 27, "uang" : 28, "ue" : 29, "ui" : 30,
+    "un" : 31, "uo" : 32, "v" : 33, "ve" : 34
+}
 
-for shengmu, id in SHENGMU_DICT.items ():
-    ID_SHENGMU_DICT[id] = shengmu
+YUNMU_LIST = YUNMU_DICT.keys ()
+
 
 MOHU_SHENGMU = {
     "z"     : ("z", "zh"),
