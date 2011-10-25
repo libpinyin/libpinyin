@@ -22,6 +22,7 @@
 import pinyin
 import bopomofo
 import chewing
+import itertools
 from correct import *
 
 
@@ -81,10 +82,17 @@ def get_chewing(pinyin_key):
     return initial, middle, final
 
 def get_pinyin_list():
+    for p in itertools.chain(gen_pinyins(),
+                             gen_shengmu(),
+                             gen_corrects(),
+                             gen_u_to_v(),
+                             ):
+        yield p
+
+def gen_pinyins():
     #generate all pinyins in bopomofo
     for pinyin_key in pinyin_list:
         flags = []
-        (initial, middle, final) = get_chewing(pinyin_key)
         if pinyin_key in bopomofo.PINYIN_BOPOMOFO_MAP.keys():
             flags.append("IS_CHEWING")
         if pinyin_key in pinyin.PINYIN_DICT.keys():
@@ -94,8 +102,9 @@ def get_pinyin_list():
         chewing_key = bopomofo.PINYIN_BOPOMOFO_MAP[pinyin_key]
         if chewing_key in chewing.ASCII_CHEWING_INITIAL_MAP:
             flags.append("CHEWING_INCOMPLETE")
-        yield pinyin_key, chewing_key, flags, (initial, final, middle)
+        yield pinyin_key, pinyin_key, chewing_key, flags, get_chewing(pinyin_key)
 
+def gen_shengmu():
     #generate all shengmu
     for shengmu in shengmu_list:
         if shengmu in pinyin_list:
@@ -108,24 +117,27 @@ def get_pinyin_list():
         else:
             chewing_key = 'PINYIN_{0}'.format(shengmu.upper())
             initial = chewing_key
-        yield shengmu, chewing_key, flags, (initial, "CHEWING_ZREO_MIDDLE", "CHEWING_ZERO_FINAL")
+        yield shengmu, shengmu, chewing_key, flags, (initial, "CHEWING_ZREO_MIDDLE", "CHEWING_ZERO_FINAL")
 
+def gen_corrects():
     #generate corrections
     for correct, wrong in auto_correct:
-        flag = ['IS_PINYIN', 'PINYIN_CORRECT_{0}_{1}'.format(wrong, correct)]
+        flags = ['IS_PINYIN', 'PINYIN_CORRECT_{0}_{1}'.format(wrong.upper(),
+                                                              correct.upper())]
         for pinyin_key in pinyin_list:
             if pinyin_key.endswith(correct) and pinyin_key != correct:
                 chewing_key = bopomofo.PINYIN_BOPOMOFO_MAP[pinyin_key]
                 new_pinyin_key = pinyin_key.replace(correct, wrong)
-                yield new_pinyin_key, chewing_key, flags, get_chewing(pinyin_key)
+                yield pinyin_key, new_pinyin_key, chewing_key, flags, get_chewing(pinyin_key)
 
+def gen_u_to_v():
     #generate U to V
     for correct, wrong, flags in auto_correct_ext:
         #over-ride flags
         flags = ['IS_PINYIN', 'PINYIN_CORRECT_V_U']
         pinyin_key = correct
         chewing_key = bopomofo.PINYIN_BOPOMOFO_MAP[pinyin_key]
-        yield wrong, chewing_key, flags, get_chewing(pinyin_key)
+        yield correct, wrong, chewing_key, flags, get_chewing(pinyin_key)
 
 ### main function ###
 if __name__ == "__main__":
