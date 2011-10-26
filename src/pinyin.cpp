@@ -20,8 +20,6 @@
  */
 
 
-
-
 #include "pinyin.h"
 #include "pinyin_internal.h"
 
@@ -46,6 +44,7 @@ struct _pinyin_context_t{
 
     char * m_system_dir;
     char * m_user_dir;
+    bool m_modified;
 };
 
 
@@ -54,6 +53,7 @@ pinyin_context_t * pinyin_init(const char * systemdir, const char * userdir){
 
     context->m_system_dir = g_strdup(systemdir);
     context->m_user_dir = g_strdup(userdir);
+    context->m_modified = false;
 
     context->m_pinyin_table = new PinyinLargeTable(&(context->m_custom));
     MemoryChunk * chunk = new MemoryChunk;
@@ -123,7 +123,10 @@ pinyin_context_t * pinyin_init(const char * systemdir, const char * userdir){
 
 bool pinyin_save(pinyin_context_t * context){
     if (!context->m_user_dir)
-        return FALSE;
+        return false;
+
+    if (!context->m_modified)
+        return false;
 
     MemoryChunk * oldchunk = new MemoryChunk;
     MemoryChunk * newlog = new MemoryChunk;
@@ -150,6 +153,7 @@ bool pinyin_save(pinyin_context_t * context){
     filename = g_build_filename(context->m_user_dir, "user.db", NULL);
     context->m_user_bigram->save_db(filename);
 
+    context->m_modified = false;
     return true;
 }
 
@@ -180,6 +184,7 @@ void pinyin_fini(pinyin_context_t * context){
 
     g_free(context->m_system_dir);
     g_free(context->m_user_dir);
+    context->m_modified = false;
 
     delete context;
 }
@@ -518,9 +523,10 @@ bool pinyin_translate_token(pinyin_instance_t * instance,
 
 bool pinyin_train(pinyin_instance_t * instance){
     if (!instance->m_context->m_user_dir)
-        return FALSE;
+        return false;
 
     pinyin_context_t * & context = instance->m_context;
+    context->m_modified = true;
 
     bool retval = context->m_pinyin_lookup->train_result
         (instance->m_pinyin_keys, instance->m_constraints,
