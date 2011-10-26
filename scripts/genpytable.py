@@ -81,7 +81,7 @@ def get_chewing(pinyin_key):
 
     return initial, middle, final
 
-def get_pinyin_list():
+def gen_pinyin_list():
     for p in itertools.chain(gen_pinyins(),
                              gen_shengmu(),
                              gen_corrects(),
@@ -145,5 +145,5 @@ if __name__ == "__main__":
     check_pinyin_chewing_map()
 
     #dump
-    for pinyin_key in get_pinyin_list():
+    for pinyin_key in gen_pinyin_list():
         print (pinyin_key)
