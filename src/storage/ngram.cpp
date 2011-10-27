@@ -224,20 +224,22 @@ bool SingleGram::set_freq( /* in */ phrase_token_t token,
 bool Bigram::load_db(const char * dbfile){
     reset();
 
-    DB * tmp_db = NULL;
-    int ret = db_create(&tmp_db, NULL, 0);
-    assert(ret == 0);
-
-    ret = tmp_db->open(tmp_db, NULL, dbfile, NULL,
-                       DB_HASH, DB_RDONLY, 0600);
-    if ( ret != 0 )
-        return false;
-
-    ret = db_create(&m_db, NULL, 0);
+    /* create in memory db. */
+    int ret = db_create(&m_db, NULL, 0);
     assert(ret == 0);
 
     ret = m_db->open(m_db, NULL, NULL, NULL,
                      DB_HASH, DB_CREATE, 0600);
+    if ( ret != 0 )
+        return false;
+
+    /* load db into memory. */
+    DB * tmp_db = NULL;
+    ret = db_create(&tmp_db, NULL, 0);
+    assert(ret == 0);
+
+    ret = tmp_db->open(tmp_db, NULL, dbfile, NULL,
+                       DB_HASH, DB_RDONLY, 0600);
     if ( ret != 0 )
         return false;
 
