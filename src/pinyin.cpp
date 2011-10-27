@@ -63,6 +63,7 @@ pinyin_context_t * pinyin_init(const char * systemdir, const char * userdir){
         fprintf(stderr, "open %s failed!\n", filename);
         return NULL;
     }
+    g_free(filename);
     context->m_pinyin_table->load(chunk);
 
     context->m_validator.initialize(context->m_pinyin_table);
@@ -77,6 +78,7 @@ pinyin_context_t * pinyin_init(const char * systemdir, const char * userdir){
         fprintf(stderr, "open %s failed!\n", filename);
         return NULL;
     }
+    g_free(filename);
     context->m_phrase_table->load(chunk);
 
     context->m_phrase_index = new FacadePhraseIndex;
@@ -86,9 +88,11 @@ pinyin_context_t * pinyin_init(const char * systemdir, const char * userdir){
         fprintf(stderr, "open %s failed!\n", filename);
         return NULL;
     }
+    g_free(filename);
     context->m_phrase_index->load(1, chunk);
     filename = g_build_filename(context->m_user_dir, "gb_char.dbin", NULL);
     log->load(filename);
+    g_free(filename);
     context->m_phrase_index->merge(1, log);
 
     log = new MemoryChunk; chunk = new MemoryChunk;
@@ -97,17 +101,22 @@ pinyin_context_t * pinyin_init(const char * systemdir, const char * userdir){
         fprintf(stderr, "open %s failed!\n", filename);
         return NULL;
     }
+    g_free(filename);
     context->m_phrase_index->load(2, chunk);
     filename = g_build_filename(context->m_user_dir, "gbk_char.dbin", NULL);
     log->load(filename);
+    g_free(filename);
     context->m_phrase_index->merge(2, log);
 
     context->m_system_bigram = new Bigram;
     filename = g_build_filename(context->m_system_dir, "bigram.db", NULL);
     context->m_system_bigram->attach(filename, ATTACH_READONLY);
+    g_free(filename);
+
     context->m_user_bigram = new Bigram;
     filename = g_build_filename(context->m_user_dir, "user.db", NULL);
     context->m_user_bigram->load_db(filename);
+    g_free(filename);
 
     context->m_pinyin_lookup = new PinyinLookup
         ( &(context->m_custom), context->m_pinyin_table,
@@ -134,24 +143,30 @@ bool pinyin_save(pinyin_context_t * context){
     gchar * filename = g_build_filename(context->m_system_dir,
                                         "gb_char.bin", NULL);
     oldchunk->load(filename);
+    g_free(filename);
     context->m_phrase_index->diff(1, oldchunk, newlog);
     filename = g_build_filename(context->m_user_dir,
                                 "gb_char.dbin", NULL);
     newlog->save(filename);
+    g_free(filename);
     delete newlog;
 
     oldchunk = new MemoryChunk; newlog = new MemoryChunk;
     filename = g_build_filename(context->m_system_dir,
                                 "gbk_char.bin", NULL);
     oldchunk->load(filename);
+    g_free(filename);
+
     context->m_phrase_index->diff(2, oldchunk, newlog);
     filename = g_build_filename(context->m_user_dir,
                                 "gbk_char.dbin", NULL);
     newlog->save(filename);
+    g_free(filename);
     delete newlog;
 
     filename = g_build_filename(context->m_user_dir, "user.db", NULL);
     context->m_user_bigram->save_db(filename);
+    g_free(filename);
 
     context->m_modified = false;
     return true;
