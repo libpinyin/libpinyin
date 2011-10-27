@@ -20,6 +20,7 @@
  */
 
 #include <stdio.h>
+#include <errno.h>
 #include <glib.h>
 #include <glib/gstdio.h>
 #include "memory_chunk.h"
@@ -273,7 +274,7 @@ bool Bigram::save_db(const char * dbfile){
     DB * tmp_db = NULL;
 
     int ret = g_unlink(dbfile);
-    if ( ret != 0 )
+    if ( ret != 0 && errno != ENOENT)
         return false;
 
     ret = db_create(&tmp_db, NULL, 0);
