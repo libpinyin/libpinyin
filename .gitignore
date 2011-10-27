@@ -20,6 +20,7 @@ libltdl
 *~
 *.o
 *.lo
+*.pyc
 .deps
 .libs
 tags

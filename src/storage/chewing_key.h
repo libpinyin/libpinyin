@@ -118,12 +118,39 @@ enum ChewingTone
     CHEWING_NUMBER_OF_TONES = CHEWING_LAST_TONE + 1
 };
 
+
+/** Note: The parsed pinyins are stored in the following two
+ *          GArrays to speed up chewing table lookup.
+ *        As the chewing table only contains information of struct ChewingKey.
+ */
+
 struct ChewingKey
 {
     guint16 m_initial : 5;
     guint16 m_middle  : 2;
     guint16 m_final   : 5;
     guint16 m_tone    : 3;
+
+    ChewingKey() {
+        m_initial = CHEWING_ZERO_INITIAL;
+        m_middle  = CHEWING_ZERO_MIDDLE;
+        m_final   = CHEWING_ZERO_FINAL;
+        m_tone    = CHEWING_ZERO_TONE;
+    }
+};
+
+struct ChewingKeyRest
+{
+    guint16 m_index;           /* the index in pinyin parser table. */
+    guint16 m_pinyin_begin;    /* the begin of pinyin in raw input. */
+    guint16 m_pinyin_end;      /* the end of pinyin in raw input. */
+
+    ChewingKeyRest() {
+        /* the 0th item in pinyin parser table is reserved for invalid. */
+        m_index = 0;
+        m_pinyin_begin = 0;
+        m_pinyin_end = 0;
+    }
 };
 
 };
