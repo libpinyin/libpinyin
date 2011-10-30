@@ -41,7 +41,12 @@ def load_phrase(filename):
         if 0 == freq:
             #print(pinyin_str)
             continue
+
         (first_key, second_key) = pinyin_str.split("'")
+        if first_key[-1].isdigit():
+            first_key = first_key[:-1]
+        if second_key[-1].isdigit():
+            second_key = second_key[:-1]
         phrase_dict[(first_key, second_key)] = freq
     phrasefile.close()
 
@@ -94,5 +99,7 @@ def filter_special():
 
 if __name__ == "__main__":
     load_phrase("pinyin2.txt")
+    for p in filter_divided():
+        print (p)
     for p in filter_special():
         print (p)
