@@ -25,10 +25,10 @@
 namespace pinyin{
 
 enum PinyinTableFlag{
-    IS_CHEWING = 1,
-    IS_PINYIN = 1 << 2,
-    PINYIN_INCOMPLETE = 1 << 3,
-    CHEWING_INCOMPLETE = 1 << 4,
+    IS_CHEWING = 1U << 1,
+    IS_PINYIN = 1U << 2,
+    PINYIN_INCOMPLETE = 1U << 3,
+    CHEWING_INCOMPLETE = 1U << 4,
 };
 
 /**
@@ -38,18 +38,17 @@ enum PinyinTableFlag{
  * We allow these ambiguities.
  */
 enum PinyinAmbiguityBeta{
-    PINYIN_AMB_ANY = 0,
-    PINYIN_AMB_C_Ch ,
-    PINYIN_AMB_Z_Zh,
-    PINYIN_AMB_S_Sh,
-    PINYIN_AMB_L_N ,
-    PINYIN_AMB_F_H ,
-    PINYIN_AMB_L_R ,
-    PINYIN_AMB_K_G ,
-    PINYIN_AMB_AN_ANG,
-    PINYIN_AMB_EN_ENG,
-    PINYIN_AMB_IN_ING,
-    PINYIN_AMB_LAST = PINYIN_AMB_IN_ING
+    PINYIN_AMB_C_Ch = 1U << 9,
+    PINYIN_AMB_Z_Zh = 1U << 10,
+    PINYIN_AMB_S_Sh = 1U << 11,
+    PINYIN_AMB_L_N = 1U << 12,
+    PINYIN_AMB_F_H = 1U << 13,
+    PINYIN_AMB_L_R = 1U << 14,
+    PINYIN_AMB_K_G = 1U << 15,
+    PINYIN_AMB_AN_ANG = 1U << 16,
+    PINYIN_AMB_EN_ENG = 1U << 17,
+    PINYIN_AMB_IN_ING = 1U << 18,
+    PINYIN_AMB_ALL = 0x3FFU << 9
 };
 
 /**
@@ -57,16 +56,15 @@ enum PinyinAmbiguityBeta{
  */
 
 enum PinyinCorrectionBeta{
-    PINYIN_CORRECT_ANY = 0,
-    PINYIN_CORRECT_GN_NG,
-    PINYIN_CORRECT_MG_NG,
-    PINYIN_CORRECT_IOU_IU,
-    PINYIN_CORRECT_UEI_UI,
-    PINYIN_CORRECT_UEN_UN,
-    PINYIN_CORRECT_UE_VE,
-    PINYIN_CORRECT_V_U,
-    PINYIN_CORRECT_ON_ONG,
-    PINYIN_CORRECT_LAST = PINYIN_CORRECT_ON_ONG,
+    PINYIN_CORRECT_GN_NG = 1U << 21,
+    PINYIN_CORRECT_MG_NG = 1U << 22,
+    PINYIN_CORRECT_IOU_IU = 1U << 23,
+    PINYIN_CORRECT_UEI_UI = 1U << 24,
+    PINYIN_CORRECT_UEN_UN = 1U << 25,
+    PINYIN_CORRECT_UE_VE = 1U << 26,
+    PINYIN_CORRECT_V_U = 1U << 27,
+    PINYIN_CORRECT_ON_ONG = 1U << 28,
+    PINYIN_CORRECT_ALL = 0xFFU << 9
 };
 
 };
