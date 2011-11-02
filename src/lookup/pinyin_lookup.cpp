@@ -108,18 +108,27 @@ bool PinyinLookup::destroy_pinyin_lookup(PhraseIndexRanges ranges){
 }
 
 size_t PinyinLookup::prepare_table_cache(int nstep, int total_pinyin){
-    //free resources
+    /* free resources */
     for ( size_t i = 0; i < m_table_cache->len; ++i){
 	PhraseIndexRanges * ranges = &g_array_index(m_table_cache, PhraseIndexRanges, i);
 	destroy_pinyin_lookup(*ranges);
     }
-    //g_array_set_size(m_table_cache, 1);
+
     PinyinKey * pinyin_keys = (PinyinKey *)m_keys->data;
     pinyin_keys += nstep;
-    //init resources
     g_array_set_size(m_table_cache, MAX_PHRASE_LENGTH + 1);
-    int len;
-    for ( len = 1; len <= total_pinyin && len <= MAX_PHRASE_LENGTH; ++len){
+
+    int len, total_len = std::min(total_pinyin, MAX_PHRASE_LENGTH);
+
+    /* probe constraint */
+    for ( len = 1; len <= total_len; ++len) {
+        lookup_constraint_t * constraint = &g_array_index(m_constraints, lookup_constraint_t, nstep + len);
+        if (constraint->m_type == CONSTRAINT_ONESTEP)
+            break;
+    }
+    total_len = std::min(len, total_len);
+
+    for ( len = 1; len <= total_len; ++len){
 	PhraseIndexRanges * ranges = &g_array_index(m_table_cache, PhraseIndexRanges, len);
 	prepare_pinyin_lookup(*ranges);
 	int result = m_pinyin_table->search(len, pinyin_keys, *ranges);
