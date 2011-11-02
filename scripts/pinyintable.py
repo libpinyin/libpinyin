@@ -155,5 +155,5 @@ if __name__ == "__main__":
     check_pinyin_chewing_map()
 
     #dump
-    for pinyin_key in gen_pinyin_list():
-        print (pinyin_key)
+    for p in gen_pinyin_list():
+        print (p)
