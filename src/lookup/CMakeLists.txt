@@ -11,6 +11,7 @@ set(
     pinyin_lookup.cpp
     winner_tree.cpp
     phrase_lookup.cpp
+    lookup.cpp
 )
 
 add_library(
