@@ -27,7 +27,7 @@ from correct import *
 
 
 pinyin_list = sorted(bopomofo.PINYIN_BOPOMOFO_MAP.keys())
-shengmu_list = sorted(pinyin.SHENGMU_DICT.keys())
+shengmu_list = sorted(pinyin.SHENGMU_LIST)
 
 
 def check_pinyin_chewing_map():
@@ -128,7 +128,7 @@ def gen_shengmu():
         chewing_key = get_shengmu_chewing(shengmu)
         chewing_initial = chewing_key[0]
         if chewing_initial in chewing.ASCII_CHEWING_INITIAL_MAP:
-            chewing_key = chewing.ASCII_CHEWING_INITIAL_MAP[chewing_key]
+            chewing_initial = chewing.ASCII_CHEWING_INITIAL_MAP[chewing_initial]
         yield shengmu, shengmu, chewing_initial, \
             flags, chewing_key
 

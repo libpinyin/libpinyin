@@ -52,9 +52,8 @@ def get_chewing_string(pinyin):
 def gen_divided_table():
     entries = []
     for (pinyin_key, first_key, second_key, freq) in divided_list:
-        pinyin_key = get_chewing_string(pinyin_key)
-        first_key = get_chewing_string(first_key)
-        second_key = get_chewing_string(second_key)
+        (pinyin_key, first_key, second_key) = map \
+            (get_chewing_string, (pinyin_key, first_key, second_key))
         entry = '{{{0}, {1}, {2}, {3}}}'.format \
             (pinyin_key, first_key, second_key, freq)
         entries.append(entry)
@@ -65,10 +64,9 @@ def gen_resplit_table():
     entries = []
     for (orig_first_key, orig_second_key, orig_freq, \
         new_first_key, new_second_key, new_freq) in resplit_list:
-        orig_first_key = get_chewing_string(orig_first_key)
-        orig_second_key = get_chewing_string(orig_second_key)
-        new_first_key = get_chewing_string(new_first_key)
-        new_second_key = get_chewing_string(new_second_key)
+        (orig_first_key, orig_second_key, new_first_key, new_second_key) = map\
+            (get_chewing_string, (orig_first_key, orig_second_key, \
+                                      new_first_key, new_second_key))
         entry = '{{{0}, {1}, {2}, {3}, {4}, {5}}}'.format \
             (orig_first_key, orig_second_key, orig_freq, \
                  new_first_key, new_second_key, new_freq)
