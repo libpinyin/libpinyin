@@ -77,11 +77,17 @@ def gen_all_resplit():
             for yun in yunmu_list:
                 if yun not in pinyin_list:
                     continue
+                #check first new pinyin key
+                if not pinyin_key[:-1] in pinyin_list:
+                    continue
+                #check second new pinyin key
                 new_pinyin_key = pinyin_key[-1] + yun
-                # if new_pinyin in pinyin_list:
-                yield pinyin_key, yun, pinyin_key[:-1], new_pinyin_key
+                if new_pinyin_key in pinyin_list:
+                    yield pinyin_key, yun, pinyin_key[:-1], new_pinyin_key
         elif pinyin_key[-1] in ["e"]:
-            yield pinyin_key, "r", pinyin_key[:-1], "er"
+            #check first new pinyin key
+            if pinyin_key[:-1] in pinyin_list:
+                yield pinyin_key, "r", pinyin_key[:-1], "er"
 
 
 def filter_resplit():
