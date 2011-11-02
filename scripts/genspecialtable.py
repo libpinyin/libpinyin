@@ -71,7 +71,7 @@ def filter_divided():
         yield pinyin_key, first_key, second_key, freq
 
 
-def gen_all_special():
+def gen_all_resplit():
     for pinyin_key in pinyin_list:
         if pinyin_key[-1] in ["n", "g", "r"]:
             for yun in yunmu_list:
@@ -84,9 +84,9 @@ def gen_all_special():
             yield pinyin_key, "r", pinyin_key[:-1], "er"
 
 
-def filter_special():
+def filter_resplit():
     for (orig_first_key, orig_second_key, new_first_key, new_second_key) \
-    in gen_all_special():
+    in gen_all_resplit():
         if not (new_first_key, new_second_key) in phrase_dict:
             continue
         orig_freq = 0
@@ -101,5 +101,5 @@ if __name__ == "__main__":
     load_phrase("pinyin2.txt")
     for p in filter_divided():
         print (p)
-    for p in filter_special():
+    for p in filter_resplit():
         print (p)
