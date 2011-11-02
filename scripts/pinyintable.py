@@ -110,21 +110,27 @@ def gen_pinyins():
             flags, get_chewing(pinyin_key)
 
 
+def get_shengmu_chewing(shengmu):
+    assert shengmu in shengmu_list, "Expected shengmu here."
+    chewing_key = 'CHEWING_{0}'.format(shengmu.upper())
+    if chewing_key in chewing.ASCII_CHEWING_INITIAL_MAP:
+        initial = chewing_key
+    else:
+        initial = 'PINYIN_{0}'.format(shengmu.upper())
+    return initial, "CHEWING_ZREO_MIDDLE", "CHEWING_ZERO_FINAL"
+
 def gen_shengmu():
     #generate all shengmu
     for shengmu in shengmu_list:
         if shengmu in pinyin_list:
             continue
         flags = ["IS_PINYIN", "PINYIN_INCOMPLETE"]
-        chewing_key = 'CHEWING_{0}'.format(shengmu.upper())
-        if chewing_key in chewing.ASCII_CHEWING_INITIAL_MAP:
-            initial = chewing_key
+        chewing_key = get_shengmu_chewing(shengmu)
+        chewing_initial = chewing_key[0]
+        if chewing_initial in chewing.ASCII_CHEWING_INITIAL_MAP:
             chewing_key = chewing.ASCII_CHEWING_INITIAL_MAP[chewing_key]
-        else:
-            chewing_key = 'PINYIN_{0}'.format(shengmu.upper())
-            initial = chewing_key
-        yield shengmu, shengmu, chewing_key, \
-            flags, (initial, "CHEWING_ZREO_MIDDLE", "CHEWING_ZERO_FINAL")
+        yield shengmu, shengmu, chewing_initial, \
+            flags, chewing_key
 
 
 def gen_corrects():

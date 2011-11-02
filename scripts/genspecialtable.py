@@ -22,7 +22,7 @@
 
 import operator
 import pinyin
-from pinyintable import get_chewing
+from pinyintable import get_chewing, get_shengmu_chewing
 from specialtable import *
 
 pinyin_list = sorted(pinyin.PINYIN_LIST)
@@ -40,10 +40,11 @@ def sort_all():
 def get_chewing_string(pinyin):
     if pinyin not in pinyin_list:
         if pinyin in shengmu_list:
-            return "Error"
+            (initial, middle, final) = get_shengmu_chewing(pinyin)
         else:
             assert False, "Un-expected pinyin string."
-    (initial, middle, final) = get_chewing(pinyin)
+    else:
+        (initial, middle, final) = get_chewing(pinyin)
     chewing_str = 'ChewingKey({0}, {1}, {2})'.format(initial, middle, final)
     return chewing_str
 
