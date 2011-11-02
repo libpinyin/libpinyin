@@ -62,9 +62,27 @@ def gen_context_table():
     return ',\n'.join(entries)
 
 
+def gen_pinyin_index():
+    entries = []
+    for (wrong, flags, correct) in pinyin_index:
+        index = [x[0] for x in content_table].index(correct)
+        entry = '{{"{0}", {1}, {2}}}'.format(wrong, flags, index)
+        entries.append(entry)
+    return ',\n'.join(entries)
+
+
+def gen_bopomofo_index():
+    entries = []
+    for (bopomofo_str, flags, bopomofo) in bopomofo_index:
+        index = [x[0] for x in content_table].index(bopomofo)
+        entry = '{{"{0}", {1}, {2}}}'.format(bopomofo_str, flags, index)
+        entries.append(entry)
+    return ',\n'.join(entries)
+
+
 ### main function ###
 if __name__ == "__main__":
     filter_pinyin_list()
     sort_all()
-    table = gen_context_table()
-    print(table)
+    s = gen_pinyin_index()
+    print(s)
