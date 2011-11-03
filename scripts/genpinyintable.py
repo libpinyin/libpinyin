@@ -54,7 +54,7 @@ def sort_all():
     bopomofo_index = sorted(bopomofo_index, key=sortfunc)
 
 
-def gen_context_table():
+def gen_content_table():
     entries = []
     for ((correct, bopomofo, chewing)) in content_table:
         entry = '{{"{0}", "{1}", {2}}}'.format(correct, bopomofo, chewing)
@@ -74,7 +74,7 @@ def gen_pinyin_index():
 def gen_bopomofo_index():
     entries = []
     for (bopomofo_str, flags, bopomofo) in bopomofo_index:
-        index = [x[0] for x in content_table].index(bopomofo)
+        index = [x[1] for x in content_table].index(bopomofo)
         entry = '{{"{0}", {1}, {2}}}'.format(bopomofo_str, flags, index)
         entries.append(entry)
     return ',\n'.join(entries)
@@ -84,5 +84,5 @@ def gen_bopomofo_index():
 if __name__ == "__main__":
     filter_pinyin_list()
     sort_all()
-    s = gen_pinyin_index()
+    s = gen_content_table() + gen_pinyin_index() + gen_bopomofo_index()
     print(s)
