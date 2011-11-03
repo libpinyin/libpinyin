@@ -38,6 +38,7 @@ def sort_all():
     resplit_list = sorted(resplit_list, key=operator.itemgetter(0, 1))
 
 def get_chewing_string(pinyin):
+    #handle shengmu
     if pinyin not in pinyin_list:
         if pinyin in shengmu_list:
             (initial, middle, final) = get_shengmu_chewing(pinyin)
