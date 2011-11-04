@@ -1,4 +1,8 @@
 set(
+    CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC"
+)
+
+set(
     LIBLOOKUP_HEADERS
     lookup.h
     pinyin_lookup.h
