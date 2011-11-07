@@ -52,3 +52,8 @@ libpinyin_la_LDFLAGS	= -Wl,--version-script=$(srcdir)/libpinyin.ver \
 libpinyin_internal_la_SOURCES	= pinyin_internal.cpp
 
 libpinyin_internal_la_LIBADD	= storage/libstorage.la lookup/liblookup.la
+
+
+## Note:
+## As libpinyin internal interface will change, only provides static library
+##   to catch errors when compiling instead of running.
