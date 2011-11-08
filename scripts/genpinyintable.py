@@ -47,7 +47,7 @@ def sort_all():
     sortfunc = operator.itemgetter(0)
     #begin sort
     content_table = sorted(content_table, key=sortfunc)
-    #prepend zero item
+    #prepend zero item to reserve the invalid item
     content_table.insert(0, ("", "", "ChewingKey()"))
     #sort index
     pinyin_index = sorted(pinyin_index, key=sortfunc)

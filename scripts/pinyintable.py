@@ -139,6 +139,7 @@ def gen_corrects():
         flags = ['IS_PINYIN', 'PINYIN_CORRECT_{0}_{1}'.format(wrong.upper(),
                                                               correct.upper())]
         for pinyin_key in pinyin_list:
+            #fixes partial pinyin instead of the whole pinyin
             if pinyin_key.endswith(correct) and pinyin_key != correct:
                 chewing_key = bopomofo.PINYIN_BOPOMOFO_MAP[pinyin_key]
                 new_pinyin_key = pinyin_key.replace(correct, wrong)

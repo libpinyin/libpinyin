@@ -41,12 +41,12 @@ def get_chewing_string(pinyin):
     #handle shengmu
     if pinyin not in pinyin_list:
         if pinyin in shengmu_list:
-            (initial, middle, final) = get_shengmu_chewing(pinyin)
+            chewing_key = get_shengmu_chewing(pinyin)
         else:
             assert False, "Un-expected pinyin string."
     else:
-        (initial, middle, final) = get_chewing(pinyin)
-    chewing_str = 'ChewingKey({0}, {1}, {2})'.format(initial, middle, final)
+        chewing_key = get_chewing(pinyin)
+    chewing_str = 'ChewingKey({0})'.format(', '.join(chewing_key))
     return chewing_str
 
 
