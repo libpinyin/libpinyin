@@ -4,14 +4,24 @@
 #ifndef PINYIN_PARSER_TABLE_H
 #define PINYIN_PARSER_TABLE_H
 
+const pinyin_index_item_t pinyin_index[] = {
 @PINYIN_INDEX@
+};
 
+const chewing_index_item_t chewing_index[] = {
 @BOPOMOFO_INDEX@
+};
 
+const content_table_item_t content_table[] = {
 @CONTENT_TABLE@
+};
 
+const divided_table_item_t divided_table[] = {
 @DIVIDED_TABLE@
+};
 
+const resplit_table_item_t resplit_table[] = {
 @RESPLIT_TABLE@
+};
 
 #endif
