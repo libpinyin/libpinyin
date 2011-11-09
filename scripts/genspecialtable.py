@@ -68,17 +68,12 @@ def gen_resplit_table():
         (orig_first_key, orig_second_key, new_first_key, new_second_key) = map\
             (get_chewing_string, (orig_first_key, orig_second_key, \
                                       new_first_key, new_second_key))
-        if new_freq > orig_freq:
-            if orig_freq == 0:
-                benefit = 0.5
-            else:
-                benefit = 0.3
-        elif orig_freq >= new_freq:
+        if orig_freq >= new_freq:
             assert orig_freq > 0, "Expected orig_freq > 0 here."
-            benefit = 0
-        entry = '{{{0}, {1}, {2}, {3}, {4}}}'.format \
-            (orig_first_key, orig_second_key, \
-                 new_first_key, new_second_key, benefit)
+
+        entry = '{{{0}, {1}, {2}, {3}, {4}, {5}}}'.format \
+            (orig_first_key, orig_second_key, orig_freq,\
+                 new_first_key, new_second_key, new_freq)
         entries.append(entry)
     return ',\n'.join(entries)
 
