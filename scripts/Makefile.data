@@ -1,9 +1,9 @@
-all: pinyin2.txt
+all: pinyins.txt
 
 
-pinyin2.txt:
-	awk -f genpinyin2.awk ../data/gb_char.table > $@
+pinyins.txt:
+	awk -f genpinyins.awk -vlen=1 ../data/gb_char.table > $@
+	awk -f genpinyins.awk -vlen=2 ../data/gb_char.table >> $@
 
 
-.PHONY: pinyin2.txt
-
+.PHONY: pinyins.txt

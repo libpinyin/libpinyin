@@ -42,12 +42,15 @@ def load_phrase(filename):
             #print(pinyin_str)
             continue
 
-        (first_key, second_key) = pinyin_str.split("'")
-        if first_key[-1].isdigit():
-            first_key = first_key[:-1]
-        if second_key[-1].isdigit():
-            second_key = second_key[:-1]
-        phrase_dict[(first_key, second_key)] = freq
+        if "'" in pinyin_str:
+            (first_key, second_key) = pinyin_str.split("'")
+            if first_key[-1].isdigit():
+                first_key = first_key[:-1]
+            if second_key[-1].isdigit():
+                second_key = second_key[:-1]
+            phrase_dict[(first_key, second_key)] = freq
+        else:
+            phrase_dict[pinyin_str] = freq
     phrasefile.close()
 
 
@@ -67,8 +70,11 @@ def filter_divided():
     for (pinyin_key, first_key, second_key) in gen_all_divided():
         if not (first_key, second_key) in phrase_dict:
             continue
-        freq = phrase_dict[(first_key, second_key)]
-        yield pinyin_key, first_key, second_key, freq
+        orig_freq = 0
+        if pinyin_key in phrase_dict:
+            orig_freq = phrase_dict[pinyin_key]
+        new_freq = phrase_dict[(first_key, second_key)]
+        yield pinyin_key, orig_freq, first_key, second_key, new_freq
 
 
 def gen_all_resplit():
@@ -104,7 +110,7 @@ def filter_resplit():
 
 
 #init code
-load_phrase("pinyin2.txt")
+load_phrase("pinyins.txt")
 
 if __name__ == "__main__":
     for p in filter_divided():

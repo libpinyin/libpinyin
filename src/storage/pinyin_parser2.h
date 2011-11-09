@@ -46,6 +46,7 @@ typedef struct {
 
 typedef struct {
     ChewingKey   m_orig_key;
+    guint32      m_orig_freq;
     ChewingKey   m_first_key;
     ChewingKey   m_second_key;
     guint32      m_new_freq;
