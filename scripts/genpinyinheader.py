@@ -20,10 +20,38 @@
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 
+import os
 from genpinyintable import gen_content_table, \
     gen_pinyin_index, gen_bopomofo_index
 from genspecialtable import gen_divided_table, gen_resplit_table
 
+def get_table_content(tablename):
+    if tablename == 'CONTENT_TABLE':
+        return gen_content_table()
+    if tablename == 'PINYIN_INDEX':
+        return gen_pinyin_index()
+    if tablename == 'BOPOMOFO_INDEX':
+        return gen_bopomofo_index()
+    if tablename == 'DIVIDED_TABLE':
+        return gen_divided_table()
+    if tablename == 'RESPLIT_TABLE':
+        return gen_resplit_table()
+
+
+def expand_file(filename):
+    infile = open(filename, "r")
+    for line in infile.readlines():
+        line = line.rstrip(os.linesep)
+        if len(line) < 3 :
+            print(line)
+            continue
+        if line[0] == '@' and line[-1] == '@':
+            tablename = line[1:-1]
+            print(get_table_content(tablename))
+        else:
+            print(line)
+
+
 ### main function ###
 if __name__ == "__main__":
-    pass
+    expand_file("pinyin_parser_table.h.in")
