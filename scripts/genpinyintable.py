@@ -80,9 +80,12 @@ def gen_bopomofo_index():
     return ',\n'.join(entries)
 
 
+#init code
+filter_pinyin_list()
+sort_all()
+
+
 ### main function ###
 if __name__ == "__main__":
-    filter_pinyin_list()
-    sort_all()
     s = gen_content_table() + gen_pinyin_index() + gen_bopomofo_index()
     print(s)

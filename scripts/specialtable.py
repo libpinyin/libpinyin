@@ -103,8 +103,10 @@ def filter_resplit():
         new_first_key, new_second_key, new_freq
 
 
+#init code
+load_phrase("pinyin2.txt")
+
 if __name__ == "__main__":
-    load_phrase("pinyin2.txt")
     for p in filter_divided():
         print (p)
     for p in filter_resplit():

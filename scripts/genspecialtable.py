@@ -83,15 +83,14 @@ def gen_resplit_table():
     return ',\n'.join(entries)
 
 
+#init code, load lists
+divided_list = filter_divided()
+resplit_list = filter_resplit()
+sort_all()
+
+
 ### main function ###
 if __name__ == "__main__":
-    load_phrase("pinyin2.txt")
-
-    #load lists
-    divided_list = filter_divided()
-    resplit_list = filter_resplit()
-    sort_all()
-
     s = gen_divided_table() + '\n' + gen_resplit_table()
     print(s)
 
