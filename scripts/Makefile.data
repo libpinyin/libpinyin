@@ -7,4 +7,8 @@ pinyins.txt:
 	awk -f genpinyins.awk -vlen=2 ../data/gb_char.table >> $@
 
 
+update-header:
+	python3 genpinyinheader.py > ../src/storage/pinyin_parser_table.h
+
+
 .PHONY: pinyins.txt

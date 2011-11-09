@@ -56,6 +56,10 @@ def gen_divided_table():
             in divided_list:
         (pinyin_key, first_key, second_key) = map \
             (get_chewing_string, (pinyin_key, first_key, second_key))
+
+        if orig_freq >= new_freq:
+            assert orig_freq > 0, "Expected orig_freq > 0 here."
+
         entry = '{{{0}, {1}, {2}, {3}, {4}}}'.format \
             (pinyin_key, orig_freq, first_key, second_key, new_freq)
         entries.append(entry)
