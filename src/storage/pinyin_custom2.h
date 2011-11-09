@@ -29,6 +29,8 @@ enum PinyinTableFlag{
     IS_PINYIN = 1U << 2,
     PINYIN_INCOMPLETE = 1U << 3,
     CHEWING_INCOMPLETE = 1U << 4,
+    USE_INCOMPLETE = 1U << 5,
+    USE_TONE = 1U << 6
 };
 
 /**
