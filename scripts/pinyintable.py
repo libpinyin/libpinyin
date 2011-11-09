@@ -117,7 +117,7 @@ def get_shengmu_chewing(shengmu):
         initial = chewing_key
     else:
         initial = 'PINYIN_{0}'.format(shengmu.upper())
-    return initial, "CHEWING_ZREO_MIDDLE", "CHEWING_ZERO_FINAL"
+    return initial, "CHEWING_ZERO_MIDDLE", "CHEWING_ZERO_FINAL"
 
 def gen_shengmu():
     #generate all shengmu

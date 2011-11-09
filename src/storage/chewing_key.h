@@ -22,6 +22,8 @@
 #ifndef CHEWING_KEY_H
 #define CHEWING_KEY_H
 
+#include <glib.h>
+
 /** @file chewing_key.h
  *  @brief the definitions of chewing key related classes and structs.
  */
@@ -136,6 +138,14 @@ struct ChewingKey
         m_middle  = CHEWING_ZERO_MIDDLE;
         m_final   = CHEWING_ZERO_FINAL;
         m_tone    = CHEWING_ZERO_TONE;
+    }
+
+    ChewingKey(ChewingInitial initial, ChewingMiddle middle,
+               ChewingFinal final) {
+        m_initial = initial;
+        m_middle = middle;
+        m_final = final;
+        m_tone = CHEWING_ZERO_TONE;
     }
 };
 

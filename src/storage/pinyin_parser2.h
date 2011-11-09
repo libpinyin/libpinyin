@@ -24,6 +24,8 @@
 
 #include "chewing_key.h"
 
+namespace pinyin{
+
 typedef struct {
     const char * m_pinyin_str;
     const char * m_chewing_str;
@@ -57,4 +59,5 @@ typedef struct {
     gfloat       m_benefit;
 } resplit_table_item_t;
 
+};
 #endif

@@ -4,6 +4,8 @@
 #ifndef PINYIN_PARSER_TABLE_H
 #define PINYIN_PARSER_TABLE_H
 
+namespace pinyin{
+
 const pinyin_index_item_t pinyin_index[] = {
 @PINYIN_INDEX@
 };
@@ -22,6 +24,8 @@ const divided_table_item_t divided_table[] = {
 
 const resplit_table_item_t resplit_table[] = {
 @RESPLIT_TABLE@
+};
+
 };
 
 #endif
