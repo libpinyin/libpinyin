@@ -41,7 +41,7 @@ enum PinyinTableFlag{
  * Some pinyin element maybe confused by somebody,
  * We allow these ambiguities.
  */
-enum PinyinAmbiguityBeta{
+enum PinyinAmbiguity2{
     PINYIN_AMB_C_Ch = 1U << 9,
     PINYIN_AMB_Z_Zh = 1U << 10,
     PINYIN_AMB_S_Sh = 1U << 11,
@@ -59,7 +59,7 @@ enum PinyinAmbiguityBeta{
  * @brief enums of pinyin corrections.
  */
 
-enum PinyinCorrectionBeta{
+enum PinyinCorrection2{
     PINYIN_CORRECT_GN_NG = 1U << 21,
     PINYIN_CORRECT_MG_NG = 1U << 22,
     PINYIN_CORRECT_IOU_IU = 1U << 23,
