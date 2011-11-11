@@ -121,7 +121,7 @@ enum ChewingTone
 };
 
 /**
- * @brief enums of Shuang Pin Schemes.
+ * @brief enums of Double Pinyin Schemes.
  */
 enum DoublePinyinScheme
 {
@@ -136,7 +136,7 @@ enum DoublePinyinScheme
 };
 
 /**
- * @brief enums of ZhuYin Schemes.
+ * @brief enums of Chewing Schemes.
  */
 enum ChewingScheme
 {
