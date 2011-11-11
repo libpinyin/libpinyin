@@ -120,10 +120,39 @@ enum ChewingTone
     CHEWING_NUMBER_OF_TONES = CHEWING_LAST_TONE + 1
 };
 
+/**
+ * @brief enums of Shuang Pin Schemes.
+ */
+enum DoublePinyinScheme
+{
+    DOUBLE_PINYIN_ZRM        = 1,
+    DOUBLE_PINYIN_MS         = 2,
+    DOUBLE_PINYIN_ZIGUANG    = 3,
+    DOUBLE_PINYIN_ABC        = 4,
+    DOUBLE_PINYIN_PYJJ       = 6,
+    DOUBLE_PINYIN_XHE        = 7,
+    DOUBLE_PINYIN_CUSTOMIZED = 30,        /* for user's keyboard */
+    DOUBLE_PINYIN_DEFAULT    = DOUBLE_PINYIN_MS
+};
+
+/**
+ * @brief enums of ZhuYin Schemes.
+ */
+enum ChewingScheme
+{
+    CHEWING_STANDARD = 1,
+    CHEWING_HSU      = 2,
+    CHEWING_IBM      = 3,
+    CHEWING_GIN_YIEH = 4,
+    CHEWING_ET       = 5,
+    CHEWING_ET26     = 6,
+    CHEWING_DEFAULT  = CHEWING_STANDARD
+};
+
 
 /** Note: The parsed pinyins are stored in the following two
  *          GArrays to speed up chewing table lookup.
- *        As the chewing table only contains information of struct ChewingKey.
+ *    As the chewing large table only contains information of struct ChewingKey.
  */
 
 struct ChewingKey

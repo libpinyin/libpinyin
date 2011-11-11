@@ -22,6 +22,7 @@
 #ifndef PINYIN_PARSER2_H
 #define PINYIN_PARSER2_H
 
+#include <glib.h>
 #include "chewing_key.h"
 
 namespace pinyin{
@@ -61,5 +62,107 @@ typedef struct {
     guint32      m_new_freq;
 } resplit_table_item_t;
 
+
+typedef GArray * ChewingKeyVector;
+typedef GArray * ChewingKeyRestVector;
+
+
+/**
+ * @brief Class to translate string into ChewingKey.
+ */
+class PinyinParser2
+{
+    /* constructor/destructor */
+public:
+    virtual ~PinyinParser2 () {}
+
+    /* public method */
+public:
+    /**
+     * @brief Translate only one ChewingKey from a string.
+     *
+     * @param options pinyin options from pinyin_custom2.h.
+     * @param key stores result ChewingKey.
+     * @param str snput string in UTF-8 encoding, in most case this string is just a plain ASCII string.
+     * @param len the length of str, in number of chars rather than bytes.
+     *
+     * @return the number of chars were actually used.
+     */
+    virtual int parse_one_key (guint32 options, ChewingKey &key, const char *str, int len) const = 0;
+
+    /**
+     * @brief Translate the source string into a set of ChewingKeys.
+     *
+     * @param options pinyin options from pinyin_custom2.h.
+     * @param keys stores result ChewingKeys.
+     * @param str input string in UTF-8 encoding, in most case this string is just a plain ASCII string.
+     * @param len the length of str, in number of chars rather than bytes.
+     *
+     * @return the number of chars were actually used.
+     */
+    /* Note:
+     *   the parse method will use dynamic programming to drive parse_one_key.
+     */
+    virtual int parse (guint32 options, ChewingKeyVector & keys, ChewingKeyRestVector & rests, const char *str, int len) const = 0;
+
 };
+
+
+/**
+ * The Full Pinyin Parser which parses full pinyin string into ChewingKeys.
+ */
+class FullPinyinParser2 : public PinyinParser2
+{
+    /* Note: some internal pointers to full pinyin table. */
+
+public:
+    virtual ~FullPinyinParser2 () {}
+
+    virtual int parse_one_key (guint32 options, ChewingKey &key, const char *str, int len) const;
+};
+
+
+/* The valid input chars of ShuangPin is a-z and ';'
+ */
+class DoublePinyinParser2 : public PinyinParser2
+{
+    /* Note: two internal pointers to double pinyin scheme table. */
+
+public:
+    virtual ~DoublePinyinParser2 () {}
+
+    virtual int parse_one_key (guint32 options, ChewingKey &key, const char *str, int len) const;
+
+public:
+    bool set_scheme (DoublePinyinScheme scheme);
+};
+
+
+/**
+ * @brief Class to parse Chewing input string
+ *
+ * Several keyboard scheme are supported:
+ * * Chewing_STANDARD  Standard ZhuYin keyboard, which maps 1 to Bo(ㄅ), q to Po(ㄆ) etc.
+ * * Chewing_HSU       Hsu ZhuYin keyboard, which uses a-z (except q) chars.
+ * * Chewing_IBM       IBM ZhuYin keyboard, which maps 1 to Bo(ㄅ), 2 to Po(ㄆ) etc.
+ * * Chewing_GIN_YIEH  Gin-Yieh ZhuYin keyboard.
+ * * Chewing_ET        Eten (倚天) ZhuYin keyboard.
+ * * Chewing_ET26      Eten (倚天) ZhuYin keyboard, which only uses a-z chars.
+ */
+class ChewingParser2 : public PinyinParser2
+{
+    /* Note: one internal pointer to chewing scheme table. */
+
+public:
+    virtual ~ChewingParser2 () {}
+
+    virtual int parse_one_key (guint32 options, ChewingKey &key, const char *str, int len) const;
+
+public:
+    bool set_scheme (ChewingScheme scheme);
+};
+
+
+};
+
 #endif
