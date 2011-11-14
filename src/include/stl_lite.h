@@ -91,8 +91,6 @@ namespace std_lite{
       _T1 first;                 ///< @c first is a copy of the first object
       _T2 second;                ///< @c second is a copy of the second object
 
-      // _GLIBCXX_RESOLVE_LIB_DEFECTS
-      // 265.  std::pair::pair() effects overly restrictive
       /** The default constructor creates @c first and @c second using their
        *  respective default constructors.  */
       pair()
@@ -257,8 +255,8 @@ namespace std_lite{
    *
    *  This is equivalent to
    *  @code
-   *    std::make_pair(lower_bound(first, last, val, comp),
-   *                   upper_bound(first, last, val, comp))
+   *    std_lite::make_pair(lower_bound(first, last, val, comp),
+   *                        upper_bound(first, last, val, comp))
    *  @endcode
    *  but does not actually call those functions.
   */

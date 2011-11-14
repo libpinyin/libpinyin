@@ -21,7 +21,6 @@
 
 #include <math.h>
 #include <assert.h>
-#include <iostream>
 #include "stl_lite.h"
 #include "novel_types.h"
 #include "pinyin_base.h"
@@ -118,7 +117,7 @@ size_t PinyinLookup::prepare_table_cache(int nstep, int total_pinyin){
     pinyin_keys += nstep;
     g_array_set_size(m_table_cache, MAX_PHRASE_LENGTH + 1);
 
-    int len, total_len = std::min(total_pinyin, MAX_PHRASE_LENGTH);
+    int len, total_len = std_lite::min(total_pinyin, MAX_PHRASE_LENGTH);
 
     /* probe constraint */
     for ( len = 1; len <= total_len; ++len) {
@@ -126,7 +125,7 @@ size_t PinyinLookup::prepare_table_cache(int nstep, int total_pinyin){
         if (constraint->m_type == CONSTRAINT_ONESTEP)
             break;
     }
-    total_len = std::min(len, total_len);
+    total_len = std_lite::min(len, total_len);
 
     for ( len = 1; len <= total_len; ++len){
 	PhraseIndexRanges * ranges = &g_array_index(m_table_cache, PhraseIndexRanges, len);
@@ -462,8 +461,8 @@ bool PinyinLookup::train_result(PinyinKeyVector keys, CandidateConstraints const
 	    }else{
 		train_next = false;
 	    }
-	    //add pi-gram frequency
-	    //std::cout<<"i:"<<i<<"last_token:"<<last_token<<"\ttoken:"<<*token<<std::endl;
+            //add pi-gram frequency
+            //printf("i:%d\tlast_token:%d\ttoken:%d\n", i, last_token, *token);
 	    m_phrase_index->get_phrase_item(*token, m_cache_phrase_item);
 	    m_cache_phrase_item.increase_pinyin_possibility(*m_custom, pinyin_keys + i, train_factor);
 	    m_phrase_index->add_unigram_frequency(*token, train_factor);
