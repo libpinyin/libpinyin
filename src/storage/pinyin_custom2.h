@@ -41,9 +41,9 @@ enum PinyinTableFlag{
  * We allow these ambiguities.
  */
 enum PinyinAmbiguity2{
-    PINYIN_AMB_C_Ch = 1U << 9,
-    PINYIN_AMB_Z_Zh = 1U << 10,
-    PINYIN_AMB_S_Sh = 1U << 11,
+    PINYIN_AMB_C_CH = 1U << 9,
+    PINYIN_AMB_Z_ZH = 1U << 10,
+    PINYIN_AMB_S_SH = 1U << 11,
     PINYIN_AMB_L_N = 1U << 12,
     PINYIN_AMB_F_H = 1U << 13,
     PINYIN_AMB_L_R = 1U << 14,
