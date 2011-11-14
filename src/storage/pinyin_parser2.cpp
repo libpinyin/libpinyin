@@ -19,7 +19,46 @@
  *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
+#include <assert.h>
 #include "pinyin_custom2.h"
 #include "chewing_key.h"
 #include "pinyin_parser2.h"
 #include "pinyin_parser_table.h"
+
+
+using namespace pinyin;
+
+bool check_pinyin_options(guint32 options, pinyin_index_item_t * item) {
+    guint32 flags = item->m_flags;
+    assert (flags & IS_PINYIN);
+
+    /* handle incomplete pinyin. */
+    if (flags & PINYIN_INCOMPLETE) {
+        if (!(options & PINYIN_INCOMPLETE))
+            return false;
+    }
+
+    /* handle correct pinyin, currently only one flag per item. */
+    flags &= PINYIN_CORRECT_ALL;
+    options &= PINYIN_CORRECT_ALL;
+
+    if (flags) {
+        if ((flags & options) != flags)
+            return false;
+    }
+
+    return true;
+}
+
+bool check_chewing_options(guint32 options, chewing_index_item_t * item) {
+    guint32 flags = item->m_flags;
+    assert (flags & IS_CHEWING);
+
+    /* handle incomplete chewing. */
+    if (flags & CHEWING_INCOMPLETE) {
+        if (!(options & CHEWING_INCOMPLETE))
+            return false;
+    }
+
+    return true;
+}
