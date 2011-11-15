@@ -43,6 +43,8 @@ def sort_all():
     global content_table, pinyin_index, bopomofo_index
     #remove duplicates
     content_table = list(set(content_table))
+    pinyin_index = list(set(pinyin_index))
+    bopomofo_index = list(set(bopomofo_index))
     #define sort function
     sortfunc = operator.itemgetter(0)
     #begin sort
