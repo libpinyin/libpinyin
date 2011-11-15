@@ -70,21 +70,21 @@ static bool check_chewing_options(guint32 options, const chewing_index_item_t * 
 
 /* methods for Chewing Keys to access pinyin parser table. */
 const char * ChewingKeyRest::get_pinyin_string(){
-    if (m_index == 0)
+    if (m_table_index == 0)
         return NULL;
 
     /* check end boundary. */
-    assert(m_index < G_N_ELEMENTS(content_table));
-    return content_table[m_index].m_pinyin_str;
+    assert(m_table_index < G_N_ELEMENTS(content_table));
+    return content_table[m_table_index].m_pinyin_str;
 }
 
 const char * ChewingKeyRest::get_chewing_string(){
-    if (m_index == 0)
+    if (m_table_index == 0)
         return NULL;
 
     /* check end boundary. */
-    assert(m_index < G_N_ELEMENTS(content_table));
-    return content_table[m_index].m_chewing_str;
+    assert(m_table_index < G_N_ELEMENTS(content_table));
+    return content_table[m_table_index].m_chewing_str;
 }
 
 
@@ -133,8 +133,8 @@ int FullPinyinParser2::parse_one_key (guint32 options, ChewingKey & key,
             if (!check_pinyin_options(options, index))
                 continue;
 
-            key_rest.m_index = index->m_table_index;
-            key = content_table[key_rest.m_index].m_chewing_key;
+            key_rest.m_table_index = index->m_table_index;
+            key = content_table[key_rest.m_table_index].m_chewing_key;
             break;
         }
     }
@@ -150,4 +150,11 @@ int FullPinyinParser2::parse_one_key (guint32 options, ChewingKey & key,
     key_rest.m_raw_begin = 0; key_rest.m_raw_end = parsed_len;
     g_free(input);
     return parsed_len;
+}
+
+
+int FullPinyinParser2::parse (guint32 options, ChewingKeyVector & keys,
+                              ChewingKeyRestVector & key_rests,
+                              const char *str, int len) const {
+    assert(FALSE);
 }
