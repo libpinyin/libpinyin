@@ -28,7 +28,7 @@
 
 using namespace pinyin;
 
-bool check_pinyin_options(guint32 options, pinyin_index_item_t * item) {
+static bool check_pinyin_options(guint32 options, pinyin_index_item_t * item) {
     guint32 flags = item->m_flags;
     assert (flags & IS_PINYIN);
 
@@ -50,7 +50,7 @@ bool check_pinyin_options(guint32 options, pinyin_index_item_t * item) {
     return true;
 }
 
-bool check_chewing_options(guint32 options, chewing_index_item_t * item) {
+static bool check_chewing_options(guint32 options, chewing_index_item_t * item) {
     guint32 flags = item->m_flags;
     assert (flags & IS_CHEWING);
 
@@ -61,4 +61,22 @@ bool check_chewing_options(guint32 options, chewing_index_item_t * item) {
     }
 
     return true;
+}
+
+const char * ChewingKeyRest::get_pinyin_string(){
+    if (m_index == 0)
+        return NULL;
+
+    /* check end boundary. */
+    assert(m_index < G_N_ELEMENTS(content_table));
+    return content_table[m_index].m_pinyin_str;
+}
+
+const char * ChewingKeyRest::get_chewing_string(){
+    if (m_index == 0)
+        return NULL;
+
+    /* check end boundary. */
+    assert(m_index < G_N_ELEMENTS(content_table));
+    return content_table[m_index].m_chewing_str;
 }

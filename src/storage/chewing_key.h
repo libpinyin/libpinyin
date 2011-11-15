@@ -190,6 +190,9 @@ struct ChewingKeyRest
         m_pinyin_begin = 0;
         m_pinyin_end = 0;
     }
+
+    const char * get_pinyin_string();
+    const char * get_chewing_string();
 };
 
 };
