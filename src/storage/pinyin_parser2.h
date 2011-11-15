@@ -88,7 +88,7 @@ public:
      *
      * @return the number of chars were actually used.
      */
-    virtual int parse_one_key (guint32 options, ChewingKey &key, const char *str, int len) const = 0;
+    virtual int parse_one_key (guint32 options, ChewingKey & key, ChewingKeyRest & key_rest, const char *str, int len) const = 0;
 
     /**
      * @brief Translate the source string into a set of ChewingKeys.
@@ -103,7 +103,7 @@ public:
     /* Note:
      *   the parse method will use dynamic programming to drive parse_one_key.
      */
-    virtual int parse (guint32 options, ChewingKeyVector & keys, ChewingKeyRestVector & rests, const char *str, int len) const = 0;
+    virtual int parse (guint32 options, ChewingKeyVector & keys, ChewingKeyRestVector & key_rests, const char *str, int len) const = 0;
 
 };
 
@@ -118,7 +118,9 @@ class FullPinyinParser2 : public PinyinParser2
 public:
     virtual ~FullPinyinParser2 () {}
 
-    virtual int parse_one_key (guint32 options, ChewingKey &key, const char *str, int len) const;
+    virtual int parse_one_key (guint32 options, ChewingKey & key, ChewingKeyRest & key_rest, const char *str, int len) const;
+
+    virtual int parse (guint32 options, ChewingKeyVector & keys, ChewingKeyRestVector & key_rests, const char *str, int len) const;
 };
 
 
@@ -131,7 +133,9 @@ class DoublePinyinParser2 : public PinyinParser2
 public:
     virtual ~DoublePinyinParser2 () {}
 
-    virtual int parse_one_key (guint32 options, ChewingKey &key, const char *str, int len) const;
+    virtual int parse_one_key (guint32 options, ChewingKey & key, ChewingKeyRest & key_rest, const char *str, int len) const;
+
+    virtual int parse (guint32 options, ChewingKeyVector & keys, ChewingKeyRestVector & key_rests, const char *str, int len) const;
 
 public:
     bool set_scheme (DoublePinyinScheme scheme);
@@ -156,7 +160,9 @@ class ChewingParser2 : public PinyinParser2
 public:
     virtual ~ChewingParser2 () {}
 
-    virtual int parse_one_key (guint32 options, ChewingKey &key, const char *str, int len) const;
+    virtual int parse_one_key (guint32 options, ChewingKey & key, ChewingKeyRest & key_rest, const char *str, int len) const;
+
+    virtual int parse (guint32 options, ChewingKeyVector & keys, ChewingKeyRestVector & key_rests, const char *str, int len) const;
 
 public:
     bool set_scheme (ChewingScheme scheme);
