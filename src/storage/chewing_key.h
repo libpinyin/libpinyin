@@ -181,14 +181,14 @@ struct ChewingKey
 struct ChewingKeyRest
 {
     guint16 m_index;           /* the index in pinyin parser table. */
-    guint16 m_pinyin_begin;    /* the begin of pinyin in raw input. */
-    guint16 m_pinyin_end;      /* the end of pinyin in raw input. */
+    guint16 m_raw_begin;           /* the begin of the raw input. */
+    guint16 m_raw_end;             /* the end of the raw input. */
 
     ChewingKeyRest() {
         /* the 0th item in pinyin parser table is reserved for invalid. */
         m_index = 0;
-        m_pinyin_begin = 0;
-        m_pinyin_end = 0;
+        m_raw_begin = 0;
+        m_raw_end = 0;
     }
 
     const char * get_pinyin_string();
