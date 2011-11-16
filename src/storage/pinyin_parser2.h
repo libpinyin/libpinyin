@@ -118,6 +118,9 @@ class FullPinyinParser2 : public PinyinParser2
 
 protected:
     ParseValueVector m_parse_steps;
+
+    int final_step(size_t step_len, ChewingKeyVector & keys,
+                   ChewingKeyRestVector & key_rests) const;
 public:
     FullPinyinParser2 ();
     virtual ~FullPinyinParser2 () {

@@ -193,7 +193,7 @@ int FullPinyinParser2::parse (guint32 options, ChewingKeyVector & keys,
     g_array_set_size(key_rests, 0);
 
     /* init m_parse_steps, and prepare dynamic programming. */
-    int step_len = len + 1;
+    size_t step_len = len + 1;
     g_array_set_size(m_parse_steps, 0);
     parse_value_t value;
     for (i = 0; i < step_len; ++i) {
@@ -221,7 +221,8 @@ int FullPinyinParser2::parse (guint32 options, ChewingKeyVector & keys,
 
         /* forward to next "'" */
         if ( 0 == next_sep ) {
-            for (size_t k = i;  k < len; ++k) {
+            size_t k;
+            for (k = i;  k < len; ++k) {
                 if (input[k] == '\'')
                     break;
             }
@@ -265,8 +266,24 @@ int FullPinyinParser2::parse (guint32 options, ChewingKeyVector & keys,
         }
     }
 
-    gint16 parsed_len = 0;
     /* final step for back tracing. */
+    gint16 parsed_len = final_step(step_len, keys, key_rests);
+
+    /* post processing for re-split table. */
+    if (options & USE_RESPLIT_TABLE) {
+        
+    }
+
+    g_free(input);
+    return parsed_len;
+}
+
+int FullPinyinParser2::final_step(size_t step_len, ChewingKeyVector & keys,
+                                  ChewingKeyRestVector & key_rests) const{
+    size_t i;
+    gint16 parsed_len = 0;
+    parse_value_t * curstep = NULL;
+
     /* find longest match, which starts from the beginning of input. */
     for ( i = step_len - 1; i >= 0; --i) {
         curstep = &g_array_index(m_parse_steps, parse_value_t, i);
@@ -278,21 +295,22 @@ int FullPinyinParser2::parse (guint32 options, ChewingKeyVector & keys,
     gint16 num_keys = curstep->m_num_keys;
     g_array_set_size(keys, num_keys);
     g_array_set_size(key_rests, num_keys);
+
     /* save the match. */
     while (curstep->m_last_step != -1) {
         gint16 pos = curstep->m_num_keys - 1;
-        ChewingKey * key = &g_array_index(keys, ChewingKey, pos);
-        ChewingKeyRest * rest = &g_array_index(key_rests, ChewingKeyRest, pos);
-        *key = curstep->m_key; *rest = curstep->m_key_rest;
+
+        /* skip "'" */
+        if (0 != curstep->m_key_rest.m_table_index) {
+            ChewingKey * key = &g_array_index(keys, ChewingKey, pos);
+            ChewingKeyRest * rest = &g_array_index
+                (key_rests, ChewingKeyRest, pos);
+            *key = curstep->m_key; *rest = curstep->m_key_rest;
+        }
+
+        /* back ward */
         curstep = &g_array_index(m_parse_steps, parse_value_t,
                                  curstep->m_last_step);
     }
-
-    /* post processing for re-split table. */
-    if (options & USE_RESPLIT_TABLE) {
-        
-    }
-
-    g_free(input);
     return parsed_len;
 }
