@@ -192,34 +192,81 @@ int FullPinyinParser2::parse (guint32 options, ChewingKeyVector & keys,
     g_array_set_size(keys, 0);
     g_array_set_size(key_rests, 0);
 
-    /* init m_parse_steps. */
+    /* init m_parse_steps, and prepare dynamic programming. */
     int step_len = len + 1;
     g_array_set_size(m_parse_steps, 0);
-    parse_value_t onestep;
+    parse_value_t value;
     for (i = 0; i < step_len; ++i) {
-        g_array_append_val(m_parse_steps, onestep);
+        g_array_append_val(m_parse_steps, value);
     }
 
-    /* split "'" here. */
+    size_t str_len = len; size_t next_sep = 0;
     gchar * input = g_strndup(str, len);
-    gchar ** inputs = g_strsplit(input, "'", -1);
-    g_free(input);
-    /* parse each input */
-    for (i = 0; inputs[i]; ++i) {
-        input = inputs[i];
+    for (i = 0; i < len; ) {
+        parse_value_t * curstep = NULL, * nextstep = NULL;
+
+        if (input[i] == '\'') {
+            curstep = &g_array_index(m_parse_steps, parse_value_t, i);
+            nextstep = &g_array_index(m_parse_steps, parse_value_t, i + 1);
+
+            /* propagate current step into next step. */
+            nextstep->m_key = ChewingKey();
+            nextstep->m_key_rest = ChewingKeyRest();
+            nextstep->m_num_keys = curstep->m_num_keys;
+            nextstep->m_parsed_len = curstep->m_parsed_len + 1;
+            nextstep->m_last_step = i;
+            next_sep = 0;
+            continue;
+        }
+
+        /* forward to next "'" */
+        if ( 0 == next_sep ) {
+            for (size_t k = i;  k < len; ++k) {
+                if (input[k] == '\'')
+                    break;
+            }
+            next_sep = k;
+            i = next_sep;
+        }
+
         /* dynamic programming here. */
-        size_t str_len = strlen(input);
-        for (size_t m = 0; m < str_len; ++m) {
+        for (size_t m = i; m < next_sep; ++m) {
+            curstep = &g_array_index(m_parse_steps, parse_value_t, m);
             size_t try_len = std_lite::min
-                (m + max_full_pinyin_length, str_len);
+                (m + max_full_pinyin_length, next_sep);
             for (size_t n = m + 1; n < try_len + 1; ++n) {
+                nextstep = &g_array_index(m_parse_steps, parse_value_t, n);
+
                 /* gen next step */
+                const char * onepinyin = input + m;
+                gint16 onepinyinlen = n - m;
+                value = parse_value_t();
+                ChewingKey key; ChewingKeyRest rest;
+                bool parsed = parse_one_key
+                    (options, key, rest, onepinyin, onepinyinlen);
+                if (!parsed)
+                    continue;
+                value.m_key = key; value.m_key_rest = rest;
+                value.m_num_keys = curstep->m_num_keys + 1;
+                value.m_parsed_len = curstep->m_parsed_len + onepinyinlen;
+                value.m_last_step = m;
+
+                /* save next step */
+                if (0 == nextstep->m_parsed_len &&
+                    0 == nextstep->m_num_keys)
+                    *nextstep = value;
+                if (value.m_parsed_len > nextstep->m_parsed_len)
+                    *nextstep = value;
+                if (value.m_parsed_len == nextstep->m_parsed_len &&
+                    value.m_num_keys < nextstep->m_num_keys)
+                    *nextstep = value;
             }
         }
     }
-    g_strfreev(inputs);
+
+    /* final step for back tracing. */
 
     /* post processing for re-split table. */
 
-    /* final step for back tracing. */
+    g_free(input);
 }
