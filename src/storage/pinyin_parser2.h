@@ -87,9 +87,9 @@ public:
      * @param str snput string in UTF-8 encoding, in most case this string is just a plain ASCII string.
      * @param len the length of str, in number of chars rather than bytes.
      *
-     * @return the number of chars were actually used.
+     * @return whether the entire string is parsed as one key.
      */
-    virtual int parse_one_key (guint32 options, ChewingKey & key, ChewingKeyRest & key_rest, const char *str, int len) const = 0;
+    virtual bool parse_one_key (guint32 options, ChewingKey & key, ChewingKeyRest & key_rest, const char *str, int len) const = 0;
 
     /**
      * @brief Translate the source string into a set of ChewingKeys.
@@ -124,7 +124,7 @@ public:
         g_array_free(m_parse_steps, TRUE);
     }
 
-    virtual int parse_one_key (guint32 options, ChewingKey & key, ChewingKeyRest & key_rest, const char *str, int len) const;
+    virtual bool parse_one_key (guint32 options, ChewingKey & key, ChewingKeyRest & key_rest, const char *str, int len) const;
 
     virtual int parse (guint32 options, ChewingKeyVector & keys, ChewingKeyRestVector & key_rests, const char *str, int len) const;
 };
@@ -139,7 +139,7 @@ class DoublePinyinParser2 : public PinyinParser2
 public:
     virtual ~DoublePinyinParser2 () {}
 
-    virtual int parse_one_key (guint32 options, ChewingKey & key, ChewingKeyRest & key_rest, const char *str, int len) const;
+    virtual bool parse_one_key (guint32 options, ChewingKey & key, ChewingKeyRest & key_rest, const char *str, int len) const;
 
     virtual int parse (guint32 options, ChewingKeyVector & keys, ChewingKeyRestVector & key_rests, const char *str, int len) const;
 
@@ -169,7 +169,7 @@ class ChewingParser2 : public PinyinParser2
 public:
     virtual ~ChewingParser2 () {}
 
-    virtual int parse_one_key (guint32 options, ChewingKey & key, ChewingKeyRest & key_rest, const char *str, int len) const;
+    virtual bool parse_one_key (guint32 options, ChewingKey & key, ChewingKeyRest & key_rest, const char *str, int len) const;
 
     virtual int parse (guint32 options, ChewingKeyVector & keys, ChewingKeyRestVector & key_rests, const char *str, int len) const;
 

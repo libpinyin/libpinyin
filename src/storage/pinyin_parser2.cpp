@@ -119,9 +119,9 @@ static bool compare_less_than(const pinyin_index_item_t & lhs,
     return 0 > strcmp(lhs.m_pinyin_input, rhs.m_pinyin_input);
 }
 
-int FullPinyinParser2::parse_one_key (guint32 options, ChewingKey & key,
-                                      ChewingKeyRest & key_rest,
-                                      const char * pinyin, int len) const {
+bool FullPinyinParser2::parse_one_key (guint32 options, ChewingKey & key,
+                                       ChewingKeyRest & key_rest,
+                                       const char * pinyin, int len) const {
     /* "'" are not accepted in parse_one_key. */
     assert(NULL == strchr(pinyin, '\''));
     gchar * input = g_strndup(pinyin, len);
@@ -144,7 +144,8 @@ int FullPinyinParser2::parse_one_key (guint32 options, ChewingKey & key,
     pinyin_index_item_t item;
     memset(&item, 0, sizeof(item));
 
-    for (; parsed_len > 0; --parsed_len) {
+    /* Note: optimize here? */
+    for (; parsed_len >= len - 1; --parsed_len) {
         input[parsed_len] = '\0';
         item.m_pinyin_input = input;
         std_lite::pair<const pinyin_index_item_t *,
@@ -153,9 +154,9 @@ int FullPinyinParser2::parse_one_key (guint32 options, ChewingKey & key,
             (pinyin_index, pinyin_index + G_N_ELEMENTS(pinyin_index),
              item, compare_less_than);
 
-        guint16 len = range.second - range.first;
-        assert (len <= 1);
-        if ( len == 1 ) {
+        guint16 range_len = range.second - range.first;
+        assert (range_len <= 1);
+        if ( range_len == 1 ) {
             const pinyin_index_item_t * index = range.first;
 
             if (!check_pinyin_options(options, index))
@@ -179,7 +180,7 @@ int FullPinyinParser2::parse_one_key (guint32 options, ChewingKey & key,
 
     key_rest.m_raw_begin = 0; key_rest.m_raw_end = parsed_len;
     g_free(input);
-    return parsed_len;
+    return parsed_len == len;
 }
 
 
