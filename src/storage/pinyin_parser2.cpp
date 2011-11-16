@@ -268,64 +268,10 @@ int FullPinyinParser2::parse (guint32 options, ChewingKeyVector & keys,
 
     /* final step for back tracing. */
     gint16 parsed_len = final_step(step_len, keys, key_rests);
-    assert(keys->len == key_rests->len);
-    gint16 num_keys = keys->len;
 
     /* post processing for re-split table. */
     if (options & USE_RESPLIT_TABLE) {
-
-        ChewingKey * cur_key = NULL, * next_key = NULL;
-        ChewingKeyRest * cur_rest = NULL, * next_rest = NULL;
-        guint16 cur_tone = CHEWING_ZERO_TONE, next_tone = CHEWING_ZERO_TONE;
-
-        for (i = 0; i < num_keys - 1; ++i) {
-            cur_rest = &g_array_index(key_rests, ChewingKeyRest, i);
-            next_rest = &g_array_index(key_rests, ChewingKeyRest, i + 1);
-
-            /* some "'" here */
-            if (cur_rest->m_raw_end != next_rest->m_raw_begin)
-                continue;
-
-            cur_key = &g_array_index(keys, ChewingKey, i);
-            next_key = &g_array_index(keys, ChewingKey, i + 1);
-
-            if (options & USE_TONE) {
-                cur_tone = cur_key->m_tone;
-                next_tone = next_key->m_tone;
-                cur_key->m_tone = next_key->m_tone = CHEWING_ZERO_TONE;
-            }
-
-            /* lookup re-split table */
-            size_t k;
-            resplit_table_item_t * item = NULL;
-            for (k = 0; k < G_N_ELEMENTS(resplit_table); ++k) {
-                item = resplit_table + k;
-                /* no ops */
-                if (item->m_orig_freq >= item->m_new_freq)
-                    continue;
-                /* TODO: refine code style here. */
-                if (item->m_orig_first_key == *cur_key &&
-                    item->m_orig_second_key == *next_key)
-                    break;
-                /* TODO: should use pinyin_exact_compare2 here. */
-                assert(FALSE);
-            }
-            if (k < G_N_ELEMENTS(resplit_table)) {
-                /* do re-split */
-                item = resplit_table + k;
-                *cur_key = item->m_new_first_key;
-                *next_key = item->m_new_second_key;
-                /* assumes only moved one char in gen_all_resplit script. */
-                cur_rest->m_raw_end --;
-                next_rest->m_raw_begin --;
-                /* save back tones */
-                if (options & USE_TONE) {
-                    cur_key->m_tone = cur_tone;
-                    next_key->m_tone = next_tone;
-                }
-            }
-        }
-        
+        post_process(options, keys, key_rests);
     }
 
     g_free(input);
@@ -367,4 +313,69 @@ int FullPinyinParser2::final_step(size_t step_len, ChewingKeyVector & keys,
                                  curstep->m_last_step);
     }
     return parsed_len;
+}
+
+
+bool FullPinyinParser2::post_process(guint32 options,
+                                     ChewingKeyVector & keys,
+                                     ChewingKeyRestVector & key_rests) const {
+    size_t i;
+    assert(keys->len == key_rests->len);
+    gint16 num_keys = keys->len;
+
+    ChewingKey * cur_key = NULL, * next_key = NULL;
+    ChewingKeyRest * cur_rest = NULL, * next_rest = NULL;
+    guint16 cur_tone = CHEWING_ZERO_TONE, next_tone = CHEWING_ZERO_TONE;
+
+    for (i = 0; i < num_keys - 1; ++i) {
+        cur_rest = &g_array_index(key_rests, ChewingKeyRest, i);
+        next_rest = &g_array_index(key_rests, ChewingKeyRest, i + 1);
+
+        /* some "'" here */
+        if (cur_rest->m_raw_end != next_rest->m_raw_begin)
+            continue;
+
+        cur_key = &g_array_index(keys, ChewingKey, i);
+        next_key = &g_array_index(keys, ChewingKey, i + 1);
+
+        if (options & USE_TONE) {
+            cur_tone = cur_key->m_tone;
+            next_tone = next_key->m_tone;
+            cur_key->m_tone = next_key->m_tone = CHEWING_ZERO_TONE;
+        }
+
+        /* lookup re-split table */
+        size_t k;
+        const resplit_table_item_t * item = NULL;
+        for (k = 0; k < G_N_ELEMENTS(resplit_table); ++k) {
+            item = resplit_table + k;
+            /* no ops */
+            if (item->m_orig_freq >= item->m_new_freq)
+                continue;
+            /* TODO: refine code style here. */
+#if 0
+            if (item->m_orig_first_key == *cur_key &&
+                item->m_orig_second_key == *next_key)
+                break;
+#endif
+            /* TODO: should use pinyin_exact_compare2 here. */
+            assert(FALSE);
+        }
+        if (k < G_N_ELEMENTS(resplit_table)) {
+            /* do re-split */
+            item = resplit_table + k;
+            *cur_key = item->m_new_first_key;
+            *next_key = item->m_new_second_key;
+            /* assumes only moved one char in gen_all_resplit script. */
+            cur_rest->m_raw_end --;
+            next_rest->m_raw_begin --;
+            /* save back tones */
+            if (options & USE_TONE) {
+                cur_key->m_tone = cur_tone;
+                next_key->m_tone = next_tone;
+            }
+        }
+    }
+
+    return true;
 }

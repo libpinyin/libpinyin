@@ -121,6 +121,10 @@ protected:
 
     int final_step(size_t step_len, ChewingKeyVector & keys,
                    ChewingKeyRestVector & key_rests) const;
+
+    bool post_process(guint32 options, ChewingKeyVector & keys,
+                      ChewingKeyRestVector & key_rests) const;
+
 public:
     FullPinyinParser2 ();
     virtual ~FullPinyinParser2 () {
