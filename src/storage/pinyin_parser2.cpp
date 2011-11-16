@@ -103,7 +103,7 @@ public:
     parse_value_t(){
         m_num_keys = 0;
         m_parsed_len = 0;
-        m_last_step = 0;
+        m_last_step = -1;
     }
 };
 
@@ -202,9 +202,9 @@ int FullPinyinParser2::parse (guint32 options, ChewingKeyVector & keys,
 
     size_t str_len = len; size_t next_sep = 0;
     gchar * input = g_strndup(str, len);
-    for (i = 0; i < len; ) {
-        parse_value_t * curstep = NULL, * nextstep = NULL;
+    parse_value_t * curstep = NULL, * nextstep = NULL;
 
+    for (i = 0; i < len; ) {
         if (input[i] == '\'') {
             curstep = &g_array_index(m_parse_steps, parse_value_t, i);
             nextstep = &g_array_index(m_parse_steps, parse_value_t, i + 1);
@@ -241,9 +241,11 @@ int FullPinyinParser2::parse (guint32 options, ChewingKeyVector & keys,
                 const char * onepinyin = input + m;
                 gint16 onepinyinlen = n - m;
                 value = parse_value_t();
+
                 ChewingKey key; ChewingKeyRest rest;
                 bool parsed = parse_one_key
                     (options, key, rest, onepinyin, onepinyinlen);
+                rest.m_raw_begin = m; rest.m_raw_end = n;
                 if (!parsed)
                     continue;
                 value.m_key = key; value.m_key_rest = rest;
@@ -252,8 +254,7 @@ int FullPinyinParser2::parse (guint32 options, ChewingKeyVector & keys,
                 value.m_last_step = m;
 
                 /* save next step */
-                if (0 == nextstep->m_parsed_len &&
-                    0 == nextstep->m_num_keys)
+                if (-1 == nextstep->m_last_step)
                     *nextstep = value;
                 if (value.m_parsed_len > nextstep->m_parsed_len)
                     *nextstep = value;
@@ -264,9 +265,34 @@ int FullPinyinParser2::parse (guint32 options, ChewingKeyVector & keys,
         }
     }
 
+    gint16 parsed_len = 0;
     /* final step for back tracing. */
+    /* find longest match, which starts from the beginning of input. */
+    for ( i = step_len - 1; i >= 0; --i) {
+        curstep = &g_array_index(m_parse_steps, parse_value_t, i);
+        if (i == curstep->m_parsed_len)
+            break;
+    }
+    /* prepare saving. */
+    parsed_len = curstep->m_parsed_len;
+    gint16 num_keys = curstep->m_num_keys;
+    g_array_set_size(keys, num_keys);
+    g_array_set_size(key_rests, num_keys);
+    /* save the match. */
+    while (curstep->m_last_step != -1) {
+        gint16 pos = curstep->m_num_keys - 1;
+        ChewingKey * key = &g_array_index(keys, ChewingKey, pos);
+        ChewingKeyRest * rest = &g_array_index(key_rests, ChewingKeyRest, pos);
+        *key = curstep->m_key; *rest = curstep->m_key_rest;
+        curstep = &g_array_index(m_parse_steps, parse_value_t,
+                                 curstep->m_last_step);
+    }
 
     /* post processing for re-split table. */
+    if (options & USE_RESPLIT_TABLE) {
+        
+    }
 
     g_free(input);
+    return parsed_len;
 }
