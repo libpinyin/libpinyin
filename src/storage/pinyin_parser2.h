@@ -65,6 +65,7 @@ typedef struct {
 
 typedef GArray * ChewingKeyVector;
 typedef GArray * ChewingKeyRestVector;
+typedef GArray * ParseValueVector;
 
 
 /**
@@ -115,8 +116,13 @@ class FullPinyinParser2 : public PinyinParser2
 {
     /* Note: some internal pointers to full pinyin table. */
 
+protected:
+    ParseValueVector m_parse_steps;
 public:
-    virtual ~FullPinyinParser2 () {}
+    FullPinyinParser2 ();
+    virtual ~FullPinyinParser2 () {
+        g_array_free(m_parse_steps, TRUE);
+    }
 
     virtual int parse_one_key (guint32 options, ChewingKey & key, ChewingKeyRest & key_rest, const char *str, int len) const;
 

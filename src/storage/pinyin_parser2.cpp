@@ -88,6 +88,32 @@ const char * ChewingKeyRest::get_chewing_string(){
 }
 
 
+/* Pinyin Parsers */
+
+/* internal information for pinyin parsers. */
+struct parse_value_t{
+    ChewingKey m_key;
+    ChewingKeyRest m_key_rest;
+    gint16 m_num_keys;
+    gint16 m_parsed_len;
+    gint16 m_last_step;
+
+    /* constructor */
+public:
+    parse_value_t(){
+        m_num_keys = 0;
+        m_parsed_len = 0;
+        m_last_step = 0;
+    }
+};
+
+/* Full Pinyin Parser */
+FullPinyinParser2::FullPinyinParser2 (){
+    m_parse_steps = g_array_new(TRUE, FALSE, sizeof(parse_value_t));
+}
+
+const guint16 max_full_pinyin_length = 7;  /* include tone. */
+
 static bool compare_less_than(const pinyin_index_item_t & lhs,
                               const pinyin_index_item_t & rhs){
     return 0 > strcmp(lhs.m_pinyin_input, rhs.m_pinyin_input);
@@ -160,5 +186,39 @@ int FullPinyinParser2::parse_one_key (guint32 options, ChewingKey & key,
 int FullPinyinParser2::parse (guint32 options, ChewingKeyVector & keys,
                               ChewingKeyRestVector & key_rests,
                               const char *str, int len) const {
-    assert(FALSE);
+    size_t i;
+    /* clear arrays. */
+    g_array_set_size(keys, 0);
+    g_array_set_size(key_rests, 0);
+
+    /* init m_parse_steps. */
+    int step_len = len + 1;
+    g_array_set_size(m_parse_steps, 0);
+    parse_value_t onestep;
+    for (i = 0; i < step_len; ++i) {
+        g_array_append_val(m_parse_steps, onestep);
+    }
+
+    /* split "'" here. */
+    gchar * input = g_strndup(str, len);
+    gchar ** inputs = g_strsplit(input, "'", -1);
+    g_free(input);
+    /* parse each input */
+    for (i = 0; inputs[i]; ++i) {
+        input = inputs[i];
+        /* dynamic programming here. */
+        size_t str_len = strlen(input);
+        for (size_t m = 0; m < str_len; ++m) {
+            size_t try_len = std_lite::min
+                (m + max_full_pinyin_length, str_len);
+            for (size_t n = m + 1; n < try_len + 1; ++n) {
+                /* gen next step */
+            }
+        }
+    }
+    g_strfreev(inputs);
+
+    /* post processing for re-split table. */
+
+    /* final step for back tracing. */
 }
