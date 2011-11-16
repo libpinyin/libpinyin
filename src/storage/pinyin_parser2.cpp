@@ -104,12 +104,14 @@ int FullPinyinParser2::parse_one_key (guint32 options, ChewingKey & key,
     guint16 parsed_len = len;
     key = ChewingKey(); key_rest = ChewingKeyRest();
 
-    /* find the tone in the last character. */
-    char chr = input[parsed_len - 1];
-    if ( '0' < chr && chr <= '5' ) {
-        tone = chr - '0';
-        parsed_len --;
-        tone_pos = parsed_len;
+    if (options & USE_TONE) {
+        /* find the tone in the last character. */
+        char chr = input[parsed_len - 1];
+        if ( '0' < chr && chr <= '5' ) {
+            tone = chr - '0';
+            parsed_len --;
+            tone_pos = parsed_len;
+        }
     }
 
     /* parse pinyin core staff here. */
@@ -139,11 +141,13 @@ int FullPinyinParser2::parse_one_key (guint32 options, ChewingKey & key,
         }
     }
 
-    /* post processing tone. */
-    if ( parsed_len == tone_pos ) {
-        if (tone != CHEWING_ZERO_TONE) {
-            key.m_tone = tone;
-            parsed_len ++;
+    if (options & USE_TONE) {
+        /* post processing tone. */
+        if ( parsed_len == tone_pos ) {
+            if (tone != CHEWING_ZERO_TONE) {
+                key.m_tone = tone;
+                parsed_len ++;
+            }
         }
     }
 
