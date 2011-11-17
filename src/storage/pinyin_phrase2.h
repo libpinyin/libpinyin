@@ -22,6 +22,7 @@
 #ifndef PINYIN_PHRASE2_H
 #define PINYIN_PHRASE2_H
 
+#include "novel_types.h"
 #include "chewing_key.h"
 #include "pinyin_custom2.h"
 #include "pinyin_parser2.h"
@@ -214,6 +215,36 @@ inline void compute_upper_value2(guint32 options,
         /* save the result */
         out_keys[i] = aKey;
     }
+}
+
+
+template<size_t phrase_length>
+struct PinyinIndexItem2{
+    phrase_token_t m_token;
+    ChewingKey m_keys[phrase_length];
+public:
+    PinyinIndexItem2<phrase_length> (ChewingKey * keys, phrase_token_t token) {
+        memmove(m_keys, keys, sizeof(ChewingKey) * phrase_length);
+        m_token = token;
+    }
+};
+
+
+/* for find the element in the phrase array */
+template<int phrase_length>
+inline int phrase_exact_compare2(const PinyinIndexItem2<phrase_length> &lhs,
+                                 const PinyinIndexItem2<phrase_length> &rhs)
+{
+    ChewingKey * keys_lhs = (ChewingKey *) lhs.m_keys;
+    ChewingKey * keys_rhs = (ChewingKey *) rhs.m_keys;
+    return pinyin_exact_compare2(keys_lhs, keys_rhs, phrase_length);
+}
+
+template<int phrase_length>
+inline bool phrase_exact_less_than2(const PinyinIndexItem2<phrase_length> &lhs,
+                                    const PinyinIndexItem2<phrase_length> &rhs)
+{
+    return 0 > phrase_exact_compare2<phrase_length>(lhs, rhs);
 }
 
 };
