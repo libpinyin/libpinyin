@@ -103,6 +103,118 @@ inline int pinyin_compare_with_ambiguities2(guint32 options,
     return 0;
 }
 
+/* compute pinyin lower bound */
+inline void compute_lower_value2(guint32 options,
+                                  ChewingKey * in_keys,
+                                  ChewingKey * out_keys,
+                                  int phrase_length) {
+    ChewingKey aKey;
+
+    for (int i = 0; i < phrase_length; ++i) {
+        int k; int sel;
+        aKey = in_keys[i];
+
+        /* compute lower initial */
+        sel = aKey.m_initial;
+        for (k = aKey.m_initial - 1; k >= CHEWING_ZERO_INITIAL; --k) {
+            if (0 != pinyin_compare_initial2
+                (options, (ChewingInitial)aKey.m_initial, (ChewingInitial)k))
+                break;
+            else
+                sel = k;
+        }
+        aKey.m_initial = (ChewingInitial)sel;
+
+        /* compute lower middle, skipped as no fuzzy pinyin here.
+         * if needed in future, still use pinyin_compare_middle_and_final2
+         * to check lower bound.
+         */
+
+        /* compute lower final */
+        sel = aKey.m_final;
+        for (k = aKey.m_final - 1; k >= CHEWING_ZERO_FINAL, --k) {
+            if (0 != pinyin_compare_middle_and_final2
+                (options,
+                 (ChewingMiddle)aKey.m_middle, (ChewingMiddle) aKey.m_middle,
+                 (ChewingFinal)aKey.m_final, (ChewingFinal)k))
+                break;
+            else
+                sel = k;
+        }
+        aKey.m_final = (ChewingFinal)sel;
+
+        /* compute lower tone */
+        sel = aKey.m_tone;
+        for (k = aKey.m_tone - 1; k >= CHEWING_ZERO_TONE; --k) {
+            if (0 != pinyin_compare_tone2
+                (options, (ChewingTone)aKey.m_tone, (ChewingTone)k))
+                break;
+            else
+                sel = k;
+        }
+        aKey.m_tone = (ChewingTone)sel;
+
+        /* save the result */
+        out_keys[i] = aKey;
+    }
+}
+
+/* compute pinyin upper bound */
+inline void compute_upper_value2(guint32 options,
+                                 ChewingKey * in_keys,
+                                 ChewingKey * out_keys,
+                                 int phrase_length) {
+    ChewingKey aKey;
+
+    for (int i = 0; i < phrase_length; ++i) {
+        int k; int sel;
+        aKey = in_keys[i];
+
+        /* compute upper initial */
+        sel = aKey.m_initial;
+        for (k = aKey.m_initial + 1; k <= CHEWING_LAST_INITIAL; ++k) {
+            if (0 != pinyin_compare_initial2
+                (options, (ChewingInitial)aKey.m_initial, (ChewingInitial)k))
+                break;
+            else
+                sel = k;
+        }
+        aKey.m_initial = (ChewingInitial)sel;
+
+        /* compute upper middle, skipped as no fuzzy pinyin here.
+         * if needed in future, still use pinyin_compare_middle_and_final2
+         * to check upper bound.
+         */
+
+        /* compute upper final */
+        sel = aKey.m_final;
+        for (k = aKey.m_final + 1; k <= CHEWING_LAST_FINAL; ++k) {
+            if (0 != pinyin_compare_middle_and_final2
+                (options,
+                 (ChewingMiddle)aKey.m_middle, (ChewingMiddle)aKey.m_middle,
+                 (ChewingFinal)aKey.m_final, (ChewingFinal)k))
+                break;
+            else
+                sel = k;
+        }
+        aKey.m_final = (ChewingFinal)sel;
+
+        /* compute upper tone */
+        sel = aKey.m_tone;
+        for (k = aKey.m_tone + 1; k <= CHEWING_LAST_TONE; ++k) {
+            if (0 != pinyin_compare_tone2
+                (options, (ChewingTone)aKey.m_tone, (ChewingTone)k))
+                break;
+            else
+                sel = k;
+        }
+        aKey.m_tone = (ChewingTone)sel;
+
+        /* save the result */
+        out_keys[i] = aKey;
+    }
+}
+
 };
 
 #endif
