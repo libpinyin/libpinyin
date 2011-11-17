@@ -360,6 +360,8 @@ bool FullPinyinParser2::post_process(guint32 options,
                 break;
 
         }
+
+        /* find the match */
         if (k < G_N_ELEMENTS(resplit_table)) {
             /* do re-split */
             item = resplit_table + k;
@@ -368,11 +370,12 @@ bool FullPinyinParser2::post_process(guint32 options,
             /* assumes only moved one char in gen_all_resplit script. */
             cur_rest->m_raw_end --;
             next_rest->m_raw_begin --;
-            /* save back tones */
-            if (options & USE_TONE) {
-                cur_key->m_tone = cur_tone;
-                next_key->m_tone = next_tone;
-            }
+        }
+
+        /* save back tones */
+        if (options & USE_TONE) {
+            cur_key->m_tone = cur_tone;
+            next_key->m_tone = next_tone;
         }
     }
 
