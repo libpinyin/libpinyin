@@ -19,10 +19,11 @@
  *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-#ifndef PINYIN_PARSER2_H
-#define PINYIN_PARSER2_H
+#ifndef PINYIN_PHRASE2_H
+#define PINYIN_PHRASE2_H
 
 #include "chewing_key.h"
+#include "pinyin_custom2.h"
 #include "pinyin_parser2.h"
 
 namespace pinyin{
@@ -132,7 +133,7 @@ inline void compute_lower_value2(guint32 options,
 
         /* compute lower final */
         sel = aKey.m_final;
-        for (k = aKey.m_final - 1; k >= CHEWING_ZERO_FINAL, --k) {
+        for (k = aKey.m_final - 1; k >= CHEWING_ZERO_FINAL; --k) {
             if (0 != pinyin_compare_middle_and_final2
                 (options,
                  (ChewingMiddle)aKey.m_middle, (ChewingMiddle) aKey.m_middle,

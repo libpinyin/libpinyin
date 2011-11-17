@@ -24,6 +24,7 @@
 
 #include <glib.h>
 #include "chewing_key.h"
+#include "pinyin_custom2.h"
 
 namespace pinyin{
 
