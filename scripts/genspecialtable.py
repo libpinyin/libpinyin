@@ -60,7 +60,7 @@ def gen_divided_table():
         if orig_freq >= new_freq:
             assert orig_freq > 0, "Expected orig_freq > 0 here."
 
-        entry = '{{{0}, {1}, {2}, {3}, {4}}}'.format \
+        entry = '{{{0}, {1}, {{{2}, {3}}}, {4}}}'.format \
             (pinyin_key, orig_freq, first_key, second_key, new_freq)
         entries.append(entry)
     return ',\n'.join(entries)
@@ -76,7 +76,7 @@ def gen_resplit_table():
         if orig_freq >= new_freq:
             assert orig_freq > 0, "Expected orig_freq > 0 here."
 
-        entry = '{{{0}, {1}, {2}, {3}, {4}, {5}}}'.format \
+        entry = '{{{{{0}, {1}}}, {2}, {{{3}, {4}}}, {5}}}'.format \
             (orig_first_key, orig_second_key, orig_freq,\
                  new_first_key, new_second_key, new_freq)
         entries.append(entry)
