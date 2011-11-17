@@ -186,9 +186,9 @@ public:
 
 
 /* compare pinyins with chewing internal representations. */
-int pinyin_compare_initial2 (guint32 options,
-                             ChewingInitial lhs,
-                             ChewingInitial rhs){
+inline int pinyin_compare_initial2 (guint32 options,
+                                    ChewingInitial lhs,
+                                    ChewingInitial rhs){
     if (lhs == rhs)
         return 0;
 
@@ -231,11 +231,11 @@ int pinyin_compare_initial2 (guint32 options,
 }
 
 
-int pinyin_compare_middle_and_final2 (guint32 options,
-                                      ChewingMiddle middle_lhs,
-                                      ChewingMiddle middle_rhs,
-                                      ChewingFinal final_lhs,
-                                      ChewingFinal final_rhs){
+inline int pinyin_compare_middle_and_final2 (guint32 options,
+                                             ChewingMiddle middle_lhs,
+                                             ChewingMiddle middle_rhs,
+                                             ChewingFinal final_lhs,
+                                             ChewingFinal final_rhs){
     if (middle_lhs == middle_rhs && final_lhs == final_rhs)
         return 0;
 
@@ -273,9 +273,9 @@ int pinyin_compare_middle_and_final2 (guint32 options,
 }
 
 
-int pinyin_compare_tone2 (guint32 options,
-                          ChewingTone lhs,
-                          ChewingTone rhs){
+inline int pinyin_compare_tone2 (guint32 options,
+                                 ChewingTone lhs,
+                                 ChewingTone rhs){
     if (lhs == rhs)
         return 0;
     if (lhs == CHEWING_ZERO_TONE)
