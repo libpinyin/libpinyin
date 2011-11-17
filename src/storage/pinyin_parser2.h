@@ -49,17 +49,14 @@ typedef struct {
 typedef struct {
     ChewingKey   m_orig_key;
     guint32      m_orig_freq;
-    ChewingKey   m_first_key;
-    ChewingKey   m_second_key;
+    ChewingKey   m_new_keys[2];
     guint32      m_new_freq;
 } divided_table_item_t;
 
 typedef struct {
-    ChewingKey   m_orig_first_key;
-    ChewingKey   m_orig_second_key;
+    ChewingKey   m_orig_keys[2];
     guint32      m_orig_freq;
-    ChewingKey   m_new_first_key;
-    ChewingKey   m_new_second_key;
+    ChewingKey   m_new_keys[2];
     guint32      m_new_freq;
 } resplit_table_item_t;
 

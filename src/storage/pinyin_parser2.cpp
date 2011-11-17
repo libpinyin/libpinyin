@@ -353,20 +353,18 @@ bool FullPinyinParser2::post_process(guint32 options,
             /* no ops */
             if (item->m_orig_freq >= item->m_new_freq)
                 continue;
-            /* TODO: refine code style here. */
-#if 0
-            if (item->m_orig_first_key == *cur_key &&
-                item->m_orig_second_key == *next_key)
+
+            /* use pinyin_exact_compare2 here. */
+            if (0 == pinyin_exact_compare2(item->m_orig_keys,
+                                           cur_key, 2))
                 break;
-#endif
-            /* TODO: should use pinyin_exact_compare2 here. */
-            assert(FALSE);
+
         }
         if (k < G_N_ELEMENTS(resplit_table)) {
             /* do re-split */
             item = resplit_table + k;
-            *cur_key = item->m_new_first_key;
-            *next_key = item->m_new_second_key;
+            *cur_key = item->m_new_keys[0];
+            *next_key = item->m_new_keys[1];
             /* assumes only moved one char in gen_all_resplit script. */
             cur_rest->m_raw_end --;
             next_rest->m_raw_begin --;
