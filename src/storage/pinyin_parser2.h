@@ -230,16 +230,48 @@ int pinyin_compare_initial2 (guint32 options,
     return (lhs - rhs);
 }
 
-int pinyin_compare_middle2 (guint32 options,
-                            ChewingMiddle lhs,
-                            ChewingMiddle rhs){
-    /* as no fuzzy pinyin option in chewing middle. */
-    return (lhs - rhs);
+
+int pinyin_compare_middle_and_final2 (guint32 options,
+                                      ChewingMiddle middle_lhs,
+                                      ChewingMiddle middle_rhs,
+                                      ChewingFinal final_lhs,
+                                      ChewingFinal final_rhs){
+    if (middle_lhs == middle_rhs && final_lhs == final_rhs)
+        return 0;
+
+    /* both pinyin and chewing incomplete options will enable this. */
+    if (options & (PINYIN_INCOMPLETE | CHEWING_INCOMPLETE)) {
+        if (middle_lhs == CHEWING_ZERO_MIDDLE &&
+            final_lhs == CHEWING_ZERO_FINAL)
+            return 0;
+        if (middle_rhs == CHEWING_ZERO_MIDDLE &&
+            final_rhs == CHEWING_ZERO_FINAL)
+            return 0;
+    }
+
+    /* compare chewing middle first. */
+    int middle_diff = middle_lhs - middle_rhs;
+    if (middle_diff)
+        return middle_diff;
+
+    if ((options & PINYIN_AMB_AN_ANG) &&
+        ((final_lhs == CHEWING_AN && final_rhs == CHEWING_ANG) ||
+         (final_lhs == CHEWING_ANG && final_rhs == CHEWING_AN)))
+        return 0;
+
+    if ((options & PINYIN_AMB_EN_ENG) &&
+        ((final_lhs == CHEWING_EN && final_rhs == CHEWING_ENG) ||
+         (final_lhs == CHEWING_ENG && final_rhs == CHEWING_EN)))
+        return 0;
+
+    if ((options & PINYIN_AMB_IN_ING) &&
+        ((final_lhs == PINYIN_IN && final_rhs == PINYIN_ING) ||
+         (final_lhs == PINYIN_ING && final_rhs == PINYIN_IN)))
+        return 0;
+
+    return (final_lhs - final_rhs);
 }
 
-int pinyin_compare_final2 (guint32 options,
-                           ChewingFinal lhs,
-                           ChewingFinal rhs);
 
 int pinyin_compare_tone2 (guint32 options,
                           ChewingTone lhs,
