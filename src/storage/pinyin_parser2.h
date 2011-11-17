@@ -185,6 +185,75 @@ public:
 };
 
 
+/* compare pinyins with chewing internal representations. */
+int pinyin_compare_initial2 (guint32 options,
+                             ChewingInitial lhs,
+                             ChewingInitial rhs){
+    if (lhs == rhs)
+        return 0;
+
+    if ((options & PINYIN_AMB_C_CH) &&
+        ((lhs == CHEWING_C && rhs == CHEWING_CH) ||
+         (lhs == CHEWING_CH && rhs == CHEWING_C)))
+        return 0;
+
+    if ((options & PINYIN_AMB_S_SH) &&
+        ((lhs == CHEWING_S && rhs == CHEWING_SH) ||
+         (lhs == CHEWING_SH && rhs == CHEWING_S)))
+        return 0;
+
+    if ((options & PINYIN_AMB_Z_ZH) &&
+        ((lhs == CHEWING_Z && rhs == CHEWING_ZH) ||
+         (lhs == CHEWING_ZH && rhs == CHEWING_Z)))
+        return 0;
+
+    if ((options & PINYIN_AMB_F_H) &&
+        ((lhs == CHEWING_F && rhs == CHEWING_H) ||
+         (lhs == CHEWING_H && rhs == CHEWING_F)))
+        return 0;
+
+    if ((options & PINYIN_AMB_L_N) &&
+        ((lhs == CHEWING_L && rhs == CHEWING_N) ||
+         (lhs == CHEWING_N && rhs == CHEWING_L)))
+        return 0;
+
+    if ((options & PINYIN_AMB_L_R) &&
+        ((lhs == CHEWING_L && rhs == CHEWING_R) ||
+         (lhs == CHEWING_R && rhs == CHEWING_L)))
+        return 0;
+
+    if ((options & PINYIN_AMB_G_K) &&
+        ((lhs == CHEWING_G && rhs == CHEWING_K) ||
+         (lhs == CHEWING_K && rhs == CHEWING_G)))
+        return 0;
+
+    return (lhs - rhs);
+}
+
+int pinyin_compare_middle2 (guint32 options,
+                            ChewingMiddle lhs,
+                            ChewingMiddle rhs){
+    /* as no fuzzy pinyin option in chewing middle. */
+    return (lhs - rhs);
+}
+
+int pinyin_compare_final2 (guint32 options,
+                           ChewingFinal lhs,
+                           ChewingFinal rhs);
+
+int pinyin_compare_tone2 (guint32 options,
+                          ChewingTone lhs,
+                          ChewingTone rhs){
+    if (lhs == rhs)
+        return 0;
+    if (lhs == CHEWING_ZERO_TONE)
+        return 0;
+    if (rhs == CHEWING_ZERO_TONE)
+        return 0;
+    return (lhs - rhs);
+}
+
+
 };
 
 #endif

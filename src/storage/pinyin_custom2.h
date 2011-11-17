@@ -42,12 +42,12 @@ enum PinyinTableFlag{
  */
 enum PinyinAmbiguity2{
     PINYIN_AMB_C_CH = 1U << 9,
-    PINYIN_AMB_Z_ZH = 1U << 10,
-    PINYIN_AMB_S_SH = 1U << 11,
-    PINYIN_AMB_L_N = 1U << 12,
-    PINYIN_AMB_F_H = 1U << 13,
-    PINYIN_AMB_L_R = 1U << 14,
-    PINYIN_AMB_K_G = 1U << 15,
+    PINYIN_AMB_S_SH = 1U << 10,
+    PINYIN_AMB_Z_ZH = 1U << 11,
+    PINYIN_AMB_F_H = 1U << 12,
+    PINYIN_AMB_G_K = 1U << 13,
+    PINYIN_AMB_L_N = 1U << 14,
+    PINYIN_AMB_L_R = 1U << 15,
     PINYIN_AMB_AN_ANG = 1U << 16,
     PINYIN_AMB_EN_ENG = 1U << 17,
     PINYIN_AMB_IN_ING = 1U << 18,
