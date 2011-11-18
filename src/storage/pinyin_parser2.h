@@ -157,15 +157,12 @@ public:
  * @brief Class to parse Chewing input string
  *
  * Several keyboard scheme are supported:
- * * ZHUYIN_ZHUYIN    Parse original ZhuYin string, such as ㄅㄧㄢ
  * * Chewing_STANDARD  Standard ZhuYin keyboard, which maps 1 to Bo(ㄅ), q to Po(ㄆ) etc.
  * * Chewing_HSU       Hsu ZhuYin keyboard, which uses a-z (except q) chars.
  * * Chewing_IBM       IBM ZhuYin keyboard, which maps 1 to Bo(ㄅ), 2 to Po(ㄆ) etc.
  * * Chewing_GIN_YIEH  Gin-Yieh ZhuYin keyboard.
  * * Chewing_ET        Eten (倚天) ZhuYin keyboard.
  * * Chewing_ET26      Eten (倚天) ZhuYin keyboard, which only uses a-z chars.
- * UTF-8 string is used in ZhuYin Parser, because the requirement of supporting original ZhuYin strings.
- * So that the length of inputted string is calculated in number of utf8 chars instead of bytes.
  */
 class ChewingParser2 : public PinyinParser2
 {
