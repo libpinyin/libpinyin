@@ -66,6 +66,12 @@ bopomofo_keyboards = {
 }
 
 
+def escape_char(ch):
+    if ch == "'" or ch == "\\":
+        ch = "\\" + ch;
+    return "'{0}'".format(ch)
+
+
 def gen_chewing_keyboard(scheme):
     keyboard = bopomofo_keyboards[scheme]
     items = []
@@ -74,7 +80,7 @@ def gen_chewing_keyboard(scheme):
     items = sorted(items, key=itemgetter(0))
     entries = []
     for (key, string) in items:
-        key = "'{0}'".format(key)
+        key = escape_char(key)
         string = '"{0}"'.format(string)
         entry = "{{{0: <5}, {1}}}".format(key, string)
         entries.append(entry)
