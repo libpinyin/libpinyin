@@ -21,8 +21,11 @@
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 
+import os
+from operator import itemgetter
+
 bopomofo = [
-    'NULL', 'ㄅ', 'ㄆ', 'ㄇ', 'ㄈ', 'ㄉ', 'ㄊ', 'ㄋ', 'ㄌ', 'ㄍ', 'ㄎ',
+    'ㄅ', 'ㄆ', 'ㄇ', 'ㄈ', 'ㄉ', 'ㄊ', 'ㄋ', 'ㄌ', 'ㄍ', 'ㄎ',
     'ㄏ', 'ㄐ', 'ㄑ', 'ㄒ', 'ㄓ', 'ㄔ', 'ㄕ', 'ㄖ', 'ㄗ', 'ㄘ', 'ㄙ',
 
     'ㄧ', 'ㄨ', 'ㄩ', 'ㄚ', 'ㄛ', 'ㄜ', 'ㄝ', 'ㄞ', 'ㄟ', 'ㄠ', 'ㄡ',
@@ -31,7 +34,7 @@ bopomofo = [
     'ˊ', 'ˇ', 'ˋ', '˙',
 ]
 
-bopomofo_keyboard = {
+bopomofo_keyboards = {
     #標準注音鍵盤
     'STANDARD':
     (
@@ -63,6 +66,37 @@ bopomofo_keyboard = {
 }
 
 
+def gen_chewing_keyboard(scheme):
+    keyboard = bopomofo_keyboards[scheme]
+    items = []
+    for (i, key) in enumerate(keyboard):
+        items.append((key, bopomofo[i]))
+    items = sorted(items, key=itemgetter(0))
+    entries = []
+    for (key, string) in items:
+        key = "'{0}'".format(key)
+        string = '"{0}"'.format(string)
+        entry = "{{{0: <5}, {1}}}".format(key, string)
+        entries.append(entry)
+    return ",\n".join(entries)
+
+
+def get_table_content(tablename):
+    return gen_chewing_keyboard(tablename)
+
+
+def expand_file(filename):
+    infile = open(filename, "r")
+    for line in infile.readlines():
+        line = line.rstrip(os.linesep)
+        if len(line) < 3 :
+            print(line)
+            continue
+        if line[0] == '@' and line[-1] == '@':
+            tablename = line[1:-1]
+            print(get_table_content(tablename))
+        else:
+            print(line)
 
 if __name__ == "__main__":
-    pass
+    expand_file("chewing_table.h.in")
