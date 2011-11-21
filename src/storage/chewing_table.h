@@ -51,7 +51,7 @@ const chewing_scheme_item_t chewing_standard[] = {
 };
 
 const chewing_scheme_item_t chewing_ginyieh[] = {
-{'''  , "ㄩ"},
+{'\'' , "ㄩ"},
 {','  , "ㄝ"},
 {'-'  , "ㄧ"},
 {'.'  , "ㄡ"},
@@ -95,7 +95,7 @@ const chewing_scheme_item_t chewing_ginyieh[] = {
 };
 
 const chewing_scheme_item_t chewing_eten[] = {
-{'''  , "ㄘ"},
+{'\'' , "ㄘ"},
 {','  , "ㄓ"},
 {'-'  , "ㄥ"},
 {'.'  , "ㄔ"},
