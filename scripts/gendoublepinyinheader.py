@@ -20,4 +20,64 @@
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 
+import os
 import pinyin
+
+
+def gen_shengmu_table(scheme):
+    entries = []
+    #select shengmu mapping
+    sheng = pinyin.SHUANGPIN_SCHEMAS[scheme][0]
+    for c in "abcdefghijklmnopqrstuvwxyz;":
+       sh = sheng.get(c, "NULL")
+       if sh != "NULL":
+           sh = '"{0}"'.format(sh)
+       entry = '{0: <5} /* {1} */'.format(sh, c.upper())
+       entries.append(entry)
+    return ',\n'.join(entries)
+
+
+def gen_yunmu_table(scheme):
+    entries = []
+    #select yunmu mapping
+    yun = pinyin.SHUANGPIN_SCHEMAS[scheme][1]
+    for c in "abcdefghijklmnopqrstuvwxyz;":
+        y = yun.get(c, ("NULL", "NULL"))
+        if len(y) == 1:
+            y1 = y[0]
+            y2 = "NULL"
+        else:
+            y1, y2 = y
+        if y1 != "NULL":
+            y1 = '"{0}"'.format(y1)
+        if y2 != "NULL":
+            y2 = '"{0}"'.format(y2)
+        entry = '{{{0: <7}, {1: <7}}} /* {2} */'.format(y1, y2, c.upper())
+        entries.append(entry)
+    return ',\n'.join(entries)
+
+
+def get_table_content(tablename):
+    (scheme, part) = tablename.split('_', 1)
+    if part == "SHENG":
+        return gen_shengmu_table(scheme)
+    if part == "YUN":
+        return gen_yunmu_table(scheme)
+
+def expand_file(filename):
+    infile = open(filename, "r")
+    for line in infile.readlines():
+        line = line.rstrip(os.linesep)
+        if len(line) < 3 :
+            print(line)
+            continue
+        if line[0] == '@' and line[-1] == '@':
+            tablename = line[1:-1]
+            print(get_table_content(tablename))
+        else:
+            print(line)
+
+
+### main function ###
+if __name__ == "__main__":
+    expand_file("double_pinyin_table.h.in")

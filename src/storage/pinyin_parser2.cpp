@@ -392,7 +392,7 @@ bool DoublePinyinParser2::parse_one_key (guint32 options, ChewingKey & key,
         assert(FALSE);
     }
 
-    options &= ~PINYIN_CORRECT_ALL;
+    options &= ~(PINYIN_CORRECT_ALL|PINYIN_AMB_ALL);
 
     if (2 == len || 3 == len) {
         /* parse shengmu and yunmu here. */
@@ -406,4 +406,11 @@ bool DoublePinyinParser2::parse_one_key (guint32 options, ChewingKey & key,
     }
 
     return false;
+}
+
+
+int DoublePinyinParser2::parse (guint32 options, ChewingKeyVector & keys,
+                                ChewingKeyRestVector & key_rests,
+                                const char *str, int len) const{
+    assert(FALSE);
 }
