@@ -37,6 +37,7 @@ noinst_HEADERS		= pinyin_large_table.h \
 			  tag_utility.h \
 			  pinyin_parser_table.h \
 			  double_pinyin_table.h \
+			  chewing_table.h \
 			  pinyin_parser2.h \
 			  pinyin_phrase2.h
 
