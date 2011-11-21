@@ -381,3 +381,29 @@ bool FullPinyinParser2::post_process(guint32 options,
 
     return true;
 }
+
+
+bool DoublePinyinParser2::parse_one_key (guint32 options, ChewingKey & key,
+                                         ChewingKeyRest & key_rest,
+                                         const char *str, int len) const{
+    if (1 == len) {
+        if (!(options & PINYIN_INCOMPLETE))
+            return false;
+        assert(FALSE);
+    }
+
+    options &= ~PINYIN_CORRECT_ALL;
+
+    if (2 == len || 3 == len) {
+        /* parse shengmu and yunmu here. */
+        assert(FALSE);
+    }
+
+    if (3 == len) {
+        if (!(options & USE_TONE))
+            return false;
+        assert(FALSE);
+    }
+
+    return false;
+}
