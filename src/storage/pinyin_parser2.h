@@ -68,6 +68,11 @@ typedef struct {
     const char * m_yunmus[2];
 } double_pinyin_scheme_yunmu_item_t;
 
+typedef struct {
+    const char m_input;
+    const char * m_chewing;
+} chewing_scheme_item_t;
+
 typedef GArray * ChewingKeyVector;
 typedef GArray * ChewingKeyRestVector;
 typedef GArray * ParseValueVector;
