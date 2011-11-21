@@ -32,6 +32,7 @@ def filter_pinyin_list():
     for (correct, wrong, bopomofo, flags, chewing) in gen_pinyin_list():
         flags = '|'.join(flags)
         chewing = "ChewingKey({0})".format(', '.join(chewing))
+        correct = correct.replace("v", "ü")
         content_table.append((correct, bopomofo, chewing))
         if "IS_PINYIN" in flags:
             pinyin_index.append((wrong, flags, correct))
