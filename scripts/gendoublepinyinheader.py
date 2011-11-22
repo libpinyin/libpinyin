@@ -32,7 +32,7 @@ def gen_shengmu_table(scheme):
        sh = sheng.get(c, "NULL")
        if sh != "NULL":
            sh = '"{0}"'.format(sh)
-       entry = '{0: <5} /* {1} */'.format(sh, c.upper())
+       entry = '{{{0: <5}}} /* {1} */'.format(sh, c.upper())
        entries.append(entry)
     return ',\n'.join(entries)
 
@@ -52,7 +52,7 @@ def gen_yunmu_table(scheme):
             y1 = '"{0}"'.format(y1)
         if y2 != "NULL":
             y2 = '"{0}"'.format(y2)
-        entry = '{{{0: <7}, {1: <7}}} /* {2} */'.format(y1, y2, c.upper())
+        entry = '{{{{{0: <7}, {1: <7}}}}} /* {2} */'.format(y1, y2, c.upper())
         entries.append(entry)
     return ',\n'.join(entries)
 
