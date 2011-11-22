@@ -200,20 +200,20 @@ bool FullPinyinParser2::parse_one_key (guint32 options, ChewingKey & key,
 int FullPinyinParser2::parse (guint32 options, ChewingKeyVector & keys,
                               ChewingKeyRestVector & key_rests,
                               const char *str, int len) const {
-    size_t i;
+    int i;
     /* clear arrays. */
     g_array_set_size(keys, 0);
     g_array_set_size(key_rests, 0);
 
     /* init m_parse_steps, and prepare dynamic programming. */
-    size_t step_len = len + 1;
+    int step_len = len + 1;
     g_array_set_size(m_parse_steps, 0);
     parse_value_t value;
     for (i = 0; i < step_len; ++i) {
         g_array_append_val(m_parse_steps, value);
     }
 
-    size_t str_len = len; size_t next_sep = 0;
+    size_t next_sep = 0;
     gchar * input = g_strndup(str, len);
     parse_value_t * curstep = NULL, * nextstep = NULL;
 
@@ -234,7 +234,7 @@ int FullPinyinParser2::parse (guint32 options, ChewingKeyVector & keys,
 
         /* forward to next "'" */
         if ( 0 == next_sep ) {
-            size_t k;
+            int k;
             for (k = i;  k < len; ++k) {
                 if (input[k] == '\'')
                     break;
@@ -293,7 +293,7 @@ int FullPinyinParser2::parse (guint32 options, ChewingKeyVector & keys,
 
 int FullPinyinParser2::final_step(size_t step_len, ChewingKeyVector & keys,
                                   ChewingKeyRestVector & key_rests) const{
-    size_t i;
+    int i;
     gint16 parsed_len = 0;
     parse_value_t * curstep = NULL;
 
@@ -332,7 +332,7 @@ int FullPinyinParser2::final_step(size_t step_len, ChewingKeyVector & keys,
 bool FullPinyinParser2::post_process(guint32 options,
                                      ChewingKeyVector & keys,
                                      ChewingKeyRestVector & key_rests) const {
-    size_t i;
+    int i;
     assert(keys->len == key_rests->len);
     gint16 num_keys = keys->len;
 
