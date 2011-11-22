@@ -462,6 +462,7 @@ bool DoublePinyinParser2::parse_one_key (guint32 options, ChewingKey & key,
             g_free(pinyin);
             return true;
         }
+        g_free(pinyin);
 
         /* second yunmu */
         yun = m_yunmu_table[charid].m_yunmus[1];
@@ -472,8 +473,8 @@ bool DoublePinyinParser2::parse_one_key (guint32 options, ChewingKey & key,
             g_free(pinyin);
             return true;
         }
-
         g_free(pinyin);
+
     }
 
 #undef IS_KEY
