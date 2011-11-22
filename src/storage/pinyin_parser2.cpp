@@ -110,17 +110,48 @@ public:
     }
 };
 
-/* Full Pinyin Parser */
-FullPinyinParser2::FullPinyinParser2 (){
-    m_parse_steps = g_array_new(TRUE, FALSE, sizeof(parse_value_t));
-}
-
 const guint16 max_full_pinyin_length = 7;  /* include tone. */
+
 
 static bool compare_less_than(const pinyin_index_item_t & lhs,
                               const pinyin_index_item_t & rhs){
     return 0 > strcmp(lhs.m_pinyin_input, rhs.m_pinyin_input);
 }
+
+static inline bool search_pinyin_index(guint32 options, const char * pinyin,
+                                       ChewingKey & key,
+                                       ChewingKeyRest & key_rest){
+    pinyin_index_item_t item;
+    memset(&item, 0, sizeof(item));
+    item.m_pinyin_input = pinyin;
+
+    std_lite::pair<const pinyin_index_item_t *,
+                   const pinyin_index_item_t *> range;
+    range = std_lite::equal_range
+        (pinyin_index, pinyin_index + G_N_ELEMENTS(pinyin_index),
+         item, compare_less_than);
+
+    guint16 range_len = range.second - range.first;
+    assert (range_len <= 1);
+    if ( range_len == 1 ) {
+        const pinyin_index_item_t * index = range.first;
+
+        if (!check_pinyin_options(options, index))
+            return false;
+
+        key_rest.m_table_index = index->m_table_index;
+        key = content_table[key_rest.m_table_index].m_chewing_key;
+        return true;
+    }
+
+    return false;
+}
+
+/* Full Pinyin Parser */
+FullPinyinParser2::FullPinyinParser2 (){
+    m_parse_steps = g_array_new(TRUE, FALSE, sizeof(parse_value_t));
+}
+
 
 bool FullPinyinParser2::parse_one_key (guint32 options, ChewingKey & key,
                                        ChewingKeyRest & key_rest,
@@ -144,31 +175,12 @@ bool FullPinyinParser2::parse_one_key (guint32 options, ChewingKey & key,
     }
 
     /* parse pinyin core staff here. */
-    pinyin_index_item_t item;
-    memset(&item, 0, sizeof(item));
 
     /* Note: optimize here? */
     for (; parsed_len >= len - 1; --parsed_len) {
         input[parsed_len] = '\0';
-        item.m_pinyin_input = input;
-        std_lite::pair<const pinyin_index_item_t *,
-                       const pinyin_index_item_t *> range;
-        range = std_lite::equal_range
-            (pinyin_index, pinyin_index + G_N_ELEMENTS(pinyin_index),
-             item, compare_less_than);
-
-        guint16 range_len = range.second - range.first;
-        assert (range_len <= 1);
-        if ( range_len == 1 ) {
-            const pinyin_index_item_t * index = range.first;
-
-            if (!check_pinyin_options(options, index))
-                continue;
-
-            key_rest.m_table_index = index->m_table_index;
-            key = content_table[key_rest.m_table_index].m_chewing_key;
+        if (search_pinyin_index(options, input, key, key_rest))
             break;
-        }
     }
 
     if (options & USE_TONE) {
@@ -388,10 +400,20 @@ bool FullPinyinParser2::post_process(guint32 options,
 bool DoublePinyinParser2::parse_one_key (guint32 options, ChewingKey & key,
                                          ChewingKeyRest & key_rest,
                                          const char *str, int len) const{
+#define IS_KEY(x)   (('a' <= x && x <= 'z') || x == ';')
+    pinyin_index_item_t item;
     if (1 == len) {
         if (!(options & PINYIN_INCOMPLETE))
             return false;
-        assert(FALSE);
+
+        char ch = str[0];
+        if (!IS_KEY(ch))
+            return false;
+        int charid = ch == ';' ? 26 : ch - 'a';
+        const char * yun = m_shengmu_table[charid].m_shengmu;
+        if ( NULL == yun || strcmp(yun, "'") == 0)
+            return false;
+
     }
 
     options &= ~(PINYIN_CORRECT_ALL|PINYIN_AMB_ALL);
@@ -406,6 +428,8 @@ bool DoublePinyinParser2::parse_one_key (guint32 options, ChewingKey & key,
             return false;
         assert(FALSE);
     }
+
+#undef IS_KEY
 
     return false;
 }
