@@ -153,8 +153,8 @@ class DoublePinyinParser2 : public PinyinParser2
 {
     /* Note: two internal pointers to double pinyin scheme table. */
 protected:
-    double_pinyin_scheme_shengmu_item_t * m_shengmu_table;
-    double_pinyin_scheme_yunmu_item_t   * m_yunmu_table;
+    const double_pinyin_scheme_shengmu_item_t * m_shengmu_table;
+    const double_pinyin_scheme_yunmu_item_t   * m_yunmu_table;
 
 public:
     DoublePinyinParser2() {

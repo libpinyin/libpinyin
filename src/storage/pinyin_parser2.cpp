@@ -416,3 +416,37 @@ int DoublePinyinParser2::parse (guint32 options, ChewingKeyVector & keys,
                                 const char *str, int len) const{
     assert(FALSE);
 }
+
+bool DoublePinyinParser2::set_scheme(DoublePinyinScheme scheme) {
+
+    switch (scheme) {
+    case DOUBLE_PINYIN_ZRM:
+        m_shengmu_table = double_pinyin_zrm_sheng;
+        m_yunmu_table   = double_pinyin_zrm_yun;
+        return true;
+    case DOUBLE_PINYIN_MS:
+        m_shengmu_table = double_pinyin_mspy_sheng;
+        m_yunmu_table   = double_pinyin_mspy_yun;
+        return true;
+    case DOUBLE_PINYIN_ZIGUANG:
+        m_shengmu_table = double_pinyin_zgpy_sheng;
+        m_yunmu_table   = double_pinyin_zgpy_yun;
+        return true;
+    case DOUBLE_PINYIN_ABC:
+        m_shengmu_table = double_pinyin_abc_sheng;
+        m_yunmu_table   = double_pinyin_abc_yun;
+        return true;
+    case DOUBLE_PINYIN_PYJJ:
+        m_shengmu_table = double_pinyin_pyjj_sheng;
+        m_yunmu_table   = double_pinyin_pyjj_yun;
+        return true;
+    case DOUBLE_PINYIN_XHE:
+        m_shengmu_table = double_pinyin_xhe_sheng;
+        m_yunmu_table   = double_pinyin_xhe_yun;
+        return true;
+    case DOUBLE_PINYIN_CUSTOMIZED:
+        assert(FALSE);
+    };
+
+    return false; /* no such scheme. */
+}
