@@ -85,7 +85,7 @@ class PinyinParser2
 {
     /* constructor/destructor */
 public:
-    virtual ~PinyinParser2 () {}
+    virtual ~PinyinParser2() {}
 
     /* public method */
 public:
@@ -99,7 +99,7 @@ public:
      *
      * @return whether the entire string is parsed as one key.
      */
-    virtual bool parse_one_key (guint32 options, ChewingKey & key, ChewingKeyRest & key_rest, const char *str, int len) const = 0;
+    virtual bool parse_one_key(guint32 options, ChewingKey & key, ChewingKeyRest & key_rest, const char *str, int len) const = 0;
 
     /**
      * @brief Translate the source string into a set of ChewingKeys.
@@ -114,7 +114,7 @@ public:
     /* Note:
      *   the parse method will use dynamic programming to drive parse_one_key.
      */
-    virtual int parse (guint32 options, ChewingKeyVector & keys, ChewingKeyRestVector & key_rests, const char *str, int len) const = 0;
+    virtual int parse(guint32 options, ChewingKeyVector & keys, ChewingKeyRestVector & key_rests, const char *str, int len) const = 0;
 
 };
 
@@ -136,14 +136,14 @@ protected:
                       ChewingKeyRestVector & key_rests) const;
 
 public:
-    FullPinyinParser2 ();
-    virtual ~FullPinyinParser2 () {
+    FullPinyinParser2();
+    virtual ~FullPinyinParser2() {
         g_array_free(m_parse_steps, TRUE);
     }
 
-    virtual bool parse_one_key (guint32 options, ChewingKey & key, ChewingKeyRest & key_rest, const char *str, int len) const;
+    virtual bool parse_one_key(guint32 options, ChewingKey & key, ChewingKeyRest & key_rest, const char *str, int len) const;
 
-    virtual int parse (guint32 options, ChewingKeyVector & keys, ChewingKeyRestVector & key_rests, const char *str, int len) const;
+    virtual int parse(guint32 options, ChewingKeyVector & keys, ChewingKeyRestVector & key_rests, const char *str, int len) const;
 };
 
 
@@ -152,16 +152,24 @@ public:
 class DoublePinyinParser2 : public PinyinParser2
 {
     /* Note: two internal pointers to double pinyin scheme table. */
+protected:
+    double_pinyin_scheme_shengmu_item_t * m_shengmu_table;
+    double_pinyin_scheme_yunmu_item_t   * m_yunmu_table;
 
 public:
-    virtual ~DoublePinyinParser2 () {}
+    DoublePinyinParser2() {
+        m_shengmu_table = NULL; m_yunmu_table = NULL;
+        set_scheme(DOUBLE_PINYIN_DEFAULT);
+    }
 
-    virtual bool parse_one_key (guint32 options, ChewingKey & key, ChewingKeyRest & key_rest, const char *str, int len) const;
+    virtual ~DoublePinyinParser2() {}
 
-    virtual int parse (guint32 options, ChewingKeyVector & keys, ChewingKeyRestVector & key_rests, const char *str, int len) const;
+    virtual bool parse_one_key(guint32 options, ChewingKey & key, ChewingKeyRest & key_rest, const char *str, int len) const;
+
+    virtual int parse(guint32 options, ChewingKeyVector & keys, ChewingKeyRestVector & key_rests, const char *str, int len) const;
 
 public:
-    bool set_scheme (DoublePinyinScheme scheme);
+    bool set_scheme(DoublePinyinScheme scheme);
 };
 
 
@@ -181,21 +189,21 @@ class ChewingParser2 : public PinyinParser2
     /* Note: one internal pointer to chewing scheme table. */
 
 public:
-    virtual ~ChewingParser2 () {}
+    virtual ~ChewingParser2() {}
 
-    virtual bool parse_one_key (guint32 options, ChewingKey & key, ChewingKeyRest & key_rest, const char *str, int len) const;
+    virtual bool parse_one_key(guint32 options, ChewingKey & key, ChewingKeyRest & key_rest, const char *str, int len) const;
 
-    virtual int parse (guint32 options, ChewingKeyVector & keys, ChewingKeyRestVector & key_rests, const char *str, int len) const;
+    virtual int parse(guint32 options, ChewingKeyVector & keys, ChewingKeyRestVector & key_rests, const char *str, int len) const;
 
 public:
-    bool set_scheme (ChewingScheme scheme);
+    bool set_scheme(ChewingScheme scheme);
 };
 
 
 /* compare pinyins with chewing internal representations. */
-inline int pinyin_compare_initial2 (guint32 options,
-                                    ChewingInitial lhs,
-                                    ChewingInitial rhs){
+inline int pinyin_compare_initial2(guint32 options,
+                                   ChewingInitial lhs,
+                                   ChewingInitial rhs) {
     if (lhs == rhs)
         return 0;
 
@@ -238,11 +246,11 @@ inline int pinyin_compare_initial2 (guint32 options,
 }
 
 
-inline int pinyin_compare_middle_and_final2 (guint32 options,
-                                             ChewingMiddle middle_lhs,
-                                             ChewingMiddle middle_rhs,
-                                             ChewingFinal final_lhs,
-                                             ChewingFinal final_rhs){
+inline int pinyin_compare_middle_and_final2(guint32 options,
+                                            ChewingMiddle middle_lhs,
+                                            ChewingMiddle middle_rhs,
+                                            ChewingFinal final_lhs,
+                                            ChewingFinal final_rhs) {
     if (middle_lhs == middle_rhs && final_lhs == final_rhs)
         return 0;
 
@@ -280,9 +288,9 @@ inline int pinyin_compare_middle_and_final2 (guint32 options,
 }
 
 
-inline int pinyin_compare_tone2 (guint32 options,
-                                 ChewingTone lhs,
-                                 ChewingTone rhs){
+inline int pinyin_compare_tone2(guint32 options,
+                                ChewingTone lhs,
+                                ChewingTone rhs) {
     if (lhs == rhs)
         return 0;
     if (lhs == CHEWING_ZERO_TONE)
