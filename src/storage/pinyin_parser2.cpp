@@ -177,11 +177,9 @@ bool FullPinyinParser2::parse_one_key (guint32 options, ChewingKey & key,
     /* parse pinyin core staff here. */
 
     /* Note: optimize here? */
-    for (; parsed_len >= len - 1; --parsed_len) {
-        input[parsed_len] = '\0';
-        if (search_pinyin_index(options, input, key, key_rest))
-            break;
-    }
+    input[parsed_len] = '\0';
+    if (!search_pinyin_index(options, input, key, key_rest))
+        --parsed_len;
 
     if (options & USE_TONE) {
         /* post processing tone. */
