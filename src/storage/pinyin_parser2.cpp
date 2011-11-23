@@ -562,3 +562,37 @@ bool DoublePinyinParser2::set_scheme(DoublePinyinScheme scheme) {
 
     return false; /* no such scheme. */
 }
+
+
+bool ChewingParser2::parse_one_key(guint32 options, ChewingKey & key, ChewingKeyRest & key_rest, const char *str, int len) const {
+    assert(FALSE);
+}
+
+
+int ChewingParser2::parse(guint32 options, ChewingKeyVector & keys, ChewingKeyRestVector & key_rests, const char *str, int len) const {
+    assert(FALSE);
+}
+
+
+bool ChewingParser2::set_scheme(ChewingScheme scheme) {
+    switch(scheme) {
+    case CHEWING_STANDARD:
+        m_symbol_table = chewing_standard_symbols;
+        m_tone_table   = chewing_standard_tones;
+        return true;
+    case CHEWING_IBM:
+        m_symbol_table = chewing_ibm_symbols;
+        m_tone_table   = chewing_ibm_tones;
+        return true;
+    case CHEWING_GINYIEH:
+        m_symbol_table = chewing_ginyieh_symbols;
+        m_tone_table   = chewing_ginyieh_tones;
+        return true;
+    case CHEWING_ETEN:
+        m_symbol_table = chewing_eten_symbols;
+        m_tone_table   = chewing_eten_tones;
+        return true;
+    }
+
+    return false;
+}

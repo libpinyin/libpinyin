@@ -197,8 +197,8 @@ class ChewingParser2 : public PinyinParser2
 {
     /* Note: some internal pointers to chewing scheme table. */
 protected:
-    chewing_symbol_item_t * m_symbol_table;
-    chewing_tone_item_t   * m_tone_table;
+    const chewing_symbol_item_t * m_symbol_table;
+    const chewing_tone_item_t   * m_tone_table;
 
 public:
     ChewingParser2() {

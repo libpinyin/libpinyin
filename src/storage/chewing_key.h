@@ -141,11 +141,9 @@ enum DoublePinyinScheme
 enum ChewingScheme
 {
     CHEWING_STANDARD = 1,
-    CHEWING_HSU      = 2,
-    CHEWING_IBM      = 3,
-    CHEWING_GIN_YIEH = 4,
-    CHEWING_ET       = 5,
-    CHEWING_ET26     = 6,
+    CHEWING_IBM      = 2,
+    CHEWING_GINYIEH  = 3,
+    CHEWING_ETEN     = 4,
     CHEWING_DEFAULT  = CHEWING_STANDARD
 };
 
