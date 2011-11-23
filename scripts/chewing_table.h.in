@@ -6,20 +6,37 @@
 
 namespace pinyin{
 
-const chewing_scheme_item_t chewing_standard[] = {
-@STANDARD@
+const chewing_symbol_item_t chewing_standard_symbols[] = {
+@STANDARD_SYMBOLS@
 };
 
-const chewing_scheme_item_t chewing_ginyieh[] = {
-@GINYIEH@
+const chewing_tone_item_t chewing_standard_tones[] = {
+@STANDARD_TONES@
 };
 
-const chewing_scheme_item_t chewing_eten[] = {
-@ETEN@
+
+const chewing_symbol_item_t chewing_ginyieh_symbols[] = {
+@GINYIEH_SYMBOLS@
 };
 
-const chewing_scheme_item_t chewing_ibm[] = {
-@IBM@
+const chewing_tone_item_t chewing_ginyieh_tones[] = {
+@GINYIEH_TONES@
+};
+
+const chewing_symbol_item_t chewing_eten_symbols[] = {
+@ETEN_SYMBOLS@
+};
+
+const chewing_tone_item_t chewing_eten_tones[] = {
+@ETEN_TONES@
+};
+
+const chewing_symbol_item_t chewing_ibm_symbols[] = {
+@IBM_SYMBOLS@
+};
+
+const chewing_tone_item_t chewing_ibm_tones[] = {
+@IBM_TONES@
 };
 
 };

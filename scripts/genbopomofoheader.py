@@ -34,6 +34,9 @@ bopomofo = [
     'ˊ', 'ˇ', 'ˋ', '˙',
 ]
 
+#陰平聲不標號
+num_tones = -4
+
 bopomofo_keyboards = {
     #標準注音鍵盤
     'STANDARD':
@@ -72,8 +75,10 @@ def escape_char(ch):
     return "'{0}'".format(ch)
 
 
-def gen_chewing_keyboard(scheme):
+#generate shengmu and yunmu here
+def gen_chewing_symbols(scheme):
     keyboard = bopomofo_keyboards[scheme]
+    keyboard = keyboard[: num_tones]
     items = []
     for (i, key) in enumerate(keyboard):
         items.append((key, bopomofo[i]))
@@ -87,8 +92,28 @@ def gen_chewing_keyboard(scheme):
     return ",\n".join(entries)
 
 
+#generate tones here
+def gen_chewing_tones(scheme):
+    keyboard = bopomofo_keyboards[scheme]
+    keyboard = keyboard[num_tones:]
+    items = []
+    for (i, key) in enumerate(keyboard, start=2):
+        items.append((key, i));
+    items = sorted(items, key=itemgetter(0))
+    entries = []
+    for (key, tone) in items:
+        key = escape_char(key);
+        entry = "{{{0: <5}, {1}}}".format(key, tone)
+        entries.append(entry)
+    return ",\n".join(entries)
+
+
 def get_table_content(tablename):
-    return gen_chewing_keyboard(tablename)
+    (scheme, part) = tablename.split('_', 1)
+    if part == "SYMBOLS":
+        return gen_chewing_symbols(scheme);
+    if part == "TONES":
+        return gen_chewing_tones(scheme);
 
 
 def expand_file(filename):
