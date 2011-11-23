@@ -116,8 +116,8 @@ const guint16 max_double_pinyin_length = 3;  /* include tone. */
 
 const guint16 max_chewing_length       = 4;  /* include tone. */
 
-static bool compare_less_than(const pinyin_index_item_t & lhs,
-                              const pinyin_index_item_t & rhs){
+static bool compare_pinyin_less_than(const pinyin_index_item_t & lhs,
+                                     const pinyin_index_item_t & rhs){
     return 0 > strcmp(lhs.m_pinyin_input, rhs.m_pinyin_input);
 }
 
@@ -132,14 +132,49 @@ static inline bool search_pinyin_index(guint32 options, const char * pinyin,
                    const pinyin_index_item_t *> range;
     range = std_lite::equal_range
         (pinyin_index, pinyin_index + G_N_ELEMENTS(pinyin_index),
-         item, compare_less_than);
+         item, compare_pinyin_less_than);
 
     guint16 range_len = range.second - range.first;
-    assert (range_len <= 1);
-    if ( range_len == 1 ) {
+    assert(range_len <= 1);
+    if (range_len == 1) {
         const pinyin_index_item_t * index = range.first;
 
         if (!check_pinyin_options(options, index))
+            return false;
+
+        key_rest.m_table_index = index->m_table_index;
+        key = content_table[key_rest.m_table_index].m_chewing_key;
+        return true;
+    }
+
+    return false;
+}
+
+static bool compare_chewing_less_than(const chewing_index_item_t & lhs,
+                                      const chewing_index_item_t & rhs){
+    return 0 > strcmp(lhs.m_chewing_input, rhs.m_chewing_input);
+}
+
+static inline bool search_chewing_index(guint32 options, const char * chewing,
+                                        ChewingKey & key,
+                                        ChewingKeyRest & key_rest){
+    chewing_index_item_t item;
+    memset(&item, 0, sizeof(item));
+    item.m_chewing_input = chewing;
+
+    std_lite::pair<const chewing_index_item_t *,
+                   const chewing_index_item_t *> range;
+    range = std_lite::equal_range
+        (chewing_index, chewing_index + G_N_ELEMENTS(chewing_index),
+         item, compare_chewing_less_than);
+
+    guint16 range_len = range.second - range.first;
+    assert (range_len <= 1);
+
+    if (range_len == 1) {
+        const chewing_index_item_t * index = range.first;
+
+        if (!check_chewing_options(options, index))
             return false;
 
         key_rest.m_table_index = index->m_table_index;
@@ -563,9 +598,78 @@ bool DoublePinyinParser2::set_scheme(DoublePinyinScheme scheme) {
     return false; /* no such scheme. */
 }
 
+/* the chewing string must be freed with g_free. */
+static bool search_chewing_symbols(const chewing_symbol_item_t * symbol_table,
+                                   const char key, char ** chewing) {
+    /* just iterate the table, as we only have < 50 items. */
+    while (symbol_table->m_input != '\0') {
+        if (symbol_table->m_input == key) {
+            *chewing = g_strdup(symbol_table->m_chewing);
+            return true;
+        }
+        symbol_table ++;
+    }
+    return false;
+}
+
+static bool search_chewing_tones(const chewing_tone_item_t * tone_table,
+                                 const char key, char * tone) {
+    /* just iterate the table, as we only have < 10 items. */
+    while (tone_table->m_input != '\0') {
+        if (tone_table->m_input == key) {
+            *tone = tone_table->m_tone;
+            return true;
+        }
+        tone_table ++;
+    }
+    return false;
+}
+
 
 bool ChewingParser2::parse_one_key(guint32 options, ChewingKey & key, ChewingKeyRest & key_rest, const char *str, int len) const {
-    assert(FALSE);
+    char tone = CHEWING_ZERO_TONE;
+
+    int symbols_len = len;
+    /* probe whether the last key is tone key in str. */
+    if (options & USE_TONE) {
+        char ch = str[len - 1];
+        /* remove tone from input */
+        if (search_chewing_tones(m_tone_table, ch, &tone))
+            symbols_len --;
+    }
+
+    int i;
+    gchar * chewing = NULL, * onechar = NULL;
+
+    /* probe the possible chewing map in the rest of str. */
+    for (i = 0; i < symbols_len; ++i) {
+        if (!search_chewing_symbols(m_symbol_table, str[i], &onechar)) {
+            g_free(onechar);
+            g_free(chewing);
+            return false;
+        }
+
+        if (!chewing) {
+            chewing = g_strdup(onechar);
+        } else {
+            gchar * tmp = chewing;
+            chewing = g_strconcat(chewing, onechar, NULL);
+            g_free(tmp);
+        }
+        g_free(onechar);
+    }
+
+    /* search the chewing in the chewing index table. */
+    if (search_chewing_index(options, chewing, key, key_rest)) {
+        key_rest.m_raw_begin = 0; key_rest.m_raw_end = len;
+        /* save back tone if available. */
+        key.m_tone = tone;
+        g_free(chewing);
+        return true;
+    }
+
+    g_free(chewing);
+    return false;
 }
 
 
@@ -595,4 +699,16 @@ bool ChewingParser2::set_scheme(ChewingScheme scheme) {
     }
 
     return false;
+}
+
+
+bool ChewingParser2::in_chewing_scheme(const char key){
+    gchar * chewing = NULL;
+    char tone = CHEWING_ZERO_TONE;
+
+    bool retval = search_chewing_symbols(m_symbol_table, key, &chewing) ||
+        search_chewing_tones(m_tone_table, key, &tone);
+    g_free(chewing);
+
+    return retval;
 }
