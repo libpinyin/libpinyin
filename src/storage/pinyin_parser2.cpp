@@ -503,7 +503,9 @@ int DoublePinyinParser2::parse (guint32 options, ChewingKeyVector & keys,
     int parsed_len = 0;
     while (parsed_len < maximum_len) {
         const char * cur_str = str + parsed_len;
-        i = std_lite::min(maximum_len - parsed_len, max_double_pinyin_length);
+        i = std_lite::min(maximum_len - parsed_len,
+                          (int)max_double_pinyin_length);
+
         ChewingKey key; ChewingKeyRest key_rest;
         for (; i > 0; --i) {
             bool success = parse_one_key(options, key, key_rest, cur_str, i);

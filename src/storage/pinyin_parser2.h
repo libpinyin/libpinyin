@@ -75,7 +75,7 @@ typedef struct {
 
 typedef struct {
     const char m_input;
-    const char  m_tone;
+    const char m_tone;
 } chewing_tone_item_t;
 
 typedef GArray * ChewingKeyVector;
@@ -195,9 +195,17 @@ public:
  */
 class ChewingParser2 : public PinyinParser2
 {
-    /* Note: one internal pointer to chewing scheme table. */
+    /* Note: some internal pointers to chewing scheme table. */
+protected:
+    chewing_symbol_item_t * m_symbol_table;
+    chewing_tone_item_t   * m_tone_table;
 
 public:
+    ChewingParser2() {
+        m_symbol_table = NULL; m_tone_table = NULL;
+        set_scheme(CHEWING_DEFAULT);
+    }
+
     virtual ~ChewingParser2() {}
 
     virtual bool parse_one_key(guint32 options, ChewingKey & key, ChewingKeyRest & key_rest, const char *str, int len) const;

@@ -89,6 +89,7 @@ def gen_chewing_symbols(scheme):
         string = '"{0}"'.format(string)
         entry = "{{{0: <5}, {1}}}".format(key, string)
         entries.append(entry)
+    entries.append("{'\\0', NULL}")
     return ",\n".join(entries)
 
 
@@ -105,6 +106,7 @@ def gen_chewing_tones(scheme):
         key = escape_char(key);
         entry = "{{{0: <5}, {1}}}".format(key, tone)
         entries.append(entry)
+    entries.append("{'\\0', 0}")
     return ",\n".join(entries)
 
 
