@@ -43,14 +43,16 @@ const chewing_symbol_item_t chewing_standard_symbols[] = {
 {'w'  , "ㄊ"},
 {'x'  , "ㄌ"},
 {'y'  , "ㄗ"},
-{'z'  , "ㄈ"}
+{'z'  , "ㄈ"},
+{'\0', NULL}
 };
 
 const chewing_tone_item_t chewing_standard_tones[] = {
 {'3'  , 3},
 {'4'  , 4},
 {'6'  , 2},
-{'7'  , 5}
+{'7'  , 5},
+{'\0', 0}
 };
 
 
@@ -91,14 +93,16 @@ const chewing_symbol_item_t chewing_ginyieh_symbols[] = {
 {'v'  , "ㄏ"},
 {'w'  , "ㄆ"},
 {'x'  , "ㄈ"},
-{'y'  , "ㄔ"}
+{'y'  , "ㄔ"},
+{'\0', NULL}
 };
 
 const chewing_tone_item_t chewing_ginyieh_tones[] = {
 {'1'  , 5},
 {'a'  , 3},
 {'q'  , 2},
-{'z'  , 4}
+{'z'  , 4},
+{'\0', 0}
 };
 
 const chewing_symbol_item_t chewing_eten_symbols[] = {
@@ -138,14 +142,16 @@ const chewing_symbol_item_t chewing_eten_symbols[] = {
 {'w'  , "ㄝ"},
 {'x'  , "ㄨ"},
 {'y'  , "ㄡ"},
-{'z'  , "ㄠ"}
+{'z'  , "ㄠ"},
+{'\0', NULL}
 };
 
 const chewing_tone_item_t chewing_eten_tones[] = {
 {'1'  , 5},
 {'2'  , 2},
 {'3'  , 3},
-{'4'  , 4}
+{'4'  , 4},
+{'\0', 0}
 };
 
 const chewing_symbol_item_t chewing_ibm_symbols[] = {
@@ -185,14 +191,16 @@ const chewing_symbol_item_t chewing_ibm_symbols[] = {
 {'w'  , "ㄑ"},
 {'x'  , "ㄢ"},
 {'y'  , "ㄕ"},
-{'z'  , "ㄡ"}
+{'z'  , "ㄡ"},
+{'\0', NULL}
 };
 
 const chewing_tone_item_t chewing_ibm_tones[] = {
 {','  , 3},
 {'.'  , 4},
 {'/'  , 5},
-{'m'  , 2}
+{'m'  , 2},
+{'\0', 0}
 };
 
 };
