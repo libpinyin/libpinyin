@@ -673,7 +673,10 @@ bool ChewingParser2::parse_one_key(guint32 options, ChewingKey & key, ChewingKey
 }
 
 
+/* only characters in chewing keyboard scheme are accepted here. */
 int ChewingParser2::parse(guint32 options, ChewingKeyVector & keys, ChewingKeyRestVector & key_rests, const char *str, int len) const {
+    /* probe the longest possible chewing string. */
+    /* maximum forward match for chewing. */
     assert(FALSE);
 }
 
