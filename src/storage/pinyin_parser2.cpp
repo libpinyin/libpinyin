@@ -394,11 +394,11 @@ bool FullPinyinParser2::post_process(guint32 options,
     return true;
 }
 
+#define IS_KEY(x)   (('a' <= x && x <= 'z') || x == ';')
 
 bool DoublePinyinParser2::parse_one_key (guint32 options, ChewingKey & key,
                                          ChewingKeyRest & key_rest,
                                          const char *str, int len) const{
-#define IS_KEY(x)   (('a' <= x && x <= 'z') || x == ';')
 
     if (1 == len) {
         if (!(options & PINYIN_INCOMPLETE))
@@ -477,17 +477,18 @@ bool DoublePinyinParser2::parse_one_key (guint32 options, ChewingKey & key,
 
     }
 
-#undef IS_KEY
-
     return false;
 }
 
 
+/* only 'a'-'z' and ';' are accepted here. */
 int DoublePinyinParser2::parse (guint32 options, ChewingKeyVector & keys,
                                 ChewingKeyRestVector & key_rests,
                                 const char *str, int len) const{
     assert(FALSE);
 }
+
+#undef IS_KEY
 
 bool DoublePinyinParser2::set_scheme(DoublePinyinScheme scheme) {
 
