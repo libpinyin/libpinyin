@@ -110,8 +110,11 @@ public:
     }
 };
 
-const guint16 max_full_pinyin_length = 7;  /* include tone. */
+const guint16 max_full_pinyin_length   = 7;  /* include tone. */
 
+const guint16 max_double_pinyin_length = 3;  /* include tone. */
+
+const guint16 max_chewing_length       = 4;  /* include tone. */
 
 static bool compare_less_than(const pinyin_index_item_t & lhs,
                               const pinyin_index_item_t & rhs){
@@ -485,7 +488,41 @@ bool DoublePinyinParser2::parse_one_key (guint32 options, ChewingKey & key,
 int DoublePinyinParser2::parse (guint32 options, ChewingKeyVector & keys,
                                 ChewingKeyRestVector & key_rests,
                                 const char *str, int len) const{
-    assert(FALSE);
+    g_array_set_size(keys, 0);
+    g_array_set_size(key_rests, 0);
+
+    int maximum_len = 0; int i;
+    /* probe the longest possible double pinyin string. */
+    for (i = 0; i < len; ++i) {
+        if (!IS_KEY(str[i]))
+            break;
+    }
+    maximum_len = i;
+
+    /* maximum forward match for double pinyin. */
+    int parsed_len = 0;
+    while (parsed_len < maximum_len) {
+        const char * cur_str = str + parsed_len;
+        i = std_lite::min(maximum_len - parsed_len, max_double_pinyin_length);
+        ChewingKey key; ChewingKeyRest key_rest;
+        for (; i > 0; --i) {
+            bool success = parse_one_key(options, key, key_rest, cur_str, i);
+            if (success)
+                break;
+        }
+
+        if (0 == i)        /* no more possible double pinyins. */
+            break;
+
+        key_rest.m_raw_begin = parsed_len; key_rest.m_raw_end = parsed_len + i;
+        parsed_len += i;
+
+        /* save the pinyin */
+        g_array_append_val(keys, key);
+        g_array_append_val(key_rests, key_rest);
+    }
+
+    return parsed_len;
 }
 
 #undef IS_KEY
