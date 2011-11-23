@@ -6,7 +6,7 @@
 
 namespace pinyin{
 
-const chewing_scheme_item_t chewing_standard[] = {
+const chewing_symbol_item_t chewing_standard_symbols[] = {
 {','  , "ㄝ"},
 {'-'  , "ㄦ"},
 {'.'  , "ㄡ"},
@@ -14,11 +14,7 @@ const chewing_scheme_item_t chewing_standard[] = {
 {'0'  , "ㄢ"},
 {'1'  , "ㄅ"},
 {'2'  , "ㄉ"},
-{'3'  , "ˇ"},
-{'4'  , "ˋ"},
 {'5'  , "ㄓ"},
-{'6'  , "ˊ"},
-{'7'  , "˙"},
 {'8'  , "ㄚ"},
 {'9'  , "ㄞ"},
 {';'  , "ㄤ"},
@@ -50,14 +46,21 @@ const chewing_scheme_item_t chewing_standard[] = {
 {'z'  , "ㄈ"}
 };
 
-const chewing_scheme_item_t chewing_ginyieh[] = {
+const chewing_tone_item_t chewing_standard_tones[] = {
+{'3'  , 3},
+{'4'  , 4},
+{'6'  , 2},
+{'7'  , 5}
+};
+
+
+const chewing_symbol_item_t chewing_ginyieh_symbols[] = {
 {'\'' , "ㄩ"},
 {','  , "ㄝ"},
 {'-'  , "ㄧ"},
 {'.'  , "ㄡ"},
 {'/'  , "ㄥ"},
 {'0'  , "ㄢ"},
-{'1'  , "˙"},
 {'2'  , "ㄅ"},
 {'3'  , "ㄉ"},
 {'6'  , "ㄓ"},
@@ -66,7 +69,6 @@ const chewing_scheme_item_t chewing_ginyieh[] = {
 {';'  , "ㄤ"},
 {'='  , "ㄦ"},
 {'['  , "ㄨ"},
-{'a'  , "ˇ"},
 {'b'  , "ㄒ"},
 {'c'  , "ㄌ"},
 {'d'  , "ㄋ"},
@@ -82,7 +84,6 @@ const chewing_scheme_item_t chewing_ginyieh[] = {
 {'n'  , "ㄖ"},
 {'o'  , "ㄟ"},
 {'p'  , "ㄣ"},
-{'q'  , "ˊ"},
 {'r'  , "ㄍ"},
 {'s'  , "ㄇ"},
 {'t'  , "ㄐ"},
@@ -90,21 +91,23 @@ const chewing_scheme_item_t chewing_ginyieh[] = {
 {'v'  , "ㄏ"},
 {'w'  , "ㄆ"},
 {'x'  , "ㄈ"},
-{'y'  , "ㄔ"},
-{'z'  , "ˋ"}
+{'y'  , "ㄔ"}
 };
 
-const chewing_scheme_item_t chewing_eten[] = {
+const chewing_tone_item_t chewing_ginyieh_tones[] = {
+{'1'  , 5},
+{'a'  , 3},
+{'q'  , 2},
+{'z'  , 4}
+};
+
+const chewing_symbol_item_t chewing_eten_symbols[] = {
 {'\'' , "ㄘ"},
 {','  , "ㄓ"},
 {'-'  , "ㄥ"},
 {'.'  , "ㄔ"},
 {'/'  , "ㄕ"},
 {'0'  , "ㄤ"},
-{'1'  , "˙"},
-{'2'  , "ˊ"},
-{'3'  , "ˇ"},
-{'4'  , "ˋ"},
 {'7'  , "ㄑ"},
 {'8'  , "ㄢ"},
 {'9'  , "ㄣ"},
@@ -138,11 +141,15 @@ const chewing_scheme_item_t chewing_eten[] = {
 {'z'  , "ㄠ"}
 };
 
-const chewing_scheme_item_t chewing_ibm[] = {
-{','  , "ˇ"},
+const chewing_tone_item_t chewing_eten_tones[] = {
+{'1'  , 5},
+{'2'  , 2},
+{'3'  , 3},
+{'4'  , 4}
+};
+
+const chewing_symbol_item_t chewing_ibm_symbols[] = {
 {'-'  , "ㄏ"},
-{'.'  , "ˋ"},
-{'/'  , "˙"},
 {'0'  , "ㄎ"},
 {'1'  , "ㄅ"},
 {'2'  , "ㄆ"},
@@ -166,7 +173,6 @@ const chewing_scheme_item_t chewing_ibm[] = {
 {'j'  , "ㄝ"},
 {'k'  , "ㄞ"},
 {'l'  , "ㄟ"},
-{'m'  , "ˊ"},
 {'n'  , "ㄦ"},
 {'o'  , "ㄘ"},
 {'p'  , "ㄙ"},
@@ -180,6 +186,13 @@ const chewing_scheme_item_t chewing_ibm[] = {
 {'x'  , "ㄢ"},
 {'y'  , "ㄕ"},
 {'z'  , "ㄡ"}
+};
+
+const chewing_tone_item_t chewing_ibm_tones[] = {
+{','  , 3},
+{'.'  , 4},
+{'/'  , 5},
+{'m'  , 2}
 };
 
 };
