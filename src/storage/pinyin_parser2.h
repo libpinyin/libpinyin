@@ -71,7 +71,12 @@ typedef struct {
 typedef struct {
     const char m_input;
     const char * m_chewing;
-} chewing_scheme_item_t;
+} chewing_symbol_item_t;
+
+typedef struct {
+    const char m_input;
+    const char  m_tone;
+} chewing_tone_item_t;
 
 typedef GArray * ChewingKeyVector;
 typedef GArray * ChewingKeyRestVector;
@@ -183,6 +188,10 @@ public:
  * * Chewing_GIN_YIEH  Gin-Yieh ZhuYin keyboard.
  * * Chewing_ET        Eten (倚天) ZhuYin keyboard.
  * * Chewing_ET26      Eten (倚天) ZhuYin keyboard, which only uses a-z chars.
+ */
+
+/* Note: maybe yunmus shuffle will be supported later.
+ *         currently this feature is postponed.
  */
 class ChewingParser2 : public PinyinParser2
 {
