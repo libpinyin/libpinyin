@@ -448,7 +448,7 @@ bool PinyinLookup::train_result(PinyinKeyVector keys, CandidateConstraints const
     //TODO: verify the new training method.
     phrase_token_t last_token = sentence_start;
     // constraints->len + 1 == results->len
-    guint32 train_factor = 23;
+    guint32 train_factor = 23 * 5;
     for ( size_t i = 0; i < constraints->len; ++i){
 	phrase_token_t * token = &g_array_index(results, phrase_token_t, i);
 	if ( *token == null_token )
@@ -465,7 +465,7 @@ bool PinyinLookup::train_result(PinyinKeyVector keys, CandidateConstraints const
             //printf("i:%d\tlast_token:%d\ttoken:%d\n", i, last_token, *token);
 	    m_phrase_index->get_phrase_item(*token, m_cache_phrase_item);
 	    m_cache_phrase_item.increase_pinyin_possibility(*m_custom, pinyin_keys + i, train_factor);
-	    m_phrase_index->add_unigram_frequency(*token, train_factor);
+	    m_phrase_index->add_unigram_frequency(*token, train_factor * 10);
 	    if ( last_token ){
 		SingleGram * system, *user;
 		m_system_bigram->load(last_token, system);
