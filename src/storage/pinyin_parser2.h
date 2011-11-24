@@ -183,11 +183,9 @@ public:
  *
  * Several keyboard scheme are supported:
  * * Chewing_STANDARD  Standard ZhuYin keyboard, which maps 1 to Bo(ㄅ), q to Po(ㄆ) etc.
- * * Chewing_HSU       Hsu ZhuYin keyboard, which uses a-z (except q) chars.
  * * Chewing_IBM       IBM ZhuYin keyboard, which maps 1 to Bo(ㄅ), 2 to Po(ㄆ) etc.
- * * Chewing_GIN_YIEH  Gin-Yieh ZhuYin keyboard.
- * * Chewing_ET        Eten (倚天) ZhuYin keyboard.
- * * Chewing_ET26      Eten (倚天) ZhuYin keyboard, which only uses a-z chars.
+ * * Chewing_GINYIEH   Gin-Yieh ZhuYin keyboard.
+ * * Chewing_ETEN      Eten (倚天) ZhuYin keyboard.
  */
 
 /* Note: maybe yunmus shuffle will be supported later.
