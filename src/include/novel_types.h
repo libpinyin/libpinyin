@@ -144,7 +144,7 @@ typedef guint32 table_offset_t;
 
 typedef double parameter_t;
 
-#define LAMBDA_PARAMETER 0.588792
+#define LAMBDA_PARAMETER 0.330642
 
 /* Array of phrase_token_t */
 typedef GArray * TokenVector;
