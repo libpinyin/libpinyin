@@ -449,7 +449,7 @@ bool PinyinLookup::train_result(PinyinKeyVector keys, CandidateConstraints const
     //TODO: verify the new training method.
     phrase_token_t last_token = sentence_start;
     // constraints->len + 1 == results->len
-    guint32 train_factor = 23 * 5;
+    const guint32 train_factor = 23 * 5;
     for ( size_t i = 0; i < constraints->len; ++i){
 	phrase_token_t * token = &g_array_index(results, phrase_token_t, i);
 	if ( *token == null_token )
