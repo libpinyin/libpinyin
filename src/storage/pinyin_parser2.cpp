@@ -195,8 +195,8 @@ bool FullPinyinParser2::parse_one_key (guint32 options, ChewingKey & key,
                                        ChewingKeyRest & key_rest,
                                        const char * pinyin, int len) const {
     /* "'" are not accepted in parse_one_key. */
-    assert(NULL == strchr(pinyin, '\''));
     gchar * input = g_strndup(pinyin, len);
+    assert(NULL == strchr(input, '\''));
 
     guint16 tone = CHEWING_ZERO_TONE; guint16 tone_pos = 0;
     guint16 parsed_len = len;
@@ -255,7 +255,7 @@ int FullPinyinParser2::parse (guint32 options, ChewingKeyVector & keys,
     gchar * input = g_strndup(str, len);
     parse_value_t * curstep = NULL, * nextstep = NULL;
 
-    for (i = 0; i < len; ) {
+    for (i = 0; i < len; ++i) {
         if (input[i] == '\'') {
             curstep = &g_array_index(m_parse_steps, parse_value_t, i);
             nextstep = &g_array_index(m_parse_steps, parse_value_t, i + 1);
@@ -278,7 +278,6 @@ int FullPinyinParser2::parse (guint32 options, ChewingKeyVector & keys,
                     break;
             }
             next_sep = k;
-            i = next_sep;
         }
 
         /* dynamic programming here. */
