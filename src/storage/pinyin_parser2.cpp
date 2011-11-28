@@ -601,6 +601,7 @@ bool DoublePinyinParser2::set_scheme(DoublePinyinScheme scheme) {
 /* the chewing string must be freed with g_free. */
 static bool search_chewing_symbols(const chewing_symbol_item_t * symbol_table,
                                    const char key, char ** chewing) {
+    *chewing = NULL;
     /* just iterate the table, as we only have < 50 items. */
     while (symbol_table->m_input != '\0') {
         if (symbol_table->m_input == key) {
@@ -614,6 +615,7 @@ static bool search_chewing_symbols(const chewing_symbol_item_t * symbol_table,
 
 static bool search_chewing_tones(const chewing_tone_item_t * tone_table,
                                  const char key, char * tone) {
+    *tone = CHEWING_ZERO_TONE;
     /* just iterate the table, as we only have < 10 items. */
     while (tone_table->m_input != '\0') {
         if (tone_table->m_input == key) {
