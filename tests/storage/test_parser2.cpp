@@ -97,6 +97,16 @@ int main(int argc, char * argv[]) {
         if ( strcmp ( linebuf, "quit" ) == 0)
             break;
 
+#if 0
+        ChewingKey key; ChewingKeyRest key_rest;
+        bool success = parser->parse_one_key(options, key, key_rest,
+                                             linebuf, strlen(linebuf));
+        if (success)
+            printf("pinyin:%s\t%d\t%d\n", key_rest.get_pinyin_string(),
+                   key_rest.m_raw_begin, key_rest.m_raw_end);
+#endif
+
+#if 1
         int len = parser->parse(options, keys, key_rests,
                                 linebuf, strlen(linebuf));
         printf("parsed %d chars, %d keys.\n", len, keys->len);
@@ -110,6 +120,7 @@ int main(int argc, char * argv[]) {
                    key_rest->m_raw_begin, key_rest->m_raw_end);
         }
         printf("\n");
+#endif
 
     }
 
