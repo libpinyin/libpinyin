@@ -22,6 +22,7 @@
 
 #include <errno.h>
 #include <stdio.h>
+#include <assert.h>
 #include <stdlib.h>
 #include <string.h>
 #include "pinyin_parser2.h"
@@ -84,12 +85,36 @@ int main(int argc, char * argv[]) {
         ++i;
     }
 
-    if (NULL == parser) {
-        print_help();
-        exit(EINVAL);
+    if (!parser)
+        parser = new FullPinyinParser2();
+
+    char* linebuf = NULL; size_t size = 0; ssize_t read;
+    while( (read = getline(&linebuf, &size, stdin)) != -1 ){
+        if ( '\n' == linebuf[strlen(linebuf) - 1] ) {
+            linebuf[strlen(linebuf) - 1] = '\0';
+        }
+
+        if ( strcmp ( linebuf, "quit" ) == 0)
+            break;
+
+        int len = parser->parse(options, keys, key_rests,
+                                linebuf, strlen(linebuf));
+        printf("parsed %d chars, %d keys.\n", len, keys->len);
+
+        assert(keys->len == key_rests->len);
+
+        for (size_t i = 0; i < keys->len; ++i) {
+            ChewingKeyRest * key_rest =
+                &g_array_index(key_rests, ChewingKeyRest, i);
+            printf("%s %d %d\t", key_rest->get_pinyin_string(),
+                   key_rest->m_raw_begin, key_rest->m_raw_end);
+        }
+        printf("\n");
+
     }
 
-
+    if (linebuf)
+        free(linebuf);
 
     return 0;
 }
