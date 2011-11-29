@@ -56,6 +56,12 @@ public:
     ChewingBitmapIndexLevel(pinyin_option_t options) : m_options(options){}
     ~ChewingBitmapIndexLevel() { reset(); }
 
+    /* set options method */
+    bool set_options(pinyin_option_t options) {
+        m_options = options;
+        return true;
+    }
+
     /* load/store method */
     bool load(MemoryChunk * chunk, table_offset_t offset, table_offset_t end);
     bool store(MemoryChunk * new_chunk, table_offset_t offset,
@@ -90,6 +96,11 @@ public:
         m_bitmap_table(options), m_chunk(NULL) {}
 
     ~ChewingLargeTable() { reset(); }
+
+    /* set options method */
+    bool set_options(pinyin_option_t options) {
+        return m_bitmap_table.set_options(options);
+    }
 
     /* load/store method */
     bool load(MemoryChunk * chunk) {
