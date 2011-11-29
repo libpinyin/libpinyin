@@ -39,7 +39,8 @@ noinst_HEADERS		= pinyin_large_table.h \
 			  double_pinyin_table.h \
 			  chewing_table.h \
 			  pinyin_parser2.h \
-			  pinyin_phrase2.h
+			  pinyin_phrase2.h \
+			  chewing_large_table.h
 
 
 noinst_LTLIBRARIES      = libstorage.la
@@ -54,5 +55,6 @@ libstorage_la_SOURCES    = pinyin_base.cpp \
 			   phrase_large_table.cpp \
 			   ngram.cpp \
 			   tag_utility.cpp \
-			   pinyin_parser2.cpp
+			   pinyin_parser2.cpp \
+			   chewing_large_table.cpp
 
