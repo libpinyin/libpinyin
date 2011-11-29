@@ -1,3 +1,5 @@
+include_directories(..)
+
 add_executable(
     test_parser
     test_parser.cpp

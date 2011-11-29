@@ -1,3 +1,5 @@
+include_directories(..)
+
 add_executable(
     test_simple_lookup
     test_simple_lookup.cpp
