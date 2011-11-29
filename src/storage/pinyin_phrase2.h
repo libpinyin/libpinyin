@@ -63,7 +63,7 @@ inline int pinyin_exact_compare2(const ChewingKey * key_lhs,
 }
 
 
-inline int pinyin_compare_with_ambiguities2(guint32 options,
+inline int pinyin_compare_with_ambiguities2(pinyin_option_t options,
                                             const ChewingKey * key_lhs,
                                             const ChewingKey * key_rhs,
                                             int phrase_length){
@@ -106,7 +106,7 @@ inline int pinyin_compare_with_ambiguities2(guint32 options,
 }
 
 /* compute pinyin lower bound */
-inline void compute_lower_value2(guint32 options,
+inline void compute_lower_value2(pinyin_option_t options,
                                   ChewingKey * in_keys,
                                   ChewingKey * out_keys,
                                   int phrase_length) {
@@ -162,7 +162,7 @@ inline void compute_lower_value2(guint32 options,
 }
 
 /* compute pinyin upper bound */
-inline void compute_upper_value2(guint32 options,
+inline void compute_upper_value2(pinyin_option_t options,
                                  ChewingKey * in_keys,
                                  ChewingKey * out_keys,
                                  int phrase_length) {

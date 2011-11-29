@@ -153,6 +153,8 @@ typedef TokenVector MatchResults;
 /* Array of lookup_constraint_t */
 typedef GArray * CandidateConstraints;
 
+typedef guint32 pinyin_option_t;
+
 };
 
 #endif

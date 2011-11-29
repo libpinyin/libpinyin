@@ -23,6 +23,7 @@
 #define PINYIN_PARSER2_H
 
 #include <glib.h>
+#include "novel_types.h"
 #include "chewing_key.h"
 #include "pinyin_custom2.h"
 
@@ -104,7 +105,7 @@ public:
      *
      * @return whether the entire string is parsed as one key.
      */
-    virtual bool parse_one_key(guint32 options, ChewingKey & key, ChewingKeyRest & key_rest, const char *str, int len) const = 0;
+    virtual bool parse_one_key(pinyin_option_t options, ChewingKey & key, ChewingKeyRest & key_rest, const char *str, int len) const = 0;
 
     /**
      * @brief Translate the source string into a set of ChewingKeys.
@@ -119,7 +120,7 @@ public:
     /* Note:
      *   the parse method will use dynamic programming to drive parse_one_key.
      */
-    virtual int parse(guint32 options, ChewingKeyVector & keys, ChewingKeyRestVector & key_rests, const char *str, int len) const = 0;
+    virtual int parse(pinyin_option_t options, ChewingKeyVector & keys, ChewingKeyRestVector & key_rests, const char *str, int len) const = 0;
 
 };
 
@@ -137,7 +138,7 @@ protected:
     int final_step(size_t step_len, ChewingKeyVector & keys,
                    ChewingKeyRestVector & key_rests) const;
 
-    bool post_process(guint32 options, ChewingKeyVector & keys,
+    bool post_process(pinyin_option_t options, ChewingKeyVector & keys,
                       ChewingKeyRestVector & key_rests) const;
 
 public:
@@ -146,9 +147,9 @@ public:
         g_array_free(m_parse_steps, TRUE);
     }
 
-    virtual bool parse_one_key(guint32 options, ChewingKey & key, ChewingKeyRest & key_rest, const char *str, int len) const;
+    virtual bool parse_one_key(pinyin_option_t options, ChewingKey & key, ChewingKeyRest & key_rest, const char *str, int len) const;
 
-    virtual int parse(guint32 options, ChewingKeyVector & keys, ChewingKeyRestVector & key_rests, const char *str, int len) const;
+    virtual int parse(pinyin_option_t options, ChewingKeyVector & keys, ChewingKeyRestVector & key_rests, const char *str, int len) const;
 };
 
 
@@ -169,9 +170,9 @@ public:
 
     virtual ~DoublePinyinParser2() {}
 
-    virtual bool parse_one_key(guint32 options, ChewingKey & key, ChewingKeyRest & key_rest, const char *str, int len) const;
+    virtual bool parse_one_key(pinyin_option_t options, ChewingKey & key, ChewingKeyRest & key_rest, const char *str, int len) const;
 
-    virtual int parse(guint32 options, ChewingKeyVector & keys, ChewingKeyRestVector & key_rests, const char *str, int len) const;
+    virtual int parse(pinyin_option_t options, ChewingKeyVector & keys, ChewingKeyRestVector & key_rests, const char *str, int len) const;
 
 public:
     bool set_scheme(DoublePinyinScheme scheme);
@@ -206,9 +207,9 @@ public:
 
     virtual ~ChewingParser2() {}
 
-    virtual bool parse_one_key(guint32 options, ChewingKey & key, ChewingKeyRest & key_rest, const char *str, int len) const;
+    virtual bool parse_one_key(pinyin_option_t options, ChewingKey & key, ChewingKeyRest & key_rest, const char *str, int len) const;
 
-    virtual int parse(guint32 options, ChewingKeyVector & keys, ChewingKeyRestVector & key_rests, const char *str, int len) const;
+    virtual int parse(pinyin_option_t options, ChewingKeyVector & keys, ChewingKeyRestVector & key_rests, const char *str, int len) const;
 
 public:
     bool set_scheme(ChewingScheme scheme);
@@ -217,7 +218,7 @@ public:
 
 
 /* compare pinyins with chewing internal representations. */
-inline int pinyin_compare_initial2(guint32 options,
+inline int pinyin_compare_initial2(pinyin_option_t options,
                                    ChewingInitial lhs,
                                    ChewingInitial rhs) {
     if (lhs == rhs)
@@ -262,7 +263,7 @@ inline int pinyin_compare_initial2(guint32 options,
 }
 
 
-inline int pinyin_compare_middle_and_final2(guint32 options,
+inline int pinyin_compare_middle_and_final2(pinyin_option_t options,
                                             ChewingMiddle middle_lhs,
                                             ChewingMiddle middle_rhs,
                                             ChewingFinal final_lhs,
@@ -304,7 +305,7 @@ inline int pinyin_compare_middle_and_final2(guint32 options,
 }
 
 
-inline int pinyin_compare_tone2(guint32 options,
+inline int pinyin_compare_tone2(pinyin_option_t options,
                                 ChewingTone lhs,
                                 ChewingTone rhs) {
     if (lhs == rhs)

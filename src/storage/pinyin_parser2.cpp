@@ -20,11 +20,11 @@
  */
 
 
+#include "pinyin_parser2.h"
 #include <ctype.h>
 #include <assert.h>
 #include <string.h>
 #include "stl_lite.h"
-#include "pinyin_parser2.h"
 #include "pinyin_phrase2.h"
 #include "pinyin_custom2.h"
 #include "chewing_key.h"
@@ -35,7 +35,7 @@
 
 using namespace pinyin;
 
-static bool check_pinyin_options(guint32 options, const pinyin_index_item_t * item) {
+static bool check_pinyin_options(pinyin_option_t options, const pinyin_index_item_t * item) {
     guint32 flags = item->m_flags;
     assert (flags & IS_PINYIN);
 
@@ -57,7 +57,7 @@ static bool check_pinyin_options(guint32 options, const pinyin_index_item_t * it
     return true;
 }
 
-static bool check_chewing_options(guint32 options, const chewing_index_item_t * item) {
+static bool check_chewing_options(pinyin_option_t options, const chewing_index_item_t * item) {
     guint32 flags = item->m_flags;
     assert (flags & IS_CHEWING);
 
@@ -121,7 +121,7 @@ static bool compare_pinyin_less_than(const pinyin_index_item_t & lhs,
     return 0 > strcmp(lhs.m_pinyin_input, rhs.m_pinyin_input);
 }
 
-static inline bool search_pinyin_index(guint32 options, const char * pinyin,
+static inline bool search_pinyin_index(pinyin_option_t options, const char * pinyin,
                                        ChewingKey & key,
                                        ChewingKeyRest & key_rest){
     pinyin_index_item_t item;
@@ -155,7 +155,7 @@ static bool compare_chewing_less_than(const chewing_index_item_t & lhs,
     return 0 > strcmp(lhs.m_chewing_input, rhs.m_chewing_input);
 }
 
-static inline bool search_chewing_index(guint32 options, const char * chewing,
+static inline bool search_chewing_index(pinyin_option_t options, const char * chewing,
                                         ChewingKey & key,
                                         ChewingKeyRest & key_rest){
     chewing_index_item_t item;
@@ -191,7 +191,7 @@ FullPinyinParser2::FullPinyinParser2 (){
 }
 
 
-bool FullPinyinParser2::parse_one_key (guint32 options, ChewingKey & key,
+bool FullPinyinParser2::parse_one_key (pinyin_option_t options, ChewingKey & key,
                                        ChewingKeyRest & key_rest,
                                        const char * pinyin, int len) const {
     /* "'" are not accepted in parse_one_key. */
@@ -235,7 +235,7 @@ bool FullPinyinParser2::parse_one_key (guint32 options, ChewingKey & key,
 }
 
 
-int FullPinyinParser2::parse (guint32 options, ChewingKeyVector & keys,
+int FullPinyinParser2::parse (pinyin_option_t options, ChewingKeyVector & keys,
                               ChewingKeyRestVector & key_rests,
                               const char *str, int len) const {
     int i;
@@ -366,7 +366,7 @@ int FullPinyinParser2::final_step(size_t step_len, ChewingKeyVector & keys,
 }
 
 
-bool FullPinyinParser2::post_process(guint32 options,
+bool FullPinyinParser2::post_process(pinyin_option_t options,
                                      ChewingKeyVector & keys,
                                      ChewingKeyRestVector & key_rests) const {
     int i;
@@ -433,7 +433,7 @@ bool FullPinyinParser2::post_process(guint32 options,
 
 #define IS_KEY(x)   (('a' <= x && x <= 'z') || x == ';')
 
-bool DoublePinyinParser2::parse_one_key(guint32 options, ChewingKey & key,
+bool DoublePinyinParser2::parse_one_key(pinyin_option_t options, ChewingKey & key,
                                         ChewingKeyRest & key_rest,
                                         const char *str, int len) const {
 
@@ -519,7 +519,7 @@ bool DoublePinyinParser2::parse_one_key(guint32 options, ChewingKey & key,
 
 
 /* only 'a'-'z' and ';' are accepted here. */
-int DoublePinyinParser2::parse(guint32 options, ChewingKeyVector & keys,
+int DoublePinyinParser2::parse(pinyin_option_t options, ChewingKeyVector & keys,
                                ChewingKeyRestVector & key_rests,
                                const char *str, int len) const {
     g_array_set_size(keys, 0);
@@ -627,7 +627,7 @@ static bool search_chewing_tones(const chewing_tone_item_t * tone_table,
 }
 
 
-bool ChewingParser2::parse_one_key(guint32 options, ChewingKey & key, ChewingKeyRest & key_rest, const char *str, int len) const {
+bool ChewingParser2::parse_one_key(pinyin_option_t options, ChewingKey & key, ChewingKeyRest & key_rest, const char *str, int len) const {
     char tone = CHEWING_ZERO_TONE;
 
     int symbols_len = len;
@@ -675,7 +675,7 @@ bool ChewingParser2::parse_one_key(guint32 options, ChewingKey & key, ChewingKey
 
 
 /* only characters in chewing keyboard scheme are accepted here. */
-int ChewingParser2::parse(guint32 options, ChewingKeyVector & keys,
+int ChewingParser2::parse(pinyin_option_t options, ChewingKeyVector & keys,
                           ChewingKeyRestVector & key_rests,
                           const char *str, int len) const {
     g_array_set_size(keys, 0);
