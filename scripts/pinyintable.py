@@ -99,7 +99,8 @@ def gen_pinyins():
         flags = []
         if pinyin_key in bopomofo.PINYIN_BOPOMOFO_MAP.keys():
             flags.append("IS_CHEWING")
-        if pinyin_key in pinyin.PINYIN_DICT.keys():
+        if pinyin_key in pinyin.PINYIN_LIST or \
+                pinyin_key in pinyin.SHENGMU_LIST:
             flags.append("IS_PINYIN")
         if pinyin_key in shengmu_list:
             flags.append("PINYIN_INCOMPLETE")
