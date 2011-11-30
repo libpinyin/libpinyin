@@ -285,3 +285,14 @@ int ChewingBitmapIndexLevel::tone_level_search
     }
     return result;
 }
+
+
+int ChewingLengthIndexLevel::search(pinyin_option_t options, int phrase_length,
+                                    /* in */ ChewingKey keys[],
+                                    /* out */ PhraseIndexRanges ranges) {
+    assert(FALSE);
+}
+
+ChewingLengthIndexLevel::~ChewingLengthIndexLevel() {
+    assert(FALSE);
+}
