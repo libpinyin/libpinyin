@@ -101,10 +101,11 @@ void ChewingBitmapIndexLevel::reset() {
             for (int m = CHEWING_ZERO_FINAL; m < CHEWING_NUMBER_OF_FINALS; ++m)
                 for (int n = CHEWING_ZERO_TONE; n < CHEWING_NUMBER_OF_TONES;
                      ++n) {
-                    ChewingLengthIndexLevel * length_array =
+                    ChewingLengthIndexLevel * & length_array =
                         m_chewing_length_indexes[k][l][m][n];
                     if (length_array)
                         delete length_array;
+                    length_array = NULL;
                 }
 }
 
@@ -168,10 +169,119 @@ int ChewingBitmapIndexLevel::initial_level_search (int phrase_length,
         }
     default:
         {
-            return middle_and_final_level_search
+            result |= middle_and_final_level_search
                 ((ChewingInitial) first_key.m_initial,
                  phrase_length, keys, ranges);
+            return result;
         }
     }
 #undef MATCH
+    return result;
+}
+
+
+int ChewingBitmapIndexLevel::middle_and_final_level_search
+(ChewingInitial initial, int phrase_length, /* in */ ChewingKey keys[],
+ /* out */ PhraseIndexRanges ranges) const {
+
+/* macros */
+#define MATCH(AMBIGUITY, ORIGIN, ANOTHER) case ORIGIN:                  \
+    {                                                                   \
+        result = tone_level_search                                      \
+            (initial, middle,                                           \
+             ORIGIN, phrase_length, keys, ranges);                      \
+        if (m_options & AMBIGUITY) {                                    \
+            result |= tone_level_search                                 \
+                (initial, middle,                                        \
+                 ANOTHER, phrase_length, keys, ranges);                 \
+        }                                                               \
+        return result;                                                  \
+    }
+
+    int result = SEARCH_NONE;
+    const ChewingKey & first_key = keys[0];
+    const ChewingMiddle middle = (ChewingMiddle)first_key.m_middle;
+
+    switch(first_key.m_final) {
+    case CHEWING_ZERO_FINAL:
+        {
+            if (middle == CHEWING_ZERO_MIDDLE) { /* in-complete pinyin */
+                if (!(m_options & PINYIN_INCOMPLETE))
+                    return result;
+                for (int m = CHEWING_I; m < CHEWING_NUMBER_OF_MIDDLES; ++m)
+                    for (int n = CHEWING_A; n < CHEWING_NUMBER_OF_FINALS;
+                         ++n) {
+                        result |= tone_level_search
+                            (initial, (ChewingMiddle) m, (ChewingFinal) n,
+                             phrase_length, keys, ranges);
+                    }
+                return result;
+            } else { /* normal pinyin */
+                result |= tone_level_search
+                    (initial, middle, (ChewingFinal)first_key.m_final,
+                     phrase_length, keys, ranges);
+                return result;
+            }
+        }
+
+        MATCH(PINYIN_AMB_AN_ANG, CHEWING_AN, CHEWING_ANG);
+	MATCH(PINYIN_AMB_AN_ANG, CHEWING_ANG, CHEWING_AN);
+	MATCH(PINYIN_AMB_EN_ENG, CHEWING_EN, CHEWING_ENG);
+	MATCH(PINYIN_AMB_EN_ENG, CHEWING_ENG, CHEWING_EN);
+	MATCH(PINYIN_AMB_IN_ING, PINYIN_IN, PINYIN_ING);
+	MATCH(PINYIN_AMB_IN_ING, PINYIN_ING, PINYIN_IN);
+
+    default:
+        {
+            result |= tone_level_search
+                (initial, middle, (ChewingFinal) first_key.m_final,
+                 phrase_length, keys, ranges);
+            return result;
+        }
+    }
+#undef MATCH
+    return result;
+}
+
+
+int ChewingBitmapIndexLevel::tone_level_search
+(ChewingInitial initial, ChewingMiddle middle, ChewingFinal final,
+ int phrase_length, /* in */ ChewingKey keys[],
+ /* out */ PhraseIndexRanges ranges) const {
+
+    int result = SEARCH_NONE;
+    const ChewingKey & first_key = keys[0];
+
+    switch (first_key.m_tone) {
+    case CHEWING_ZERO_TONE:
+        {
+            /* deal with zero tone in chewing large table. */
+            for (int i = CHEWING_ZERO_TONE; i < CHEWING_NUMBER_OF_TONES; ++i) {
+                ChewingLengthIndexLevel * phrases =
+                    m_chewing_length_indexes
+                    [initial][middle][final][(ChewingTone)i];
+                if (phrases)
+                    result |= phrases->search
+                        (m_options, phrase_length - 1, keys + 1, ranges);
+            }
+            return result;
+        }
+    default:
+        {
+            ChewingLengthIndexLevel * phrases =
+                m_chewing_length_indexes
+                [initial][middle][final][CHEWING_ZERO_TONE];
+            if (phrases)
+                result |= phrases->search
+                    (m_options, phrase_length - 1, keys + 1, ranges);
+
+            phrases = m_chewing_length_indexes
+                [initial][middle][final][(ChewingTone) first_key.m_tone];
+            if (phrases)
+                result |= phrases->search
+                    (m_options, phrase_length - 1, keys + 1, ranges);
+            return result;
+        }
+    }
+    return result;
 }
