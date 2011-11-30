@@ -42,18 +42,21 @@ protected:
     [CHEWING_NUMBER_OF_FINALS][CHEWING_NUMBER_OF_TONES];
 
     /* search functions */
-    int initial_level_search(int word_length, /* in */ChewingKey keys[],
+    int initial_level_search(int word_length, /* in */ ChewingKey keys[],
                              /* out */ PhraseIndexRanges ranges) const;
-    int middle_and_final_level_search(int word_length, ChewingKey keys[],
+    int middle_and_final_level_search(ChewingInitial initial, int word_length,
+                                      /* in */ ChewingKey keys[],
                                       /* out */ PhraseIndexRanges ranges)const;
-    int tone_level_search(int word_length, /* in */ ChewingKey keys[],
+    int tone_level_search(ChewingInitial initial, ChewingMiddle middle,
+                          ChewingFinal final, int word_length,
+                          /* in */ ChewingKey keys[],
                           /* out */ PhraseIndexRanges ranges) const;
 
     void reset();
 
 public:
     /* constructor/destructor */
-    ChewingBitmapIndexLevel(pinyin_option_t options) : m_options(options){}
+    ChewingBitmapIndexLevel(pinyin_option_t options);
     ~ChewingBitmapIndexLevel() { reset(); }
 
     /* set options method */
