@@ -192,7 +192,7 @@ int ChewingBitmapIndexLevel::middle_and_final_level_search
              ORIGIN, phrase_length, keys, ranges);                      \
         if (m_options & AMBIGUITY) {                                    \
             result |= tone_level_search                                 \
-                (initial, middle,                                        \
+                (initial, middle,                                       \
                  ANOTHER, phrase_length, keys, ranges);                 \
         }                                                               \
         return result;                                                  \
@@ -218,7 +218,7 @@ int ChewingBitmapIndexLevel::middle_and_final_level_search
                 return result;
             } else { /* normal pinyin */
                 result |= tone_level_search
-                    (initial, middle, (ChewingFinal)first_key.m_final,
+                    (initial, middle, CHEWING_ZERO_FINAL,
                      phrase_length, keys, ranges);
                 return result;
             }
