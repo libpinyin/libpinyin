@@ -29,12 +29,16 @@ cscope.*
 *.la
 libpinyin.pc
 libpinyin.spec
+libpinyin.so*
+src/lookup/liblookup.a
+src/storage/libstorage.a
 tests/include/test_memory_chunk
 tests/lookup/test_phrase_lookup
 tests/lookup/test_simple_lookup
 tests/storage/test_flexible_ngram
 tests/storage/test_ngram
 tests/storage/test_parser
+tests/storage/test_parser2
 tests/storage/test_phrase_index
 tests/storage/test_phrase_index_logger
 tests/storage/test_phrase_table
@@ -72,6 +76,7 @@ data/gbk_char.table
 data/interpolation.text
 data/phrase_index.bin
 data/pinyin_index.bin
+data/user.db
 CMakeFiles
 CMakeCache.txt
 cmake_install.cmake
