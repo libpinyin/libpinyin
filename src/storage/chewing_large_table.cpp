@@ -55,7 +55,7 @@ public:
 };
 
 
-template<size_t phrase_length>
+template<int phrase_length>
 class ChewingArrayIndexLevel{
 protected:
     MemoryChunk m_chunk;
@@ -287,12 +287,163 @@ int ChewingBitmapIndexLevel::tone_level_search
 }
 
 
-int ChewingLengthIndexLevel::search(pinyin_option_t options, int phrase_length,
-                                    /* in */ ChewingKey keys[],
-                                    /* out */ PhraseIndexRanges ranges) {
-    assert(FALSE);
+ChewingLengthIndexLevel::ChewingLengthIndexLevel() {
+    m_chewing_array_indexes = g_array_new(FALSE, TRUE, sizeof(void *));
 }
 
 ChewingLengthIndexLevel::~ChewingLengthIndexLevel() {
-    assert(FALSE);
+#define CASE(len) case len:                                             \
+    {                                                                   \
+        ChewingArrayIndexLevel<len> * & array = g_array_index           \
+            (m_chewing_array_indexes, ChewingArrayIndexLevel<len> *, len); \
+        if (array)                                                      \
+            delete array;                                               \
+        array = NULL;                                                   \
+        break;                                                          \
+    }
+
+    for (guint i = 0; i < m_chewing_array_indexes->len; ++i) {
+        switch (i){
+	    CASE(0);
+	    CASE(1);
+	    CASE(2);
+	    CASE(3);
+	    CASE(4);
+	    CASE(5);
+	    CASE(6);
+	    CASE(7);
+	    CASE(8);
+	    CASE(9);
+	    CASE(10);
+	    CASE(11);
+	    CASE(12);
+	    CASE(13);
+	    CASE(14);
+	    CASE(15);
+	default:
+	    assert(false);
+	}
+    }
+#undef CASE
+    g_array_free(m_chewing_array_indexes, TRUE);
+    m_chewing_array_indexes = NULL;
 }
+
+
+int ChewingLengthIndexLevel::search(pinyin_option_t options, int phrase_length,
+                                    /* in */ ChewingKey keys[],
+                                    /* out */ PhraseIndexRanges ranges) {
+    int result = SEARCH_NONE;
+    if (m_chewing_array_indexes->len < phrase_length + 1)
+        return result;
+    if (m_chewing_array_indexes->len > phrase_length + 1)
+        result |= SEARCH_CONTINUED;
+
+#define CASE(len) case len:                                             \
+    {                                                                   \
+        ChewingArrayIndexLevel<len> * & array = g_array_index           \
+            (m_chewing_array_indexes, ChewingArrayIndexLevel<len> *, len); \
+        if (!array)                                                     \
+            return result;                                              \
+        result |= array->search(options, keys, ranges);                 \
+        return result;                                                  \
+    }
+
+    switch (phrase_length) {
+	CASE(0);
+	CASE(1);
+	CASE(2);
+	CASE(3);
+	CASE(4);
+	CASE(5);
+	CASE(6);
+	CASE(7);
+	CASE(8);
+	CASE(9);
+	CASE(10);
+	CASE(11);
+	CASE(12);
+	CASE(13);
+	CASE(14);
+	CASE(15);
+    default:
+	assert(false);
+    }
+
+#undef CASE
+}
+
+
+template<int phrase_length>
+int ChewingArrayIndexLevel<phrase_length>::search
+(pinyin_option_t options, /* in */ChewingKey keys[], /* out */ PhraseIndexRanges ranges) {
+    PinyinIndexItem2<phrase_length> * chunk_begin = NULL, * chunk_end = NULL;
+    chunk_begin = (PinyinIndexItem2<phrase_length> *) m_chunk.begin();
+    chunk_end = (PinyinIndexItem2<phrase_length> *) m_chunk.end();
+
+    /* do the search */
+    ChewingKey left_keys[phrase_length], right_keys[phrase_length];
+    compute_lower_value2(options, keys, left_keys, phrase_length);
+    compute_upper_value2(options, keys, right_keys, phrase_length);
+
+    PinyinIndexItem2<phrase_length> left(left_keys, -1), right(right_keys, -1);
+
+    PinyinIndexItem2<phrase_length> * begin = std_lite::lower_bound
+        (chunk_begin, chunk_end, left,
+         phrase_exact_less_than2<phrase_length>);
+    PinyinIndexItem2<phrase_length> * end   = std_lite::upper_bound
+        (chunk_begin, chunk_end, right,
+         phrase_exact_less_than2<phrase_length>);
+
+    return convert(options, keys, begin, end, ranges);
+}
+
+/* compress consecutive tokens */
+template<int phrase_length>
+int ChewingArrayIndexLevel<phrase_length>::convert
+(pinyin_option_t options, ChewingKey keys[],
+ PinyinIndexItem2<phrase_length> * begin,
+ PinyinIndexItem2<phrase_length> * end,
+ PhraseIndexRanges ranges) {
+    PinyinIndexItem2<phrase_length> * iter = NULL;
+    PhraseIndexRange cursor;
+    GArray * head, * cursor_head = NULL;
+
+    int result = SEARCH_NONE;
+    /* TODO: check the below code */
+    cursor.m_range_begin = null_token; cursor.m_range_end = null_token;
+    for (iter = begin; iter != end; ++iter) {
+        if (0 != pinyin_compare_with_ambiguities2
+            (options, keys, iter->m_keys, phrase_length))
+            continue;
+
+        phrase_token_t token = iter->m_token;
+        head = ranges[PHRASE_INDEX_LIBRARY_INDEX(token)];
+        if (NULL == head)
+            continue;
+
+        result |= SEARCH_OK;
+
+        if (null_token == cursor.m_range_begin) {
+            cursor.m_range_begin = token;
+            cursor.m_range_end   = token + 1;
+        } else if (cursor.m_range_end == token &&
+                   PHRASE_INDEX_LIBRARY_INDEX(cursor.m_range_begin) ==
+                   PHRASE_INDEX_LIBRARY_INDEX(token)) {
+            ++cursor.m_range_end;
+        } else {
+            g_array_append_val(cursor_head, cursor);
+            cursor.m_range_begin = token; cursor.m_range_end = token + 1;
+            cursor_head = head;
+        }
+    }
+
+    if (null_token == cursor.m_range_begin)
+        return result;
+
+    g_array_append_val(cursor_head, cursor);
+    return result;
+}
+
+
+/* add/remove index method */

@@ -218,7 +218,7 @@ inline void compute_upper_value2(pinyin_option_t options,
 }
 
 
-template<size_t phrase_length>
+template<int phrase_length>
 struct PinyinIndexItem2{
     phrase_token_t m_token;
     ChewingKey m_keys[phrase_length];
