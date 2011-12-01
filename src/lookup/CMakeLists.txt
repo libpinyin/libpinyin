@@ -3,14 +3,6 @@ set(
 )
 
 set(
-    LIBLOOKUP_HEADERS
-    lookup.h
-    pinyin_lookup.h
-    phrase_lookup.h
-    winner_tree.h
-)
-
-set(
     LIBLOOKUP_SOURCES
     pinyin_lookup.cpp
     winner_tree.cpp

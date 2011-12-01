@@ -4,16 +4,10 @@ set(
 
 set(
     LIBSTORAGE_HEADERS
-    pinyin_large_table.h
+    pinyin_custom.h
     pinyin_base.h
-    pinyin_phrase.h
-    phrase_index.h
-    phrase_index_logger.h
-    pinyin_zhuyin_map_data.h
-    phrase_large_table.h
-    ngram.h
-    flexible_ngram.h
-    tag_utility.h
+    chewing_key.h
+    pinyin_custom2.h
 )
 
 set(
@@ -24,6 +18,8 @@ set(
     phrase_large_table.cpp
     ngram.cpp
     tag_utility.cpp
+    pinyin_parser2.cpp
+    chewing_large_table.cpp
 )
 
 add_library(

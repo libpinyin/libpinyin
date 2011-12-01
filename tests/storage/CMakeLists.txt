@@ -11,6 +11,16 @@ target_link_libraries(
 )
 
 add_executable(
+    test_parser2
+    test_parser2.cpp
+)
+
+target_link_libraries(
+    test_parser2
+    libpinyin
+)
+
+add_executable(
     test_pinyin_index
     test_pinyin_index.cpp
 )
@@ -27,6 +37,16 @@ add_executable(
 
 target_link_libraries(
     test_phrase_index
+    libpinyin
+)
+
+add_executable(
+    test_phrase_index_logger
+    test_phrase_index_logger.cpp
+)
+
+target_link_libraries(
+    test_phrase_index_logger
     libpinyin
 )
 
