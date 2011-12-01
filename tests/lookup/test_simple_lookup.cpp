@@ -2,7 +2,7 @@
 #include <string.h>
 #include "pinyin_internal.h"
 
-size_t bench_times = 1000;
+size_t bench_times = 100;
 
 int main( int argc, char * argv[]){
 
@@ -66,10 +66,9 @@ int main( int argc, char * argv[]){
 	MatchResults results = g_array_new(FALSE, FALSE, sizeof(phrase_token_t));
 	
 	guint32 start_time = record_time();
-	size_t times = 100;
-	for ( size_t i = 0; i < times; ++i)
+	for ( size_t i = 0; i < bench_times; ++i)
 	    pinyin_lookup.get_best_match(keys, constraints, results);
-	print_time(start_time, times);
+	print_time(start_time, bench_times);
 	for ( size_t i = 0; i < results->len; ++i){
 	    phrase_token_t * token = &g_array_index(results, phrase_token_t, i);
 	    if ( null_token == *token)

@@ -20,6 +20,7 @@
  */
 
 
+#include "timer.h"
 #include <errno.h>
 #include <stdio.h>
 #include <assert.h>
@@ -27,6 +28,8 @@
 #include <string.h>
 #include "pinyin_parser2.h"
 
+
+size_t bench_times = 1000;
 
 using namespace pinyin;
 
@@ -107,8 +110,14 @@ int main(int argc, char * argv[]) {
 #endif
 
 #if 1
-        int len = parser->parse(options, keys, key_rests,
+        int len = 0;
+        guint32 start_time = record_time();
+        for ( size_t i = 0; i < bench_times; ++i)
+            len = parser->parse(options, keys, key_rests,
                                 linebuf, strlen(linebuf));
+
+        print_time(start_time, bench_times);
+
         printf("parsed %d chars, %d keys.\n", len, keys->len);
 
         assert(keys->len == key_rests->len);
