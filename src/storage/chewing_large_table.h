@@ -123,7 +123,7 @@ public:
 
     /* search method */
     int search(int phrase_length, /* in */ ChewingKey keys[],
-               /* out */ PhraseIndexRanges ranges) {
+               /* out */ PhraseIndexRanges ranges) const {
         return m_bitmap_table.search(phrase_length, keys, ranges);
     }
 

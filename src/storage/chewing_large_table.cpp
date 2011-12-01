@@ -45,7 +45,7 @@ public:
     /* search method */
     int search(pinyin_option_t options, int phrase_length,
                /* in */ ChewingKey keys[],
-               /* out */ PhraseIndexRanges ranges);
+               /* out */ PhraseIndexRanges ranges) const;
 
     /* add/remove index method */
     int add_index(int phrase_length, /* in */ ChewingKey keys[],
@@ -65,7 +65,7 @@ protected:
                 ChewingKey keys[],
                 PinyinIndexItem2<phrase_length> * begin,
                 PinyinIndexItem2<phrase_length> * end,
-                PhraseIndexRanges ranges);
+                PhraseIndexRanges ranges) const;
 
 public:
     /* load/store method */
@@ -75,7 +75,7 @@ public:
 
     /* search method */
     int search(pinyin_option_t options, /* in */ChewingKey keys[],
-               /* out */ PhraseIndexRanges ranges);
+               /* out */ PhraseIndexRanges ranges) const;
 
     /* add/remove index method */
     int add_index(/* in */ ChewingKey keys[], /* in */ phrase_token_t token);
@@ -332,7 +332,7 @@ ChewingLengthIndexLevel::~ChewingLengthIndexLevel() {
 
 int ChewingLengthIndexLevel::search(pinyin_option_t options, int phrase_length,
                                     /* in */ ChewingKey keys[],
-                                    /* out */ PhraseIndexRanges ranges) {
+                                    /* out */ PhraseIndexRanges ranges) const {
     int result = SEARCH_NONE;
     if (m_chewing_array_indexes->len < phrase_length + 1)
         return result;
@@ -376,7 +376,8 @@ int ChewingLengthIndexLevel::search(pinyin_option_t options, int phrase_length,
 
 template<int phrase_length>
 int ChewingArrayIndexLevel<phrase_length>::search
-(pinyin_option_t options, /* in */ChewingKey keys[], /* out */ PhraseIndexRanges ranges) {
+(pinyin_option_t options, /* in */ChewingKey keys[],
+ /* out */ PhraseIndexRanges ranges) const {
     PinyinIndexItem2<phrase_length> * chunk_begin = NULL, * chunk_end = NULL;
     chunk_begin = (PinyinIndexItem2<phrase_length> *) m_chunk.begin();
     chunk_end = (PinyinIndexItem2<phrase_length> *) m_chunk.end();
@@ -404,7 +405,7 @@ int ChewingArrayIndexLevel<phrase_length>::convert
 (pinyin_option_t options, ChewingKey keys[],
  PinyinIndexItem2<phrase_length> * begin,
  PinyinIndexItem2<phrase_length> * end,
- PhraseIndexRanges ranges) {
+ PhraseIndexRanges ranges) const {
     PinyinIndexItem2<phrase_length> * iter = NULL;
     PhraseIndexRange cursor;
     GArray * head, * cursor_head = NULL;
