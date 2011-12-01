@@ -72,4 +72,7 @@ data/gbk_char.table
 data/interpolation.text
 data/phrase_index.bin
 data/pinyin_index.bin
-
+CMakeFiles
+CMakeCache.txt
+cmake_install.cmake
+CTestTestfile.cmake
