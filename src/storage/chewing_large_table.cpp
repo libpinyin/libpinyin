@@ -448,3 +448,115 @@ int ChewingArrayIndexLevel<phrase_length>::convert
 
 
 /* add/remove index method */
+
+int ChewingBitmapIndexLevel::add_index(int phrase_length,
+                                       /* in */ ChewingKey keys[],
+                                       /* in */ phrase_token_t token) {
+    const ChewingKey first_key = keys[0];
+    ChewingLengthIndexLevel * & length_array = m_chewing_length_indexes
+        [first_key.m_initial][first_key.m_middle]
+        [first_key.m_final][first_key.m_tone];
+
+    if (NULL == length_array) {
+        length_array = new ChewingLengthIndexLevel();
+    }
+
+    return length_array->add_index(phrase_length - 1, keys + 1, token);
+}
+
+int ChewingBitmapIndexLevel::remove_index(int phrase_length,
+                                          /* in */ ChewingKey keys[],
+                                          /* in */ phrase_token_t token) {
+    const ChewingKey first_key = keys[0];
+    ChewingLengthIndexLevel * & length_array = m_chewing_length_indexes
+        [first_key.m_initial][first_key.m_middle]
+        [first_key.m_final][first_key.m_tone];
+
+    if (length_array)
+        return length_array->remove_index(phrase_length - 1, keys + 1, token);
+    return REMOVE_ITEM_DONOT_EXISTS;
+}
+
+int ChewingLengthIndexLevel::add_index(int phrase_length,
+                                       /* in */ ChewingKey keys[],
+                                       /* in */ phrase_token_t token) {
+    assert(phrase_length + 1 < MAX_PHRASE_LENGTH);
+
+    if (m_chewing_array_indexes->len <= phrase_length)
+        g_array_set_size(m_chewing_array_indexes, phrase_length + 1);
+
+#define CASE(len) case len:                                     \
+    {                                                           \
+        ChewingArrayIndexLevel<len> * & array = g_array_index   \
+            (m_chewing_array_indexes,                           \
+             ChewingArrayIndexLevel<len> *, len);               \
+        if (NULL == array)                                      \
+            array = new ChewingArrayIndexLevel<len>;            \
+        return array->add_index(keys, token);                   \
+    }
+
+    switch(phrase_length) {
+	CASE(0);
+	CASE(1);
+	CASE(2);
+	CASE(3);
+	CASE(4);
+	CASE(5);
+	CASE(6);
+	CASE(7);
+	CASE(8);
+	CASE(9);
+	CASE(10);
+	CASE(11);
+	CASE(12);
+	CASE(13);
+	CASE(14);
+	CASE(15);
+    default:
+	assert(false);
+    }
+
+#undef CASE
+}
+
+int ChewingLengthIndexLevel::remove_index(int phrase_length,
+                                          /* in */ ChewingKey keys[],
+                                          /* in */ phrase_token_t token) {
+    assert(phrase_length + 1 < MAX_PHRASE_LENGTH);
+
+    if (m_chewing_array_indexes->len <= phrase_length)
+        return REMOVE_ITEM_DONOT_EXISTS;
+
+#define CASE(len) case len:                                     \
+    {                                                           \
+        ChewingArrayIndexLevel<len> * & array = g_array_index   \
+            (m_chewing_array_indexes,                           \
+             ChewingArrayIndexLevel<len> *, len);               \
+        if (NULL == array)                                      \
+            return REMOVE_ITEM_DONOT_EXISTS;                    \
+        return array->remove_index(keys, token);                \
+    }
+
+    switch (phrase_length) {
+	CASE(0);
+	CASE(1);
+	CASE(2);
+	CASE(3);
+	CASE(4);
+	CASE(5);
+	CASE(6);
+	CASE(7);
+	CASE(8);
+	CASE(9);
+	CASE(10);
+	CASE(11);
+	CASE(12);
+	CASE(13);
+	CASE(14);
+	CASE(15);
+    default:
+	assert(false);
+    }
+
+#undef CASE
+}
