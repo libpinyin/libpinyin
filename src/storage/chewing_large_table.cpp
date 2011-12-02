@@ -611,7 +611,7 @@ int ChewingArrayIndexLevel<phrase_length>::remove_index
             break;
     }
 
-    if (cur_elem == range.second || cur_elem->m_token != token)
+    if (cur_elem == range.second)
         return REMOVE_ITEM_DONOT_EXISTS;
 
     int offset = (cur_elem - begin) * sizeof(IndexItem);
