@@ -58,13 +58,16 @@ public:
 template<int phrase_length>
 class ChewingArrayIndexLevel{
 protected:
+    typedef PinyinIndexItem2<phrase_length> IndexItem;
+
+protected:
     MemoryChunk m_chunk;
 
     /* compress consecutive tokens */
     int convert(pinyin_option_t options,
                 ChewingKey keys[],
-                PinyinIndexItem2<phrase_length> * begin,
-                PinyinIndexItem2<phrase_length> * end,
+                IndexItem * begin,
+                IndexItem * end,
                 PhraseIndexRanges ranges) const;
 
 public:
@@ -378,21 +381,21 @@ template<int phrase_length>
 int ChewingArrayIndexLevel<phrase_length>::search
 (pinyin_option_t options, /* in */ChewingKey keys[],
  /* out */ PhraseIndexRanges ranges) const {
-    PinyinIndexItem2<phrase_length> * chunk_begin = NULL, * chunk_end = NULL;
-    chunk_begin = (PinyinIndexItem2<phrase_length> *) m_chunk.begin();
-    chunk_end = (PinyinIndexItem2<phrase_length> *) m_chunk.end();
+    IndexItem * chunk_begin = NULL, * chunk_end = NULL;
+    chunk_begin = (IndexItem *) m_chunk.begin();
+    chunk_end = (IndexItem *) m_chunk.end();
 
     /* do the search */
     ChewingKey left_keys[phrase_length], right_keys[phrase_length];
     compute_lower_value2(options, keys, left_keys, phrase_length);
     compute_upper_value2(options, keys, right_keys, phrase_length);
 
-    PinyinIndexItem2<phrase_length> left(left_keys, -1), right(right_keys, -1);
+    IndexItem left(left_keys, -1), right(right_keys, -1);
 
-    PinyinIndexItem2<phrase_length> * begin = std_lite::lower_bound
+    IndexItem * begin = std_lite::lower_bound
         (chunk_begin, chunk_end, left,
          phrase_exact_less_than2<phrase_length>);
-    PinyinIndexItem2<phrase_length> * end   = std_lite::upper_bound
+    IndexItem * end   = std_lite::upper_bound
         (chunk_begin, chunk_end, right,
          phrase_exact_less_than2<phrase_length>);
 
@@ -403,10 +406,10 @@ int ChewingArrayIndexLevel<phrase_length>::search
 template<int phrase_length>
 int ChewingArrayIndexLevel<phrase_length>::convert
 (pinyin_option_t options, ChewingKey keys[],
- PinyinIndexItem2<phrase_length> * begin,
- PinyinIndexItem2<phrase_length> * end,
+ IndexItem * begin,
+ IndexItem * end,
  PhraseIndexRanges ranges) const {
-    PinyinIndexItem2<phrase_length> * iter = NULL;
+    IndexItem * iter = NULL;
     PhraseIndexRange cursor;
     GArray * head, * cursor_head = NULL;
 
@@ -559,4 +562,59 @@ int ChewingLengthIndexLevel::remove_index(int phrase_length,
     }
 
 #undef CASE
+}
+
+template<int phrase_length>
+int ChewingArrayIndexLevel<phrase_length>::add_index
+(/* in */ ChewingKey keys[], /* in */ phrase_token_t token) {
+    IndexItem * begin, * end;
+
+    IndexItem add_elem(keys, token);
+    begin = (IndexItem *) m_chunk.begin();
+    end   = (IndexItem *) m_chunk.end();
+
+    std_lite::pair<IndexItem *, IndexItem *> range;
+    range = std_lite::equal_range
+        (begin, end, add_elem, phrase_exact_less_than2<phrase_length>);
+
+    IndexItem * cur_elem;
+    for (cur_elem = range.first;
+         cur_elem != range.second; ++cur_elem) {
+        if (cur_elem->m_token == token)
+            return INSERT_ITEM_EXISTS;
+        if (cur_elem->m_token > token)
+            break;
+    }
+
+    int offset = (cur_elem - begin) * sizeof(IndexItem);
+    m_chunk.insert_content(offset, &add_elem, sizeof(IndexItem));
+    return INSERT_OK;
+}
+
+template<int phrase_length>
+int ChewingArrayIndexLevel<phrase_length>::remove_index
+(/* in */ ChewingKey keys[], /* in */ phrase_token_t token) {
+    IndexItem * begin, * end;
+
+    IndexItem remove_elem(keys, token);
+    begin = (IndexItem *) m_chunk.begin();
+    end   = (IndexItem *) m_chunk.end();
+
+    std_lite::pair<IndexItem *, IndexItem *> range;
+    range = std_lite::equal_range
+        (begin, end, remove_elem, phrase_exact_less_than2<phrase_length>);
+
+    IndexItem * cur_elem;
+    for (cur_elem = range.first;
+         cur_elem != range.second; ++cur_elem) {
+        if (cur_elem->m_token == token)
+            break;
+    }
+
+    if (cur_elem == range.second || cur_elem->m_token != token)
+        return REMOVE_ITEM_DONOT_EXISTS;
+
+    int offset = (cur_elem - begin) * sizeof(IndexItem);
+    m_chunk.remove_content(offset, sizeof(IndexItem));
+    return REMOVE_OK;
 }
