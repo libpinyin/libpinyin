@@ -22,6 +22,7 @@
 #include "chewing_large_table.h"
 #include <assert.h>
 #include "pinyin_phrase2.h"
+#include "pinyin_parser2.h"
 
 
 /* internal class definition */
@@ -617,4 +618,40 @@ int ChewingArrayIndexLevel<phrase_length>::remove_index
     int offset = (cur_elem - begin) * sizeof(IndexItem);
     m_chunk.remove_content(offset, sizeof(IndexItem));
     return REMOVE_OK;
+}
+
+
+/* load text method */
+bool ChewingLargeTable::load_text(FILE * infile) {
+    char pinyin[256];
+    char phrase[256];
+    phrase_token_t token;
+    size_t freq;
+
+    while (!feof(infile)) {
+        fscanf(infile, "%s", pinyin);
+        fscanf(infile, "%s", phrase);
+        fscanf(infile, "%u", &token);
+        fscanf(infile, "%ld", &freq);
+
+        if(feof(infile))
+            break;
+
+        FullPinyinParser2 parser;
+        ChewingKeyVector keys;
+        ChewingKeyRestVector key_rests;
+
+        keys = g_array_new(FALSE, FALSE, sizeof(ChewingKey));
+        key_rests = g_array_new(FALSE, FALSE, sizeof(ChewingKeyRest));
+
+        pinyin_option_t options = USE_TONE;
+        parser.parse(options, keys, key_rests, pinyin, strlen(pinyin));
+
+        add_index(keys->len, (ChewingKey *)keys->data, token);
+
+        g_array_free(keys, TRUE);
+        g_array_free(key_rests, TRUE);
+    }
+
+    return true;
 }

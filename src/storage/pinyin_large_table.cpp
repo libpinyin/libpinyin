@@ -557,8 +557,8 @@ bool PinyinLargeTable::load_text(FILE * infile){
 	
 	add_index( keys->len, (PinyinKey *)keys->data, token);
 
-	g_array_free(keys, true);
-	g_array_free(poses, true);
+	g_array_free(keys, TRUE);
+	g_array_free(poses, TRUE);
     }
     return true;
 }
