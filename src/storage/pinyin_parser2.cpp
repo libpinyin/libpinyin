@@ -23,6 +23,7 @@
 #include "pinyin_parser2.h"
 #include <ctype.h>
 #include <assert.h>
+#include <stdio.h>
 #include <string.h>
 #include "stl_lite.h"
 #include "pinyin_phrase2.h"
@@ -528,7 +529,8 @@ int DoublePinyinParser2::parse(pinyin_option_t options, ChewingKeyVector & keys,
     int maximum_len = 0; int i;
     /* probe the longest possible double pinyin string. */
     for (i = 0; i < len; ++i) {
-        if (!IS_KEY(str[i]))
+        const char ch = str[i];
+        if (!(IS_KEY(ch) || ('0' < ch && ch <= '5')))
             break;
     }
     maximum_len = i;

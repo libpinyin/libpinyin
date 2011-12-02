@@ -56,7 +56,7 @@ int main(int argc, char * argv[]) {
     ChewingKeyVector keys = g_array_new(FALSE, FALSE, sizeof(ChewingKey));
     ChewingKeyRestVector key_rests =
         g_array_new(FALSE, FALSE, sizeof(ChewingKeyRest));
-    pinyin_option_t options = PINYIN_CORRECT_ALL | USE_RESPLIT_TABLE;
+    pinyin_option_t options = PINYIN_CORRECT_ALL | USE_TONE | USE_RESPLIT_TABLE;
 
     int i = 1;
     while(i < argc) {
