@@ -415,10 +415,6 @@ namespace pinyin{
  */
 bool merge_single_gram(SingleGram * merged, const SingleGram * system,
                        const SingleGram * user){
-    /* clear merged. */
-    MemoryChunk & merged_chunk = merged->m_chunk;
-    merged_chunk.set_size(0);
-
     if (NULL == system && NULL == user)
         return false;
 
@@ -434,12 +430,16 @@ bool merge_single_gram(SingleGram * merged, const SingleGram * system,
         return true;
     }
 
-    /* merge the origin info and delta info */
+    /* clear merged. */
+    MemoryChunk & merged_chunk = merged->m_chunk;
+    merged_chunk.set_size(sizeof(guint32));
 
+    /* merge the origin info and delta info */
     guint32 system_total, user_total;
     assert(system->get_total_freq(system_total));
     assert(user->get_total_freq(user_total));
-    assert(merged->set_total_freq(system_total + user_total));
+    const guint32 merged_total = system_total + user_total;
+    merged_chunk.set_content(0, &merged_total, sizeof(guint32));
 
     const SingleGramItem * cur_system = (const SingleGramItem *)
         ((const char *)(system->m_chunk.begin()) + sizeof(guint32));
