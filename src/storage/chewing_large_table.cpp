@@ -655,3 +655,221 @@ bool ChewingLargeTable::load_text(FILE * infile) {
 
     return true;
 }
+
+
+/* load/store method */
+
+bool ChewingBitmapIndexLevel::load(MemoryChunk * chunk, table_offset_t offset,
+                                   table_offset_t end) {
+    reset();
+    char * begin = (char *) chunk->begin();
+    table_offset_t phrase_begin, phrase_end;
+    table_offset_t * index = (table_offset_t *) (begin + offset);
+    phrase_end = *index;
+
+    for (int k = 0; k < CHEWING_NUMBER_OF_INITIALS; ++k)
+        for (int l = 0; l < CHEWING_NUMBER_OF_MIDDLES; ++l)
+            for (int m = 0; m < CHEWING_NUMBER_OF_FINALS; ++m)
+                for (int n = 0; n < CHEWING_NUMBER_OF_TONES; ++n) {
+                    phrase_begin = phrase_end;
+                    index++;
+                    phrase_end = *index;
+
+                    if (phrase_begin == phrase_end) /* null pointer */
+                        continue;
+
+                    ChewingLengthIndexLevel * phrases = new ChewingLengthIndexLevel;
+                    phrases->load(chunk, phrase_begin, phrase_end - 1);
+                    m_chewing_length_indexes[k][l][m][n] = phrases;
+
+                    assert(phrase_end <= end);
+                    assert(*(begin + phrase_end - 1)  == c_separate);
+                }
+
+    offset += (CHEWING_NUMBER_OF_INITIALS * CHEWING_NUMBER_OF_MIDDLES * CHEWING_NUMBER_OF_FINALS * CHEWING_NUMBER_OF_TONES + 1) * sizeof(table_offset_t);
+    assert(c_separate == *(begin + offset));
+    return true;
+}
+
+bool ChewingBitmapIndexLevel::store(MemoryChunk * new_chunk,
+                                    table_offset_t offset,
+                                    table_offset_t & end) {
+    table_offset_t phrase_end;
+    table_offset_t index = offset;
+    offset += (CHEWING_NUMBER_OF_INITIALS * CHEWING_NUMBER_OF_MIDDLES * CHEWING_NUMBER_OF_FINALS * CHEWING_NUMBER_OF_TONES + 1) * sizeof(table_offset_t);
+
+    /* add '#' */
+    new_chunk->set_content(offset, &c_separate, sizeof(char));
+    offset += sizeof(char);
+    new_chunk->set_content(index, &offset, sizeof(table_offset_t));
+    index += sizeof(table_offset_t);
+
+    for (int k = 0; k < CHEWING_NUMBER_OF_INITIALS; ++k)
+        for (int l = 0; l < CHEWING_NUMBER_OF_MIDDLES; ++l)
+            for (int m = 0; m < CHEWING_NUMBER_OF_FINALS; ++m)
+                for (int n = 0; n < CHEWING_NUMBER_OF_TONES; ++n) {
+                    ChewingLengthIndexLevel * phrases =
+                        m_chewing_length_indexes[k][l][m][n];
+
+                    if (NULL == phrases) { /* null pointer */
+                        new_chunk->set_content(index, &offset,
+                                               sizeof(table_offset_t));
+                        index += sizeof(table_offset_t);
+                        continue;
+                    }
+
+                    /* has a end '#' */
+                    phrases->store(new_chunk, offset, phrase_end);
+                    offset = phrase_end;
+
+                    /* add '#' */
+                    new_chunk->set_content(offset, &c_separate, sizeof(char));
+                    offset += sizeof(char);
+                    new_chunk->set_content(index, &offset,
+                                           sizeof(table_offset_t));
+                    index += sizeof(table_offset_t);
+                }
+
+    end = offset;
+    return true;
+}
+
+bool ChewingLengthIndexLevel::load(MemoryChunk * chunk, table_offset_t offset,
+                                   table_offset_t end) {
+    char * begin = (char *) chunk->begin();
+    guint32 nindex = *((guint32 *)(begin + offset)); /* number of index */
+    table_offset_t * index = (table_offset_t *)
+        (begin + offset + sizeof(guint32));
+
+    table_offset_t phrase_begin, phrase_end = *index;
+    m_chewing_array_indexes = g_array_new(FALSE, TRUE, sizeof(void *));
+    for (guint32 i = 0; i < nindex; ++i) {
+        phrase_begin = phrase_end;
+        index++;
+        phrase_end = *index;
+
+        if (phrase_begin == phrase_end) {
+            void * null = NULL;
+            g_array_append_val(m_chewing_array_indexes, null);
+            continue;
+        }
+
+#define CASE(len) case len:                                             \
+        {                                                               \
+            ChewingArrayIndexLevel<len> * phrase =                      \
+                new ChewingArrayIndexLevel<len>;                        \
+            phrase->load(chunk, phrase_begin, phrase_end - 1);          \
+            assert(*(begin + phrase_end - 1) == c_separate);            \
+            assert(phrase_end <= end);                                  \
+            g_array_append_val(m_chewing_array_indexes, phrase);        \
+            break;                                                      \
+        }
+
+	switch ( i ){
+	    CASE(0);
+	    CASE(1);
+	    CASE(2);
+	    CASE(3);
+	    CASE(4);
+	    CASE(5);
+	    CASE(6);
+	    CASE(7);
+	    CASE(8);
+	    CASE(9);
+	    CASE(10);
+	    CASE(11);
+	    CASE(12);
+	    CASE(13);
+	    CASE(14);
+	    CASE(15);
+	default:
+	    assert(false);
+	}
+
+#undef CASE
+    }
+
+    /* check '#' */
+    offset += sizeof(guint32) + (nindex + 1) * sizeof(table_offset_t);
+    assert(c_separate == *(begin + offset));
+    return true;
+}
+
+bool ChewingLengthIndexLevel::store(MemoryChunk * new_chunk,
+                                    table_offset_t offset,
+                                    table_offset_t & end) {
+    guint32 nindex = m_chewing_array_indexes->len; /* number of index */
+    new_chunk->set_content(offset, &nindex, sizeof(guint32));
+    table_offset_t index = offset + sizeof(guint32);
+
+    offset += sizeof(guint32) + (nindex + 1) * sizeof(table_offset_t);
+    new_chunk->set_content(offset, &c_separate, sizeof(char));
+    offset += sizeof(char);
+    new_chunk->set_content(index, &offset, sizeof(table_offset_t));
+    index += sizeof(table_offset_t);
+
+    table_offset_t phrase_end;
+    for (guint32 i = 0; i < nindex; ++i) {
+#define CASE(len) case len:                                             \
+        {                                                               \
+            ChewingArrayIndexLevel<len> * phrase = g_array_index        \
+                (m_chewing_array_indexes, ChewingArrayIndexLevel<len> *, i); \
+            if (NULL == phrase) {                                       \
+                new_chunk->set_content                                  \
+                    (index, &offset, sizeof(table_offset_t));           \
+                index += sizeof(table_offset_t);                        \
+                continue;                                               \
+            }                                                           \
+            phrase->store(new_chunk, offset, phrase_end);               \
+            offset = phrase_end;                                        \
+            break;                                                      \
+        }
+
+	switch ( i ){
+	    CASE(0);
+	    CASE(1);
+	    CASE(2);
+	    CASE(3);
+	    CASE(4);
+	    CASE(5);
+	    CASE(6);
+	    CASE(7);
+	    CASE(8);
+	    CASE(9);
+	    CASE(10);
+	    CASE(11);
+	    CASE(12);
+	    CASE(13);
+	    CASE(14);
+	    CASE(15);
+	default:
+	    assert(false);
+	}
+#undef CASE
+
+        /* add '#' */
+        new_chunk->set_content(offset, &c_separate, sizeof(char));
+        offset += sizeof(char);
+        new_chunk->set_content(index, &offset, sizeof(table_offset_t));
+        index += sizeof(table_offset_t);
+    }
+
+    end = offset;
+    return true;
+}
+
+template<int phrase_length>
+bool ChewingArrayIndexLevel<phrase_length>::
+load(MemoryChunk * chunk, table_offset_t offset, table_offset_t end) {
+    char * begin = (char *) chunk->begin();
+    m_chunk.set_chunk(begin + offset, end - offset, NULL);
+    return true;
+}
+
+template<int phrase_length>
+bool ChewingArrayIndexLevel<phrase_length>::
+store(MemoryChunk * new_chunk, table_offset_t offset, table_offset_t & end) {
+    new_chunk->set_content(offset, m_chunk.begin(), m_chunk.size());
+    end = offset + m_chunk.size();
+    return true;
+}
