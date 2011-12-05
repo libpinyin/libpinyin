@@ -43,7 +43,7 @@ SingleGram::SingleGram(void * buffer, size_t length){
     m_chunk.set_chunk(buffer, length, NULL);
 }
 
-bool SingleGram::get_total_freq(guint32 & total){
+bool SingleGram::get_total_freq(guint32 & total) const{
     char * buf_begin = (char *)m_chunk.begin();
     total = *((guint32 *)buf_begin);
     return true;
@@ -404,3 +404,86 @@ bool Bigram::get_all_items(GArray * items){
 
     return true;
 }
+
+
+namespace pinyin{
+
+/* merge origin system info and delta user info */
+/*  Note: Please keep system and user single gram
+ *          when using merged single gram.
+ */
+bool merge_single_gram(SingleGram * merged, const SingleGram * system,
+                       const SingleGram * user){
+    /* clear merged. */
+    MemoryChunk & merged_chunk = merged->m_chunk;
+    merged_chunk.set_size(0);
+
+    if (NULL == system && NULL == user)
+        return false;
+
+    if (NULL == system) {
+        merged_chunk.set_chunk(user->m_chunk.begin(),
+                               user->m_chunk.size(), NULL);
+        return true;
+    }
+
+    if (NULL == user) {
+        merged_chunk.set_chunk(system->m_chunk.begin(),
+                               system->m_chunk.size(), NULL);
+        return true;
+    }
+
+    /* merge the origin info and delta info */
+
+    guint32 system_total, user_total;
+    assert(system->get_total_freq(system_total));
+    assert(user->get_total_freq(user_total));
+    assert(merged->set_total_freq(system_total + user_total));
+
+    const SingleGramItem * cur_system = (const SingleGramItem *)
+        ((const char *)(system->m_chunk.begin()) + sizeof(guint32));
+    const SingleGramItem * system_end = (const SingleGramItem *)
+        system->m_chunk.end();
+
+    const SingleGramItem * cur_user = (const SingleGramItem *)
+        ((const char *)(user->m_chunk.begin()) + sizeof(guint32));
+    const SingleGramItem * user_end = (const SingleGramItem *)
+        user->m_chunk.end();
+
+    while (cur_system < system_end && cur_user < user_end) {
+
+        if (cur_system->m_token < cur_user->m_token) {
+            /* do append operation here */
+            merged_chunk.append_content(cur_system, sizeof(SingleGramItem));
+            cur_system++;
+        } if (cur_system->m_token > cur_user->m_token) {
+            /* do append operation here */
+            merged_chunk.append_content(cur_user, sizeof(SingleGramItem));
+            cur_user++;
+        } else {
+            assert(cur_system->m_token == cur_user->m_token);
+
+            SingleGramItem merged_item;
+            merged_item.m_token = cur_system->m_token;
+            merged_item.m_freq = cur_system->m_freq + cur_user->m_freq;
+
+            merged_chunk.append_content(&merged_item, sizeof(SingleGramItem));
+            cur_system++; cur_user++;
+        }
+    }
+
+    /* add remained items. */
+    while (cur_system < system_end) {
+        merged_chunk.append_content(cur_system, sizeof(SingleGramItem));
+        cur_system++;
+    }
+
+    while (cur_user < user_end) {
+        merged_chunk.append_content(cur_user, sizeof(SingleGramItem));
+        cur_user++;
+    }
+
+    return true;
+}
+
+};

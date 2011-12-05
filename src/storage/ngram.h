@@ -41,6 +41,10 @@ class Bigram;
 
 class SingleGram{
     friend class Bigram;
+    friend bool merge_single_gram(SingleGram * merged,
+                                  const SingleGram * system,
+                                  const SingleGram * user);
+
 private:
     MemoryChunk m_chunk;
     SingleGram(void * buffer, size_t length);
@@ -78,7 +82,7 @@ public:
     /* get_total_freq method
      * used in user bigram table
      */
-    bool get_total_freq(guint32 & total);
+    bool get_total_freq(guint32 & total) const;
 
     /* set_total_freq method
      * used in user bigram table
@@ -129,6 +133,9 @@ public:
     /* array of phrase_token_t items, for parameter estimation. */
     bool get_all_items(/* out */ GArray * items);
 };
+
+bool merge_single_gram(SingleGram * merged, const SingleGram * system,
+                       const SingleGram * user);
 
 };
 

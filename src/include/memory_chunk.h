@@ -169,6 +169,12 @@ public:
 	m_data_end = m_data_begin + cursize;
 	return true;
     }
+    /* append function
+     * Data are appended at the end.
+     */
+    bool append_content(const void * data, size_t len){
+        set_content(size(), data, len);
+    }
     /* insert function
      * Data are written to the memory area,
      * the original content are moved towards the rear.
