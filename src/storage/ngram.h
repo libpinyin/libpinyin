@@ -52,12 +52,12 @@ public:
     /* Null Constructor */
     SingleGram();
     /* retrieve all items */
-    bool retrieve_all(/* out */ BigramPhraseWithCountArray array);
+    bool retrieve_all(/* out */ BigramPhraseWithCountArray array) const;
 
     /* search method */
     /* the array result contains many items */
-    bool search(/* in */ PhraseIndexRange * range, 
-	       /* out */ BigramPhraseArray array);
+    bool search(/* in */ PhraseIndexRange * range,
+	       /* out */ BigramPhraseArray array) const;
 
     /* insert_freq method
      */
@@ -72,7 +72,7 @@ public:
     /* get_freq method
      */
     bool get_freq(/* in */ phrase_token_t token,
-	       /* out */ guint32 & freq); 
+	       /* out */ guint32 & freq) const;
     
     /* set_freq method
      */

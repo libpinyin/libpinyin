@@ -83,7 +83,8 @@ static bool token_less_than(const SingleGramItem & lhs,const SingleGramItem & rh
     return lhs.m_token < rhs.m_token;
 }
 
-bool SingleGram::retrieve_all(/* out */ BigramPhraseWithCountArray array){
+bool SingleGram::retrieve_all(/* out */ BigramPhraseWithCountArray array)
+    const {
     const SingleGramItem * begin = (const SingleGramItem *)
         ((const char *)(m_chunk.begin()) + sizeof(guint32));
     const SingleGramItem * end = (const SingleGramItem *) m_chunk.end();
@@ -102,8 +103,8 @@ bool SingleGram::retrieve_all(/* out */ BigramPhraseWithCountArray array){
     return true;
 }
 
-bool SingleGram::search(/* in */ PhraseIndexRange * range, 
-			/* out */ BigramPhraseArray array){
+bool SingleGram::search(/* in */ PhraseIndexRange * range,
+			/* out */ BigramPhraseArray array) const {
     const SingleGramItem * begin = (const SingleGramItem *)
 	((const char *)(m_chunk.begin()) + sizeof(guint32));
     const SingleGramItem * end = (const SingleGramItem *)m_chunk.end();
@@ -181,7 +182,7 @@ bool SingleGram::remove_freq( /* in */ phrase_token_t token,
 }
 
 bool SingleGram::get_freq(/* in */ phrase_token_t token,
-                          /* out */ guint32 & freq){
+                          /* out */ guint32 & freq) const {
     freq = 0;
     const SingleGramItem * begin = (const SingleGramItem *)
 	((const char *)(m_chunk.begin()) + sizeof(guint32));
