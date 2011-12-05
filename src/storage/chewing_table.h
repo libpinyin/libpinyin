@@ -48,6 +48,7 @@ const chewing_symbol_item_t chewing_standard_symbols[] = {
 };
 
 const chewing_tone_item_t chewing_standard_tones[] = {
+{' '  , 1},
 {'3'  , 3},
 {'4'  , 4},
 {'6'  , 2},
@@ -98,6 +99,7 @@ const chewing_symbol_item_t chewing_ginyieh_symbols[] = {
 };
 
 const chewing_tone_item_t chewing_ginyieh_tones[] = {
+{' '  , 1},
 {'1'  , 5},
 {'a'  , 3},
 {'q'  , 2},
@@ -147,6 +149,7 @@ const chewing_symbol_item_t chewing_eten_symbols[] = {
 };
 
 const chewing_tone_item_t chewing_eten_tones[] = {
+{' '  , 1},
 {'1'  , 5},
 {'2'  , 2},
 {'3'  , 3},
@@ -196,6 +199,7 @@ const chewing_symbol_item_t chewing_ibm_symbols[] = {
 };
 
 const chewing_tone_item_t chewing_ibm_tones[] = {
+{' '  , 1},
 {','  , 3},
 {'.'  , 4},
 {'/'  , 5},
