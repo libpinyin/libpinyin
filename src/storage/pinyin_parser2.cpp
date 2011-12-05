@@ -217,8 +217,10 @@ bool FullPinyinParser2::parse_one_key (pinyin_option_t options, ChewingKey & key
 
     /* Note: optimize here? */
     input[parsed_len] = '\0';
-    if (!search_pinyin_index(options, input, key, key_rest))
-        --parsed_len;
+    if (!search_pinyin_index(options, input, key, key_rest)) {
+        g_free(input);
+        return false;
+    }
 
     if (options & USE_TONE) {
         /* post processing tone. */
