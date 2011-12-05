@@ -418,6 +418,8 @@ bool merge_single_gram(SingleGram * merged, const SingleGram * system,
     if (NULL == system && NULL == user)
         return false;
 
+    MemoryChunk & merged_chunk = merged->m_chunk;
+
     if (NULL == system) {
         merged_chunk.set_chunk(user->m_chunk.begin(),
                                user->m_chunk.size(), NULL);
@@ -431,7 +433,6 @@ bool merge_single_gram(SingleGram * merged, const SingleGram * system,
     }
 
     /* clear merged. */
-    MemoryChunk & merged_chunk = merged->m_chunk;
     merged_chunk.set_size(sizeof(guint32));
 
     /* merge the origin info and delta info */
