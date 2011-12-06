@@ -27,7 +27,7 @@
 size_t bench_times = 1000;
 
 int main(int argc, char * argv[]) {
-    pinyin_option_t options = USE_TONE;
+    pinyin_option_t options = USE_TONE | PINYIN_INCOMPLETE;
     ChewingLargeTable largetable(options);
     FacadePhraseIndex phrase_index;
 
