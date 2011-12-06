@@ -39,6 +39,16 @@ public:
         m_user_chewing_table = NULL;
     }
 
+    /* set options method */
+    bool set_options(pinyin_option_t options) {
+        bool result = false;
+        if (m_system_chewing_table)
+            result = m_system_chewing_table->set_options(options)  || result;
+        if (m_user_chewing_table)
+            result = m_user_chewing_table->set_options(options) || result;
+        return result;
+    }
+
     /* load/store method */
     bool load(pinyin_option_t options, MemoryChunk * system,
               MemoryChunk * user){
