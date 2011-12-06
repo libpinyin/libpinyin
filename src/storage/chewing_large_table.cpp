@@ -432,6 +432,7 @@ int ChewingArrayIndexLevel<phrase_length>::convert
         if (null_token == cursor.m_range_begin) {
             cursor.m_range_begin = token;
             cursor.m_range_end   = token + 1;
+            cursor_head = head;
         } else if (cursor.m_range_end == token &&
                    PHRASE_INDEX_LIBRARY_INDEX(cursor.m_range_begin) ==
                    PHRASE_INDEX_LIBRARY_INDEX(token)) {
@@ -646,6 +647,11 @@ bool ChewingLargeTable::load_text(FILE * infile) {
 
         pinyin_option_t options = USE_TONE;
         parser.parse(options, keys, key_rests, pinyin, strlen(pinyin));
+
+        if (0 == keys->len) {
+            fprintf(stderr, "%s\t%s\t%u\t%ld\n", pinyin, phrase, token, freq);
+            continue;
+        }
 
         add_index(keys->len, (ChewingKey *)keys->data, token);
 
