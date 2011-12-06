@@ -173,7 +173,7 @@ public:
      * Data are appended at the end.
      */
     bool append_content(const void * data, size_t len){
-        set_content(size(), data, len);
+        return set_content(size(), data, len);
     }
     /* insert function
      * Data are written to the memory area,
