@@ -36,6 +36,10 @@
 #include "pinyin_lookup.h"
 #include "phrase_lookup.h"
 #include "tag_utility.h"
+#include "chewing_large_table.h"
+#include "facade_chewing_table.h"
+#include "facade_phrase_table.h"
+
 
 /* training module */
 #include "flexible_ngram.h"
