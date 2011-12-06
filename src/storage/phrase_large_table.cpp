@@ -22,7 +22,7 @@
 #include <assert.h>
 #include <string.h>
 #include "phrase_large_table.h"
-
+#include "facade_phrase_table.h"
 
 /* class definition */
 
