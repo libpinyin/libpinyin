@@ -24,7 +24,7 @@ int main( int argc, char * argv[]){
 
     FILE * gbkfile = fopen("../../data/gbk_char.table","r");
     if ( gbkfile == NULL ) {
-	fprintf(stderr, "open gb_char.table failed!\n");
+	fprintf(stderr, "open gbk_char.table failed!\n");
 	exit(ENOENT);
     }
     
