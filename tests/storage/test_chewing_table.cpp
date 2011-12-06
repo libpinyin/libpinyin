@@ -67,7 +67,12 @@ int main(int argc, char * argv[]) {
         ChewingKeyVector keys = g_array_new(FALSE, FALSE, sizeof(ChewingKey));
         ChewingKeyRestVector key_rests =
             g_array_new(FALSE, FALSE, sizeof(ChewingKeyRest));
+
         parser.parse(options, keys, key_rests, linebuf, strlen(linebuf));
+        if (0 == keys->len) {
+            fprintf(stderr, "Invalid input.\n");
+            continue;
+        }
 
         guint32 start = record_time();
         PhraseIndexRanges ranges;
