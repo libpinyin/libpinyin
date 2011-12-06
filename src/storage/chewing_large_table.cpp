@@ -407,8 +407,7 @@ int ChewingArrayIndexLevel<phrase_length>::search
 template<int phrase_length>
 int ChewingArrayIndexLevel<phrase_length>::convert
 (pinyin_option_t options, ChewingKey keys[],
- IndexItem * begin,
- IndexItem * end,
+ IndexItem * begin, IndexItem * end,
  PhraseIndexRanges ranges) const {
     IndexItem * iter = NULL;
     PhraseIndexRange cursor;
