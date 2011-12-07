@@ -38,6 +38,7 @@
 #include "tag_utility.h"
 #include "pinyin_custom2.h"
 #include "pinyin_parser2.h"
+#include "pinyin_phrase2.h"
 #include "chewing_large_table.h"
 #include "facade_chewing_table.h"
 #include "facade_phrase_table.h"

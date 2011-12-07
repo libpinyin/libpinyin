@@ -25,7 +25,8 @@ noinst_PROGRAMS          = gen_zhuyin_map \
 			   gen_pinyin_table \
 			   gen_binary_files \
 			   export_interpolation \
-			   import_interpolation
+			   import_interpolation \
+			   gen_chewing_table
 
 gen_zhuyin_map_SOURCES      = gen_zhuyin_map.cpp
 
@@ -46,3 +47,7 @@ import_interpolation_LDADD = ../../src/libpinyin_internal.la @GLIB2_LDFLAGS@
 export_interpolation_SOURCES = export_interpolation.cpp
 
 export_interpolation_LDADD = ../../src/libpinyin_internal.la @GLIB2_LDFLAGS@
+
+gen_chewing_table_SOURCES    = gen_chewing_table.cpp
+
+gen_chewing_table_LDADD      = ../../src/libpinyin_internal.la @GLIB2_LDFLAGS@
