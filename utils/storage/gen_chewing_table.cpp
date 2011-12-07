@@ -111,6 +111,7 @@ int main(int argc, char * argv[]){
     printf("nnodes: %d\n", g_tree_nnodes(g_chewing_tree));
 
     /* store in item array */
+    g_item_array[0] = NULL;
     for ( int i = 1; i < MAX_PHRASE_LENGTH + 1; ++i){
 	g_item_array[i] = g_array_new
             (FALSE, TRUE, sizeof(phrase_and_array_item));
@@ -290,7 +291,7 @@ void gen_phrase_file(const char * outfilename, int phrase_index){
                     ChewingKeyRest key_rest = g_array_index
                         (key_rests, ChewingKeyRest, k);
 
-                    assert (CHEWING_ZERO_TONE != key.m_tone);
+                    //assert (CHEWING_ZERO_TONE != key.m_tone);
                     pinyin = get_pinyin_string(key, key_rest);
                     g_array_append_val(pinyins, pinyin);
                 }
@@ -310,8 +311,9 @@ void gen_phrase_file(const char * outfilename, int phrase_index){
                         pinyin_str, phrase_str,
                         PHRASE_INDEX_MAKE_TOKEN(phrase_index, token), freq);
 
-                g_free(pinyin_str); g_free(phrase_str);
+                g_free(pinyin_str);
             }
+            g_free(phrase_str);
             token++;
         }
     }
