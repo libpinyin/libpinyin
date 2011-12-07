@@ -193,6 +193,16 @@ struct ChewingKeyRest
     const char * get_chewing_string();
 };
 
+static inline gchar * get_pinyin_string(ChewingKey key,
+                                        ChewingKeyRest key_rest) {
+    if (CHEWING_ZERO_TONE != key.m_tone) {
+        return g_strdup_printf
+            ("%s%d", key_rest.get_pinyin_string(), key.m_tone);
+    } else {
+        return g_strdup(key_rest.get_pinyin_string());
+    }
+}
+
 };
 
 #endif
