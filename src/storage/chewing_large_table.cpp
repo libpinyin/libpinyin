@@ -637,6 +637,8 @@ bool ChewingLargeTable::load_text(FILE * infile) {
         if(feof(infile))
             break;
 
+        glong len = g_utf8_strlen(phrase, -1);
+
         FullPinyinParser2 parser;
         ChewingKeyVector keys;
         ChewingKeyRestVector key_rests;
@@ -647,7 +649,7 @@ bool ChewingLargeTable::load_text(FILE * infile) {
         pinyin_option_t options = USE_TONE;
         parser.parse(options, keys, key_rests, pinyin, strlen(pinyin));
 
-        if (0 == keys->len) {
+        if (len != keys->len) {
             fprintf(stderr, "%s\t%s\t%u\t%ld\n", pinyin, phrase, token, freq);
             continue;
         }
