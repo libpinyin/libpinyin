@@ -96,7 +96,7 @@ int main(int argc, char * argv[]) {
 
         largetable.search(keys->len, (ChewingKey *)keys->data, ranges);
 
-        for (size_t i = 0; i < PHRASE_INDEX_LIBRARY_COUNT; ++i) {
+        for (size_t i = min_index; i < max_index; ++i) {
             GArray * & range = ranges[i];
             if (range) {
                 for (size_t k = 0; k < range->len; ++k) {
