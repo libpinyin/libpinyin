@@ -22,9 +22,12 @@
 #ifndef LOOKUP_H
 #define LOOKUP_H
 
+
 /** @file lookup.h
  *  @brief the definitions of common lookup related classes and structs.
  */
+
+#include "novel_types.h"
 
 namespace pinyin{
 

@@ -22,11 +22,15 @@
 #ifndef PINYIN_LOOKUP_H
 #define PINYIN_LOOKUP_H
 
+
 #include <float.h>
 #include <glib.h>
 #include "novel_types.h"
-#include "pinyin_base.h"
+#include "chewing_key.h"
+#include "phrase_index.h"
+#include "chewing_large_table.h"
 #include "lookup.h"
+
 
 namespace pinyin{
 
@@ -84,11 +88,11 @@ private:
 protected:
     //saved varibles
     CandidateConstraints m_constraints;
-    PinyinKeyVector m_keys;
+    ChewingKeyVector m_keys;
     
-    PinyinLargeTable * m_pinyin_table;
+    ChewingLargeTable * m_pinyin_table;
     FacadePhraseIndex * m_phrase_index;
-    PinyinCustomSettings * m_custom;
+    pinyin_option_t m_options;
     Bigram * m_system_bigram;
     Bigram * m_user_bigram;
     
@@ -118,13 +122,15 @@ protected:
     
     bool final_step(MatchResults & results);
 public:
-    PinyinLookup( PinyinCustomSettings * custom, PinyinLargeTable * pinyin_table, FacadePhraseIndex * phrase_index, Bigram * system_bigram, Bigram * user_bigram);
+    PinyinLookup(pinyin_option_t options, ChewingLargeTable * pinyin_table,
+                 FacadePhraseIndex * phrase_index, Bigram * system_bigram,
+                 Bigram * user_bigram);
 
     ~PinyinLookup();
 
-    bool get_best_match(PinyinKeyVector keys, CandidateConstraints constraints, MatchResults & results);
+    bool get_best_match(ChewingKeyVector keys, CandidateConstraints constraints, MatchResults & results);
     
-    bool train_result(PinyinKeyVector keys, CandidateConstraints constraints, MatchResults & results);
+    bool train_result(ChewingKeyVector keys, CandidateConstraints constraints, MatchResults & results);
 
     bool convert_to_utf8(MatchResults results,
                          /* out */ char * & result_string)
@@ -138,7 +144,7 @@ public:
 
     bool clear_constraint(CandidateConstraints constraints, size_t index);
 
-    bool validate_constraint(CandidateConstraints constraints, PinyinKeyVector m_parsed_keys);
+    bool validate_constraint(CandidateConstraints constraints, ChewingKeyVector m_parsed_keys);
 
     /* init pinyin table lookup array */
     bool prepare_pinyin_lookup(PhraseIndexRanges ranges);
