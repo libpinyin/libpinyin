@@ -25,8 +25,9 @@
 #include <stdio.h>
 #include <glib.h>
 #include "novel_types.h"
-#include "pinyin_base.h"
-#include "pinyin_phrase.h"
+#include "chewing_key.h"
+#include "pinyin_parser2.h"
+#include "pinyin_phrase2.h"
 #include "memory_chunk.h"
 #include "phrase_index_logger.h"
 
@@ -49,8 +50,7 @@ namespace pinyin{
 
 class PinyinLookup;
 
-/* Because this is not large,
- * Store this in user home directory.
+/* Store delta info by phrase index logger in user home directory.
  */
 
 const size_t phrase_item_header = sizeof(guint8) + sizeof(guint8) + sizeof(guint32);
@@ -90,21 +90,22 @@ public:
 	return (*(guint32 *)(buf_begin + sizeof(guint8) + sizeof(guint8)));
     }
 
-    gfloat get_pinyin_possibility(PinyinCustomSettings & custom, 
-				  PinyinKey * pinyin_keys){
+    gfloat get_pinyin_possibility(pinyin_option_t options,
+				  ChewingKey * keys){
 	guint8 phrase_length = get_phrase_length();
 	guint8 npron = get_n_pronunciation();
-	size_t offset = phrase_item_header + phrase_length * sizeof ( utf16_t );
+	size_t offset = phrase_item_header + phrase_length * sizeof (utf16_t);
 	char * buf_begin = (char *)m_chunk.begin();
 	guint32 matched = 0, total_freq =0;
 	for ( int i = 0 ; i < npron ; ++i){
-	    char * pinyin_begin = buf_begin + offset + 
-		i * ( phrase_length * sizeof(PinyinKey) + sizeof(guint32) );
-	    guint32 * freq = (guint32 *)(pinyin_begin + phrase_length * sizeof(PinyinKey));
+	    char * chewing_begin = buf_begin + offset +
+		i * (phrase_length * sizeof(ChewingKey) + sizeof(guint32));
+	    guint32 * freq = (guint32 *)(chewing_begin +
+                                         phrase_length * sizeof(ChewingKey));
 	    total_freq += *freq;
-	    if ( 0 == pinyin_compare_with_ambiguities
-                 (custom,  pinyin_keys,
-                  (PinyinKey *)pinyin_begin,phrase_length) ){
+	    if ( 0 == pinyin_compare_with_ambiguities2
+                 (options,  keys,
+                  (ChewingKey *)chewing_begin,phrase_length) ){
 		matched += *freq;
 	    }
 	}
@@ -121,19 +122,19 @@ public:
 	return retval;
     }
     
-    void increase_pinyin_possibility(PinyinCustomSettings & custom,
-				     PinyinKey * pinyin_keys,
+    void increase_pinyin_possibility(pinyin_option_t options,
+				     ChewingKey * keys,
 				     gint32 delta);
 
     bool get_phrase_string(utf16_t * phrase);
     bool set_phrase_string(guint8 phrase_length, utf16_t * phrase);
     bool get_nth_pronunciation(size_t index, 
-			       /* out */ PinyinKey * pinyin, 
+			       /* out */ ChewingKey * keys,
 			       /* out */ guint32 & freq);
     /* Normally don't change the first pronunciation,
      * which decides the token number.
      */
-    void append_pronunciation(PinyinKey * pinyin, guint32 freq);
+    void append_pronunciation(ChewingKey * keys, guint32 freq);
     void remove_nth_pronunciation(size_t index);
 
     bool operator == (const PhraseItem & rhs) const{
