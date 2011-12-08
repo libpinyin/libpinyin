@@ -21,12 +21,22 @@ target_link_libraries(
 )
 
 add_executable(
-    test_pinyin_index
-    test_pinyin_index.cpp
+    test_chewing_table
+    test_chewing_table.cpp
 )
 
 target_link_libraries(
-    test_pinyin_index
+    test_chewing_table
+    libpinyin
+)
+
+add_executable(
+    test_pinyin_table
+    test_pinyin_table.cpp
+)
+
+target_link_libraries(
+    test_pinyin_table
     libpinyin
 )
 
