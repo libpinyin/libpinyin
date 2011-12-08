@@ -1,6 +1,12 @@
 #include "timer.h"
 #include <string.h>
-#include "pinyin_internal.h"
+#include <errno.h>
+#include "novel_types.h"
+#include "pinyin_base.h"
+#include "pinyin_large_table.h"
+#include "phrase_index.h"
+
+using namespace pinyin;
 
 size_t bench_times = 1000;
 

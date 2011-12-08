@@ -24,7 +24,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "pinyin_internal.h"
+#include <errno.h>
+#include "pinyin_base.h"
+
+using namespace pinyin;
 
 static const char *help_msg =
     "Usage:\n"
