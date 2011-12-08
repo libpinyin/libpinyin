@@ -25,8 +25,9 @@
 
 #include <stdio.h>
 #include "novel_types.h"
-#include "pinyin_custom.h"
-#include "pinyin_base.h"
+#include "pinyin_custom2.h"
+#include "chewing_key.h"
+#include "pinyin_parser2.h"
 
 using namespace pinyin;
 
@@ -36,8 +37,8 @@ typedef struct _pinyin_context_t pinyin_context_t;
 
 typedef struct {
     pinyin_context_t * m_context;
-    PinyinKeyVector m_pinyin_keys;
-    PinyinKeyPosVector m_pinyin_poses;
+    ChewingKeyVector m_pinyin_keys;
+    ChewingKeyRestVector m_pinyin_key_rests;
     CandidateConstraints m_constraints;
     MatchResults m_match_results;
 } pinyin_instance_t;
@@ -45,13 +46,13 @@ typedef struct {
 pinyin_context_t * pinyin_init(const char * systemdir, const char * userdir);
 bool pinyin_save(pinyin_context_t * context);
 bool pinyin_set_double_pinyin_scheme(pinyin_context_t * context,
-                                     PinyinShuangPinScheme scheme);
+                                     DoublePinyinScheme scheme);
 bool pinyin_set_chewing_scheme(pinyin_context_t * context,
-                               PinyinZhuYinScheme scheme);
+                               ChewingScheme scheme);
 void pinyin_fini(pinyin_context_t * context);
 
 bool pinyin_set_options(pinyin_context_t * context,
-                        PinyinCustomSettings * custom);
+                        pinyin_option_t options);
 
 pinyin_instance_t * pinyin_alloc_instance(pinyin_context_t * context);
 void pinyin_free_instance(pinyin_instance_t * instance);
@@ -66,19 +67,22 @@ bool pinyin_get_sentence(pinyin_instance_t * instance,
 
 bool pinyin_parse_full_pinyin(pinyin_instance_t * instance,
                               const char * onepinyin,
-                              PinyinKey * onekey);
+                              ChewingKey * onekey,
+                              ChewingKeyRest * onekeyrest);
 size_t pinyin_parse_more_full_pinyins(pinyin_instance_t * instance,
                                       const char * pinyins);
 
 bool pinyin_parse_double_pinyin(pinyin_instance_t * instance,
                                 const char * onepinyin,
-                                PinyinKey * onekey);
+                                ChewingKey * onekey,
+                                ChewingKeyRest * onekeyrest);
 size_t pinyin_parse_more_double_pinyins(pinyin_instance_t * instance,
                                         const char * pinyins);
 
 bool pinyin_parse_chewing(pinyin_instance_t * instance,
                           const char * onechewing,
-                          PinyinKey * onekey);
+                          ChewingKey * onekey,
+                          ChewingKeyRest * onekeyrest);
 size_t pinyin_parse_more_chewings(pinyin_instance_t * instance,
                                   const char * chewings);
 

@@ -26,6 +26,7 @@
 #include "pinyin.h"
 #include "memory_chunk.h"
 
+#include "pinyin_base.h"
 #include "pinyin_phrase.h"
 #include "pinyin_large_table.h"
 #include "phrase_large_table.h"

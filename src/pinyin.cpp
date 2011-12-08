@@ -26,14 +26,13 @@
 /* a glue layer for input method integration. */
 
 struct _pinyin_context_t{
-    PinyinCustomSettings m_custom;
+    pinyin_option_t m_options;
 
-    BitmapPinyinValidator m_validator;
-    PinyinDefaultParser * m_default_parser;
-    PinyinShuangPinParser * m_shuang_pin_parser;
-    PinyinZhuYinParser * m_chewing_parser;
+    FullPinyinParser2 * m_default_parser;
+    DoublePinyinParser2 * m_shuang_pin_parser;
+    ChewingParser2 * m_chewing_parser;
 
-    PinyinLargeTable * m_pinyin_table;
+    ChewingLargeTable * m_pinyin_table;
     PhraseLargeTable * m_phrase_table;
     FacadePhraseIndex * m_phrase_index;
     Bigram * m_system_bigram;
@@ -55,7 +54,7 @@ pinyin_context_t * pinyin_init(const char * systemdir, const char * userdir){
     context->m_user_dir = g_strdup(userdir);
     context->m_modified = false;
 
-    context->m_pinyin_table = new PinyinLargeTable(&(context->m_custom));
+    context->m_pinyin_table = new ChewingLargeTable(context->m_options);
     MemoryChunk * chunk = new MemoryChunk;
     gchar * filename = g_build_filename
         (context->m_system_dir, "pinyin_index.bin", NULL);
@@ -66,10 +65,9 @@ pinyin_context_t * pinyin_init(const char * systemdir, const char * userdir){
     g_free(filename);
     context->m_pinyin_table->load(chunk);
 
-    context->m_validator.initialize(context->m_pinyin_table);
-    context->m_default_parser = new PinyinDefaultParser;
-    context->m_shuang_pin_parser = new PinyinShuangPinParser;
-    context->m_chewing_parser = new PinyinZhuYinParser;
+    context->m_default_parser = new FullPinyinParser2;
+    context->m_shuang_pin_parser = new DoublePinyinParser2;
+    context->m_chewing_parser = new ChewingParser2;
 
     context->m_phrase_table = new PhraseLargeTable;
     chunk = new MemoryChunk;
@@ -119,7 +117,7 @@ pinyin_context_t * pinyin_init(const char * systemdir, const char * userdir){
     g_free(filename);
 
     context->m_pinyin_lookup = new PinyinLookup
-        ( &(context->m_custom), context->m_pinyin_table,
+        ( context->m_options, context->m_pinyin_table,
           context->m_phrase_index, context->m_system_bigram,
           context->m_user_bigram);
 
@@ -173,13 +171,13 @@ bool pinyin_save(pinyin_context_t * context){
 }
 
 bool pinyin_set_double_pinyin_scheme(pinyin_context_t * context,
-                                     PinyinShuangPinScheme scheme){
+                                     DoublePinyinScheme scheme){
     context->m_shuang_pin_parser->set_scheme(scheme);
     return true;
 }
 
 bool pinyin_set_chewing_scheme(pinyin_context_t * context,
-                               PinyinZhuYinScheme scheme){
+                               ChewingScheme scheme){
     context->m_chewing_parser->set_scheme(scheme);
     return true;
 }
@@ -206,9 +204,8 @@ void pinyin_fini(pinyin_context_t * context){
 
 /* copy from custom to context->m_custom. */
 bool pinyin_set_options(pinyin_context_t * context,
-                        PinyinCustomSettings * custom){
-    guint32 option = custom->to_value();
-    context->m_custom.from_value(option);
+                        pinyin_option_t options){
+    context->m_options = options;
     return true;
 }
 
@@ -217,8 +214,9 @@ pinyin_instance_t * pinyin_alloc_instance(pinyin_context_t * context){
     pinyin_instance_t * instance = new pinyin_instance_t;
     instance->m_context = context;
 
-    instance->m_pinyin_keys = g_array_new(FALSE, FALSE, sizeof(PinyinKey));
-    instance->m_pinyin_poses = g_array_new(FALSE, FALSE, sizeof(PinyinKeyPos));
+    instance->m_pinyin_keys = g_array_new(FALSE, FALSE, sizeof(ChewingKey));
+    instance->m_pinyin_key_rests =
+        g_array_new(FALSE, FALSE, sizeof(ChewingKeyRest));
     instance->m_constraints = g_array_new
         (FALSE, FALSE, sizeof(lookup_constraint_t));
     instance->m_match_results =
@@ -229,7 +227,7 @@ pinyin_instance_t * pinyin_alloc_instance(pinyin_context_t * context){
 
 void pinyin_free_instance(pinyin_instance_t * instance){
     g_array_free(instance->m_pinyin_keys, TRUE);
-    g_array_free(instance->m_pinyin_poses, TRUE);
+    g_array_free(instance->m_pinyin_key_rests, TRUE);
     g_array_free(instance->m_constraints, TRUE);
     g_array_free(instance->m_match_results, TRUE);
 
@@ -239,7 +237,7 @@ void pinyin_free_instance(pinyin_instance_t * instance){
 
 static bool pinyin_update_constraints(pinyin_instance_t * instance){
     pinyin_context_t * & context = instance->m_context;
-    PinyinKeyVector & pinyin_keys = instance->m_pinyin_keys;
+    ChewingKeyVector & pinyin_keys = instance->m_pinyin_keys;
     CandidateConstraints & constraints = instance->m_constraints;
 
     size_t key_len = constraints->len;
@@ -300,12 +298,13 @@ bool pinyin_get_sentence(pinyin_instance_t * instance,
 
 bool pinyin_parse_full_pinyin(pinyin_instance_t * instance,
                               const char * onepinyin,
-                              PinyinKey * onekey){
+                              ChewingKey * onekey,
+                              ChewingKeyRest * onekeyrest){
     pinyin_context_t * & context = instance->m_context;
 
     int pinyin_len = strlen(onepinyin);
     int parse_len = context->m_default_parser->parse_one_key
-        ( context->m_validator, *onekey, onepinyin, pinyin_len);
+        ( context->m_options, *onekey, *onekeyrest, onepinyin, pinyin_len);
     return pinyin_len == parse_len;
 }
 
@@ -315,20 +314,21 @@ size_t pinyin_parse_more_full_pinyins(pinyin_instance_t * instance,
     int pinyin_len = strlen(pinyins);
 
     int parse_len = context->m_default_parser->parse
-        ( context->m_validator, instance->m_pinyin_keys,
-          instance->m_pinyin_poses, pinyins, pinyin_len);
+        ( context->m_options, instance->m_pinyin_keys,
+          instance->m_pinyin_key_rests, pinyins, pinyin_len);
 
     return parse_len;
 }
 
 bool pinyin_parse_double_pinyin(pinyin_instance_t * instance,
                                 const char * onepinyin,
-                                PinyinKey * onekey){
+                                ChewingKey * onekey,
+                                ChewingKeyRest * onekeyrest){
     pinyin_context_t * & context = instance->m_context;
 
     int pinyin_len = strlen(onepinyin);
     int parse_len = context->m_shuang_pin_parser->parse_one_key
-        ( context->m_validator, *onekey, onepinyin, pinyin_len);
+        ( context->m_options, *onekey, *onekeyrest, onepinyin, pinyin_len);
     return pinyin_len == parse_len;
 }
 
@@ -338,20 +338,21 @@ size_t pinyin_parse_more_double_pinyins(pinyin_instance_t * instance,
     int pinyin_len = strlen(pinyins);
 
     int parse_len = context->m_shuang_pin_parser->parse
-        ( context->m_validator, instance->m_pinyin_keys,
-          instance->m_pinyin_poses, pinyins, pinyin_len);
+        ( context->m_options, instance->m_pinyin_keys,
+          instance->m_pinyin_key_rests, pinyins, pinyin_len);
 
     return parse_len;
 }
 
 bool pinyin_parse_chewing(pinyin_instance_t * instance,
                           const char * onechewing,
-                          PinyinKey * onekey){
+                          ChewingKey * onekey,
+                          ChewingKeyRest * onekeyrest){
     pinyin_context_t * & context = instance->m_context;
 
     int chewing_len = strlen(onechewing);
     int parse_len = context->m_chewing_parser->parse_one_key
-        ( context->m_validator, *onekey, onechewing, chewing_len );
+        ( context->m_options, *onekey, *onekeyrest, onechewing, chewing_len );
     return chewing_len == parse_len;
 }
 
@@ -361,8 +362,8 @@ size_t pinyin_parse_more_chewings(pinyin_instance_t * instance,
     int chewing_len = strlen(chewings);
 
     int parse_len = context->m_chewing_parser->parse
-        ( context->m_validator, instance->m_pinyin_keys,
-          instance->m_pinyin_poses, chewings, chewing_len);
+        ( context->m_options, instance->m_pinyin_keys,
+          instance->m_pinyin_key_rests, chewings, chewing_len);
 
     return parse_len;
 }
@@ -370,7 +371,7 @@ size_t pinyin_parse_more_chewings(pinyin_instance_t * instance,
 /* internal definition */
 typedef struct {
     pinyin_context_t * m_context;
-    PinyinKey * m_pinyin_keys;
+    ChewingKey * m_pinyin_keys;
 } compare_context;
 
 static gint compare_token( gconstpointer lhs, gconstpointer rhs){
@@ -386,16 +387,16 @@ static gint compare_token_with_unigram_freq(gconstpointer lhs,
     phrase_token_t token_rhs = *((phrase_token_t *)rhs);
     compare_context * context = (compare_context *)user_data;
     FacadePhraseIndex * phrase_index = context->m_context->m_phrase_index;
-    PinyinCustomSettings & custom = context->m_context->m_custom;
-    PinyinKey * pinyin_keys = context->m_pinyin_keys;
+    pinyin_option_t options = context->m_context->m_options;
+    ChewingKey * pinyin_keys = context->m_pinyin_keys;
 
     PhraseItem item;
     phrase_index->get_phrase_item(token_lhs, item);
     guint32 freq_lhs = item.get_unigram_frequency() *
-        item.get_pinyin_possibility(custom, pinyin_keys) * 256;
+        item.get_pinyin_possibility(options, pinyin_keys) * 256;
     phrase_index->get_phrase_item(token_rhs, item);
     guint32 freq_rhs = item.get_unigram_frequency() *
-        item.get_pinyin_possibility(custom, pinyin_keys) * 256;
+        item.get_pinyin_possibility(options, pinyin_keys) * 256;
 
     return -(freq_lhs - freq_rhs); /* in descendant order */
 }
@@ -404,11 +405,11 @@ bool pinyin_get_candidates(pinyin_instance_t * instance,
                            size_t offset,
                            TokenVector candidates){
     pinyin_context_t * & context = instance->m_context;
-    PinyinKeyVector & pinyin_keys = instance->m_pinyin_keys;
+    ChewingKeyVector & pinyin_keys = instance->m_pinyin_keys;
     g_array_set_size(candidates, 0);
 
-    PinyinKey * keys = &g_array_index
-        (pinyin_keys, PinyinKey, offset);
+    ChewingKey * keys = &g_array_index
+        (pinyin_keys, ChewingKey, offset);
     size_t pinyin_len = pinyin_keys->len - offset;
 
     compare_context comp_context;
@@ -552,7 +553,7 @@ bool pinyin_train(pinyin_instance_t * instance){
 
 bool pinyin_reset(pinyin_instance_t * instance){
     g_array_set_size(instance->m_pinyin_keys, 0);
-    g_array_set_size(instance->m_pinyin_poses, 0);
+    g_array_set_size(instance->m_pinyin_key_rests, 0);
     g_array_set_size(instance->m_constraints, 0);
     g_array_set_size(instance->m_match_results, 0);
 
