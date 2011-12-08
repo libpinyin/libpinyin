@@ -25,11 +25,13 @@
 
 #include "pinyin.h"
 #include "memory_chunk.h"
-
-#include "pinyin_base.h"
-#include "pinyin_phrase.h"
-#include "pinyin_large_table.h"
+#include "pinyin_custom2.h"
+#include "pinyin_parser2.h"
+#include "pinyin_phrase2.h"
+#include "chewing_large_table.h"
 #include "phrase_large_table.h"
+#include "facade_chewing_table.h"
+#include "facade_phrase_table.h"
 #include "phrase_index.h"
 #include "phrase_index_logger.h"
 #include "ngram.h"
@@ -37,12 +39,6 @@
 #include "pinyin_lookup.h"
 #include "phrase_lookup.h"
 #include "tag_utility.h"
-#include "pinyin_custom2.h"
-#include "pinyin_parser2.h"
-#include "pinyin_phrase2.h"
-#include "chewing_large_table.h"
-#include "facade_chewing_table.h"
-#include "facade_phrase_table.h"
 
 
 /* training module */
