@@ -176,6 +176,18 @@ struct ChewingKey
     }
 };
 
+static inline bool operator == (ChewingKey lhs, ChewingKey rhs) {
+    if (lhs.m_initial != rhs.m_initial)
+        return false;
+    if (lhs.m_middle  != rhs.m_middle)
+        return false;
+    if (lhs.m_final   != rhs.m_final)
+        return false;
+    if (lhs.m_tone    != rhs.m_tone)
+        return false;
+    return true;
+}
+
 struct ChewingKeyRest
 {
     guint16 m_table_index;         /* the index in pinyin parser table. */
