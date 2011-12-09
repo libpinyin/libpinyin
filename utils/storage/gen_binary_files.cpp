@@ -47,8 +47,8 @@ int main(int argc, char * argv[]){
     }
 
     /* generate pinyin index*/
-    PinyinCustomSettings custom;
-    PinyinLargeTable pinyinlargetable(&custom);
+    pinyin_option_t options = USE_TONE;
+    ChewingLargeTable chewinglargetable(options);
     PhraseLargeTable phraselargetable;
 
     /* generate phrase index */
@@ -63,8 +63,7 @@ int main(int argc, char * argv[]){
 	exit(ENOENT);
     }
 
-    pinyinlargetable.load_text(gbfile);
-
+    chewinglargetable.load_text(gbfile);
     fseek(gbfile, 0L, SEEK_SET);
     phraselargetable.load_text(gbfile);
     fseek(gbfile, 0L, SEEK_SET);
@@ -80,8 +79,7 @@ int main(int argc, char * argv[]){
         exit(ENOENT);
     }
     
-    pinyinlargetable.load_text(gbkfile);
-
+    chewinglargetable.load_text(gbkfile);
     fseek(gbkfile, 0L, SEEK_SET);
     phraselargetable.load_text(gbkfile);
     fseek(gbkfile, 0L, SEEK_SET);
@@ -89,9 +87,9 @@ int main(int argc, char * argv[]){
     fclose(gbkfile);
 
     MemoryChunk * new_chunk = new MemoryChunk;
-    pinyinlargetable.store(new_chunk);
+    chewinglargetable.store(new_chunk);
     new_chunk->save("pinyin_index.bin");
-    pinyinlargetable.load(new_chunk);
+    chewinglargetable.load(new_chunk);
     
     new_chunk = new MemoryChunk;
     phraselargetable.store(new_chunk);
