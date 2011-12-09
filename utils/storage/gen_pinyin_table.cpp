@@ -19,10 +19,16 @@
  *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
+
+#include "novel_types.h"
+#include "pinyin_base.h"
+#include "pinyin_phrase.h"
 #include <stdio.h>
+#include <errno.h>
 #include <locale.h>
 #include <glib.h>
-#include "pinyin_internal.h"
+
+using namespace pinyin;
 
 
 GTree * g_pinyin_tree;
