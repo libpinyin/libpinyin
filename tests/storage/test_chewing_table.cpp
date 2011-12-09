@@ -99,14 +99,32 @@ int main(int argc, char * argv[]) {
         for (size_t i = min_index; i < max_index; ++i) {
             GArray * & range = ranges[i];
             if (range) {
+                if (range->len)
+                    printf("range items number:%d\n", range->len);
+
                 for (size_t k = 0; k < range->len; ++k) {
                     PhraseIndexRange * onerange =
                         &g_array_index(range, PhraseIndexRange, k);
                     printf("start:%d\tend%d\n", onerange->m_range_begin,
                            onerange->m_range_end);
+
+		    PhraseItem item;
+		    for ( phrase_token_t token = onerange->m_range_begin;
+                          token != onerange->m_range_end; ++token){
+
+			phrase_index.get_phrase_item( token, item);
+
+                        /* get phrase string */
+			gunichar2 buffer[MAX_PHRASE_LENGTH + 1];
+			item.get_phrase_string(buffer);
+			char * string = g_utf16_to_utf8
+			    ( buffer, item.get_phrase_length(),
+			      NULL, NULL, NULL);
+			printf("%s\t", string);
+			g_free(string);
+                    }
+                    printf("\n");
                 }
-                if (range->len)
-                    printf("range items number:%d\n", range->len);
             }
             g_array_set_size(range, 0);
         }
