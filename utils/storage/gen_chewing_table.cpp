@@ -43,8 +43,9 @@ struct chewing_and_freq_item{
 };
 
 struct phrase_and_array_item{
-    phrase_item phrase;
-    GArray * chewing_and_freq_array;       /* Array of chewing_and_freq_item */
+    phrase_item phrase;                    /* the key of g_chewing_tree */
+    /* Array of chewing_and_freq_item */
+    GArray * chewing_and_freq_array;       /* the value of g_chewing_tree */
 };
 
 
