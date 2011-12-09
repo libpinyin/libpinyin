@@ -28,47 +28,47 @@ void print_help(){
 }
 
 bool get_possible_pinyin(FacadePhraseIndex * phrase_index,
-                         TokenVector tokens, PinyinKeyVector pinyins){
-    PinyinKey buffer[MAX_PHRASE_LENGTH];
-    size_t pinyin_index; guint32 max_freq;
+                         TokenVector tokens, ChewingKeyVector keys){
+    ChewingKey buffer[MAX_PHRASE_LENGTH];
+    size_t key_index; guint32 max_freq;
     guint32 freq;
-    g_array_set_size(pinyins, 0);
+    g_array_set_size(keys, 0);
 
     for (size_t i = 0; i < tokens->len; ++i){
         phrase_token_t * token = &g_array_index(tokens, phrase_token_t, i);
         PhraseItem item;
         phrase_index->get_phrase_item(*token, item);
-        pinyin_index = 0; max_freq = 0;
+        key_index = 0; max_freq = 0;
         for ( size_t m = 0; m < item.get_n_pronunciation(); ++m ) {
             freq = 0;
             assert(item.get_nth_pronunciation(m, buffer, freq));
             if ( freq > max_freq ) {
-                pinyin_index = m;
+                key_index = m;
                 max_freq = freq;
             }
         }
 
-        assert(item.get_nth_pronunciation(pinyin_index, buffer, freq));
+        assert(item.get_nth_pronunciation(key_index, buffer, freq));
         assert(max_freq == freq);
         guint8 len = item.get_phrase_length();
-        g_array_append_vals(pinyins, buffer, len);
+        g_array_append_vals(keys, buffer, len);
     }
     return true;
 }
 
 bool get_best_match(PinyinLookup * pinyin_lookup,
-                    PinyinKeyVector pinyins, TokenVector tokens){
+                    ChewingKeyVector keys, TokenVector tokens){
     /* initialize constraints. */
     CandidateConstraints constraints = g_array_new
         (FALSE, FALSE, sizeof(lookup_constraint_t));
-    g_array_set_size(constraints, pinyins->len);
+    g_array_set_size(constraints, keys->len);
     for ( size_t i = 0; i < constraints->len; ++i ) {
         lookup_constraint_t * constraint = &g_array_index
             (constraints, lookup_constraint_t, i);
         constraint->m_type = NO_CONSTRAINT;
     }
 
-    return pinyin_lookup->get_best_match(pinyins, constraints, tokens);
+    return pinyin_lookup->get_best_match(keys, constraints, tokens);
 }
 
 bool do_one_test(PinyinLookup * pinyin_lookup,
@@ -76,12 +76,12 @@ bool do_one_test(PinyinLookup * pinyin_lookup,
                  TokenVector tokens){
     bool retval = false;
 
-    PinyinKeyVector pinyins = g_array_new(FALSE, TRUE, sizeof(PinyinKey));
+    ChewingKeyVector keys = g_array_new(FALSE, TRUE, sizeof(ChewingKey));
     TokenVector guessed_tokens = g_array_new
         (FALSE, TRUE, sizeof(phrase_token_t));
 
-    get_possible_pinyin(phrase_index, tokens, pinyins);
-    get_best_match(pinyin_lookup, pinyins, guessed_tokens);
+    get_possible_pinyin(phrase_index, tokens, keys);
+    get_best_match(pinyin_lookup, keys, guessed_tokens);
     /* compare the results */
     char * sentence = NULL; char * guessed_sentence = NULL;
     pinyin_lookup->convert_to_utf8(tokens, sentence);
@@ -98,7 +98,7 @@ bool do_one_test(PinyinLookup * pinyin_lookup,
     }
 
     g_free(sentence); g_free(guessed_sentence);
-    g_array_free(pinyins, TRUE);
+    g_array_free(keys, TRUE);
     g_array_free(guessed_tokens, TRUE);
     return retval;
 }
@@ -106,8 +106,8 @@ bool do_one_test(PinyinLookup * pinyin_lookup,
 int main(int argc, char * argv[]){
     const char * evals_text = "evals.text";
 
-    PinyinCustomSettings custom;
-    PinyinLargeTable largetable(&custom);
+    pinyin_option_t options = USE_TONE;
+    ChewingLargeTable largetable(options);
 
     MemoryChunk * new_chunk = new MemoryChunk;
     new_chunk->load("pinyin_index.bin");
@@ -131,7 +131,7 @@ int main(int argc, char * argv[]){
     Bigram user_bigram;
     user_bigram.attach(NULL, ATTACH_CREATE|ATTACH_READWRITE);
 
-    PinyinLookup pinyin_lookup(&custom, &largetable, &phrase_index,
+    PinyinLookup pinyin_lookup(options, &largetable, &phrase_index,
                                &system_bigram, &user_bigram);
 
     /* open evals.text. */
