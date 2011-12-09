@@ -20,10 +20,11 @@
  */
 
 
-#include "pinyin_internal.h"
+#include "pinyin_base.h"
 #include <stdio.h>
 #include <string.h>
 
+using namespace pinyin;
 
 static const char *map_names [] = {
     "__zhuyin_standard_map",
