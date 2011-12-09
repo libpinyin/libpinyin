@@ -105,7 +105,7 @@ int main(int argc, char * argv[]) {
                 for (size_t k = 0; k < range->len; ++k) {
                     PhraseIndexRange * onerange =
                         &g_array_index(range, PhraseIndexRange, k);
-                    printf("start:%d\tend%d\n", onerange->m_range_begin,
+                    printf("start:%d\tend:%d\n", onerange->m_range_begin,
                            onerange->m_range_end);
 
 		    PhraseItem item;

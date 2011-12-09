@@ -71,17 +71,21 @@ int main( int argc, char * argv[]){
 	largetable.search(keys->len, (PinyinKey *)keys->data, ranges);
 	for( size_t i = 0 ; i < PHRASE_INDEX_LIBRARY_COUNT ; ++i){
 	    GArray * range = ranges[i];
-	    if ( range ){
-		if ( range->len)
-		    printf("range items number:%d\n", range->len);
+            if (range) {
+                if (range->len)
+                    printf("range items number:%d\n", range->len);
 
-		for (size_t k = 0; k < range->len; ++k){
-		    PhraseIndexRange* onerange = &g_array_index(range, PhraseIndexRange, k);
-		    printf("start:%d\tend:%d\n", onerange->m_range_begin, onerange->m_range_end);
-		}
-	    }
-	    g_array_set_size( range, 0);
-	}
+                for (size_t k = 0; k < range->len; ++k) {
+                    PhraseIndexRange * onerange =
+                        &g_array_index(range, PhraseIndexRange, k);
+                    printf("start:%d\tend:%d\n", onerange->m_range_begin,
+                           onerange->m_range_end);
+
+                }
+            }
+
+            g_array_set_size(range, 0);
+        }
 
 	g_array_free(keys, TRUE);
 	g_array_free(poses, TRUE);
