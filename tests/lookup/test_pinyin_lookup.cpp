@@ -6,16 +6,13 @@ size_t bench_times = 100;
 
 int main( int argc, char * argv[]){
 
-    PinyinCustomSettings custom;
-    PinyinLargeTable largetable(&custom);
+    pinyin_option_t options = PINYIN_CORRECT_ALL | USE_TONE;
+    ChewingLargeTable largetable(options);
 
     MemoryChunk * new_chunk = new MemoryChunk;
     new_chunk->load("../../data/pinyin_index.bin");
     largetable.load(new_chunk);
 
-    BitmapPinyinValidator validator;
-    validator.initialize(&largetable);
-    
     FacadePhraseIndex phrase_index;
     new_chunk = new MemoryChunk;
     new_chunk->load("../../data/gb_char.bin");
@@ -29,7 +26,7 @@ int main( int argc, char * argv[]){
     Bigram user_bigram;
     user_bigram.attach(NULL, ATTACH_CREATE|ATTACH_READWRITE);
     
-    PinyinLookup pinyin_lookup(&custom, &largetable, &phrase_index,
+    PinyinLookup pinyin_lookup(options, &largetable, &phrase_index,
                                &system_bigram, &user_bigram);
     
     char* linebuf = NULL;
@@ -43,18 +40,15 @@ int main( int argc, char * argv[]){
 	if ( strcmp ( linebuf, "quit" ) == 0)
 	    break;
 	
-	PinyinDefaultParser parser;
-	PinyinKeyVector keys;
-	PinyinKeyPosVector poses;
+	FullPinyinParser2 parser;
+	ChewingKeyVector keys  = g_array_new(FALSE, FALSE, sizeof(ChewingKey));
+	ChewingKeyRestVector key_rests =
+            g_array_new(FALSE, FALSE, sizeof(ChewingKeyRest));
+	parser.parse(options, keys, key_rests, linebuf, strlen(linebuf));
 
-	validator.initialize(&largetable);
-	
-	keys = g_array_new(FALSE, FALSE, sizeof( PinyinKey));
-	poses = g_array_new(FALSE, FALSE, sizeof( PinyinKeyPos));
-	parser.parse(validator, keys, poses,linebuf);
-
-	if ( 0 == keys->len )
+	if ( 0 == keys->len ) /* invalid pinyin */
 	    continue;
+
 	CandidateConstraints constraints = g_array_new(FALSE, FALSE, sizeof(lookup_constraint_t));
 
 	g_array_set_size(constraints, keys->len);
@@ -82,7 +76,7 @@ int main( int argc, char * argv[]){
 	g_array_free(results, TRUE);
 
 	g_array_free(keys, TRUE);
-	g_array_free(poses, TRUE);
+	g_array_free(key_rests, TRUE);
 	g_free(sentence);
     }
     free(linebuf);
