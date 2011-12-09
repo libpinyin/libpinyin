@@ -20,8 +20,9 @@
  */
 
 
-#include <stdlib.h>
 #include "pinyin.h"
+#include <stdlib.h>
+#include <string.h>
 
 int main(int argc, char * argv[]){
     pinyin_context_t * context =
