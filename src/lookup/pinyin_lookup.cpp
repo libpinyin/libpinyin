@@ -335,7 +335,7 @@ bool PinyinLookup::unigram_gen_next_step(int nstep, lookup_value_t * cur_step, p
 	m_phrase_index->get_phrase_index_total_freq();
     if ( elem_poss < DBL_EPSILON )
 	return false;
-    gfloat pinyin_poss = m_cache_phrase_item.get_pinyin_possibility(m_options, pinyinkeys);
+    gfloat pinyin_poss = m_cache_phrase_item.get_pronunciation_possibility(m_options, pinyinkeys);
     if (pinyin_poss < FLT_EPSILON )
 	return false;
     lookup_value_t next_step;
@@ -356,7 +356,7 @@ bool PinyinLookup::bigram_gen_next_step(int nstep, lookup_value_t * cur_step, ph
 
     if ( bigram_poss < FLT_EPSILON && unigram_poss < DBL_EPSILON )
 	return false;
-    gfloat pinyin_poss = m_cache_phrase_item.get_pinyin_possibility(m_options, pinyinkeys);
+    gfloat pinyin_poss = m_cache_phrase_item.get_pronunciation_possibility(m_options, pinyinkeys);
     if ( pinyin_poss < FLT_EPSILON )
 	return false;
     lookup_value_t next_step;
@@ -462,7 +462,7 @@ bool PinyinLookup::train_result(ChewingKeyVector keys, CandidateConstraints cons
             //add pi-gram frequency
             //printf("i:%d\tlast_token:%d\ttoken:%d\n", i, last_token, *token);
 	    m_phrase_index->get_phrase_item(*token, m_cache_phrase_item);
-	    m_cache_phrase_item.increase_pinyin_possibility(m_options, pinyin_keys + i, train_factor);
+	    m_cache_phrase_item.increase_pronunciation_possibility(m_options, pinyin_keys + i, train_factor);
 	    m_phrase_index->add_unigram_frequency(*token, train_factor * 10);
 	    if ( last_token ){
 		SingleGram * system, *user;
@@ -579,7 +579,7 @@ bool PinyinLookup::validate_constraint(CandidateConstraints constraints, Chewing
 		continue;
 	    }
 	    //clear invalidated pinyin
-	    gfloat pinyin_poss = m_cache_phrase_item.get_pinyin_possibility(m_options, pinyin_keys + i);
+	    gfloat pinyin_poss = m_cache_phrase_item.get_pronunciation_possibility(m_options, pinyin_keys + i);
 	    if ( pinyin_poss < FLT_EPSILON ){
 		clear_constraint(constraints, i);
 	    }

@@ -69,7 +69,7 @@ bool PhraseItem::set_phrase_string(guint8 phrase_length, utf16_t * phrase){
     return true;
 }
 
-void PhraseItem::increase_pinyin_possibility(pinyin_option_t options,
+void PhraseItem::increase_pronunciation_possibility(pinyin_option_t options,
 					     ChewingKey * keys,
 					     gint32 delta){
     guint8 phrase_length = get_phrase_length();

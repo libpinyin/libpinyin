@@ -90,7 +90,7 @@ public:
 	return (*(guint32 *)(buf_begin + sizeof(guint8) + sizeof(guint8)));
     }
 
-    gfloat get_pinyin_possibility(pinyin_option_t options,
+    gfloat get_pronunciation_possibility(pinyin_option_t options,
 				  ChewingKey * keys){
 	guint8 phrase_length = get_phrase_length();
 	guint8 npron = get_n_pronunciation();
@@ -122,7 +122,7 @@ public:
 	return retval;
     }
     
-    void increase_pinyin_possibility(pinyin_option_t options,
+    void increase_pronunciation_possibility(pinyin_option_t options,
 				     ChewingKey * keys,
 				     gint32 delta);
 

@@ -394,10 +394,10 @@ static gint compare_token_with_unigram_freq(gconstpointer lhs,
     PhraseItem item;
     phrase_index->get_phrase_item(token_lhs, item);
     guint32 freq_lhs = item.get_unigram_frequency() *
-        item.get_pinyin_possibility(options, pinyin_keys) * 256;
+        item.get_pronunciation_possibility(options, pinyin_keys) * 256;
     phrase_index->get_phrase_item(token_rhs, item);
     guint32 freq_rhs = item.get_unigram_frequency() *
-        item.get_pinyin_possibility(options, pinyin_keys) * 256;
+        item.get_pronunciation_possibility(options, pinyin_keys) * 256;
 
     return -(freq_lhs - freq_rhs); /* in descendant order */
 }

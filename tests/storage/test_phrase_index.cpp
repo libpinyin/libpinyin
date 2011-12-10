@@ -28,7 +28,7 @@ int main(int argc, char * argv[]){
     assert(freq == 300);
 
     pinyin_option_t options = 0;
-    gfloat poss = phrase_item.get_pinyin_possibility(options, &key1);
+    gfloat poss = phrase_item.get_pronunciation_possibility(options, &key1);
     printf("pinyin possiblitiy:%f\n", poss);
 
     assert(phrase_item.get_unigram_frequency() == 0);
@@ -51,21 +51,21 @@ int main(int argc, char * argv[]){
 	assert(item2.get_unigram_frequency() == 0);
 	assert(item2.get_n_pronunciation() == 2);
 	assert(item2.get_phrase_length() == 1);
-	assert(item2.get_pinyin_possibility(options, &key2) == 0.75);
+	assert(item2.get_pronunciation_possibility(options, &key2) == 0.75);
     }
     print_time(time, bench_times);
 
     {
         PhraseItem item3;
         phrase_index.get_phrase_item(1, item3);
-        item3.increase_pinyin_possibility(options, &key1, 200);
-        assert(item3.get_pinyin_possibility(options, &key1) == 0.5) ;
+        item3.increase_pronunciation_possibility(options, &key1, 200);
+        assert(item3.get_pronunciation_possibility(options, &key1) == 0.5) ;
     }
 
     {
         PhraseItem item5;
         phrase_index.get_phrase_item(1, item5);
-        gfloat poss = item5.get_pinyin_possibility(options, &key1);
+        gfloat poss = item5.get_pronunciation_possibility(options, &key1);
         printf("pinyin poss:%f\n", poss);
         assert(poss == 0.5);
     }
