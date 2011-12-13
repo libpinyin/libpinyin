@@ -84,7 +84,7 @@ def gen_bopomofo_index():
     return ',\n'.join(entries)
 
 
-def gen_chewing_key_table_index_map():
+def gen_chewing_key_table():
     return gen_table_index(content_table)
 
 
@@ -96,5 +96,5 @@ sort_all()
 ### main function ###
 if __name__ == "__main__":
     #s = gen_content_table() + gen_pinyin_index() + gen_bopomofo_index()
-    s = gen_chewing_key_table_index_map()
+    s = gen_chewing_key_table()
     print(s)
