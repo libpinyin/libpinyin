@@ -22,7 +22,8 @@
 
 import os
 from genpinyintable import gen_content_table, \
-    gen_pinyin_index, gen_bopomofo_index
+    gen_pinyin_index, gen_bopomofo_index, \
+    gen_chewing_key_to_table_index
 from genspecialtable import gen_divided_table, gen_resplit_table
 
 def get_table_content(tablename):
@@ -36,6 +37,8 @@ def get_table_content(tablename):
         return gen_divided_table()
     if tablename == 'RESPLIT_TABLE':
         return gen_resplit_table()
+    if tablename == 'TABLE_INDEX':
+        return gen_chewing_key_to_table_index()
 
 
 def expand_file(filename):

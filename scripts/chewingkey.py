@@ -125,6 +125,26 @@ def gen_tones():
                        'CHEWING_NUMBER_OF_TONES = CHEWING_LAST_TONE + 1')
 
 
+def gen_table_index(content_table):
+    entries = []
+    for i in range(0, len(CHEWING_INITIAL_LIST)):
+        initial = CHEWING_INITIAL_LIST[i]
+        for m in range(0, len(CHEWING_MIDDLE_LIST)):
+            middle = CHEWING_MIDDLE_LIST[m]
+            for f in range(0, len(CHEWING_FINAL_LIST)):
+                final = CHEWING_FINAL_LIST[f]
+                chewingkey = 'ChewingKey({0}, {1}, {2})'.format(initial, middle, final)
+                index = -1
+                try:
+                    index = [x[2] for x in content_table].index(chewingkey)
+                except ValueError:
+                    pass
+
+                entry = '{0} /* {1} */'.format(index, chewingkey)
+                entries.append(entry)
+    return ",\n".join(entries)
+
+
 if __name__ == "__main__":
     print(gen_initials())
     print(gen_middles())

@@ -21,6 +21,7 @@
 
 import operator
 from pinyintable import *
+from chewingkey import gen_table_index
 
 
 content_table = []
@@ -83,6 +84,10 @@ def gen_bopomofo_index():
     return ',\n'.join(entries)
 
 
+def gen_chewing_key_table_index_map():
+    return gen_table_index(content_table)
+
+
 #init code
 filter_pinyin_list()
 sort_all()
@@ -90,5 +95,6 @@ sort_all()
 
 ### main function ###
 if __name__ == "__main__":
-    s = gen_content_table() + gen_pinyin_index() + gen_bopomofo_index()
+    #s = gen_content_table() + gen_pinyin_index() + gen_bopomofo_index()
+    s = gen_chewing_key_table_index_map()
     print(s)
