@@ -3437,10 +3437,10 @@ const gint chewing_key_table[CHEWING_NUMBER_OF_INITIALS *
 const char * chewing_tone_table[CHEWING_NUMBER_OF_TONES] = {
 "",
 "ˉ",
-'ˊ',
-'ˇ',
-'ˋ',
-'˙'
+"ˊ",
+"ˇ",
+"ˋ",
+"˙"
 };
 
 };
