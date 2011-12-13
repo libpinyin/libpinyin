@@ -140,7 +140,7 @@ def gen_table_index(content_table):
                 except ValueError:
                     pass
 
-                entry = '{0} /* {1} */'.format(index, chewingkey)
+                entry = '{0:<7} /* {1} */'.format(index, chewingkey)
                 entries.append(entry)
     return ",\n".join(entries)
 
