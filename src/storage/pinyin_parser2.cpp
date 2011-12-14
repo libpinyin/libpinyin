@@ -416,7 +416,7 @@ int FullPinyinParser2::final_step(size_t step_len, ChewingKeyVector & keys,
         gint16 pos = curstep->m_num_keys - 1;
 
         /* skip "'" */
-        if (0 != curstep->m_key_rest.m_table_index) {
+        if (0 != curstep->m_key.get_table_index()) {
             ChewingKey * key = &g_array_index(keys, ChewingKey, pos);
             ChewingKeyRest * rest = &g_array_index
                 (key_rests, ChewingKeyRest, pos);

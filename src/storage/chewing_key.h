@@ -197,18 +197,14 @@ static inline bool operator == (ChewingKey lhs, ChewingKey rhs) {
 
 struct ChewingKeyRest
 {
-    /* Note: the table index is deprecated,
-     *   and will be removed in the next major release.
-     *   Currently this is kept for debugging purpose.
+    /* Note: the table index is removed,
      *   Please use get_table_index in ChewingKey.
      */
-    guint16 m_table_index;         /* the index in pinyin parser table. */
     guint16 m_raw_begin;           /* the begin of the raw input. */
     guint16 m_raw_end;             /* the end of the raw input. */
 
     ChewingKeyRest() {
         /* the 0th item in pinyin parser table is reserved for invalid. */
-        m_table_index = 0;
         m_raw_begin = 0;
         m_raw_end = 0;
     }
