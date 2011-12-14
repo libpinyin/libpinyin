@@ -174,6 +174,13 @@ struct ChewingKey
         m_final = final;
         m_tone = CHEWING_ZERO_TONE;
     }
+
+public:
+    gint get_table_index();
+
+    /* Note: the return value should be freed by g_free. */
+    gchar * get_pinyin_string();
+    gchar * get_chewing_string();
 };
 
 static inline bool operator == (ChewingKey lhs, ChewingKey rhs) {
@@ -190,6 +197,11 @@ static inline bool operator == (ChewingKey lhs, ChewingKey rhs) {
 
 struct ChewingKeyRest
 {
+    /* Note: the table index is deprecated,
+     *   and will be removed in the next major release.
+     *   Currently this is kept for debugging purpose.
+     *   Please use get_table_index in ChewingKey.
+     */
     guint16 m_table_index;         /* the index in pinyin parser table. */
     guint16 m_raw_begin;           /* the begin of the raw input. */
     guint16 m_raw_end;             /* the end of the raw input. */

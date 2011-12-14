@@ -72,6 +72,41 @@ static bool check_chewing_options(pinyin_option_t options, const chewing_index_i
 }
 
 
+gint ChewingKey::get_table_index() {
+    assert(m_initial <  CHEWING_NUMBER_OF_INITIALS);
+    assert(m_middle < CHEWING_NUMBER_OF_MIDDLES);
+    assert(m_final < CHEWING_NUMBER_OF_FINALS);
+
+    gint index = chewing_key_table[(m_initial * CHEWING_NUMBER_OF_MIDDLES + m_middle) * CHEWING_NUMBER_OF_FINALS + m_final];
+    return index == -1 ? 0 : index;
+}
+
+gchar * ChewingKey::get_pinyin_string() {
+    assert(m_tone < CHEWING_NUMBER_OF_TONES);
+    gint index = get_table_index();
+    const content_table_item_t & item = content_table[index];
+
+    if (CHEWING_ZERO_TONE == m_tone) {
+        return g_strdup(item.m_pinyin_str);
+    } else {
+        return g_strdup_printf("%s%d", item.m_pinyin_str, m_tone);
+    }
+}
+
+gchar * ChewingKey::get_chewing_string() {
+    assert(m_tone < CHEWING_NUMBER_OF_TONES);
+    gint index = get_table_index();
+    const content_table_item_t & item = content_table[index];
+
+    if (CHEWING_ZERO_TONE == m_tone) {
+        return g_strdup(item.m_chewing_str);
+    } else {
+        return g_strdup_printf("%s%s", item.m_chewing_str,
+                               chewing_tone_table[m_tone]);
+    }
+}
+
+
 /* methods for Chewing Keys to access pinyin parser table. */
 const char * ChewingKeyRest::get_pinyin_string(){
     if (m_table_index == 0)
