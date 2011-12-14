@@ -145,6 +145,7 @@ def gen_table_index(content_table):
     return ",\n".join(entries)
 
 
+### main function ###
 if __name__ == "__main__":
     print(gen_initials())
     print(gen_middles())
