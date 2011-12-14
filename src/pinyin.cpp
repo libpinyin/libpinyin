@@ -299,13 +299,12 @@ bool pinyin_get_sentence(pinyin_instance_t * instance,
 
 bool pinyin_parse_full_pinyin(pinyin_instance_t * instance,
                               const char * onepinyin,
-                              ChewingKey * onekey,
-                              ChewingKeyRest * onekeyrest){
+                              ChewingKey * onekey){
     pinyin_context_t * & context = instance->m_context;
 
     int pinyin_len = strlen(onepinyin);
     int parse_len = context->m_default_parser->parse_one_key
-        ( context->m_options, *onekey, *onekeyrest, onepinyin, pinyin_len);
+        ( context->m_options, *onekey, onepinyin, pinyin_len);
     return pinyin_len == parse_len;
 }
 
@@ -323,13 +322,12 @@ size_t pinyin_parse_more_full_pinyins(pinyin_instance_t * instance,
 
 bool pinyin_parse_double_pinyin(pinyin_instance_t * instance,
                                 const char * onepinyin,
-                                ChewingKey * onekey,
-                                ChewingKeyRest * onekeyrest){
+                                ChewingKey * onekey){
     pinyin_context_t * & context = instance->m_context;
 
     int pinyin_len = strlen(onepinyin);
     int parse_len = context->m_shuang_pin_parser->parse_one_key
-        ( context->m_options, *onekey, *onekeyrest, onepinyin, pinyin_len);
+        ( context->m_options, *onekey, onepinyin, pinyin_len);
     return pinyin_len == parse_len;
 }
 
@@ -347,13 +345,12 @@ size_t pinyin_parse_more_double_pinyins(pinyin_instance_t * instance,
 
 bool pinyin_parse_chewing(pinyin_instance_t * instance,
                           const char * onechewing,
-                          ChewingKey * onekey,
-                          ChewingKeyRest * onekeyrest){
+                          ChewingKey * onekey){
     pinyin_context_t * & context = instance->m_context;
 
     int chewing_len = strlen(onechewing);
     int parse_len = context->m_chewing_parser->parse_one_key
-        ( context->m_options, *onekey, *onekeyrest, onechewing, chewing_len );
+        ( context->m_options, *onekey, onechewing, chewing_len );
     return chewing_len == parse_len;
 }
 

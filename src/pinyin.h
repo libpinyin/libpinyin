@@ -67,22 +67,19 @@ bool pinyin_get_sentence(pinyin_instance_t * instance,
 
 bool pinyin_parse_full_pinyin(pinyin_instance_t * instance,
                               const char * onepinyin,
-                              ChewingKey * onekey,
-                              ChewingKeyRest * onekeyrest);
+                              ChewingKey * onekey);
 size_t pinyin_parse_more_full_pinyins(pinyin_instance_t * instance,
                                       const char * pinyins);
 
 bool pinyin_parse_double_pinyin(pinyin_instance_t * instance,
                                 const char * onepinyin,
-                                ChewingKey * onekey,
-                                ChewingKeyRest * onekeyrest);
+                                ChewingKey * onekey);
 size_t pinyin_parse_more_double_pinyins(pinyin_instance_t * instance,
                                         const char * pinyins);
 
 bool pinyin_parse_chewing(pinyin_instance_t * instance,
                           const char * onechewing,
-                          ChewingKey * onekey,
-                          ChewingKeyRest * onekeyrest);
+                          ChewingKey * onekey);
 size_t pinyin_parse_more_chewings(pinyin_instance_t * instance,
                                   const char * chewings);
 
