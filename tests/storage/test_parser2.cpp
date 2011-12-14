@@ -105,7 +105,7 @@ int main(int argc, char * argv[]) {
         bool success = parser->parse_one_key(options, key, key_rest,
                                              linebuf, strlen(linebuf));
         if (success)
-            printf("pinyin:%s\t%d\t%d\n", key_rest.get_pinyin_string(),
+            printf("pinyin:%s\t%d\t%d\n", key.get_pinyin_string(),
                    key_rest.m_raw_begin, key_rest.m_raw_end);
 #endif
 
@@ -123,9 +123,11 @@ int main(int argc, char * argv[]) {
         assert(keys->len == key_rests->len);
 
         for (size_t i = 0; i < keys->len; ++i) {
+            ChewingKey * key =
+                &g_array_index(keys, ChewingKey, i);
             ChewingKeyRest * key_rest =
                 &g_array_index(key_rests, ChewingKeyRest, i);
-            printf("%s %d %d\t", key_rest->get_pinyin_string(),
+            printf("%s %d %d\t", key->get_pinyin_string(),
                    key_rest->m_raw_begin, key_rest->m_raw_end);
         }
         printf("\n");

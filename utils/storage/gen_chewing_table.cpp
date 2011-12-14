@@ -293,7 +293,7 @@ void gen_phrase_file(const char * outfilename, int phrase_index){
                         (key_rests, ChewingKeyRest, k);
 
                     //assert (CHEWING_ZERO_TONE != key.m_tone);
-                    pinyin = get_pinyin_string(key, key_rest);
+                    pinyin = key.get_pinyin_string();
                     g_array_append_val(pinyins, pinyin);
                 }
                 gchar * pinyin_str = g_strjoinv("'", (gchar **)pinyins->data);
