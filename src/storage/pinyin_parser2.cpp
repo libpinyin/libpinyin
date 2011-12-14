@@ -139,9 +139,9 @@ static bool compare_pinyin_less_than(const pinyin_index_item_t & lhs,
     return 0 > strcmp(lhs.m_pinyin_input, rhs.m_pinyin_input);
 }
 
-static inline bool search_pinyin_index(pinyin_option_t options, const char * pinyin,
-                                       ChewingKey & key,
-                                       ChewingKeyRest & key_rest){
+static inline bool search_pinyin_index(pinyin_option_t options,
+                                       const char * pinyin,
+                                       ChewingKey & key){
     pinyin_index_item_t item;
     memset(&item, 0, sizeof(item));
     item.m_pinyin_input = pinyin;
@@ -160,8 +160,8 @@ static inline bool search_pinyin_index(pinyin_option_t options, const char * pin
         if (!check_pinyin_options(options, index))
             return false;
 
-        key_rest.m_table_index = index->m_table_index;
-        key = content_table[key_rest.m_table_index].m_chewing_key;
+        key = content_table[index->m_table_index].m_chewing_key;
+        assert(key.get_table_index() == index->m_table_index);
         return true;
     }
 
@@ -173,9 +173,9 @@ static bool compare_chewing_less_than(const chewing_index_item_t & lhs,
     return 0 > strcmp(lhs.m_chewing_input, rhs.m_chewing_input);
 }
 
-static inline bool search_chewing_index(pinyin_option_t options, const char * chewing,
-                                        ChewingKey & key,
-                                        ChewingKeyRest & key_rest){
+static inline bool search_chewing_index(pinyin_option_t options,
+                                        const char * chewing,
+                                        ChewingKey & key){
     chewing_index_item_t item;
     memset(&item, 0, sizeof(item));
     item.m_chewing_input = chewing;
@@ -195,8 +195,8 @@ static inline bool search_chewing_index(pinyin_option_t options, const char * ch
         if (!check_chewing_options(options, index))
             return false;
 
-        key_rest.m_table_index = index->m_table_index;
-        key = content_table[key_rest.m_table_index].m_chewing_key;
+        key = content_table[index->m_table_index].m_chewing_key;
+        assert(key.get_table_index() == index->m_table_index);
         return true;
     }
 
@@ -209,8 +209,8 @@ FullPinyinParser2::FullPinyinParser2 (){
 }
 
 
-bool FullPinyinParser2::parse_one_key (pinyin_option_t options, ChewingKey & key,
-                                       ChewingKeyRest & key_rest,
+bool FullPinyinParser2::parse_one_key (pinyin_option_t options,
+                                       ChewingKey & key,
                                        const char * pinyin, int len) const {
     /* "'" are not accepted in parse_one_key. */
     gchar * input = g_strndup(pinyin, len);
@@ -218,7 +218,7 @@ bool FullPinyinParser2::parse_one_key (pinyin_option_t options, ChewingKey & key
 
     guint16 tone = CHEWING_ZERO_TONE; guint16 tone_pos = 0;
     guint16 parsed_len = len;
-    key = ChewingKey(); key_rest = ChewingKeyRest();
+    key = ChewingKey();
 
     if (options & USE_TONE) {
         /* find the tone in the last character. */
@@ -234,7 +234,7 @@ bool FullPinyinParser2::parse_one_key (pinyin_option_t options, ChewingKey & key
 
     /* Note: optimize here? */
     input[parsed_len] = '\0';
-    if (!search_pinyin_index(options, input, key, key_rest)) {
+    if (!search_pinyin_index(options, input, key)) {
         g_free(input);
         return false;
     }
@@ -249,7 +249,6 @@ bool FullPinyinParser2::parse_one_key (pinyin_option_t options, ChewingKey & key
         }
     }
 
-    key_rest.m_raw_begin = 0; key_rest.m_raw_end = parsed_len;
     g_free(input);
     return parsed_len == len;
 }
@@ -316,7 +315,7 @@ int FullPinyinParser2::parse (pinyin_option_t options, ChewingKeyVector & keys,
 
                 ChewingKey key; ChewingKeyRest rest;
                 bool parsed = parse_one_key
-                    (options, key, rest, onepinyin, onepinyinlen);
+                    (options, key, onepinyin, onepinyinlen);
                 rest.m_raw_begin = pos; rest.m_raw_end = n;
 
                 if (!parsed)
@@ -358,7 +357,7 @@ int FullPinyinParser2::parse (pinyin_option_t options, ChewingKeyVector & keys,
 
                 ChewingKey key; ChewingKeyRest rest;
                 bool parsed = parse_one_key
-                    (options, key, rest, onepinyin, onepinyinlen);
+                    (options, key, onepinyin, onepinyinlen);
                 rest.m_raw_begin = m; rest.m_raw_end = n;
                 if (!parsed)
                     continue;
@@ -499,8 +498,8 @@ bool FullPinyinParser2::post_process(pinyin_option_t options,
 
 #define IS_KEY(x)   (('a' <= x && x <= 'z') || x == ';')
 
-bool DoublePinyinParser2::parse_one_key(pinyin_option_t options, ChewingKey & key,
-                                        ChewingKeyRest & key_rest,
+bool DoublePinyinParser2::parse_one_key(pinyin_option_t options,
+                                        ChewingKey & key,
                                         const char *str, int len) const {
 
     if (1 == len) {
@@ -516,8 +515,7 @@ bool DoublePinyinParser2::parse_one_key(pinyin_option_t options, ChewingKey & ke
         if (NULL == sheng || strcmp(sheng, "'") == 0)
             return false;
 
-        if (search_pinyin_index(options, sheng, key, key_rest)) {
-            key_rest.m_raw_begin = 0; key_rest.m_raw_end = len;
+        if (search_pinyin_index(options, sheng, key)) {
             return true;
         } else {
             return false;
@@ -559,8 +557,7 @@ bool DoublePinyinParser2::parse_one_key(pinyin_option_t options, ChewingKey & ke
         /* first yunmu */
         const char * yun = m_yunmu_table[charid].m_yunmus[0];
         gchar * pinyin = g_strdup_printf("%s%s", sheng, yun);
-        if (search_pinyin_index(options, pinyin, key, key_rest)) {
-            key_rest.m_raw_begin = 0; key_rest.m_raw_end = len;
+        if (search_pinyin_index(options, pinyin, key)) {
             key.m_tone = tone;
             g_free(pinyin);
             return true;
@@ -570,8 +567,7 @@ bool DoublePinyinParser2::parse_one_key(pinyin_option_t options, ChewingKey & ke
         /* second yunmu */
         yun = m_yunmu_table[charid].m_yunmus[1];
         pinyin = g_strdup_printf("%s%s", sheng, yun);
-        if (search_pinyin_index(options, pinyin, key, key_rest)) {
-            key_rest.m_raw_begin = 0; key_rest.m_raw_end = len;
+        if (search_pinyin_index(options, pinyin, key)) {
             key.m_tone = tone;
             g_free(pinyin);
             return true;
@@ -609,7 +605,7 @@ int DoublePinyinParser2::parse(pinyin_option_t options, ChewingKeyVector & keys,
 
         ChewingKey key; ChewingKeyRest key_rest;
         for (; i > 0; --i) {
-            bool success = parse_one_key(options, key, key_rest, cur_str, i);
+            bool success = parse_one_key(options, key, cur_str, i);
             if (success)
                 break;
         }
@@ -694,7 +690,9 @@ static bool search_chewing_tones(const chewing_tone_item_t * tone_table,
 }
 
 
-bool ChewingParser2::parse_one_key(pinyin_option_t options, ChewingKey & key, ChewingKeyRest & key_rest, const char *str, int len) const {
+bool ChewingParser2::parse_one_key(pinyin_option_t options,
+                                   ChewingKey & key,
+                                   const char *str, int len) const {
     char tone = CHEWING_ZERO_TONE;
 
     int symbols_len = len;
@@ -728,8 +726,7 @@ bool ChewingParser2::parse_one_key(pinyin_option_t options, ChewingKey & key, Ch
     }
 
     /* search the chewing in the chewing index table. */
-    if (search_chewing_index(options, chewing, key, key_rest)) {
-        key_rest.m_raw_begin = 0; key_rest.m_raw_end = len;
+    if (search_chewing_index(options, chewing, key)) {
         /* save back tone if available. */
         key.m_tone = tone;
         g_free(chewing);
@@ -765,7 +762,7 @@ int ChewingParser2::parse(pinyin_option_t options, ChewingKeyVector & keys,
 
         ChewingKey key; ChewingKeyRest key_rest;
         for (; i > 0; --i) {
-            bool success = parse_one_key(options, key, key_rest, cur_str, i);
+            bool success = parse_one_key(options, key, cur_str, i);
             if (success)
                 break;
         }

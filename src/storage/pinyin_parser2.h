@@ -105,7 +105,7 @@ public:
      *
      * @return whether the entire string is parsed as one key.
      */
-    virtual bool parse_one_key(pinyin_option_t options, ChewingKey & key, ChewingKeyRest & key_rest, const char *str, int len) const = 0;
+    virtual bool parse_one_key(pinyin_option_t options, ChewingKey & key, const char *str, int len) const = 0;
 
     /**
      * @brief Translate the source string into a set of ChewingKeys.
@@ -116,9 +116,6 @@ public:
      * @param len the length of str, in number of chars rather than bytes.
      *
      * @return the number of chars were actually used.
-     */
-    /* Note:
-     *   the parse method will use dynamic programming to drive parse_one_key.
      */
     virtual int parse(pinyin_option_t options, ChewingKeyVector & keys, ChewingKeyRestVector & key_rests, const char *str, int len) const = 0;
 
@@ -147,8 +144,11 @@ public:
         g_array_free(m_parse_steps, TRUE);
     }
 
-    virtual bool parse_one_key(pinyin_option_t options, ChewingKey & key, ChewingKeyRest & key_rest, const char *str, int len) const;
+    virtual bool parse_one_key(pinyin_option_t options, ChewingKey & key, const char *str, int len) const;
 
+    /* Note:
+     *   the parse method will use dynamic programming to drive parse_one_key.
+     */
     virtual int parse(pinyin_option_t options, ChewingKeyVector & keys, ChewingKeyRestVector & key_rests, const char *str, int len) const;
 };
 
@@ -170,7 +170,7 @@ public:
 
     virtual ~DoublePinyinParser2() {}
 
-    virtual bool parse_one_key(pinyin_option_t options, ChewingKey & key, ChewingKeyRest & key_rest, const char *str, int len) const;
+    virtual bool parse_one_key(pinyin_option_t options, ChewingKey & key, const char *str, int len) const;
 
     virtual int parse(pinyin_option_t options, ChewingKeyVector & keys, ChewingKeyRestVector & key_rests, const char *str, int len) const;
 
@@ -207,7 +207,7 @@ public:
 
     virtual ~ChewingParser2() {}
 
-    virtual bool parse_one_key(pinyin_option_t options, ChewingKey & key, ChewingKeyRest & key_rest, const char *str, int len) const;
+    virtual bool parse_one_key(pinyin_option_t options, ChewingKey & key, const char *str, int len) const;
 
     virtual int parse(pinyin_option_t options, ChewingKeyVector & keys, ChewingKeyRestVector & key_rests, const char *str, int len) const;
 
