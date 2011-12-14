@@ -34,7 +34,6 @@ src/lookup/liblookup.a
 src/storage/libstorage.a
 tests/include/test_memory_chunk
 tests/lookup/test_phrase_lookup
-tests/lookup/test_simple_lookup
 tests/storage/test_flexible_ngram
 tests/storage/test_ngram
 tests/storage/test_parser
@@ -42,15 +41,18 @@ tests/storage/test_parser2
 tests/storage/test_phrase_index
 tests/storage/test_phrase_index_logger
 tests/storage/test_phrase_table
-tests/storage/test_pinyin_index
 tests/test_chewing
 tests/test_phrase
 tests/test_pinyin
+tests/lookup/test_pinyin_lookup
+tests/storage/test_chewing_table
+tests/storage/test_pinyin_table
 utils/segment/ngseg
 utils/segment/spseg
 utils/storage/export_interpolation
 utils/storage/gen_binary_files
 utils/storage/gen_pinyin_table
+utils/storage/gen_chewing_table
 utils/storage/gen_zhuyin_map
 utils/storage/import_interpolation
 utils/training/estimate_interpolation
