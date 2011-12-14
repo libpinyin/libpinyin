@@ -20,9 +20,8 @@
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 
-import os
 import pinyin
-
+from utils import expand_file
 
 def gen_shengmu_table(scheme):
     entries = []
@@ -64,20 +63,7 @@ def get_table_content(tablename):
     if part == "YUN":
         return gen_yunmu_table(scheme)
 
-def expand_file(filename):
-    infile = open(filename, "r")
-    for line in infile.readlines():
-        line = line.rstrip(os.linesep)
-        if len(line) < 3 :
-            print(line)
-            continue
-        if line[0] == '@' and line[-1] == '@':
-            tablename = line[1:-1]
-            print(get_table_content(tablename))
-        else:
-            print(line)
-
 
 ### main function ###
 if __name__ == "__main__":
-    expand_file("double_pinyin_table.h.in")
+    expand_file("double_pinyin_table.h.in", get_table_content)
