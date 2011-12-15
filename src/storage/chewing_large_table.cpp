@@ -650,7 +650,8 @@ bool ChewingLargeTable::load_text(FILE * infile) {
         parser.parse(options, keys, key_rests, pinyin, strlen(pinyin));
 
         if (len != keys->len) {
-            fprintf(stderr, "%s\t%s\t%u\t%ld\n", pinyin, phrase, token, freq);
+            fprintf(stderr, "ChewingLargeTable::load_text:%s\t%s\t%u\t%ld\n",
+                    pinyin, phrase, token, freq);
             continue;
         }
 

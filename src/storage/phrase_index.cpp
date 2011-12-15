@@ -476,8 +476,12 @@ bool FacadePhraseIndex::load_text(guint8 phrase_index, FILE * infile){
 
 	parser.parse(options, keys, key_rests, pinyin, strlen(pinyin));
 	
-	if (item_ptr->get_phrase_length() == keys->len)
+	if (item_ptr->get_phrase_length() == keys->len) {
             item_ptr->append_pronunciation((ChewingKey *)keys->data, freq);
+        } else {
+            fprintf(stderr, "FacadePhraseIndex::load_text:%s\t%s\n",
+                    pinyin, phrase);
+        }
 
 	g_array_free(keys, TRUE);
 	g_array_free(key_rests, TRUE);

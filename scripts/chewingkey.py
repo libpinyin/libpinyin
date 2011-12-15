@@ -147,7 +147,4 @@ def gen_table_index(content_table):
 
 ### main function ###
 if __name__ == "__main__":
-    print(gen_initials())
-    print(gen_middles())
-    print(gen_finals())
-    print(gen_tones())
+    print(gen_initials() + gen_middles() + gen_finals() + gen_tones())
