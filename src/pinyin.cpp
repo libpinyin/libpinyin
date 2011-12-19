@@ -50,6 +50,8 @@ struct _pinyin_context_t{
 pinyin_context_t * pinyin_init(const char * systemdir, const char * userdir){
     pinyin_context_t * context = new pinyin_context_t;
 
+    context->m_options = USE_TONE;
+
     context->m_system_dir = g_strdup(systemdir);
     context->m_user_dir = g_strdup(userdir);
     context->m_modified = false;
