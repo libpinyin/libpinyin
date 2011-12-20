@@ -31,6 +31,8 @@
  * struct MagicHeader, ArrayHeader, ArrayItem.
  */
 
+namespace pinyin{
+
 typedef GArray * FlexibleBigramPhraseArray;
 
 template<typename ArrayHeader, typename ArrayItem>
@@ -524,6 +526,8 @@ public:
         int ret = m_db->put(m_db, NULL, &db_key, &db_data, 0);
         return ret == 0;
     }
+
+};
 
 };
 

@@ -23,9 +23,11 @@
 #ifndef PINYIN_INTERNAL_H
 #define PINYIN_INTERNAL_H
 
-#include "pinyin.h"
+#include <stdio.h>
+#include "novel_types.h"
 #include "memory_chunk.h"
 #include "pinyin_custom2.h"
+#include "chewing_key.h"
 #include "pinyin_parser2.h"
 #include "pinyin_phrase2.h"
 #include "chewing_large_table.h"
