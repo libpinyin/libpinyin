@@ -34,14 +34,15 @@ using namespace pinyin;
 extern "C" {
 
 typedef struct _pinyin_context_t pinyin_context_t;
+typedef struct _pinyin_instance_t pinyin_instance_t;
 
-typedef struct {
+struct _pinyin_instance_t{
     pinyin_context_t * m_context;
     ChewingKeyVector m_pinyin_keys;
     ChewingKeyRestVector m_pinyin_key_rests;
     CandidateConstraints m_constraints;
     MatchResults m_match_results;
-} pinyin_instance_t;
+};
 
 pinyin_context_t * pinyin_init(const char * systemdir, const char * userdir);
 bool pinyin_save(pinyin_context_t * context);
