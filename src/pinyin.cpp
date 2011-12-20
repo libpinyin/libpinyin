@@ -261,6 +261,7 @@ bool pinyin_set_options(pinyin_context_t * context,
                         pinyin_option_t options){
     context->m_options = options;
     context->m_pinyin_table->set_options(context->m_options);
+    context->m_pinyin_lookup->set_options(context->m_options);
     return true;
 }
 

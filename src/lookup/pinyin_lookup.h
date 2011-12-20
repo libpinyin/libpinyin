@@ -128,6 +128,11 @@ public:
 
     ~PinyinLookup();
 
+    bool set_options(pinyin_option_t options) {
+        m_options = options;
+        return true;
+    }
+
     bool get_best_match(ChewingKeyVector keys, CandidateConstraints constraints, MatchResults & results);
     
     bool train_result(ChewingKeyVector keys, CandidateConstraints constraints, MatchResults & results);
