@@ -21,12 +21,15 @@ INCLUDES                = -I$(top_srcdir)/src/include \
 
 libpinyinincludedir	= $(includedir)/libpinyin-@LIBPINYIN_BINARY_VERSION@
 
-libpinyininclude_HEADERS= pinyin_custom.h \
-			  pinyin_base.h \
+libpinyininclude_HEADERS= chewing_enum.h \
 			  chewing_key.h \
-			  pinyin_custom2.h
+			  pinyin_custom2.h \
+			  pinyin_parser2.h
 
-noinst_HEADERS		= pinyin_large_table.h \
+
+noinst_HEADERS		= pinyin_custom.h \
+			  pinyin_base.h \
+			  pinyin_large_table.h \
 		    	  pinyin_phrase.h \
 			  phrase_index.h \
 			  phrase_index_logger.h \
@@ -38,8 +41,6 @@ noinst_HEADERS		= pinyin_large_table.h \
 			  pinyin_parser_table.h \
 			  double_pinyin_table.h \
 			  chewing_table.h \
-			  chewing_enum.h \
-			  pinyin_parser2.h \
 			  pinyin_phrase2.h \
 			  chewing_large_table.h \
 			  facade_chewing_table.h \

@@ -19,8 +19,8 @@
  *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-#ifndef CHEWING_CUSTOM_H
-#define CHEWING_CUSTOM_H
+#ifndef PINYIN_CUSTOM2_H
+#define PINYIN_CUSTOM2_H
 
 namespace pinyin{
 
