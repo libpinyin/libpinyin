@@ -106,6 +106,9 @@ bool pinyin_reset(pinyin_instance_t * instance);
 /* hack here. */
 typedef ChewingKey PinyinKey;
 typedef ChewingKeyRest PinyinKeyPos;
+typedef ChewingKeyVector PinyinKeyVector;
+typedef ChewingKeyRestVector PinyinKeyPosVector;
+
 
 #define LIBPINYIN_FORMAT_VERSION  "0.4.91"
 
