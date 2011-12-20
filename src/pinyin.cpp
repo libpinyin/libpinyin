@@ -21,6 +21,7 @@
 
 
 #include "pinyin.h"
+#include <glib/gstdio.h>
 #include "pinyin_internal.h"
 
 /* a glue layer for input method integration. */
@@ -47,6 +48,53 @@ struct _pinyin_context_t{
 };
 
 
+static bool check_format(const char * userdir){
+    gchar * filename = g_build_filename
+        (userdir, "version", NULL);
+
+    MemoryChunk chunk;
+    bool exists = chunk.load(filename);
+
+    if (exists) {
+        exists = (0 == memcmp
+                  (LIBPINYIN_FORMAT_VERSION, chunk.begin(),
+                   strlen(LIBPINYIN_FORMAT_VERSION) + 1));
+    }
+    g_free(filename);
+
+    if (exists)
+        return exists;
+
+    /* clean up files, if version mis-matches. */
+    filename = g_build_filename
+        (userdir, "gb_char.dbin", NULL);
+    g_unlink(filename);
+    g_free(filename);
+
+    filename = g_build_filename
+        (userdir, "gbk_char.dbin", NULL);
+    g_unlink(filename);
+    g_free(filename);
+
+    filename = g_build_filename
+        (userdir, "user.db", NULL);
+    g_unlink(filename);
+    g_free(filename);
+
+    return exists;
+}
+
+static bool mark_version(const char * userdir){
+    gchar * filename = g_build_filename
+        (userdir, "version", NULL);
+    MemoryChunk chunk;
+    chunk.set_content(0, LIBPINYIN_FORMAT_VERSION,
+                      strlen(LIBPINYIN_FORMAT_VERSION) + 1);
+    bool retval = chunk.save(filename);
+    g_free(filename);
+    return retval;
+}
+
 pinyin_context_t * pinyin_init(const char * systemdir, const char * userdir){
     pinyin_context_t * context = new pinyin_context_t;
 
@@ -55,6 +103,8 @@ pinyin_context_t * pinyin_init(const char * systemdir, const char * userdir){
     context->m_system_dir = g_strdup(systemdir);
     context->m_user_dir = g_strdup(userdir);
     context->m_modified = false;
+
+    check_format(context->m_user_dir);
 
     context->m_pinyin_table = new ChewingLargeTable(context->m_options);
     MemoryChunk * chunk = new MemoryChunk;
@@ -167,6 +217,8 @@ bool pinyin_save(pinyin_context_t * context){
     filename = g_build_filename(context->m_user_dir, "user.db", NULL);
     context->m_user_bigram->save_db(filename);
     g_free(filename);
+
+    mark_version(context->m_user_dir);
 
     context->m_modified = false;
     return true;

@@ -101,6 +101,13 @@ bool pinyin_translate_token(pinyin_instance_t * instance,
 bool pinyin_train(pinyin_instance_t * instance);
 bool pinyin_reset(pinyin_instance_t * instance);
 
+
+/* hack here. */
+typedef ChewingKey PinyinKey;
+typedef ChewingKeyRest PinyinKeyPos;
+
+#define LIBPINYIN_FORMAT_VERSION  "0.4.91"
+
 };
 
 #endif
