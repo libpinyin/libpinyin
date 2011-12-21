@@ -213,7 +213,7 @@ public:
 
 public:
     bool set_scheme(ChewingScheme scheme);
-    bool in_chewing_scheme(const char key) const;
+    bool in_chewing_scheme(const char key, const char ** symbol) const;
 };
 
 

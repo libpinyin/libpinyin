@@ -662,12 +662,12 @@ bool DoublePinyinParser2::set_scheme(DoublePinyinScheme scheme) {
 
 /* the chewing string must be freed with g_free. */
 static bool search_chewing_symbols(const chewing_symbol_item_t * symbol_table,
-                                   const char key, char ** chewing) {
+                                   const char key, const char ** chewing) {
     *chewing = NULL;
     /* just iterate the table, as we only have < 50 items. */
     while (symbol_table->m_input != '\0') {
         if (symbol_table->m_input == key) {
-            *chewing = g_strdup(symbol_table->m_chewing);
+            *chewing = symbol_table->m_chewing;
             return true;
         }
         symbol_table ++;
@@ -705,12 +705,11 @@ bool ChewingParser2::parse_one_key(pinyin_option_t options,
     }
 
     int i;
-    gchar * chewing = NULL, * onechar = NULL;
+    gchar * chewing = NULL; const char * onechar = NULL;
 
     /* probe the possible chewing map in the rest of str. */
     for (i = 0; i < symbols_len; ++i) {
         if (!search_chewing_symbols(m_symbol_table, str[i], &onechar)) {
-            g_free(onechar);
             g_free(chewing);
             return false;
         }
@@ -722,7 +721,6 @@ bool ChewingParser2::parse_one_key(pinyin_option_t options,
             chewing = g_strconcat(chewing, onechar, NULL);
             g_free(tmp);
         }
-        g_free(onechar);
     }
 
     /* search the chewing in the chewing index table. */
@@ -748,7 +746,7 @@ int ChewingParser2::parse(pinyin_option_t options, ChewingKeyVector & keys,
     int maximum_len = 0; int i;
     /* probe the longest possible chewing string. */
     for (i = 0; i < len; ++i) {
-        if (!in_chewing_scheme(str[i]))
+        if (!in_chewing_scheme(str[i], NULL))
             break;
     }
     maximum_len = i;
@@ -806,13 +804,21 @@ bool ChewingParser2::set_scheme(ChewingScheme scheme) {
 }
 
 
-bool ChewingParser2::in_chewing_scheme(const char key) const {
-    gchar * chewing = NULL;
+bool ChewingParser2::in_chewing_scheme(const char key, const char ** symbol)
+ const {
+    const gchar * chewing = NULL;
     char tone = CHEWING_ZERO_TONE;
 
-    bool retval = search_chewing_symbols(m_symbol_table, key, &chewing) ||
-        search_chewing_tones(m_tone_table, key, &tone);
-    g_free(chewing);
+    if (search_chewing_symbols(m_symbol_table, key, &chewing)) {
+        if (symbol)
+            *symbol = chewing;
+        return true;
+    }
 
-    return retval;
+    if (search_chewing_tones(m_tone_table, key, &tone)) {
+        if (symbol)
+            *symbol = chewing_tone_table[tone];
+    }
+
+    return false;
 }

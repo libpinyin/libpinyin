@@ -540,9 +540,9 @@ bool pinyin_get_candidates(pinyin_instance_t * instance,
     return true;
 }
 
-guint8 pinyin_choose_candidate(pinyin_instance_t * instance,
-                               size_t offset,
-                               phrase_token_t token){
+int pinyin_choose_candidate(pinyin_instance_t * instance,
+                            size_t offset,
+                            phrase_token_t token){
     pinyin_context_t * & context = instance->m_context;
 
     guint8 len = context->m_pinyin_lookup->add_constraint

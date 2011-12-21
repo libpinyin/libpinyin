@@ -120,6 +120,10 @@ struct ChewingKeyRest
         m_raw_begin = 0;
         m_raw_end = 0;
     }
+
+    guint16 length() {
+        return m_raw_end - m_raw_begin;
+    }
 };
 
 };
