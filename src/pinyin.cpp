@@ -421,6 +421,13 @@ size_t pinyin_parse_more_chewings(pinyin_instance_t * instance,
     return parse_len;
 }
 
+bool pinyin_in_chewing_keyboard(pinyin_instance_t * instance,
+                                const char key, const char ** symbol) {
+    pinyin_context_t * & context = instance->m_context;
+    return context->m_chewing_parser->in_chewing_scheme(key, symbol);
+}
+
+
 /* internal definition */
 typedef struct {
     pinyin_context_t * m_context;

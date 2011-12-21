@@ -83,6 +83,8 @@ bool pinyin_parse_chewing(pinyin_instance_t * instance,
                           ChewingKey * onekey);
 size_t pinyin_parse_more_chewings(pinyin_instance_t * instance,
                                   const char * chewings);
+bool pinyin_in_chewing_keyboard(pinyin_instance_t * instance,
+                                const char key, const char ** symbol);
 
 bool pinyin_get_candidates(pinyin_instance_t * instance,
                            size_t offset,

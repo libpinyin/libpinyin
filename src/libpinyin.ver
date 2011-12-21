@@ -17,6 +17,7 @@ LIBPINYIN {
         pinyin_parse_more_double_pinyins;
         pinyin_parse_chewing;
         pinyin_parse_more_chewings;
+        pinyin_in_chewing_keyboard;
         pinyin_get_candidates;
         pinyin_choose_candidate;
         pinyin_clear_constraint;
