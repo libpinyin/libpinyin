@@ -122,6 +122,19 @@ int main(int argc, char * argv[]) {
 			      NULL, NULL, NULL);
 			printf("%s\t", string);
 			g_free(string);
+
+                        ChewingKey chewing_buffer[1024];
+                        size_t npron = item.get_n_pronunciation();
+                        guint32 freq;
+                        for (size_t m = 0; m < npron; ++m){
+                            item.get_nth_pronunciation(m, chewing_buffer, freq);
+                            for (size_t n = 0; n < item.get_phrase_length();
+                                  ++n){
+                                printf("%s'",
+                                       chewing_buffer[n].get_pinyin_string());
+                            }
+                            printf("\b\t%d\t", freq);
+                        }
                     }
                     printf("\n");
                 }
