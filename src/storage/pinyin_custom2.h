@@ -67,7 +67,7 @@ enum PinyinCorrection2{
     PINYIN_CORRECT_UE_VE = 1U << 26,
     PINYIN_CORRECT_V_U = 1U << 27,
     PINYIN_CORRECT_ON_ONG = 1U << 28,
-    PINYIN_CORRECT_ALL = 0xFFU << 9
+    PINYIN_CORRECT_ALL = 0xFFU << 21
 };
 
 };
