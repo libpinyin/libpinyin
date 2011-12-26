@@ -590,11 +590,11 @@ bool pinyin_translate_token(pinyin_instance_t * instance,
     PhraseItem item;
     utf16_t buffer[MAX_PHRASE_LENGTH];
 
-    bool retval = context->m_phrase_index->get_phrase_item(token, item);
+    int retval = context->m_phrase_index->get_phrase_item(token, item);
     item.get_phrase_string(buffer);
     guint8 length = item.get_phrase_length();
     *word = g_utf16_to_utf8(buffer, length, NULL, NULL, NULL);
-    return retval;
+    return retval == ERROR_OK;
 }
 
 bool pinyin_train(pinyin_instance_t * instance){
