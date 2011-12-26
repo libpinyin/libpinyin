@@ -594,7 +594,7 @@ bool pinyin_translate_token(pinyin_instance_t * instance,
     item.get_phrase_string(buffer);
     guint8 length = item.get_phrase_length();
     *word = g_utf16_to_utf8(buffer, length, NULL, NULL, NULL);
-    return retval == ERROR_OK;
+    return ERROR_OK == retval;
 }
 
 bool pinyin_train(pinyin_instance_t * instance){
