@@ -34,15 +34,21 @@ libpinyin_dbdir		= $(pkgdatadir)/data
 
 CLEANFILES		= $(binary_model_data)
 
-$(textual_model_data):
+model.text.tar.gz:
 	wget https://github.com/downloads/libpinyin/libpinyin/model.text.tar.gz
+
+interpolation.text: model.text.tar.gz
 	tar xvf model.text.tar.gz
 
-$(binary_model_data): $(textual_model_data)
+gb_char.table gbk_char.table: interpolation.text
+
+bigram.db: $(textual_model_data)
 	$(RM) $(binary_model_data)
 	../utils/storage/gen_binary_files --table-dir $(top_srcdir)/data
 	../utils/storage/import_interpolation < $(top_srcdir)/data/interpolation.text
 	../utils/training/gen_unigram
+
+gb_char.bin gbk_char.bin phrase_index.bin pinyin_index.bin: bigram.db
 
 rebuild:
 	git reset --hard
