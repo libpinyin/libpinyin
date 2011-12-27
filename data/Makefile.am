@@ -34,10 +34,8 @@ libpinyin_dbdir		= $(pkgdatadir)/data
 
 CLEANFILES		= $(binary_model_data)
 
-model.text.tar.gz:
+interpolation.text:
 	wget https://github.com/downloads/libpinyin/libpinyin/model.text.tar.gz
-
-interpolation.text: model.text.tar.gz
 	tar xvf model.text.tar.gz
 
 gb_char.table gbk_char.table: interpolation.text
