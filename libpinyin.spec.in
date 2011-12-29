@@ -38,7 +38,7 @@ The %{name}-data package contains data files.
 
 %build
 %configure --disable-static
-make
+make %{?_smp_mflags}
 
 
 %install
