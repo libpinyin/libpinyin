@@ -1,2 +1,12 @@
-2010-08-03 version 0.2.99 <alexepico@gmail.com>
-* Import from pinyin.
+version 0.4.91
+* New parsers for full pinyin/double pinyin/chewing.
+  * libpinyin now fully supports all pinyin auto corrections in
+ibus-pinyin;
+  * libpinyin now better supports an/ang, en/eng, in/ing fuzzy
+pinyin match.
+
+version 0.3.0
+* the first official release of 0.3.x.
+
+version 0.2.99
+* import from pinyin.
