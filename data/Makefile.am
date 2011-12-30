@@ -50,5 +50,5 @@ gb_char.bin gbk_char.bin phrase_index.bin pinyin_index.bin: bigram.db
 
 rebuild:
 	git reset --hard
-	sed -i -e "s/#define LAMBDA_PARAMETER 0.588792/#define LAMBDA_PARAMETER $(LAMBDA_PARAMETER)/" ../src/include/novel_types.h
+	sed -i -e "s/#define LAMBDA_PARAMETER 0.330642/#define LAMBDA_PARAMETER $(LAMBDA_PARAMETER)/" ../src/include/novel_types.h
 	make -C .. >/dev/null 2>/dev/null
