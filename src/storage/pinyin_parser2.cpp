@@ -822,6 +822,7 @@ bool ChewingParser2::in_chewing_scheme(const char key, const char ** symbol)
     if (search_chewing_tones(m_tone_table, key, &tone)) {
         if (symbol)
             *symbol = chewing_tone_table[tone];
+        return true;
     }
 
     return false;
