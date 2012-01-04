@@ -728,7 +728,7 @@ bool ChewingParser2::parse_one_key(pinyin_option_t options,
     }
 
     /* search the chewing in the chewing index table. */
-    if (search_chewing_index(options, chewing, key)) {
+    if (chewing && search_chewing_index(options, chewing, key)) {
         /* save back tone if available. */
         key.m_tone = tone;
         g_free(chewing);
