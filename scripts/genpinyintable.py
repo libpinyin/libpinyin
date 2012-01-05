@@ -20,6 +20,7 @@
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 import operator
+import bopomofo
 from pinyintable import *
 from chewingkey import gen_table_index
 
@@ -38,7 +39,7 @@ def filter_pinyin_list():
         if "IS_PINYIN" in flags:
             pinyin_index.append((wrong, flags, correct))
         if "IS_CHEWING" in flags:
-            bopomofo_index.append((bopomofo, flags, bopomofo))
+            bopomofo_index.append((bopomofo, flags))
 
 
 def sort_all():
@@ -77,8 +78,9 @@ def gen_pinyin_index():
 
 def gen_bopomofo_index():
     entries = []
-    for (bopomofo_str, flags, bopomofo) in bopomofo_index:
-        index = [x[1] for x in content_table].index(bopomofo)
+    for (bopomofo_str, flags) in bopomofo_index:
+        pinyin_str = bopomofo.BOPOMOFO_PINYIN_MAP[bopomofo_str]
+        index = [x[0] for x in content_table].index(pinyin_str)
         entry = '{{"{0}", {1}, {2}}}'.format(bopomofo_str, flags, index)
         entries.append(entry)
     return ',\n'.join(entries)

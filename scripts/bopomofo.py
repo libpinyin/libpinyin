@@ -457,6 +457,9 @@ BOPOMOFO_PINYIN_MAP = {
 
 PINYIN_BOPOMOFO_MAP = dict([(v, k) for k, v in BOPOMOFO_PINYIN_MAP.items()])
 
+SPECIAL_INITIAL_SET = {'ci', 'chi', 'si', 'shi', 'zi', 'zhi', 'ri'}
+
+'''
 SHENG_YUN_BOPOMOFO_MAP = {
     "b" : "ㄅ",
     "p" : "ㄆ",
@@ -524,3 +527,4 @@ SHENG_YUN_BOPOMOFO_MAP = {
     "ong" :  ("ㄨㄥ", ("jqxy", "ㄩㄥ")),  # y後面為ㄩㄥ
     "iong" : "ㄩㄥ",
 }
+'''

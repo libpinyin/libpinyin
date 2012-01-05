@@ -53,8 +53,8 @@ def get_chewing(pinyin_key):
     #get chewing string
     bopomofo_str = bopomofo.PINYIN_BOPOMOFO_MAP[pinyin_key]
 
-    #handle 'ci', 'chi', 'si', 'shi', 'zi', 'zhi', 'ri'
-    if pinyin_key in {'ci', 'chi', 'si', 'shi', 'zi', 'zhi', 'ri'}:
+    #handle bopomofo SPECIAL_INITIAL_SET
+    if pinyin_key in bopomofo.SPECIAL_INITIAL_SET:
         middle = "CHEWING_I"
     #normal process
     for char in bopomofo_str:
@@ -105,7 +105,8 @@ def gen_pinyins():
         if pinyin_key in shengmu_list:
             flags.append("PINYIN_INCOMPLETE")
         chewing_key = bopomofo.PINYIN_BOPOMOFO_MAP[pinyin_key]
-        if chewing_key in chewing.CHEWING_ASCII_INITIAL_MAP:
+        if chewing_key in chewing.CHEWING_ASCII_INITIAL_MAP and \
+                pinyin_key not in bopomofo.SPECIAL_INITIAL_SET:
             flags.append("CHEWING_INCOMPLETE")
         yield pinyin_key, pinyin_key, chewing_key, \
             flags, get_chewing(pinyin_key)
