@@ -25,9 +25,10 @@ INCLUDES		= -I$(top_srcdir)/src \
 
 noinst_HEADERS		= k_mixture_model.h
 
+bin_PROGRAMS		= gen_unigram
+
 noinst_PROGRAMS		= gen_ngram \
 			  gen_deleted_ngram \
-			  gen_unigram \
 			  gen_k_mixture_model \
 			  estimate_interpolation \
 			  estimate_k_mixture_model \

@@ -21,11 +21,12 @@ INCLUDES                = -I$(top_srcdir)/src \
                           -I$(top_srcdir)/src/lookup \
                           @GLIB2_CPPFLAGS@
 
+bin_PROGRAMS		 = gen_binary_files \
+			   import_interpolation
+
 noinst_PROGRAMS          = gen_zhuyin_map \
 			   gen_pinyin_table \
-			   gen_binary_files \
 			   export_interpolation \
-			   import_interpolation \
 			   gen_chewing_table
 
 gen_zhuyin_map_SOURCES      = gen_zhuyin_map.cpp
