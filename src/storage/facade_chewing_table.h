@@ -67,6 +67,13 @@ public:
     /* search method */
     int search(int phrase_length, /* in */ ChewingKey keys[],
                /* out */ PhraseIndexRanges ranges) const {
+
+        /* clear ranges. */
+        for (size_t i = 0; i < PHRASE_INDEX_LIBRARY_COUNT; ++i) {
+            if (ranges[i])
+                g_array_set_size(ranges[i], 0);
+        }
+
         int result = SEARCH_NONE;
 
         if (NULL != m_system_chewing_table)

@@ -61,6 +61,7 @@ public:
     int search(int phrase_length, /* in */ utf16_t phrase[],
                /* out */ phrase_token_t & token){
         int result = SEARCH_NONE;
+        token = null_token;
 
         if (NULL != m_system_phrase_table)
             result |= m_system_phrase_table->search
