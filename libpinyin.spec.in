@@ -8,7 +8,7 @@ URL:            https://github.com/libpinyin/libpinyin
 Source0:        https://github.com/downloads/libpinyin/libpinyin/%{name}-%{version}.tar.gz
 
 BuildRequires:  db4-devel, glib2-devel
-#Requires:       
+Requires:       %{name}-data = %{version}-%{release}
 
 %description
 The libpinyin project aims to provide the algorithms core
@@ -32,6 +32,14 @@ Requires:       %{name} = %{version}-%{release}
 The %{name}-data package contains data files.
 
 
+%package        tools
+Summary:        Tools for %{name}
+Requires:       %{name} = %{version}-%{release}
+
+%description tools
+The %{name}-tools package contains tools.
+
+
 %prep
 %setup -q
 
@@ -40,9 +48,7 @@ The %{name}-data package contains data files.
 %configure --disable-static
 make %{?_smp_mflags}
 
-
 %install
-rm -rf $RPM_BUILD_ROOT
 make install DESTDIR=$RPM_BUILD_ROOT
 find $RPM_BUILD_ROOT -name '*.la' -exec rm -f {} ';'
 
@@ -68,7 +74,27 @@ find $RPM_BUILD_ROOT -name '*.la' -exec rm -f {} ';'
 %doc
 %{_datadir}/libpinyin/data
 
+%files tools
+%{_bindir}/gen_binary_files
+%{_bindir}/import_interpolation
+%{_bindir}/gen_unigram
+
 %changelog
+* Mon Jan 09 2012  Peng Wu <pwu@redhat.com> - 0.4.92-2
+- Split tools sub package
+
+* Thu Dec 29 2011  Peng Wu <pwu@redhat.com> - 0.4.92-1
+- Update to 0.4.92
+
+* Tue Dec 27 2011  Peng Wu <pwu@redhat.com> - 0.4.91-1
+- Update to 0.4.91
+
+* Fri Nov 18 2011  Peng Wu <pwu@redhat.com> - 0.3.0-1
+- Update to 0.3.0
+
+* Thu Nov 03 2011  Peng Wu <pwu@redhat.com> - 0.2.99.3-1
+- Update to 0.2.99.3
+
 * Tue Oct 11 2011  Peng Wu <pwu@redhat.com> - 0.2.99.2-1
 - Update to 0.2.99.2
 
