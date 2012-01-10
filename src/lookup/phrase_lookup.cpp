@@ -147,29 +147,21 @@ bool PhraseLookup::search_bigram(int nstep, phrase_token_t token){
         m_system_bigram->load(index_token, system);
         m_user_bigram->load(index_token, user);
 
-        if ( system && user ){
+        if ( !merge_single_gram(&m_merged_single_gram, system, user) )
+            continue;
+
+        guint32 freq;
+        if ( m_merged_single_gram.get_freq(token, freq) ){
             guint32 total_freq;
-            assert(user->get_total_freq(total_freq));
-            assert(system->set_total_freq(total_freq));
+            m_merged_single_gram.get_total_freq(total_freq);
+            gfloat bigram_poss = freq / (gfloat) total_freq;
+            found = bigram_gen_next_step(nstep, cur_value, token, bigram_poss) || found;
         }
-        if ( system ){
-            guint32 freq;
-            if ( system->get_freq(token, freq) ){
-                guint32 total_freq;
-                system->get_total_freq(total_freq);
-                gfloat bigram_poss = freq / (gfloat) total_freq;
-                found = bigram_gen_next_step(nstep, cur_value, token, bigram_poss) || found;
-            }
-        }
-        if ( user ){
-            guint32 freq;
-            if ( user->get_freq(token, freq) ){
-                guint32 total_freq;
-                user->get_total_freq(total_freq);
-                gfloat bigram_poss = freq / (gfloat) total_freq;
-                found = bigram_gen_next_step(nstep, cur_value, token, bigram_poss) || found;
-            }
-        }
+
+        if (system)
+            delete system;
+        if (user)
+            delete user;
     }
 
     return found;
