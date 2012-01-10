@@ -28,7 +28,6 @@
 #include "novel_types.h"
 #include "chewing_key.h"
 #include "phrase_index.h"
-#include "chewing_large_table.h"
 #include "lookup.h"
 
 
@@ -90,7 +89,7 @@ protected:
     CandidateConstraints m_constraints;
     ChewingKeyVector m_keys;
     
-    ChewingLargeTable * m_pinyin_table;
+    FacadeChewingTable * m_pinyin_table;
     FacadePhraseIndex * m_phrase_index;
     pinyin_option_t m_options;
     Bigram * m_system_bigram;
@@ -122,7 +121,7 @@ protected:
     
     bool final_step(MatchResults & results);
 public:
-    PinyinLookup(pinyin_option_t options, ChewingLargeTable * pinyin_table,
+    PinyinLookup(pinyin_option_t options, FacadeChewingTable * pinyin_table,
                  FacadePhraseIndex * phrase_index, Bigram * system_bigram,
                  Bigram * user_bigram);
 

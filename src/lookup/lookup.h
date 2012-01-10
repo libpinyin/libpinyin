@@ -49,8 +49,8 @@ struct lookup_value_t{
 };
 
 
-class PinyinLargeTable;
-class PhraseLargeTable;
+class FacadeChewingTable;
+class FacadePhraseTable;
 class FacadePhraseIndex;
 class Bigram;
 

@@ -33,8 +33,8 @@ struct _pinyin_context_t{
     DoublePinyinParser2 * m_double_pinyin_parser;
     ChewingParser2 * m_chewing_parser;
 
-    ChewingLargeTable * m_pinyin_table;
-    PhraseLargeTable * m_phrase_table;
+    FacadeChewingTable * m_pinyin_table;
+    FacadePhraseTable * m_phrase_table;
     FacadePhraseIndex * m_phrase_index;
     Bigram * m_system_bigram;
     Bigram * m_user_bigram;
@@ -106,7 +106,7 @@ pinyin_context_t * pinyin_init(const char * systemdir, const char * userdir){
 
     check_format(context->m_user_dir);
 
-    context->m_pinyin_table = new ChewingLargeTable(context->m_options);
+    context->m_pinyin_table = new FacadeChewingTable;
     MemoryChunk * chunk = new MemoryChunk;
     gchar * filename = g_build_filename
         (context->m_system_dir, "pinyin_index.bin", NULL);
@@ -115,13 +115,14 @@ pinyin_context_t * pinyin_init(const char * systemdir, const char * userdir){
         return NULL;
     }
     g_free(filename);
-    context->m_pinyin_table->load(chunk);
+
+    context->m_pinyin_table->load(context->m_options, chunk, NULL);
 
     context->m_full_pinyin_parser = new FullPinyinParser2;
     context->m_double_pinyin_parser = new DoublePinyinParser2;
     context->m_chewing_parser = new ChewingParser2;
 
-    context->m_phrase_table = new PhraseLargeTable;
+    context->m_phrase_table = new FacadePhraseTable;
     chunk = new MemoryChunk;
     filename = g_build_filename(context->m_system_dir, "phrase_index.bin", NULL);
     if (!chunk->load(filename)) {
@@ -129,7 +130,7 @@ pinyin_context_t * pinyin_init(const char * systemdir, const char * userdir){
         return NULL;
     }
     g_free(filename);
-    context->m_phrase_table->load(chunk);
+    context->m_phrase_table->load(chunk, NULL);
 
     context->m_phrase_index = new FacadePhraseIndex;
     MemoryChunk * log = new MemoryChunk; chunk = new MemoryChunk;

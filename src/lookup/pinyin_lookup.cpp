@@ -26,6 +26,7 @@
 #include "stl_lite.h"
 #include "novel_types.h"
 #include "pinyin_phrase2.h"
+#include "facade_chewing_table.h"
 #include "ngram.h"
 #include "winner_tree.h"
 
@@ -35,7 +36,7 @@ const gfloat PinyinLookup::bigram_lambda = LAMBDA_PARAMETER;
 const gfloat PinyinLookup::unigram_lambda = 1 - LAMBDA_PARAMETER;
 
 PinyinLookup::PinyinLookup(pinyin_option_t options,
-                           ChewingLargeTable * pinyin_table,
+                           FacadeChewingTable * pinyin_table,
                            FacadePhraseIndex * phrase_index,
                            Bigram * system_bigram,
                            Bigram * user_bigram){

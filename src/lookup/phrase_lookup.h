@@ -39,7 +39,7 @@ private:
     PhraseItem m_cache_phrase_item;
 protected:
     //saved varibles
-    PhraseLargeTable * m_phrase_table;
+    FacadePhraseTable * m_phrase_table;
     FacadePhraseIndex * m_phrase_index;
     Bigram * m_system_bigram;
     Bigram * m_user_bigram;
@@ -68,7 +68,7 @@ protected:
 
     bool final_step(MatchResults & results);
 public:
-    PhraseLookup(PhraseLargeTable * phrase_table,
+    PhraseLookup(FacadePhraseTable * phrase_table,
                  FacadePhraseIndex * phrase_index,
                  Bigram * system_bigram,
                  Bigram * user_bigram);

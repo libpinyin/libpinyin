@@ -23,7 +23,7 @@
 #include "stl_lite.h"
 #include "novel_types.h"
 #include "phrase_index.h"
-#include "phrase_large_table.h"
+#include "facade_phrase_table.h"
 #include "ngram.h"
 #include "phrase_lookup.h"
 
@@ -32,7 +32,7 @@ using namespace pinyin;
 const gfloat PhraseLookup::bigram_lambda = LAMBDA_PARAMETER;
 const gfloat PhraseLookup::unigram_lambda = 1 - LAMBDA_PARAMETER;
 
-PhraseLookup::PhraseLookup(PhraseLargeTable * phrase_table,
+PhraseLookup::PhraseLookup(FacadePhraseTable * phrase_table,
                            FacadePhraseIndex * phrase_index,
                            Bigram * system_bigram,
                            Bigram * user_bigram){
