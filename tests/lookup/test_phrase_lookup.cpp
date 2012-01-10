@@ -70,10 +70,10 @@ int main(int argc, char * argv[]){
 
 
     //init phrase table
-    PhraseLargeTable phrase_table;
+    FacadePhraseTable phrase_table;
     MemoryChunk * chunk = new MemoryChunk;
     chunk->load("../../data/phrase_index.bin");
-    phrase_table.load(chunk);
+    phrase_table.load(chunk, NULL);
 
     //init phrase index
     FacadePhraseIndex phrase_index;

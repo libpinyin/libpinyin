@@ -107,11 +107,11 @@ int main(int argc, char * argv[]){
     const char * evals_text = "evals.text";
 
     pinyin_option_t options = USE_TONE;
-    ChewingLargeTable largetable(options);
+    FacadeChewingTable largetable;
 
     MemoryChunk * new_chunk = new MemoryChunk;
     new_chunk->load("pinyin_index.bin");
-    largetable.load(new_chunk);
+    largetable.load(options, new_chunk, NULL);
 
     FacadePhraseIndex phrase_index;
     new_chunk = new MemoryChunk;
@@ -121,10 +121,10 @@ int main(int argc, char * argv[]){
     new_chunk->load("gbk_char.bin");
     phrase_index.load(2, new_chunk);
 
-    PhraseLargeTable phrases;
+    FacadePhraseTable phrases;
     new_chunk = new MemoryChunk;
     new_chunk->load("phrase_index.bin");
-    phrases.load(new_chunk);
+    phrases.load(new_chunk, NULL);
 
     Bigram system_bigram;
     system_bigram.attach("bigram.db", ATTACH_READONLY);

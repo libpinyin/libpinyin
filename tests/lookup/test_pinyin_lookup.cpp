@@ -7,11 +7,11 @@ size_t bench_times = 100;
 int main( int argc, char * argv[]){
 
     pinyin_option_t options = USE_TONE | PINYIN_CORRECT_ALL | PINYIN_AMB_ALL;
-    ChewingLargeTable largetable(options);
+    FacadeChewingTable largetable;
 
     MemoryChunk * new_chunk = new MemoryChunk;
     new_chunk->load("../../data/pinyin_index.bin");
-    largetable.load(new_chunk);
+    largetable.load(options, new_chunk, NULL);
 
     FacadePhraseIndex phrase_index;
     new_chunk = new MemoryChunk;
