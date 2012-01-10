@@ -28,6 +28,7 @@
 #include "novel_types.h"
 #include "chewing_key.h"
 #include "phrase_index.h"
+#include "ngram.h"
 #include "lookup.h"
 
 
@@ -84,6 +85,7 @@ private:
     static const gfloat unigram_lambda;
     
     PhraseItem m_cache_phrase_item;
+    SingleGram m_merged_single_gram;
 protected:
     //saved varibles
     CandidateConstraints m_constraints;

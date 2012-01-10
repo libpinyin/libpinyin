@@ -117,7 +117,7 @@ size_t PinyinLookup::prepare_table_cache(int nstep, int total_pinyin){
     g_array_set_size(m_table_cache, MAX_PHRASE_LENGTH + 1);
 
     int len, total_len = std_lite::min(total_pinyin, MAX_PHRASE_LENGTH);
-
+#if 0
     /* probe constraint */
     for ( len = 1; len <= total_len; ++len) {
         lookup_constraint_t * constraint = &g_array_index(m_constraints, lookup_constraint_t, nstep + len);
@@ -125,6 +125,7 @@ size_t PinyinLookup::prepare_table_cache(int nstep, int total_pinyin){
             break;
     }
     total_len = std_lite::min(len, total_len);
+#endif
 
     for ( len = 1; len <= total_len; ++len){
 	PhraseIndexRanges * ranges = &g_array_index(m_table_cache, PhraseIndexRanges, len);
@@ -241,10 +242,6 @@ bool PinyinLookup::search_bigram(IBranchIterator * iter,
     if ( CONSTRAINT_NOSEARCH == constraint->m_type )
 	return false;
 
-#if 0
-    GArray * lookup_content = (GArray *) g_ptr_array_index(m_steps_content, nstep);
-#endif
-
     bool found = false;
     BigramPhraseArray bigram_phrase_items = g_array_new(FALSE, FALSE, 
 					       sizeof(BigramPhraseItem));
@@ -255,64 +252,45 @@ bool PinyinLookup::search_bigram(IBranchIterator * iter,
 	SingleGram * system, * user;
 	m_system_bigram->load(index_token, system);
         m_user_bigram->load(index_token, user);
-	if ( system && user ){
-	    guint32 total_freq;
-	    assert(user->get_total_freq(total_freq));
-	    assert(system->set_total_freq(total_freq));
-	}
+
+        if ( !merge_single_gram(&m_merged_single_gram, system, user) )
+            continue;
+
 	if ( CONSTRAINT_ONESTEP == constraint->m_type ){
 	    phrase_token_t token = constraint->m_token;
-	    if ( system ){
-		guint32 freq;
-		if( system->get_freq(token, freq) ){
-		    guint32 total_freq;
-		    system->get_total_freq(total_freq);
-		    gfloat bigram_poss = freq / (gfloat) total_freq;
-		    found =  bigram_gen_next_step(nstep, &cur_step, token, bigram_poss) || found;
-		}
-	    }
-	    if ( user ){
-		guint32 freq;
-		if( user->get_freq(token, freq) ){
-		    guint32 total_freq;
-		    user->get_total_freq(total_freq);
-		    gfloat bigram_poss = freq / (gfloat) total_freq;
-		    found = bigram_gen_next_step(nstep, &cur_step, token, bigram_poss) || found;
-		}
-	    }
+
+            guint32 freq;
+            if( m_merged_single_gram.get_freq(token, freq) ){
+                guint32 total_freq;
+                m_merged_single_gram.get_total_freq(total_freq);
+                gfloat bigram_poss = freq / (gfloat) total_freq;
+                found =  bigram_gen_next_step(nstep, &cur_step, token, bigram_poss) || found;
+            }
 	}
 
 	if ( NO_CONSTRAINT == constraint->m_type ){
-	    for ( size_t i = 1; i < m_table_cache->len 
-		      && i <= MAX_PHRASE_LENGTH;++i ){
+	    for ( size_t i = 1; i < m_table_cache->len
+		      && i <= MAX_PHRASE_LENGTH; ++i ){
                 lookup_constraint_t * constraint = &g_array_index(m_constraints, lookup_constraint_t, nstep + i - 1);
-                if ( constraint->m_type != NO_CONSTRAINT )
-                     continue;
+                if ( constraint->m_type == CONSTRAINT_NOSEARCH )
+                    break;
 
 		PhraseIndexRanges * ranges = &g_array_index(m_table_cache, PhraseIndexRanges, i);
 		for( size_t m = 0; m < PHRASE_INDEX_LIBRARY_COUNT; ++m){
 		    GArray * array = (*ranges)[m];
 		    if ( !array ) continue;
+
 		    for ( size_t n = 0; n < array->len; ++n){
-			PhraseIndexRange * range = &g_array_index(array, PhraseIndexRange, n);
-			if (system){
-			    g_array_set_size(bigram_phrase_items, 0);
-			    system->search(range, bigram_phrase_items);
-			    for( size_t k = 0; k < bigram_phrase_items->len; 
-				 ++k){
-				BigramPhraseItem * item = &g_array_index(bigram_phrase_items, BigramPhraseItem, k);
-				found = bigram_gen_next_step(nstep, &cur_step, item->m_token, item->m_freq) || found;
-			    }
-			}
-			if (user){
-			    g_array_set_size(bigram_phrase_items, 0);
-			    user->search(range, bigram_phrase_items);
-			    for( size_t k  = 0; k < bigram_phrase_items->len;
-				 ++k){
-				BigramPhraseItem * item = &g_array_index(bigram_phrase_items, BigramPhraseItem, k);
-				found = bigram_gen_next_step(nstep, &cur_step, item->m_token, item->m_freq) || found;
-			    }
-			}
+			PhraseIndexRange * range =
+                            &g_array_index(array, PhraseIndexRange, n);
+
+                        g_array_set_size(bigram_phrase_items, 0);
+                        m_merged_single_gram.search(range, bigram_phrase_items);
+                        for( size_t k = 0; k < bigram_phrase_items->len;
+                             ++k){
+                            BigramPhraseItem * item = &g_array_index(bigram_phrase_items, BigramPhraseItem, k);
+                            found = bigram_gen_next_step(nstep, &cur_step, item->m_token, item->m_freq) || found;
+                        }
 		    }
 		}
 	    }
