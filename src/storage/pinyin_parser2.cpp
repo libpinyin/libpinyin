@@ -299,8 +299,10 @@ int FullPinyinParser2::parse (pinyin_option_t options, ChewingKeyVector & keys,
             next_sep = k;
         }
 
+        pinyin_option_t heuristic_options = options & ~PINYIN_CORRECT_ALL;
+
         /* Heuristic Method:
-         *   do maximum forward match first. */
+         *   do maximum forward match first, and without auto corrections. */
         for (size_t pos = i; pos < next_sep; ++pos) {
             curstep = &g_array_index(m_parse_steps, parse_value_t, pos);
             size_t try_len = std_lite::min
@@ -315,7 +317,7 @@ int FullPinyinParser2::parse (pinyin_option_t options, ChewingKeyVector & keys,
 
                 ChewingKey key; ChewingKeyRest rest;
                 bool parsed = parse_one_key
-                    (options, key, onepinyin, onepinyinlen);
+                    (heuristic_options, key, onepinyin, onepinyinlen);
                 rest.m_raw_begin = pos; rest.m_raw_end = n;
 
                 if (!parsed)
