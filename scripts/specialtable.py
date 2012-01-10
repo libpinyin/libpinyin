@@ -48,11 +48,17 @@ def load_phrase(filename):
                 first_key = first_key[:-1]
             if second_key[-1].isdigit():
                 second_key = second_key[:-1]
-            phrase_dict[(first_key, second_key)] = freq
+            if (first_key, second_key) in phrase_dict:
+                phrase_dict[(first_key, second_key)] += freq
+            else:
+                phrase_dict[(first_key, second_key)] = freq
         else:
             if pinyin_str[-1].isdigit():
                 pinyin_str = pinyin_str[:-1]
-            phrase_dict[pinyin_str] = freq
+            if pinyin_str in phrase_dict:
+                phrase_dict[pinyin_str] += freq
+            else:
+                phrase_dict[pinyin_str] = freq
     phrasefile.close()
 
 
