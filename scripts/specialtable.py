@@ -107,7 +107,11 @@ def gen_all_resplit():
 def filter_resplit():
     for (orig_first_key, orig_second_key, new_first_key, new_second_key) \
     in gen_all_resplit():
-        if not (new_first_key, new_second_key) in phrase_dict:
+        #do the reverse here, as libpinyin pinyin parser is different with
+        #ibus-pinyin's parser.
+        (orig_first_key, orig_second_key, new_first_key, new_second_key) = \
+            (new_first_key, new_second_key, orig_first_key, orig_second_key)
+        if (new_first_key, new_second_key) not in phrase_dict:
             continue
         orig_freq = 0
         new_freq = phrase_dict[(new_first_key, new_second_key)]
