@@ -419,6 +419,7 @@ bool PinyinLookup::final_step(MatchResults & results){
     return true;
 }
 
+#if 0
 bool PinyinLookup::train_result(ChewingKeyVector keys, CandidateConstraints constraints, MatchResults & results){
     bool train_next = false;
     ChewingKey * pinyin_keys = (ChewingKey *)keys->data;
@@ -475,6 +476,86 @@ bool PinyinLookup::train_result(ChewingKeyVector keys, CandidateConstraints cons
 	    }
 	}
 	last_token = *token;
+    }
+    return true;
+}
+#endif
+
+
+bool PinyinLookup::train_result2(ChewingKeyVector keys,
+                                 CandidateConstraints constraints,
+                                 MatchResults results) {
+    const guint32 initial_seed = 23 * 15;
+    const guint32 expand_factor = 2;
+    const guint32 unigram_factor = 7;
+    const guint32 pinyin_factor = 1;
+    const guint32 ceiling_seed = 23 * 15 * 64;
+
+    /* begin training based on constraints and results. */
+    bool train_next = false;
+    ChewingKey * pinyin_keys = (ChewingKey *) keys->data;
+
+    phrase_token_t last_token = sentence_start;
+    /* constraints->len + 1 == results->len */
+    for (size_t i = 0; i < constraints->len; ++i) {
+        phrase_token_t * token = &g_array_index(results, phrase_token_t, i);
+        if (null_token == *token)
+            continue;
+
+        lookup_constraint_t * constraint = &g_array_index
+            (constraints, lookup_constraint_t, i);
+        if (train_next || CONSTRAINT_ONESTEP == constraint->m_type) {
+            if (CONSTRAINT_ONESTEP == constraint->m_type) {
+                assert(*token == constraint->m_token);
+                train_next = true;
+            } else {
+                train_next = false;
+            }
+
+            guint32 seed = initial_seed;
+            /* train bi-gram first, and get train seed. */
+            if (last_token) {
+                SingleGram * user = NULL;
+                m_user_bigram->load(last_token, user);
+
+                guint32 total_freq = 0;
+                if (!user) {
+                    user = new SingleGram;
+                }
+                assert(user->get_total_freq(total_freq));
+
+                guint32 freq = 0;
+                /* compute train factor */
+                if (!user->get_freq(*token, freq)) {
+                    assert(user->insert_freq(*token, 0));
+                    seed = initial_seed;
+                } else {
+                    seed = std_lite::max(freq, initial_seed);
+                    seed *= expand_factor;
+                    seed = std_lite::min(seed, ceiling_seed);
+                }
+
+                /* protect against total_freq overflow */
+                if (seed > 0 && total_freq > total_freq + seed)
+                    goto next;
+
+                assert(user->set_total_freq(total_freq + seed));
+                /* if total_freq is not overflow, then freq won't overflow. */
+                assert(user->set_freq(*token, freq + seed));
+                assert(m_user_bigram->store(last_token, user));
+            next:
+                if (user)
+                    delete user;
+            }
+
+            /* train uni-gram */
+	    m_phrase_index->get_phrase_item(*token, m_cache_phrase_item);
+	    m_cache_phrase_item.increase_pronunciation_possibility
+                (m_options, pinyin_keys + i, seed * pinyin_factor);
+	    m_phrase_index->add_unigram_frequency
+                (*token, seed * unigram_factor);
+        }
+        last_token = *token;
     }
     return true;
 }

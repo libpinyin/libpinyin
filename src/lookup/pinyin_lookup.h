@@ -136,7 +136,7 @@ public:
 
     bool get_best_match(ChewingKeyVector keys, CandidateConstraints constraints, MatchResults & results);
     
-    bool train_result(ChewingKeyVector keys, CandidateConstraints constraints, MatchResults & results);
+    bool train_result2(ChewingKeyVector keys, CandidateConstraints constraints, MatchResults results);
 
     bool convert_to_utf8(MatchResults results,
                          /* out */ char * & result_string)

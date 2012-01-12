@@ -605,7 +605,7 @@ bool pinyin_train(pinyin_instance_t * instance){
     pinyin_context_t * & context = instance->m_context;
     context->m_modified = true;
 
-    bool retval = context->m_pinyin_lookup->train_result
+    bool retval = context->m_pinyin_lookup->train_result2
         (instance->m_pinyin_keys, instance->m_constraints,
          instance->m_match_results);
 
