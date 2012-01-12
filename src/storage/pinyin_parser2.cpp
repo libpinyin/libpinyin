@@ -379,8 +379,10 @@ int FullPinyinParser2::parse (pinyin_option_t options, ChewingKeyVector & keys,
                 if (value.m_parsed_len == nextstep->m_parsed_len &&
                     value.m_num_keys < nextstep->m_num_keys)
                     *nextstep = value;
-                if (nextstep->m_key.m_initial == CHEWING_ZERO_INITIAL &&
-                    value.m_key.m_initial != CHEWING_ZERO_INITIAL)
+                if (value.m_parsed_len == nextstep->m_parsed_len &&
+                    value.m_num_keys == nextstep->m_num_keys &&
+                    value.m_key.m_initial != CHEWING_ZERO_INITIAL &&
+                    nextstep->m_key.m_initial == CHEWING_ZERO_INITIAL)
                     *nextstep = value;
             }
         }
