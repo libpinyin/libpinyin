@@ -299,10 +299,9 @@ int FullPinyinParser2::parse (pinyin_option_t options, ChewingKeyVector & keys,
             next_sep = k;
         }
 
-        pinyin_option_t heuristic_options = options & ~PINYIN_CORRECT_ALL;
-
+#if 0
         /* Heuristic Method:
-         *   do maximum forward match first, and without auto corrections. */
+         *   do maximum forward match first. */
         for (size_t pos = i; pos < next_sep; ++pos) {
             curstep = &g_array_index(m_parse_steps, parse_value_t, pos);
             size_t try_len = std_lite::min
@@ -317,7 +316,7 @@ int FullPinyinParser2::parse (pinyin_option_t options, ChewingKeyVector & keys,
 
                 ChewingKey key; ChewingKeyRest rest;
                 bool parsed = parse_one_key
-                    (heuristic_options, key, onepinyin, onepinyinlen);
+                    (options, key, onepinyin, onepinyinlen);
                 rest.m_raw_begin = pos; rest.m_raw_end = n;
 
                 if (!parsed)
@@ -343,6 +342,7 @@ int FullPinyinParser2::parse (pinyin_option_t options, ChewingKeyVector & keys,
                 break;
             }
         }
+#endif
 
         /* dynamic programming here. */
         for (size_t m = i; m < next_sep; ++m) {
@@ -378,6 +378,9 @@ int FullPinyinParser2::parse (pinyin_option_t options, ChewingKeyVector & keys,
                     *nextstep = value;
                 if (value.m_parsed_len == nextstep->m_parsed_len &&
                     value.m_num_keys < nextstep->m_num_keys)
+                    *nextstep = value;
+                if (nextstep->m_key.m_initial == CHEWING_ZERO_INITIAL &&
+                    value.m_key.m_initial != CHEWING_ZERO_INITIAL)
                     *nextstep = value;
             }
         }
@@ -489,8 +492,8 @@ bool FullPinyinParser2::post_process(pinyin_option_t options,
             *cur_key = item->m_new_keys[0];
             *next_key = item->m_new_keys[1];
             /* assumes only moved one char in gen_all_resplit script. */
-            cur_rest->m_raw_end --;
-            next_rest->m_raw_begin --;
+            cur_rest->m_raw_end ++;
+            next_rest->m_raw_begin ++;
         }
 
         /* save back tones */
