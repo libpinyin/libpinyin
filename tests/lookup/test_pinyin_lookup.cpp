@@ -6,7 +6,8 @@ size_t bench_times = 100;
 
 int main( int argc, char * argv[]){
 
-    pinyin_option_t options = USE_TONE | PINYIN_CORRECT_ALL | PINYIN_AMB_ALL;
+    pinyin_option_t options =
+        USE_TONE | USE_RESPLIT_TABLE | PINYIN_CORRECT_ALL | PINYIN_AMB_ALL;
     FacadeChewingTable largetable;
 
     MemoryChunk * new_chunk = new MemoryChunk;
