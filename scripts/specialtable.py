@@ -98,10 +98,12 @@ def gen_all_resplit():
                 new_pinyin_key = pinyin_key[-1] + yun
                 if new_pinyin_key in pinyin_list:
                     yield pinyin_key, yun, pinyin_key[:-1], new_pinyin_key
+'''
         elif pinyin_key[-1] in ["e"]:
             #check first new pinyin key
             if pinyin_key[:-1] in pinyin_list:
                 yield pinyin_key, "r", pinyin_key[:-1], "er"
+'''
 
 
 def filter_resplit():
