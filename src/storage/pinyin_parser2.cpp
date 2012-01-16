@@ -380,10 +380,24 @@ int FullPinyinParser2::parse (pinyin_option_t options, ChewingKeyVector & keys,
                     value.m_num_keys < nextstep->m_num_keys)
                     *nextstep = value;
                 if (value.m_parsed_len == nextstep->m_parsed_len &&
-                    value.m_num_keys == nextstep->m_num_keys &&
-                    value.m_key.m_initial != CHEWING_ZERO_INITIAL &&
-                    nextstep->m_key.m_initial == CHEWING_ZERO_INITIAL)
-                    *nextstep = value;
+                    value.m_num_keys == nextstep->m_num_keys) {
+
+                    /* "kaneiji" -> "ka'nei'ji" */
+                    if ((value.m_key.m_initial != CHEWING_ZERO_INITIAL &&
+                         !(value.m_key.m_middle == CHEWING_ZERO_MIDDLE &&
+                           value.m_key.m_final == CHEWING_ZERO_FINAL)) &&
+                        nextstep->m_key.m_initial == CHEWING_ZERO_INITIAL)
+                        *nextstep = value;
+
+                    /* "xierqi" -> "xi'er'qi." */
+                    if ((value.m_key.m_initial == CHEWING_ZERO_INITIAL &&
+                        value.m_key.m_middle == CHEWING_ZERO_MIDDLE &&
+                        value.m_key.m_final == CHEWING_ER) &&
+                        (nextstep->m_key.m_initial == CHEWING_R &&
+                         nextstep->m_key.m_middle == CHEWING_ZERO_MIDDLE &&
+                         nextstep->m_key.m_final == CHEWING_ZERO_FINAL))
+                        *nextstep = value;
+                }
             }
         }
     }
