@@ -1,3 +1,9 @@
+version 0.4.93
+* fixes some bugs in new parsers
+
+version 0.4.92
+* enable parallel make
+	
 version 0.4.91
 * New parsers for full pinyin/double pinyin/chewing.
   * libpinyin now fully supports all pinyin auto corrections in
