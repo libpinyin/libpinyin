@@ -458,7 +458,7 @@ bool merge_single_gram(SingleGram * merged, const SingleGram * system,
             /* do append operation here */
             merged_chunk.append_content(cur_system, sizeof(SingleGramItem));
             cur_system++;
-        } if (cur_system->m_token > cur_user->m_token) {
+        } else if (cur_system->m_token > cur_user->m_token) {
             /* do append operation here */
             merged_chunk.append_content(cur_user, sizeof(SingleGramItem));
             cur_user++;
