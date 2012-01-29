@@ -526,6 +526,7 @@ bool FullPinyinParser2::post_process(pinyin_option_t options,
 bool DoublePinyinParser2::parse_one_key(pinyin_option_t options,
                                         ChewingKey & key,
                                         const char *str, int len) const {
+    options &= ~(PINYIN_CORRECT_ALL|PINYIN_AMB_ALL);
 
     if (1 == len) {
         if (!(options & PINYIN_INCOMPLETE))
@@ -548,7 +549,7 @@ bool DoublePinyinParser2::parse_one_key(pinyin_option_t options,
     }
 
     ChewingTone tone = CHEWING_ZERO_TONE;
-    options &= ~(PINYIN_CORRECT_ALL|PINYIN_AMB_ALL);
+    options &= ~(PINYIN_INCOMPLETE|CHEWING_INCOMPLETE);
 
     /* parse tone */
     if (3 == len) {
@@ -718,6 +719,7 @@ static bool search_chewing_tones(const chewing_tone_item_t * tone_table,
 bool ChewingParser2::parse_one_key(pinyin_option_t options,
                                    ChewingKey & key,
                                    const char *str, int len) const {
+    options &= ~(PINYIN_CORRECT_ALL|PINYIN_AMB_ALL);
     char tone = CHEWING_ZERO_TONE;
 
     int symbols_len = len;
