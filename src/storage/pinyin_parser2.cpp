@@ -582,6 +582,9 @@ bool DoublePinyinParser2::parse_one_key(pinyin_option_t options,
         charid = ch == ';' ? 26 : ch - 'a';
         /* first yunmu */
         const char * yun = m_yunmu_table[charid].m_yunmus[0];
+        if (NULL == yun)
+            return false;
+
         gchar * pinyin = g_strdup_printf("%s%s", sheng, yun);
         if (search_pinyin_index(options, pinyin, key)) {
             key.m_tone = tone;
@@ -592,6 +595,9 @@ bool DoublePinyinParser2::parse_one_key(pinyin_option_t options,
 
         /* second yunmu */
         yun = m_yunmu_table[charid].m_yunmus[1];
+        if (NULL == yun)
+            return false;
+
         pinyin = g_strdup_printf("%s%s", sheng, yun);
         if (search_pinyin_index(options, pinyin, key)) {
             key.m_tone = tone;
