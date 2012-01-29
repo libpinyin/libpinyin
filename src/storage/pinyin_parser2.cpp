@@ -464,21 +464,19 @@ bool FullPinyinParser2::post_process(pinyin_option_t options,
     guint16 next_tone = CHEWING_ZERO_TONE;
 
     for (i = 0; i < num_keys - 1; ++i) {
-        cur_key = &g_array_index(keys, ChewingKey, i);
-        next_key = &g_array_index(keys, ChewingKey, i + 1);
+        cur_rest = &g_array_index(key_rests, ChewingKeyRest, i);
+        next_rest = &g_array_index(key_rests, ChewingKeyRest, i + 1);
 
         /* some "'" here */
-        if (0 == cur_key->get_table_index())
+        if (cur_rest->m_raw_end != next_rest->m_raw_begin)
             continue;
-        if (0 == next_key->get_table_index())
-            continue;
+
+        cur_key = &g_array_index(keys, ChewingKey, i);
+        next_key = &g_array_index(keys, ChewingKey, i + 1);
 
         /* some tone here */
         if (CHEWING_ZERO_TONE != cur_key->m_tone)
             continue;
-
-        cur_rest = &g_array_index(key_rests, ChewingKeyRest, i);
-        next_rest = &g_array_index(key_rests, ChewingKeyRest, i + 1);
 
         if (options & USE_TONE) {
             next_tone = next_key->m_tone;
