@@ -1,0 +1,38 @@
+.TH LIBPINYIN "1" "Fed 2012" "libpinyin" "User Commands"
+
+.SH NAME
+libpinyin \- Library to deal with pinyin
+
+.SH DESCRIPTION
+The libpinyin project aims to provide the algorithms core for intelligent sentence-based Chinese pinyin input methods.
+
+.SH TOOLS
+gen_binary_files \- generate initially binary pinyin libraries
+import_interpolation \- import libpinyin textual format model data
+gen_unigram \- increase the unigram frequency for all phrases
+
+.SH USAGE
+.HP
+gen_binary_files --table-dir <DIRNAME>
+.RS
+.HP
+.B --table-dir
+Read textual format files from the <DIRNAME> directory.
+.RE
+.HP
+import_interpolation \< <MODELFILE>
+.HP
+gen_unigram
+
+.SH EXAMPLE
+Download the model.text.tar.gz, and extracts all files into a folder, then run the commands below to generate the binary model data.
+
+.RS
+rm gb_char.bin gbk_char.bin phrase_index.bin pinyin_index.bin bigram.db
+
+gen_binary_files --table-dir ../data
+
+import_interpolation < ../data/interpolation.text
+
+utils/training/gen_unigram
+.RE
