@@ -59,7 +59,7 @@ int main(int argc, char * argv[]){
     g_free(filename);
 
     if ( gbfile == NULL) {
-	fprintf(stderr, "open gb_char.table failed!");
+	fprintf(stderr, "open gb_char.table failed!\n");
 	exit(ENOENT);
     }
 
@@ -75,7 +75,7 @@ int main(int argc, char * argv[]){
     g_free(filename);
 
     if ( gbkfile == NULL) {
-        fprintf(stderr, "open gbk_char.table failed!");
+        fprintf(stderr, "open gbk_char.table failed!\n");
         exit(ENOENT);
     }
     

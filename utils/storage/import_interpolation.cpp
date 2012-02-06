@@ -199,23 +199,39 @@ int main(int argc, char * argv[]){
     PhraseLargeTable phrases;
 
     MemoryChunk * chunk = new MemoryChunk;
-    chunk->load("phrase_index.bin");
+    bool retval = chunk->load("phrase_index.bin");
+    if (!retval) {
+        fprintf(stderr, "open phrase_index.bin failed!\n");
+        exit(ENOENT);
+    }
     phrases.load(chunk);
 
     FacadePhraseIndex phrase_index;
 
     //gb_char binary file
     chunk = new MemoryChunk;
-    chunk->load("gb_char.bin");
+    retval = chunk->load("gb_char.bin");
+    if (!retval) {
+        fprintf(stderr, "open gb_char.bin failed!\n");
+        exit(ENOENT);
+    }
     phrase_index.load(1, chunk);
 
     //gbk_char binary file
     chunk = new MemoryChunk;
-    chunk->load("gbk_char.bin");
+    retval = chunk->load("gbk_char.bin");
+    if (!retval) {
+        fprintf(stderr, "open gbk_char.bin failed!\n");
+        exit(ENOENT);
+    }
     phrase_index.load(2, chunk);
 
     Bigram bigram;
-    bigram.attach(bigram_filename, ATTACH_CREATE|ATTACH_READWRITE);
+    retval = bigram.attach(bigram_filename, ATTACH_CREATE|ATTACH_READWRITE);
+    if (!retval) {
+        fprintf(stderr, "open %s failed!\n", bigram_filename);
+        exit(ENOENT);
+    }
 
     taglib_init();
 

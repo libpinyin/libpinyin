@@ -31,12 +31,20 @@ int main(int argc, char * argv[]){
     
     /* gb_char binary file */
     MemoryChunk * chunk = new MemoryChunk;
-    chunk->load("gb_char.bin");
+    bool retval = chunk->load("gb_char.bin");
+    if (!retval) {
+        fprintf(stderr, "open gb_char.bin failed!\n");
+        exit(ENOENT);
+    }
     phrase_index.load(1, chunk);
     
     /* gbk_char binary file */
     chunk = new MemoryChunk;
-    chunk->load("gbk_char.bin");
+    retval = chunk->load("gbk_char.bin");
+    if (!retval) {
+        fprintf(stderr, "open gbk_char.bin failed!\n");
+        exit(ENOENT);
+    }
     phrase_index.load(2, chunk);
 
     /* Note: please increase the value when corpus size becomes larger.
