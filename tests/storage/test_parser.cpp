@@ -57,7 +57,7 @@ static const char *help_msg =
     "                zy-et26\n";
 
 void print_help(){
-    printf(help_msg);
+    printf("%s", help_msg);
 }
 
 int main (int argc, char * argv [])

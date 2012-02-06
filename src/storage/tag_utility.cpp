@@ -143,7 +143,7 @@ static gchar ** split_line(const gchar * line){
             gchar * tmp = g_strndup( begin, cur - begin);
             /* TODO: switch to own strdup_escape implementation
                for \"->" transforming. */
-            token = g_strdup_printf(tmp);
+            token = g_strdup_printf("%s", tmp);
             g_free(tmp);
         } else {
             /* handles other tokens. */

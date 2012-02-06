@@ -48,7 +48,7 @@ static const char * help_msg =
 
 
 void print_help(){
-    printf(help_msg);
+    printf("%s", help_msg);
 }
 
 int main(int argc, char * argv[]) {
