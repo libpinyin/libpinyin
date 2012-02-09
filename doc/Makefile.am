@@ -15,16 +15,10 @@
 ## along with this program; if not, write to the Free Software
 ## Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
-EXTRA_DIST		= COPYING
 
-AUTOMAKE_OPTIONS 	= gnu
-SUBDIRS 		= src utils tests data doc
+man_MANS		= libpinyin.1 \
+			  gen_binary_files.1 \
+			  import_interpolation.1 \
+			  gen_unigram.1
 
-MAINTAINERCLEANFILES 	= Makefile.in 
-
-CLEANFILES		= *.bak 
-
-ACLOCAL			= aclocal -I .
-
-pkgconfigdir = $(libdir)/pkgconfig
-pkgconfig_DATA = libpinyin.pc
+EXTRA_DIST		= $(man_MANS)
