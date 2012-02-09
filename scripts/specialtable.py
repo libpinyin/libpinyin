@@ -125,6 +125,7 @@ def filter_resplit():
 
 #init code
 load_phrase("pinyins.txt")
+load_phrase("specials.txt")
 
 if __name__ == "__main__":
     for p in filter_divided():
