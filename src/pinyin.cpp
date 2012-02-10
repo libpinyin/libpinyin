@@ -425,7 +425,8 @@ size_t pinyin_parse_more_chewings(pinyin_instance_t * instance,
 bool pinyin_in_chewing_keyboard(pinyin_instance_t * instance,
                                 const char key, const char ** symbol) {
     pinyin_context_t * & context = instance->m_context;
-    return context->m_chewing_parser->in_chewing_scheme(key, symbol);
+    return context->m_chewing_parser->in_chewing_scheme
+        (context->m_options, key, symbol);
 }
 
 

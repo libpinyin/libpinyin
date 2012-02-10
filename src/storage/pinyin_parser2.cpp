@@ -777,7 +777,7 @@ int ChewingParser2::parse(pinyin_option_t options, ChewingKeyVector & keys,
     int maximum_len = 0; int i;
     /* probe the longest possible chewing string. */
     for (i = 0; i < len; ++i) {
-        if (!in_chewing_scheme(str[i], NULL))
+        if (!in_chewing_scheme(options, str[i], NULL))
             break;
     }
     maximum_len = i;
@@ -835,7 +835,8 @@ bool ChewingParser2::set_scheme(ChewingScheme scheme) {
 }
 
 
-bool ChewingParser2::in_chewing_scheme(const char key, const char ** symbol)
+bool ChewingParser2::in_chewing_scheme(pinyin_option_t options,
+                                       const char key, const char ** symbol)
  const {
     const gchar * chewing = NULL;
     char tone = CHEWING_ZERO_TONE;
@@ -845,6 +846,9 @@ bool ChewingParser2::in_chewing_scheme(const char key, const char ** symbol)
             *symbol = chewing;
         return true;
     }
+
+    if (!(options & USE_TONE))
+        return false;
 
     if (search_chewing_tones(m_tone_table, key, &tone)) {
         if (symbol)
