@@ -397,6 +397,15 @@ int FullPinyinParser2::parse (pinyin_option_t options, ChewingKeyVector & keys,
                          nextstep->m_key.m_middle == CHEWING_ZERO_MIDDLE &&
                          nextstep->m_key.m_final == CHEWING_ZERO_FINAL))
                         *nextstep = value;
+
+                    /* "zheyanga$" -> "zhe'yang'a$" */
+                    if (value.m_parsed_len == len &&
+                        (nextstep->m_key.m_initial != CHEWING_ZERO_INITIAL &&
+                         nextstep->m_key.m_final == CHEWING_A) &&
+                        (value.m_key.m_initial == CHEWING_ZERO_INITIAL &&
+                         value.m_key.m_middle == CHEWING_ZERO_MIDDLE &&
+                         value.m_key.m_final == CHEWING_A))
+                        *nextstep = value;
                 }
             }
         }
