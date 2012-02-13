@@ -78,8 +78,18 @@ find $RPM_BUILD_ROOT -name '*.la' -exec rm -f {} ';'
 %{_bindir}/gen_binary_files
 %{_bindir}/import_interpolation
 %{_bindir}/gen_unigram
+%{_mandir}/man1/*.1.*
 
 %changelog
+* Mon Feb 13 2012  Peng Wu <pwu@redhat.com> - 0.5.91-1
+- Update to 0.5.91
+
+* Wed Jan 18 2012  Peng Wu <pwu@redhat.com> - 0.5.0-1
+- Update to 0.5.0
+
+* Fri Jan 13 2012  Peng Wu <pwu@redhat.com> - 0.4.93-1
+- Update to 0.4.93
+
 * Mon Jan 09 2012  Peng Wu <pwu@redhat.com> - 0.4.92-2
 - Split tools sub package
 
