@@ -345,7 +345,9 @@ int FullPinyinParser2::parse (pinyin_option_t options, ChewingKeyVector & keys,
 #endif
 
         /* dynamic programming here. */
-        for (size_t m = i; m < next_sep; ++m) {
+        /* for (size_t m = i; m < next_sep; ++m) */
+        {
+            size_t m = i;
             curstep = &g_array_index(m_parse_steps, parse_value_t, m);
             size_t try_len = std_lite::min
                 (m + max_full_pinyin_length, next_sep);
@@ -379,6 +381,7 @@ int FullPinyinParser2::parse (pinyin_option_t options, ChewingKeyVector & keys,
                 if (value.m_parsed_len == nextstep->m_parsed_len &&
                     value.m_num_keys < nextstep->m_num_keys)
                     *nextstep = value;
+
                 if (value.m_parsed_len == nextstep->m_parsed_len &&
                     value.m_num_keys == nextstep->m_num_keys) {
 
