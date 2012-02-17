@@ -100,7 +100,7 @@ PhraseBitmapIndexLevel::PhraseBitmapIndexLevel(){
 }
 
 void PhraseBitmapIndexLevel::reset(){
-    for ( size_t i = 0; i < PHRASE_Number_Of_Bitmap_Index; i++){
+    for ( size_t i = 0; i < PHRASE_NUMBER_OF_BITMAP_INDEX; i++){
         PhraseLengthIndexLevel * length_array =
             m_phrase_length_indexes[i];
         if ( length_array )
@@ -390,7 +390,7 @@ bool PhraseBitmapIndexLevel::load(MemoryChunk * chunk, table_offset_t offset,
     table_offset_t * index = (table_offset_t *) (buf_begin + offset);
     phrase_end = *index;
 
-    for ( size_t i = 0; i < PHRASE_Number_Of_Bitmap_Index; ++i) {
+    for ( size_t i = 0; i < PHRASE_NUMBER_OF_BITMAP_INDEX; ++i) {
         phrase_begin = phrase_end;
         index++;
         phrase_end = *index;
@@ -402,7 +402,7 @@ bool PhraseBitmapIndexLevel::load(MemoryChunk * chunk, table_offset_t offset,
         assert( phrase_end <= end );
         assert( *(buf_begin + phrase_end - 1) == c_separate);
     }
-    offset += (PHRASE_Number_Of_Bitmap_Index + 1) * sizeof(table_offset_t);
+    offset += (PHRASE_NUMBER_OF_BITMAP_INDEX + 1) * sizeof(table_offset_t);
     assert( c_separate == *(buf_begin + offset) );
     return true;
 }
@@ -412,13 +412,13 @@ bool PhraseBitmapIndexLevel::store(MemoryChunk * new_chunk,
                                    table_offset_t & end){
     table_offset_t phrase_end;
     table_offset_t index = offset;
-    offset += (PHRASE_Number_Of_Bitmap_Index + 1) * sizeof(table_offset_t);
+    offset += (PHRASE_NUMBER_OF_BITMAP_INDEX + 1) * sizeof(table_offset_t);
     //add '#'
     new_chunk->set_content(offset, &c_separate, sizeof(char));
     offset +=sizeof(char);
     new_chunk->set_content(index, &offset, sizeof(table_offset_t));
     index += sizeof(table_offset_t);
-    for ( size_t i = 0; i < PHRASE_Number_Of_Bitmap_Index; ++i) {
+    for ( size_t i = 0; i < PHRASE_NUMBER_OF_BITMAP_INDEX; ++i) {
         PhraseLengthIndexLevel * phrases = m_phrase_length_indexes[i];
         if ( !phrases ) { //null pointer
             new_chunk->set_content(index, &offset, sizeof(table_offset_t));
