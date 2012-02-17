@@ -374,25 +374,35 @@ int FullPinyinParser2::parse (pinyin_option_t options, ChewingKeyVector & keys,
                 value.m_last_step = m;
 
                 /* save next step */
+                /* no previous result */
                 if (-1 == nextstep->m_last_step)
                     *nextstep = value;
+                /* prefer the longest pinyin */
                 if (value.m_parsed_len > nextstep->m_parsed_len)
                     *nextstep = value;
+                /* prefer the shortest keys with the same pinyin length */
                 if (value.m_parsed_len == nextstep->m_parsed_len &&
                     value.m_num_keys < nextstep->m_num_keys)
                     *nextstep = value;
 
+                /* handle with the same pinyin length and the number of keys */
                 if (value.m_parsed_len == nextstep->m_parsed_len &&
                     value.m_num_keys == nextstep->m_num_keys) {
 
-                    /* "kaneiji" -> "ka'nei'ji" */
+                    /* prefer the complete pinyin with shengmu
+                     * over without shengmu,
+                     * ex: "kaneiji" -> "ka'nei'ji".
+                     */
                     if ((value.m_key.m_initial != CHEWING_ZERO_INITIAL &&
                          !(value.m_key.m_middle == CHEWING_ZERO_MIDDLE &&
                            value.m_key.m_final == CHEWING_ZERO_FINAL)) &&
                         nextstep->m_key.m_initial == CHEWING_ZERO_INITIAL)
                         *nextstep = value;
 
-                    /* "xierqi" -> "xi'er'qi." */
+                    /* prefer the complete pinyin 'er'
+                     * over the in-complete pinyin 'r',
+                     * ex: "xierqi" -> "xi'er'qi."
+                     */
                     if ((value.m_key.m_initial == CHEWING_ZERO_INITIAL &&
                         value.m_key.m_middle == CHEWING_ZERO_MIDDLE &&
                         value.m_key.m_final == CHEWING_ER) &&
@@ -401,7 +411,9 @@ int FullPinyinParser2::parse (pinyin_option_t options, ChewingKeyVector & keys,
                          nextstep->m_key.m_final == CHEWING_ZERO_FINAL))
                         *nextstep = value;
 
-                    /* "zheyanga$" -> "zhe'yang'a$" */
+                    /* prefer the 'a' at the end of clause,
+                     * ex: "zheyanga$" -> "zhe'yang'a$".
+                     */
                     if (value.m_parsed_len == len &&
                         (nextstep->m_key.m_initial != CHEWING_ZERO_INITIAL &&
                          nextstep->m_key.m_final == CHEWING_A) &&
