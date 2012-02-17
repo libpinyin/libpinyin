@@ -212,9 +212,15 @@ int ChewingBitmapIndexLevel::middle_and_final_level_search
             if (middle == CHEWING_ZERO_MIDDLE) { /* in-complete pinyin */
                 if (!(m_options & PINYIN_INCOMPLETE))
                     return result;
-                for (int m = CHEWING_I; m < CHEWING_NUMBER_OF_MIDDLES; ++m)
-                    for (int n = CHEWING_A; n < CHEWING_NUMBER_OF_FINALS;
-                         ++n) {
+                for (int m = CHEWING_ZERO_MIDDLE;
+                     m < CHEWING_NUMBER_OF_MIDDLES; ++m)
+                    for (int n = CHEWING_ZERO_FINAL;
+                         n < CHEWING_NUMBER_OF_FINALS; ++n) {
+
+                        if (CHEWING_ZERO_MIDDLE == m &&
+                            CHEWING_ZERO_FINAL == n)
+                            continue;
+
                         result |= tone_level_search
                             (initial, (ChewingMiddle) m, (ChewingFinal) n,
                              phrase_length, keys, ranges);
