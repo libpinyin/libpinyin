@@ -72,10 +72,10 @@ using namespace pinyin;
 template<size_t phrase_length>
 struct PhraseIndexItem{
     phrase_token_t m_token;
-    utf16_t m_phrase[phrase_length];
+    ucs4_t m_phrase[phrase_length];
 public:
-    PhraseIndexItem<phrase_length>(utf16_t phrase[], phrase_token_t token){
-        memmove(m_phrase, phrase, sizeof(utf16_t) * phrase_length);
+    PhraseIndexItem<phrase_length>(ucs4_t phrase[], phrase_token_t token){
+        memmove(m_phrase, phrase, sizeof(ucs4_t) * phrase_length);
         m_token = token;
     }
 };
@@ -83,10 +83,10 @@ public:
 template<size_t phrase_length>
 static int phrase_compare(const PhraseIndexItem<phrase_length> &lhs,
                           const PhraseIndexItem<phrase_length> &rhs){
-    utf16_t * phrase_lhs = (utf16_t *) lhs.m_phrase;
-    utf16_t * phrase_rhs = (utf16_t *) rhs.m_phrase;
+    ucs4_t * phrase_lhs = (ucs4_t *) lhs.m_phrase;
+    ucs4_t * phrase_rhs = (ucs4_t *) rhs.m_phrase;
 
-    return memcmp(phrase_lhs, phrase_rhs, sizeof(utf16_t) * phrase_length);
+    return memcmp(phrase_lhs, phrase_rhs, sizeof(ucs4_t) * phrase_length);
 }
 
 template<size_t phrase_length>
@@ -108,15 +108,18 @@ void PhraseBitmapIndexLevel::reset(){
     }
 }
 
-int PhraseBitmapIndexLevel::search( int phrase_length, /* in */ utf16_t phrase[], /* out */ phrase_token_t & token){
+int PhraseBitmapIndexLevel::search( int phrase_length, /* in */ ucs4_t phrase[], /* out */ phrase_token_t & token){
     assert(phrase_length > 0);
 
     int result = SEARCH_NONE;
-    utf16_t first_key = phrase[0];
+    /* use the lower 16-bit for bitmap index,
+     * as most the higher 16-bit are zero.
+     */
+    guint16 first_key = phrase[0] & 0xFFFF;
 
     PhraseLengthIndexLevel * phrase_array = m_phrase_length_indexes[first_key];
     if ( phrase_array )
-        return phrase_array->search(phrase_length - 1, phrase + 1, token);
+        return phrase_array->search(phrase_length, phrase, token);
     return result;
 }
 
@@ -161,7 +164,7 @@ PhraseLengthIndexLevel::~PhraseLengthIndexLevel(){
 }
 
 int PhraseLengthIndexLevel::search(int phrase_length,
-                                   /* in */ utf16_t phrase[],
+                                   /* in */ ucs4_t phrase[],
                                    /* out */ phrase_token_t & token){
     int result = SEARCH_NONE;
     if(m_phrase_array_indexes->len < phrase_length + 1)
@@ -203,7 +206,7 @@ int PhraseLengthIndexLevel::search(int phrase_length,
 }
 
 template<size_t phrase_length>
-int PhraseArrayIndexLevel<phrase_length>::search(/* in */ utf16_t phrase[], /* out */ phrase_token_t & token){
+int PhraseArrayIndexLevel<phrase_length>::search(/* in */ ucs4_t phrase[], /* out */ phrase_token_t & token){
     PhraseIndexItem<phrase_length> * chunk_begin, * chunk_end;
     chunk_begin = (PhraseIndexItem<phrase_length> *)m_chunk.begin();
     chunk_end = (PhraseIndexItem<phrase_length> *)m_chunk.end();
@@ -221,24 +224,24 @@ int PhraseArrayIndexLevel<phrase_length>::search(/* in */ utf16_t phrase[], /* o
     return SEARCH_OK;
 }
 
-int PhraseBitmapIndexLevel::add_index( int phrase_length, /* in */ utf16_t phrase[], /* in */ phrase_token_t token){
-    utf16_t first_key =  phrase[0];
+int PhraseBitmapIndexLevel::add_index( int phrase_length, /* in */ ucs4_t phrase[], /* in */ phrase_token_t token){
+    guint16 first_key =  phrase[0] & 0xFFFF;
     PhraseLengthIndexLevel * & length_array = m_phrase_length_indexes[first_key];
     if ( !length_array ){
         length_array = new PhraseLengthIndexLevel();
     }
-    return length_array->add_index(phrase_length - 1, phrase + 1, token);
+    return length_array->add_index(phrase_length, phrase, token);
 }
 
-int PhraseBitmapIndexLevel::remove_index( int phrase_length, /* in */ utf16_t phrase[], /* out */ phrase_token_t & token){
-    utf16_t first_key = phrase[0];
+int PhraseBitmapIndexLevel::remove_index( int phrase_length, /* in */ ucs4_t phrase[], /* out */ phrase_token_t & token){
+    guint16 first_key = phrase[0] & 0xFFFF;
     PhraseLengthIndexLevel * &length_array = m_phrase_length_indexes[first_key];
     if ( length_array )
-        return length_array->remove_index(phrase_length - 1, phrase + 1, token);
+        return length_array->remove_index(phrase_length, phrase, token);
     return REMOVE_ITEM_DONOT_EXISTS;
 }
 
-int PhraseLengthIndexLevel::add_index( int phrase_length, /* in */ utf16_t phrase[], /* in */ phrase_token_t token){
+int PhraseLengthIndexLevel::add_index( int phrase_length, /* in */ ucs4_t phrase[], /* in */ phrase_token_t token){
     assert(phrase_length + 1 < MAX_PHRASE_LENGTH);
     if ( m_phrase_array_indexes -> len <= phrase_length )
         g_array_set_size(m_phrase_array_indexes, phrase_length + 1);
@@ -276,7 +279,7 @@ int PhraseLengthIndexLevel::add_index( int phrase_length, /* in */ utf16_t phras
 #undef CASE
 }
 
-int PhraseLengthIndexLevel::remove_index( int phrase_length, /* in */ utf16_t phrase[], /* out */ phrase_token_t & token){
+int PhraseLengthIndexLevel::remove_index( int phrase_length, /* in */ ucs4_t phrase[], /* out */ phrase_token_t & token){
     assert(phrase_length + 1 < MAX_PHRASE_LENGTH);
     if ( m_phrase_array_indexes -> len <= phrase_length )
         return REMOVE_ITEM_DONOT_EXISTS;
@@ -313,7 +316,7 @@ int PhraseLengthIndexLevel::remove_index( int phrase_length, /* in */ utf16_t ph
 }
 
 template<size_t phrase_length>
-int PhraseArrayIndexLevel<phrase_length>::add_index(/* in */ utf16_t phrase[], /* in */ phrase_token_t token){
+int PhraseArrayIndexLevel<phrase_length>::add_index(/* in */ ucs4_t phrase[], /* in */ phrase_token_t token){
     PhraseIndexItem<phrase_length> * buf_begin, * buf_end;
 
     PhraseIndexItem<phrase_length> new_elem(phrase, token);
@@ -336,7 +339,7 @@ int PhraseArrayIndexLevel<phrase_length>::add_index(/* in */ utf16_t phrase[], /
 }
 
 template<size_t phrase_length>
-int PhraseArrayIndexLevel<phrase_length>::remove_index(/* in */ utf16_t phrase[], /* out */ phrase_token_t & token){
+int PhraseArrayIndexLevel<phrase_length>::remove_index(/* in */ ucs4_t phrase[], /* out */ phrase_token_t & token){
     PhraseIndexItem<phrase_length> * buf_begin, * buf_end;
 
     PhraseIndexItem<phrase_length> remove_elem(phrase, -1);
@@ -374,7 +377,7 @@ bool PhraseLargeTable::load_text(FILE * infile){
             break;
 
         glong phrase_len = g_utf8_strlen(phrase, -1);
-        utf16_t * new_phrase = g_utf8_to_utf16(phrase, -1, NULL, NULL, NULL);
+        ucs4_t * new_phrase = g_utf8_to_ucs4(phrase, -1, NULL, NULL, NULL);
         add_index(phrase_len, new_phrase, token);
 
         g_free(new_phrase);

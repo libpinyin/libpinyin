@@ -35,7 +35,7 @@ class PhraseLengthIndexLevel;
 class PhraseBitmapIndexLevel{
 protected:
     PhraseLengthIndexLevel * m_phrase_length_indexes[PHRASE_NUMBER_OF_BITMAP_INDEX];
-    /* shift a half ucs4_t for class PhraseLengthIndexLevel, just like PinyinLengthIndexLevel. */
+    /* use a half ucs4_t for class PhraseLengthIndexLevel, just like PinyinLengthIndexLevel. */
     void reset();
 public:
     PhraseBitmapIndexLevel();
