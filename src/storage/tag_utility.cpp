@@ -337,7 +337,7 @@ phrase_token_t taglib_string_to_token(PhraseLargeTable * phrases, const char * s
     }
 
     glong phrase_len = g_utf8_strlen(string, -1);
-    utf16_t * phrase = g_utf8_to_utf16(string, -1, NULL, NULL, NULL);
+    ucs4_t * phrase = g_utf8_to_ucs4(string, -1, NULL, NULL, NULL);
     int result = phrases->search(phrase_len, phrase, token);
     if ( !(result & SEARCH_OK) )
         fprintf(stderr, "error: unknown token:%s.\n", string);
@@ -371,7 +371,7 @@ static const char * taglib_special_token_to_string(phrase_token_t token){
 char * taglib_token_to_string(FacadePhraseIndex * phrase_index,
                               phrase_token_t token) {
     PhraseItem item;
-    utf16_t buffer[MAX_PHRASE_LENGTH];
+    ucs4_t buffer[MAX_PHRASE_LENGTH];
 
     gchar * phrase;
     /* deal with the special phrase index, for "<start>..." */
@@ -387,7 +387,7 @@ char * taglib_token_to_string(FacadePhraseIndex * phrase_index,
 
     item.get_phrase_string(buffer);
     guint8 length = item.get_phrase_length();
-    phrase = g_utf16_to_utf8(buffer, length, NULL, NULL, NULL);
+    phrase = g_ucs4_to_utf8(buffer, length, NULL, NULL, NULL);
     return phrase;
 }
 
