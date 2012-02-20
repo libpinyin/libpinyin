@@ -42,8 +42,8 @@
  * ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
  * + Phrase Length + number of  Pronunciations  + Uni-gram Frequency+
  * ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- * + n Pronunciations + Phrase String(UCS2) +
- * ++++++++++++++++++++++++++++++++++++++++++
+ * + Phrase String(UCS2) + n Pronunciations with Frequency +
+ * +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
  */
 
 namespace pinyin{
