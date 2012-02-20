@@ -58,7 +58,7 @@ public:
     }
 
     /* search method */
-    int search(int phrase_length, /* in */ utf16_t phrase[],
+    int search(int phrase_length, /* in */ ucs4_t phrase[],
                /* out */ phrase_token_t & token){
         int result = SEARCH_NONE;
         token = null_token;
@@ -74,14 +74,14 @@ public:
     }
 
     /* add/remove index method */
-    int add_index(int phrase_length, /* in */ utf16_t phrase[],
+    int add_index(int phrase_length, /* in */ ucs4_t phrase[],
                   /* in */ phrase_token_t token) {
         assert(NULL != m_user_phrase_table);
         return m_user_phrase_table->add_index
             (phrase_length, phrase, token);
     }
 
-    int remove_index(int phrase_length, /* in */ utf16_t phrase[],
+    int remove_index(int phrase_length, /* in */ ucs4_t phrase[],
                      /* out */ phrase_token_t & token){
         assert(NULL != m_user_phrase_table);
         return m_user_phrase_table->remove_index

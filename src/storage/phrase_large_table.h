@@ -28,14 +28,14 @@
 
 namespace pinyin{
 
-const size_t PHRASE_NUMBER_OF_BITMAP_INDEX = 1<<(sizeof(utf16_t) * 8);
+const size_t PHRASE_NUMBER_OF_BITMAP_INDEX = 1<<(sizeof(ucs4_t) / 2 * 8);
 
 class PhraseLengthIndexLevel;
 
 class PhraseBitmapIndexLevel{
 protected:
     PhraseLengthIndexLevel * m_phrase_length_indexes[PHRASE_NUMBER_OF_BITMAP_INDEX];
-    //shift one utf16_t for class PhraseLengthIndexLevel, just like PinyinLengthIndexLevel.
+    /* shift a half ucs4_t for class PhraseLengthIndexLevel, just like PinyinLengthIndexLevel. */
     void reset();
 public:
     PhraseBitmapIndexLevel();
@@ -48,11 +48,11 @@ public:
     bool store(MemoryChunk * new_chunk, table_offset_t offset, table_offset_t & end);
 
     /* search/add_index/remove_index method */
-    int search( int phrase_length, /* in */ utf16_t phrase[],
+    int search( int phrase_length, /* in */ ucs4_t phrase[],
                 /* out */ phrase_token_t & token);
 
-    int add_index( int phrase_length, /* in */ utf16_t phrase[], /* in */ phrase_token_t token);
-    int remove_index( int phrase_length, /* in */ utf16_t phrase[], /* out */ phrase_token_t & token);
+    int add_index( int phrase_length, /* in */ usc4_t phrase[], /* in */ phrase_token_t token);
+    int remove_index( int phrase_length, /* in */ ucs4_t phrase[], /* out */ phrase_token_t & token);
 };
 
 class PhraseLargeTable{
@@ -90,16 +90,16 @@ public:
     bool load_text(FILE * file);
 
     /* search/add_index/remove_index method */
-    int search( int phrase_length, /* in */ utf16_t phrase[],
+    int search( int phrase_length, /* in */ usc4_t phrase[],
                 /* out */ phrase_token_t & token){
         return m_bitmap_table.search(phrase_length, phrase, token);
     }
 
-    int add_index( int phrase_length, /* in */ utf16_t phrase[], /* in */ phrase_token_t token){
+    int add_index( int phrase_length, /* in */ ucs4_t phrase[], /* in */ phrase_token_t token){
         return m_bitmap_table.add_index(phrase_length, phrase, token);
     }
 
-    int remove_index( int phrase_length, /* in */ utf16_t phrase[], /* out */ phrase_token_t & token){
+    int remove_index( int phrase_length, /* in */ ucs4_t phrase[], /* out */ phrase_token_t & token){
         return m_bitmap_table.remove_index(phrase_length, phrase, token);
     }
 };
