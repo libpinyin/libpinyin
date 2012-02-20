@@ -94,7 +94,7 @@ public:
 				  ChewingKey * keys){
 	guint8 phrase_length = get_phrase_length();
 	guint8 npron = get_n_pronunciation();
-	size_t offset = phrase_item_header + phrase_length * sizeof (utf16_t);
+	size_t offset = phrase_item_header + phrase_length * sizeof (ucs4_t);
 	char * buf_begin = (char *)m_chunk.begin();
 	guint32 matched = 0, total_freq =0;
 	for ( int i = 0 ; i < npron ; ++i){
@@ -126,8 +126,8 @@ public:
 				     ChewingKey * keys,
 				     gint32 delta);
 
-    bool get_phrase_string(utf16_t * phrase);
-    bool set_phrase_string(guint8 phrase_length, utf16_t * phrase);
+    bool get_phrase_string(ucs4_t * phrase);
+    bool set_phrase_string(guint8 phrase_length, ucs4_t * phrase);
     bool get_nth_pronunciation(size_t index, 
 			       /* out */ ChewingKey * keys,
 			       /* out */ guint32 & freq);
