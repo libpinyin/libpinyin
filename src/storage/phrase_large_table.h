@@ -51,7 +51,7 @@ public:
     int search( int phrase_length, /* in */ ucs4_t phrase[],
                 /* out */ phrase_token_t & token);
 
-    int add_index( int phrase_length, /* in */ usc4_t phrase[], /* in */ phrase_token_t token);
+    int add_index( int phrase_length, /* in */ ucs4_t phrase[], /* in */ phrase_token_t token);
     int remove_index( int phrase_length, /* in */ ucs4_t phrase[], /* out */ phrase_token_t & token);
 };
 
@@ -90,7 +90,7 @@ public:
     bool load_text(FILE * file);
 
     /* search/add_index/remove_index method */
-    int search( int phrase_length, /* in */ usc4_t phrase[],
+    int search( int phrase_length, /* in */ ucs4_t phrase[],
                 /* out */ phrase_token_t & token){
         return m_bitmap_table.search(phrase_length, phrase, token);
     }
