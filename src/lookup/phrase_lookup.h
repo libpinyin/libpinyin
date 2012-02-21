@@ -54,7 +54,7 @@ protected:
 
     /* Saved sentence */
     int m_sentence_length;
-    utf16_t * m_sentence;
+    ucs4_t * m_sentence;
 
 protected:
     /* Explicitly search the next phrase,
@@ -78,7 +78,7 @@ public:
     ~PhraseLookup();
 
     /* Note: this method only accepts the characters in phrase large table. */
-    bool get_best_match(int sentence_length, utf16_t sentence[], MatchResults & results);
+    bool get_best_match(int sentence_length, ucs4_t sentence[], MatchResults & results);
 
     /* Note: free the phrase by g_free */
     bool convert_to_utf8(MatchResults results,

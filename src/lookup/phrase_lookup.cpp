@@ -62,7 +62,7 @@ PhraseLookup::~PhraseLookup(){
     g_ptr_array_free(m_steps_content, TRUE);
 }
 
-bool PhraseLookup::get_best_match(int sentence_length, utf16_t sentence[],
+bool PhraseLookup::get_best_match(int sentence_length, ucs4_t sentence[],
                                   MatchResults & results){
     m_sentence_length = sentence_length;
     m_sentence = sentence;

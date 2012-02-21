@@ -43,11 +43,11 @@ bool convert_to_utf8(FacadePhraseIndex * phrase_index,
             continue;
 
         phrase_index->get_phrase_item(*token, item);
-        utf16_t buffer[MAX_PHRASE_LENGTH];
+        ucs4_t buffer[MAX_PHRASE_LENGTH];
         item.get_phrase_string(buffer);
 
         guint8 length = item.get_phrase_length();
-        gchar * phrase = g_utf16_to_utf8(buffer, length, NULL, NULL, NULL);
+        gchar * phrase = g_ucs4_to_utf8(buffer, length, NULL, NULL, NULL);
         char * tmp = result_string;
         if ( NULL == result_string )
             result_string = g_strdup(phrase);
