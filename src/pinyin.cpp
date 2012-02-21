@@ -329,15 +329,15 @@ bool pinyin_phrase_segment(pinyin_instance_t * instance,
     pinyin_context_t * & context = instance->m_context;
 
     const glong num_of_chars = g_utf8_strlen(sentence, -1);
-    glong utf16_len = 0;
-    utf16_t * utf16 = g_utf8_to_utf16(sentence, -1, NULL, &utf16_len, NULL);
+    glong ucs4_len = 0;
+    ucs4_t * ucs4_str = g_utf8_to_ucs4(sentence, -1, NULL, &ucs4_len, NULL);
 
-    g_return_val_if_fail(num_of_chars == utf16_len, FALSE);
+    g_return_val_if_fail(num_of_chars == ucs4_len, FALSE);
 
     bool retval = context->m_phrase_lookup->get_best_match
-        (utf16_len, utf16, instance->m_match_results);
+        (ucs4_len, ucs4_str, instance->m_match_results);
 
-    g_free(utf16);
+    g_free(ucs4_str);
     return retval;
 }
 
@@ -590,12 +590,12 @@ bool pinyin_translate_token(pinyin_instance_t * instance,
                             phrase_token_t token, char ** word){
     pinyin_context_t * & context = instance->m_context;
     PhraseItem item;
-    utf16_t buffer[MAX_PHRASE_LENGTH];
+    ucs4_t buffer[MAX_PHRASE_LENGTH];
 
     int retval = context->m_phrase_index->get_phrase_item(token, item);
     item.get_phrase_string(buffer);
     guint8 length = item.get_phrase_length();
-    *word = g_utf16_to_utf8(buffer, length, NULL, NULL, NULL);
+    *word = g_ucs4_to_utf8(buffer, length, NULL, NULL, NULL);
     return ERROR_OK == retval;
 }
 
