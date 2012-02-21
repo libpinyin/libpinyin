@@ -32,7 +32,7 @@ bool PhraseItem::set_n_pronunciation(guint8 n_prouns){
 bool PhraseItem::get_nth_pronunciation(size_t index, ChewingKey * keys,
                                        guint32 & freq){
     guint8 phrase_length = get_phrase_length();
-    table_offset_t offset = phrase_item_header + phrase_length * sizeof( utf16_t) + index * ( phrase_length * sizeof (ChewingKey) + sizeof(guint32));
+    table_offset_t offset = phrase_item_header + phrase_length * sizeof( ucs4_t) + index * ( phrase_length * sizeof (ChewingKey) + sizeof(guint32));
 
     bool retval = m_chunk.get_content
         (offset, keys, phrase_length * sizeof(ChewingKey));
@@ -53,19 +53,19 @@ void PhraseItem::append_pronunciation(ChewingKey * keys, guint32 freq){
 void PhraseItem::remove_nth_pronunciation(size_t index){
     guint8 phrase_length = get_phrase_length();
     set_n_pronunciation(get_n_pronunciation() - 1);
-    size_t offset = phrase_item_header + phrase_length * sizeof ( utf16_t ) +
+    size_t offset = phrase_item_header + phrase_length * sizeof ( ucs4_t ) +
         index * (phrase_length * sizeof (ChewingKey) + sizeof(guint32));
     m_chunk.remove_content(offset, phrase_length * sizeof(ChewingKey) + sizeof(guint32));
 }
 
-bool PhraseItem::get_phrase_string(utf16_t * phrase){
+bool PhraseItem::get_phrase_string(ucs4_t * phrase){
     guint8 phrase_length = get_phrase_length();
-    return m_chunk.get_content(phrase_item_header, phrase, phrase_length * sizeof(utf16_t));
+    return m_chunk.get_content(phrase_item_header, phrase, phrase_length * sizeof(ucs4_t));
 }
 
-bool PhraseItem::set_phrase_string(guint8 phrase_length, utf16_t * phrase){
+bool PhraseItem::set_phrase_string(guint8 phrase_length, ucs4_t * phrase){
     m_chunk.set_content(0, &phrase_length, sizeof(guint8));
-    m_chunk.set_content(phrase_item_header, phrase, phrase_length * sizeof(utf16_t));
+    m_chunk.set_content(phrase_item_header, phrase, phrase_length * sizeof(ucs4_t));
     return true;
 }
 
@@ -74,7 +74,7 @@ void PhraseItem::increase_pronunciation_possibility(pinyin_option_t options,
 					     gint32 delta){
     guint8 phrase_length = get_phrase_length();
     guint8 npron = get_n_pronunciation();
-    size_t offset = phrase_item_header + phrase_length * sizeof ( utf16_t );
+    size_t offset = phrase_item_header + phrase_length * sizeof ( ucs4_t );
     char * buf_begin = (char *) m_chunk.begin();
     guint32 total_freq = 0;
     for ( int i = 0 ; i < npron ; ++i){
@@ -153,7 +153,7 @@ int SubPhraseIndex::get_phrase_item(phrase_token_t token, PhraseItem & item){
     if ( !result ) 
 	return ERROR_FILE_CORRUPTION;
 
-    size_t length = phrase_item_header + phrase_length * sizeof ( utf16_t ) + n_prons * ( phrase_length * sizeof (ChewingKey) + sizeof(guint32) );
+    size_t length = phrase_item_header + phrase_length * sizeof ( ucs4_t ) + n_prons * ( phrase_length * sizeof (ChewingKey) + sizeof(guint32) );
     item.m_chunk.set_chunk((char *)m_phrase_content.begin() + offset, length, NULL);
     return ERROR_OK;
 }
@@ -452,12 +452,12 @@ bool FacadePhraseIndex::load_text(guint8 phrase_index, FILE * infile){
         assert(PHRASE_INDEX_LIBRARY_INDEX(token) == phrase_index );
 
 	glong written;
-	utf16_t * phrase_utf16 = g_utf8_to_utf16(phrase, -1, NULL, 
-					       &written, NULL);
+	ucs4_t * phrase_ucs4 = g_utf8_to_ucs4(phrase, -1, NULL, 
+                                              &written, NULL);
 	
 	if ( 0 == cur_token ){
 	    cur_token = token;
-	    item_ptr->set_phrase_string(written, phrase_utf16);
+	    item_ptr->set_phrase_string(written, phrase_ucs4);
 	}
 
 	if ( cur_token != token ){
@@ -465,7 +465,7 @@ bool FacadePhraseIndex::load_text(guint8 phrase_index, FILE * infile){
 	    delete item_ptr;
 	    item_ptr = new PhraseItem;
 	    cur_token = token;
-	    item_ptr->set_phrase_string(written, phrase_utf16);
+	    item_ptr->set_phrase_string(written, phrase_ucs4);
 	}
 
         pinyin_option_t options = USE_TONE;
@@ -485,7 +485,7 @@ bool FacadePhraseIndex::load_text(guint8 phrase_index, FILE * infile){
 
 	g_array_free(keys, TRUE);
 	g_array_free(key_rests, TRUE);
-	g_free(phrase_utf16);
+	g_free(phrase_ucs4);
     }
 
     add_phrase_item( cur_token, item_ptr);
