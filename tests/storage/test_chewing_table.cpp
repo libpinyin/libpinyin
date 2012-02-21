@@ -115,9 +115,9 @@ int main(int argc, char * argv[]) {
 			phrase_index.get_phrase_item( token, item);
 
                         /* get phrase string */
-			gunichar2 buffer[MAX_PHRASE_LENGTH + 1];
+			ucs4_t buffer[MAX_PHRASE_LENGTH + 1];
 			item.get_phrase_string(buffer);
-			char * string = g_utf16_to_utf8
+			char * string = g_ucs4_to_utf8
 			    ( buffer, item.get_phrase_length(),
 			      NULL, NULL, NULL);
 			printf("%s\t", string);

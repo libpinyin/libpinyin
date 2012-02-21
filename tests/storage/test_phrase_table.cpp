@@ -37,7 +37,7 @@ int main(int argc, char * argv[]){
             break;
 
         glong phrase_len = g_utf8_strlen(linebuf, -1);
-        utf16_t * new_phrase = g_utf8_to_utf16(linebuf, -1, NULL, NULL, NULL);
+        ucs4_t * new_phrase = g_utf8_to_ucs4(linebuf, -1, NULL, NULL, NULL);
         phrase_token_t token;
 
         guint32 start = record_time();

@@ -29,10 +29,10 @@ void print_help(){
 }
 
 bool try_phrase_lookup(PhraseLookup * phrase_lookup,
-                       utf16_t * utf16, glong utf16_len){
+                       ucs4_t * ucs4_str, glong ucs4_len){
     char * result_string = NULL;
     MatchResults results = g_array_new(FALSE, FALSE, sizeof(phrase_token_t));
-    phrase_lookup->get_best_match(utf16_len, utf16, results);
+    phrase_lookup->get_best_match(ucs4_len, ucs4_str, results);
 #if 0
     for ( size_t i = 0; i < results->len; ++i) {
         phrase_token_t * token = &g_array_index(results, phrase_token_t, i);
@@ -108,7 +108,7 @@ int main(int argc, char * argv[]){
         //check non-ucs2 characters
         const glong num_of_chars = g_utf8_strlen(linebuf, -1);
         glong len = 0;
-        utf16_t * sentence = g_utf8_to_utf16(linebuf, -1, NULL, &len, NULL);
+        ucs4_t * sentence = g_utf8_to_ucs4(linebuf, -1, NULL, &len, NULL);
         if ( len != num_of_chars ) {
             fprintf(stderr, "non-ucs2 characters are not accepted.\n");
             g_free(sentence);
