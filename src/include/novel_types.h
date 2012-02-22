@@ -34,7 +34,6 @@ namespace pinyin{
 
 typedef guint32 phrase_token_t;
 typedef gunichar ucs4_t;
-typedef gunichar2 utf16_t;
 
 /*
  *  Phrase Index Library Definition
