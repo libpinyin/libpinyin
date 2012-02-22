@@ -49,10 +49,10 @@ void print_help(){
     printf("Usage: ngseg [--generate-extra-enter]\n");
 }
 
-bool deal_with_segmentable(GArray * current_utf16){
+bool deal_with_segmentable(GArray * current_ucs4){
     char * result_string = NULL;
     MatchResults results = g_array_new(FALSE, FALSE, sizeof(phrase_token_t));
-    g_phrase_lookup->get_best_match(current_utf16->len, (utf16_t *) current_utf16->data, results);
+    g_phrase_lookup->get_best_match(current_ucs4->len, (ucs4_t *) current_ucs4->data, results);
 #if 0
     for ( size_t i = 0; i < results->len; ++i) {
         phrase_token_t * token = &g_array_index(results, phrase_token_t, i);
@@ -66,8 +66,8 @@ bool deal_with_segmentable(GArray * current_utf16){
     if (result_string) {
         printf("%s\n", result_string);
     } else {
-        char * tmp_string = g_utf16_to_utf8
-            ( (utf16_t *) current_utf16->data, current_utf16->len,
+        char * tmp_string = g_ucs4_to_utf8
+            ( (ucs4_t *) current_ucs4->data, current_ucs4->len,
               NULL, NULL, NULL);
         fprintf(stderr, "Un-segmentable sentence encountered:%s\n",
                 tmp_string);
@@ -79,9 +79,9 @@ bool deal_with_segmentable(GArray * current_utf16){
     return true;
 }
 
-bool deal_with_unknown(GArray * current_utf16){
-    char * result_string = g_utf16_to_utf8
-        ( (utf16_t *) current_utf16->data, current_utf16->len,
+bool deal_with_unknown(GArray * current_ucs4){
+    char * result_string = g_ucs4_to_utf8
+        ( (ucs4_t *) current_ucs4->data, current_ucs4->len,
           NULL, NULL, NULL);
     printf("%s\n", result_string);
     g_free(result_string);
@@ -134,7 +134,7 @@ int main(int argc, char * argv[]){
 
 
     CONTEXT_STATE state, next_state;
-    GArray * current_utf16 = g_array_new(TRUE, TRUE, sizeof(utf16_t));
+    GArray * current_ucs4 = g_array_new(TRUE, TRUE, sizeof(ucs4_t));
     phrase_token_t token = null_token;
 
     //split the sentence
@@ -149,9 +149,9 @@ int main(int argc, char * argv[]){
         //check non-ucs2 characters
         const glong num_of_chars = g_utf8_strlen(linebuf, -1);
         glong len = 0;
-        utf16_t * sentence = g_utf8_to_utf16(linebuf, -1, NULL, &len, NULL);
+        ucs4_t * sentence = g_utf8_to_ucs4(linebuf, -1, NULL, &len, NULL);
         if ( len != num_of_chars ) {
-            fprintf(stderr, "non-ucs2 characters encountered:%s.\n", linebuf);
+            fprintf(stderr, "non-ucs4 characters encountered:%s.\n", linebuf);
             printf("\n");
             continue;
         }
@@ -164,7 +164,7 @@ int main(int argc, char * argv[]){
 
         state = CONTEXT_INIT;
         bool result = phrase_table.search( 1, sentence, token);
-        g_array_append_val( current_utf16, sentence[0]);
+        g_array_append_val( current_ucs4, sentence[0]);
         if ( result & SEARCH_OK )
             state = CONTEXT_SEGMENTABLE;
         else
@@ -178,31 +178,31 @@ int main(int argc, char * argv[]){
                 next_state = CONTEXT_UNKNOWN;
 
             if ( state == next_state ){
-                g_array_append_val(current_utf16, sentence[i]);
+                g_array_append_val(current_ucs4, sentence[i]);
                 continue;
             }
 
             assert ( state != next_state );
             if ( state == CONTEXT_SEGMENTABLE )
-                deal_with_segmentable(current_utf16);
+                deal_with_segmentable(current_ucs4);
 
             if ( state == CONTEXT_UNKNOWN )
-                deal_with_unknown(current_utf16);
+                deal_with_unknown(current_ucs4);
 
             /* save the current character */
-            g_array_set_size(current_utf16, 0);
-            g_array_append_val(current_utf16, sentence[i]);
+            g_array_set_size(current_ucs4, 0);
+            g_array_append_val(current_ucs4, sentence[i]);
             state = next_state;
         }
 
-        if ( current_utf16->len ) {
+        if ( current_ucs4->len ) {
             /* this seems always true. */
             if ( state == CONTEXT_SEGMENTABLE )
-                deal_with_segmentable(current_utf16);
+                deal_with_segmentable(current_ucs4);
 
             if ( state == CONTEXT_UNKNOWN )
-                deal_with_unknown(current_utf16);
-            g_array_set_size(current_utf16, 0);
+                deal_with_unknown(current_ucs4);
+            g_array_set_size(current_ucs4, 0);
         }
 
         /* print extra enter */
@@ -214,7 +214,7 @@ int main(int argc, char * argv[]){
     g_phrase_lookup = NULL;
     /* print enter at file tail */
     printf("\n");
-    g_array_free(current_utf16, TRUE);
+    g_array_free(current_ucs4, TRUE);
     free(linebuf);
     return 0;
 }

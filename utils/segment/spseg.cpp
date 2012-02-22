@@ -35,7 +35,7 @@
 
 struct SegmentStep{
     phrase_token_t m_handle;
-    utf16_t * m_phrase;
+    ucs4_t * m_phrase;
     size_t m_phrase_len;
     //use formula W = number of words. Zero handle means one word.
     guint m_nword;
@@ -55,7 +55,7 @@ bool backtrace(GArray * steps, glong phrase_len, GArray * strings);
 
 //Note: do not free phrase, as it is used by strings (array of segment).
 bool segment(PhraseLargeTable * phrases, //Lookup Phrase
-             utf16_t * phrase,
+             ucs4_t * phrase,
              glong phrase_len,
              GArray * strings /* Array of Segment *. */){
     /* Prepare for shortest path segment dynamic programming. */
@@ -73,7 +73,7 @@ bool segment(PhraseLargeTable * phrases, //Lookup Phrase
         size_t nword = step_begin->m_nword;
         for ( glong k = i + 1; k < phrase_len + 1; ++k ) {
             size_t len = k - i;
-            utf16_t * cur_phrase = phrase + i;
+            ucs4_t * cur_phrase = phrase + i;
 
             phrase_token_t token = 0;
             int result = phrases->search(len, cur_phrase, token);
@@ -165,7 +165,7 @@ int main(int argc, char * argv[]){
         //check non-ucs2 characters
         const glong num_of_chars = g_utf8_strlen(linebuf, -1);
         glong len = 0;
-        utf16_t * sentence = g_utf8_to_utf16(linebuf, -1, NULL, &len, NULL);
+        ucs4_t * sentence = g_utf8_to_ucs4(linebuf, -1, NULL, &len, NULL);
         if ( len != num_of_chars ) {
             fprintf(stderr, "non-ucs2 characters encountered:%s.\n", linebuf);
             printf("\n");
@@ -179,7 +179,7 @@ int main(int argc, char * argv[]){
         //print out the split phrase
         for ( glong i = 0; i < strings->len; ++i ) {
             SegmentStep * step = &g_array_index(strings, SegmentStep, i);
-            char * string = g_utf16_to_utf8( step->m_phrase, step->m_phrase_len, NULL, NULL, NULL);
+            char * string = g_ucs4_to_utf8( step->m_phrase, step->m_phrase_len, NULL, NULL, NULL);
             printf("%s\n", string);
             g_free(string);
         }
