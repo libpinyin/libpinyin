@@ -105,12 +105,12 @@ int main(int argc, char * argv[]){
         if ( strcmp ( linebuf, "quit" ) == 0)
             break;
 
-        //check non-ucs2 characters
+        //check non-ucs4 characters
         const glong num_of_chars = g_utf8_strlen(linebuf, -1);
         glong len = 0;
         ucs4_t * sentence = g_utf8_to_ucs4(linebuf, -1, NULL, &len, NULL);
         if ( len != num_of_chars ) {
-            fprintf(stderr, "non-ucs2 characters are not accepted.\n");
+            fprintf(stderr, "non-ucs4 characters are not accepted.\n");
             g_free(sentence);
             continue;
         }

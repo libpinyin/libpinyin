@@ -28,9 +28,9 @@
 /* graph shortest path sentence segment. */
 
 /* Note:
- * Currently libpinyin only supports ucs2 characters, as this is a
+ * Currently libpinyin only supports ucs4 characters, as this is a
  * pre-processor tool for raw corpus, it will skip all sentences
- * which contains non-ucs2 characters.
+ * which contains non-ucs4 characters.
  */
 
 struct SegmentStep{
@@ -162,12 +162,12 @@ int main(int argc, char * argv[]){
             linebuf[strlen(linebuf) - 1] = '\0';
         }
 
-        //check non-ucs2 characters
+        //check non-ucs4 characters
         const glong num_of_chars = g_utf8_strlen(linebuf, -1);
         glong len = 0;
         ucs4_t * sentence = g_utf8_to_ucs4(linebuf, -1, NULL, &len, NULL);
         if ( len != num_of_chars ) {
-            fprintf(stderr, "non-ucs2 characters encountered:%s.\n", linebuf);
+            fprintf(stderr, "non-ucs4 characters encountered:%s.\n", linebuf);
             printf("\n");
             continue;
         }
