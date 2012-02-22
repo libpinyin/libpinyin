@@ -154,7 +154,7 @@ int main(int argc, char * argv[]){
             linebuf[strlen(linebuf)-1] = '\0';
 
         glong phrase_len = 0;
-        utf16_t * phrase = g_utf8_to_utf16(linebuf, -1, NULL, &phrase_len, NULL);
+        ucs4_t * phrase = g_utf8_to_ucs4(linebuf, -1, NULL, &phrase_len, NULL);
 
         token = 0;
         if ( 0 != phrase_len ) {
