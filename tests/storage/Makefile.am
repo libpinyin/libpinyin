@@ -22,6 +22,10 @@ INCLUDES                = -I$(top_srcdir)/src \
                           -I$(top_srcdir)/tests \
                           @GLIB2_CPPFLAGS@
 
+TESTS			 = test_phrase_index_logger \
+			   test_ngram \
+			   test_flexible_ngram
+
 noinst_PROGRAMS          = test_parser \
 			   test_pinyin_table \
 			   test_phrase_index \

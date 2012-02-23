@@ -21,6 +21,8 @@ INCLUDES                = -I$(top_srcdir)/src \
                           -I$(top_srcdir)/src/lookup \
                           @GLIB2_CPPFLAGS@
 
+TESTS			 = test_memory_chunk
+
 noinst_PROGRAMS          = test_memory_chunk
 
 test_memory_chunk_SOURCES    = test_memory_chunk.cpp
