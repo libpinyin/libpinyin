@@ -172,7 +172,7 @@ void feed_line(const char * phrase, const char * pinyin, const guint32 freq) {
     ChewingKeyRestVector key_rests = g_array_new
         (FALSE, FALSE, sizeof(ChewingKeyRest));
 
-    pinyin_option_t options = USE_TONE;
+    pinyin_option_t options = PINYIN_CORRECT_ALL | USE_TONE;
     parser.parse(options, keys, key_rests, pinyin, strlen(pinyin));
     assert(keys->len == key_rests->len);
 
