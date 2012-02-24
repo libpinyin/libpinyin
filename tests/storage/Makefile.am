@@ -26,9 +26,7 @@ TESTS			 = test_phrase_index_logger \
 			   test_ngram \
 			   test_flexible_ngram
 
-noinst_PROGRAMS          = test_parser \
-			   test_pinyin_table \
-			   test_phrase_index \
+noinst_PROGRAMS          = test_phrase_index \
 			   test_phrase_index_logger \
 			   test_phrase_table \
 			   test_ngram \
@@ -36,14 +34,6 @@ noinst_PROGRAMS          = test_parser \
 			   test_parser2 \
 			   test_chewing_table
 
-
-test_parser_SOURCES    = test_parser.cpp
-
-test_parser_LDADD      = ../../src/libpinyin_internal.la @GLIB2_LDFLAGS@
-
-test_pinyin_table_SOURCES    = test_pinyin_table.cpp
-
-test_pinyin_table_LDADD      = ../../src/libpinyin_internal.la @GLIB2_LDFLAGS@
 
 test_phrase_index_SOURCES = test_phrase_index.cpp
 

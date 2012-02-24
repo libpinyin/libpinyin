@@ -24,18 +24,8 @@ INCLUDES                = -I$(top_srcdir)/src \
 bin_PROGRAMS		 = gen_binary_files \
 			   import_interpolation
 
-noinst_PROGRAMS          = gen_zhuyin_map \
-			   gen_pinyin_table \
-			   export_interpolation \
+noinst_PROGRAMS          = export_interpolation \
 			   gen_chewing_table
-
-gen_zhuyin_map_SOURCES      = gen_zhuyin_map.cpp
-
-gen_zhuyin_map_LDADD        = ../../src/libpinyin_internal.la @GLIB2_LDFLAGS@
-
-gen_pinyin_table_SOURCES    = gen_pinyin_table.cpp
-
-gen_pinyin_table_LDADD      = ../../src/libpinyin_internal.la @GLIB2_LDFLAGS@
 
 gen_binary_files_SOURCES    = gen_binary_files.cpp
 
