@@ -1,24 +1,4 @@
 add_executable(
-    gen_zhuyin_map
-    gen_zhuyin_map.cpp
-)
-
-target_link_libraries(
-    gen_zhuyin_map
-    libpinyin
-)
-
-add_executable(
-    gen_pinyin_table
-    gen_pinyin_table.cpp
-)
-
-target_link_libraries(
-    gen_pinyin_table
-    libpinyin
-)
-
-add_executable(
     gen_binary_files
     gen_binary_files.cpp
 )

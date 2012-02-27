@@ -1,16 +1,6 @@
 include_directories(..)
 
 add_executable(
-    test_parser
-    test_parser.cpp
-)
-
-target_link_libraries(
-    test_parser
-    libpinyin
-)
-
-add_executable(
     test_parser2
     test_parser2.cpp
 )
@@ -27,16 +17,6 @@ add_executable(
 
 target_link_libraries(
     test_chewing_table
-    libpinyin
-)
-
-add_executable(
-    test_pinyin_table
-    test_pinyin_table.cpp
-)
-
-target_link_libraries(
-    test_pinyin_table
     libpinyin
 )
 

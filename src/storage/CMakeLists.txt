@@ -4,16 +4,12 @@ set(
 
 set(
     LIBSTORAGE_HEADERS
-    pinyin_custom.h
-    pinyin_base.h
     chewing_key.h
     pinyin_custom2.h
 )
 
 set(
     LIBSTORAGE_SOURCES
-    pinyin_base.cpp
-    pinyin_large_table.cpp
     phrase_index.cpp
     phrase_large_table.cpp
     ngram.cpp
