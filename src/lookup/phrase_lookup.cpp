@@ -32,6 +32,23 @@ using namespace pinyin;
 const gfloat PhraseLookup::bigram_lambda = LAMBDA_PARAMETER;
 const gfloat PhraseLookup::unigram_lambda = 1 - LAMBDA_PARAMETER;
 
+static void clear_steps(GPtrArray * steps_index,
+                        GPtrArray * steps_content){
+    /* clear steps_index */
+    for ( size_t i = 0; i < steps_index->len; ++i){
+        GHashTable * table = (GHashTable *) g_ptr_array_index(steps_index, i);
+        g_hash_table_destroy(table);
+        g_ptr_array_index(steps_index, i) = NULL;
+    }
+
+    /* free steps_content */
+    for ( size_t i = 0; i < steps_content->len; ++i){
+        GArray * array = (GArray *) g_ptr_array_index(steps_content, i);
+        g_array_free(array, TRUE);
+        g_ptr_array_index(steps_content, i) = NULL;
+    }
+}
+
 PhraseLookup::PhraseLookup(FacadePhraseTable * phrase_table,
                            FacadePhraseIndex * phrase_index,
                            Bigram * system_bigram,
@@ -46,19 +63,8 @@ PhraseLookup::PhraseLookup(FacadePhraseTable * phrase_table,
 }
 
 PhraseLookup::~PhraseLookup(){
-    //free m_steps_index
-    for ( size_t i = 0; i < m_steps_index->len; ++i){
-        GHashTable * table = (GHashTable *) g_ptr_array_index(m_steps_index, i);
-        g_hash_table_destroy(table);
-    }
+    clear_steps(m_steps_index, m_steps_content);
     g_ptr_array_free(m_steps_index, TRUE);
-    m_steps_index = NULL;
-
-    //free m_steps_content
-    for ( size_t i = 0; i < m_steps_content->len; ++i){
-        GArray * array = (GArray *) g_ptr_array_index(m_steps_content, i);
-        g_array_free(array, TRUE);
-    }
     g_ptr_array_free(m_steps_content, TRUE);
 }
 
@@ -68,19 +74,7 @@ bool PhraseLookup::get_best_match(int sentence_length, ucs4_t sentence[],
     m_sentence = sentence;
     int nstep = m_sentence_length + 1;
 
-    //free m_steps_index
-    for ( size_t i = 0; i < m_steps_index->len; ++i){
-        GHashTable * table = (GHashTable *) g_ptr_array_index(m_steps_index, i);
-        g_hash_table_destroy(table);
-        g_ptr_array_index(m_steps_index, i) = NULL;
-    }
-
-    //free m_steps_content
-    for ( size_t i = 0; i < m_steps_content->len; ++i){
-        GArray * array = (GArray *) g_ptr_array_index(m_steps_content, i);
-        g_array_free(array, TRUE);
-        g_ptr_array_index(m_steps_content, i) = NULL;
-    }
+    clear_steps(m_steps_index, m_steps_content);
 
     //add null start step
     g_ptr_array_set_size(m_steps_index, nstep);
