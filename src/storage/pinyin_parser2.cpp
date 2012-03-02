@@ -389,6 +389,7 @@ int FullPinyinParser2::parse (pinyin_option_t options, ChewingKeyVector & keys,
                 if (value.m_parsed_len == nextstep->m_parsed_len &&
                     value.m_num_keys == nextstep->m_num_keys) {
 
+#if 0
                     /* prefer the complete pinyin with shengmu
                      * over without shengmu,
                      * ex: "kaneiji" -> "ka'nei'ji".
@@ -410,6 +411,7 @@ int FullPinyinParser2::parse (pinyin_option_t options, ChewingKeyVector & keys,
                          nextstep->m_key.m_middle == CHEWING_ZERO_MIDDLE &&
                          nextstep->m_key.m_final == CHEWING_ZERO_FINAL))
                         *nextstep = value;
+#endif
 
                     /* prefer the 'a' at the end of clause,
                      * ex: "zheyanga$" -> "zhe'yang'a$".
