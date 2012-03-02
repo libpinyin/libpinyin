@@ -320,10 +320,10 @@ bool pinyin_guess_sentence(pinyin_instance_t * instance){
     g_array_set_size(instance->m_prefixes, 0);
     g_array_append_val(instance->m_prefixes, sentence_start);
 
-    /* TODO: update get_best_match call. */
     pinyin_update_constraints(instance);
     bool retval = context->m_pinyin_lookup->get_best_match
-        (instance->m_pinyin_keys,
+        (instance->m_prefixes,
+         instance->m_pinyin_keys,
          instance->m_constraints,
          instance->m_match_results);
 

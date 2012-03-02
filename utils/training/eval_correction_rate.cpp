@@ -58,6 +58,11 @@ bool get_possible_pinyin(FacadePhraseIndex * phrase_index,
 
 bool get_best_match(PinyinLookup * pinyin_lookup,
                     ChewingKeyVector keys, TokenVector tokens){
+    /* prepare the prefixes for get_best_match. */
+    TokenVector prefixes = g_array_new
+        (FALSE, FALSE, sizeof(phrase_token_t));
+    g_array_append_val(prefixes, sentence_start);
+
     /* initialize constraints. */
     CandidateConstraints constraints = g_array_new
         (FALSE, FALSE, sizeof(lookup_constraint_t));
@@ -68,7 +73,11 @@ bool get_best_match(PinyinLookup * pinyin_lookup,
         constraint->m_type = NO_CONSTRAINT;
     }
 
-    return pinyin_lookup->get_best_match(keys, constraints, tokens);
+    bool retval = pinyin_lookup->get_best_match(prefixes, keys, constraints, tokens);
+
+    g_array_free(prefixes, TRUE);
+    g_array_free(constraints, TRUE);
+    return retval;
 }
 
 bool do_one_test(PinyinLookup * pinyin_lookup,
