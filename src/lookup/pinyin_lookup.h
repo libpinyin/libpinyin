@@ -134,7 +134,7 @@ public:
         return true;
     }
 
-    bool get_best_match(ChewingKeyVector keys, CandidateConstraints constraints, MatchResults & results);
+    bool get_best_match(TokenVector prefixes, ChewingKeyVector keys, CandidateConstraints constraints, MatchResults & results);
     
     bool train_result2(ChewingKeyVector keys, CandidateConstraints constraints, MatchResults results);
 

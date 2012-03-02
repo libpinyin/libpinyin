@@ -143,7 +143,10 @@ size_t PinyinLookup::prepare_table_cache(int nstep, int total_pinyin){
     return m_table_cache->len - 1;
 }
 
-bool PinyinLookup::get_best_match(ChewingKeyVector keys, CandidateConstraints constraints, MatchResults & results){
+bool PinyinLookup::get_best_match(TokenVector prefixes,
+                                  ChewingKeyVector keys,
+                                  CandidateConstraints constraints,
+                                  MatchResults & results){
     //g_array_set_size(results, 0);
 
     m_constraints = constraints;
@@ -156,20 +159,24 @@ bool PinyinLookup::get_best_match(ChewingKeyVector keys, CandidateConstraints co
     g_ptr_array_set_size(m_steps_index, nstep);
     g_ptr_array_set_size(m_steps_content, nstep);
 
-    for ( int i = 0 ; i < nstep; ++i ){
+    for ( int i = 0; i < nstep; ++i ){
 	//initialize m_steps_index
 	g_ptr_array_index(m_steps_index, i) = g_hash_table_new(g_direct_hash, g_direct_equal);
 	//initialize m_steps_content
 	g_ptr_array_index(m_steps_content, i) = g_array_new(FALSE, FALSE, sizeof(lookup_value_t));
     }
-    
-    lookup_key_t initial_key = sentence_start;
-    lookup_value_t initial_value(log(1));
-    initial_value.m_handles[1] = sentence_start;
-    GArray * initial_step_content = (GArray *) g_ptr_array_index(m_steps_content, 0);
-    initial_step_content = g_array_append_val(initial_step_content, initial_value);
-    GHashTable * initial_step_index = (GHashTable *) g_ptr_array_index(m_steps_index, 0);
-    g_hash_table_insert(initial_step_index, GUINT_TO_POINTER(initial_key), GUINT_TO_POINTER(initial_step_content->len - 1));
+
+    for ( int i = 0; i < prefixes->len; ++i ){
+        phrase_token_t token = g_array_index(prefixes, phrase_token_t, i);
+        lookup_key_t initial_key = token;
+        lookup_value_t initial_value(log(1));
+        initial_value.m_handles[1] = token;
+
+        GArray * initial_step_content = (GArray *) g_ptr_array_index(m_steps_content, 0);
+        initial_step_content = g_array_append_val(initial_step_content, initial_value);
+        GHashTable * initial_step_index = (GHashTable *) g_ptr_array_index(m_steps_index, 0);
+        g_hash_table_insert(initial_step_index, GUINT_TO_POINTER(initial_key), GUINT_TO_POINTER(initial_step_content->len - 1));
+    }
 
 #if 0
     /* Note: this section has been dropped to enable pi-gram. */
