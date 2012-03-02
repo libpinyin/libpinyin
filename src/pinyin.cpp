@@ -271,6 +271,7 @@ pinyin_instance_t * pinyin_alloc_instance(pinyin_context_t * context){
     pinyin_instance_t * instance = new pinyin_instance_t;
     instance->m_context = context;
 
+    instance->m_prefixes = g_array_new(FALSE, FALSE, sizeof(phrase_token_t));
     instance->m_pinyin_keys = g_array_new(FALSE, FALSE, sizeof(ChewingKey));
     instance->m_pinyin_key_rests =
         g_array_new(FALSE, FALSE, sizeof(ChewingKeyRest));
@@ -283,6 +284,7 @@ pinyin_instance_t * pinyin_alloc_instance(pinyin_context_t * context){
 }
 
 void pinyin_free_instance(pinyin_instance_t * instance){
+    g_array_free(instance->m_prefixes, TRUE);
     g_array_free(instance->m_pinyin_keys, TRUE);
     g_array_free(instance->m_pinyin_key_rests, TRUE);
     g_array_free(instance->m_constraints, TRUE);
@@ -315,6 +317,10 @@ static bool pinyin_update_constraints(pinyin_instance_t * instance){
 bool pinyin_guess_sentence(pinyin_instance_t * instance){
     pinyin_context_t * & context = instance->m_context;
 
+    g_array_set_size(instance->m_prefixes, 0);
+    g_array_append_val(instance->m_prefixes, sentence_start);
+
+    /* TODO: update get_best_match call. */
     pinyin_update_constraints(instance);
     bool retval = context->m_pinyin_lookup->get_best_match
         (instance->m_pinyin_keys,

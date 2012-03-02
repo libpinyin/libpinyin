@@ -38,6 +38,7 @@ typedef struct _pinyin_instance_t pinyin_instance_t;
 
 struct _pinyin_instance_t{
     pinyin_context_t * m_context;
+    TokenVector m_prefixes;
     ChewingKeyVector m_pinyin_keys;
     ChewingKeyRestVector m_pinyin_key_rests;
     CandidateConstraints m_constraints;
