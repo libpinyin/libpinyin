@@ -50,6 +50,12 @@ int main( int argc, char * argv[]){
 	if ( 0 == keys->len ) /* invalid pinyin */
 	    continue;
 
+        /* prepare the prefixes for get_best_match. */
+        TokenVector prefixes = g_array_new
+            (FALSE, FALSE, sizeof(phrase_token_t));
+        g_array_append_val(prefixes, sentence_start);
+
+        /* initialize constraints. */
 	CandidateConstraints constraints = g_array_new(FALSE, FALSE, sizeof(lookup_constraint_t));
 
 	g_array_set_size(constraints, keys->len);
@@ -62,7 +68,7 @@ int main( int argc, char * argv[]){
 	
 	guint32 start_time = record_time();
 	for ( size_t i = 0; i < bench_times; ++i)
-	    pinyin_lookup.get_best_match(keys, constraints, results);
+	    pinyin_lookup.get_best_match(prefixes, keys, constraints, results);
 	print_time(start_time, bench_times);
 	for ( size_t i = 0; i < results->len; ++i){
 	    phrase_token_t * token = &g_array_index(results, phrase_token_t, i);
