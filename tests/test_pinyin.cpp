@@ -30,8 +30,8 @@ int main(int argc, char * argv[]){
 
     pinyin_instance_t * instance = pinyin_alloc_instance(context);
 
-    char * linebuf = NULL; char * prefixbuf = NULL;
-    size_t linesize = 0; size_t prefixsize = 0;
+    char * prefixbuf = NULL; size_t prefixsize = 0;
+    char * linebuf = NULL; size_t linesize = 0;
     ssize_t read;
 
     while( TRUE ){
