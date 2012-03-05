@@ -9,6 +9,7 @@ LIBPINYIN {
         pinyin_alloc_instance;
         pinyin_free_instance;
         pinyin_guess_sentence;
+        pinyin_guess_sentence_with_prefix;
         pinyin_phrase_segment;
         pinyin_get_sentence;
         pinyin_parse_full_pinyin;

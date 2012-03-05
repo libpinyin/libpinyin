@@ -330,6 +330,41 @@ bool pinyin_guess_sentence(pinyin_instance_t * instance){
     return retval;
 }
 
+bool pinyin_guess_sentence_with_prefix(pinyin_instance_t * instance,
+                                       const char * prefix){
+    pinyin_context_t * & context = instance->m_context;
+
+    g_array_set_size(instance->m_prefixes, 0);
+    g_array_append_val(instance->m_prefixes, sentence_start);
+
+    glong written = 0;
+    ucs4_t * ucs4_str = g_utf8_to_ucs4(prefix, -1, NULL, &written, NULL);
+
+    if (ucs4_str && written) {
+        /* add prefixes. */
+        for (ssize_t i = 1; i <= written; ++i) {
+            if (i > MAX_PHRASE_LENGTH)
+                break;
+
+            phrase_token_t token = null_token;
+            ucs4_t * start = ucs4_str + written - i;
+            int result = context->m_phrase_table->search(i, start, token);
+            if (result & SEARCH_OK)
+                g_array_append_val(instance->m_prefixes, token);
+        }
+    }
+    g_free(ucs4_str);
+
+    pinyin_update_constraints(instance);
+    bool retval = context->m_pinyin_lookup->get_best_match
+        (instance->m_prefixes,
+         instance->m_pinyin_keys,
+         instance->m_constraints,
+         instance->m_match_results);
+
+    return retval;
+}
+
 bool pinyin_phrase_segment(pinyin_instance_t * instance,
                            const char * sentence){
     pinyin_context_t * & context = instance->m_context;

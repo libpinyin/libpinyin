@@ -143,6 +143,18 @@ void pinyin_free_instance(pinyin_instance_t * instance);
 bool pinyin_guess_sentence(pinyin_instance_t * instance);
 
 /**
+ * pinyin_guess_sentence_with_prefix:
+ * @instance: the pinyin instance.
+ * @prefix: the prefix before the sentence.
+ * @returns: whether the sentence are guessed successfully.
+ *
+ * Guess a sentence from the saved pinyin keys with a prefix.
+ *
+ */
+bool pinyin_guess_sentence_with_prefix(pinyin_instance_t * instance,
+                                       const char * prefix);
+
+/**
  * pinyin_phrase_segment:
  * @instance: the pinyin instance.
  * @sentence: the utf-8 sentence to be segmented.
