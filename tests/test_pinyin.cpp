@@ -30,19 +30,33 @@ int main(int argc, char * argv[]){
 
     pinyin_instance_t * instance = pinyin_alloc_instance(context);
 
-    char* linebuf = NULL;
-    size_t size = 0;
+    char * linebuf = NULL; char * prefixbuf = NULL;
+    size_t linesize = 0; size_t prefixsize = 0;
     ssize_t read;
-    while( (read = getline(&linebuf, &size, stdin)) != -1 ){
+
+    while( TRUE ){
+        fprintf(stdout, "prefix:");
+        fflush(stdout);
+
+        if ((read = getline(&prefixbuf, &prefixsize, stdin)) == -1)
+            break;
+
+        if ( '\n' == prefixbuf[strlen(prefixbuf) - 1] ) {
+            prefixbuf[strlen(prefixbuf) - 1] = '\0';
+        }
+
+        if ((read = getline(&linebuf, &linesize, stdin)) == -1)
+            break;
+
         if ( '\n' == linebuf[strlen(linebuf) - 1] ) {
             linebuf[strlen(linebuf) - 1] = '\0';
         }
 
         if ( strcmp ( linebuf, "quit" ) == 0)
             break;
-        
+
         pinyin_parse_more_full_pinyins(instance, linebuf);
-        pinyin_guess_sentence(instance);
+        pinyin_guess_sentence_with_prefix(instance, prefixbuf);
 
         char * sentence = NULL;
         pinyin_get_sentence (instance, &sentence);
@@ -57,6 +71,6 @@ int main(int argc, char * argv[]){
 
     pinyin_free_instance(instance);
     pinyin_fini(context);
-    free(linebuf);
+    free(prefixbuf); free(linebuf);
     return 0;
 }
