@@ -215,8 +215,12 @@ bool pinyin_save(pinyin_context_t * context){
     g_free(filename);
     delete newlog;
 
+    gchar * tmpfilename = g_build_filename(context->m_user_dir,
+                                        "user.db.tmp", NULL);
     filename = g_build_filename(context->m_user_dir, "user.db", NULL);
-    context->m_user_bigram->save_db(filename);
+    context->m_user_bigram->save_db(tmpfilename);
+    rename(tmpfilename, filename);
+    g_free(tmpfilename);
     g_free(filename);
 
     mark_version(context->m_user_dir);
