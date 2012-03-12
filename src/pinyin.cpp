@@ -195,10 +195,15 @@ bool pinyin_save(pinyin_context_t * context){
                                         "gb_char.bin", NULL);
     oldchunk->load(filename);
     g_free(filename);
+
     context->m_phrase_index->diff(1, oldchunk, newlog);
+    gchar * tmpfilename = g_build_filename(context->m_user_dir,
+                                           "gb_char.dbin.tmp", NULL);
     filename = g_build_filename(context->m_user_dir,
                                 "gb_char.dbin", NULL);
-    newlog->save(filename);
+    newlog->save(tmpfilename);
+    rename(tmpfilename, filename);
+    g_free(tmpfilename);
     g_free(filename);
     delete newlog;
 
@@ -209,14 +214,18 @@ bool pinyin_save(pinyin_context_t * context){
     g_free(filename);
 
     context->m_phrase_index->diff(2, oldchunk, newlog);
+    tmpfilename = g_build_filename(context->m_user_dir,
+                                   "gbk_char.dbin.tmp", NULL);
     filename = g_build_filename(context->m_user_dir,
                                 "gbk_char.dbin", NULL);
-    newlog->save(filename);
+    newlog->save(tmpfilename);
+    rename(tmpfilename, filename);
+    g_free(tmpfilename);
     g_free(filename);
     delete newlog;
 
-    gchar * tmpfilename = g_build_filename(context->m_user_dir,
-                                        "user.db.tmp", NULL);
+    tmpfilename = g_build_filename(context->m_user_dir,
+                                   "user.db.tmp", NULL);
     filename = g_build_filename(context->m_user_dir, "user.db", NULL);
     context->m_user_bigram->save_db(tmpfilename);
     rename(tmpfilename, filename);
