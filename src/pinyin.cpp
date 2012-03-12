@@ -21,6 +21,8 @@
 
 
 #include "pinyin.h"
+#include <stdio.h>
+#include <unistd.h>
 #include <glib/gstdio.h>
 #include "pinyin_internal.h"
 
@@ -226,6 +228,7 @@ bool pinyin_save(pinyin_context_t * context){
 
     tmpfilename = g_build_filename(context->m_user_dir,
                                    "user.db.tmp", NULL);
+    unlink(tmpfilename);
     filename = g_build_filename(context->m_user_dir, "user.db", NULL);
     context->m_user_bigram->save_db(tmpfilename);
     rename(tmpfilename, filename);
