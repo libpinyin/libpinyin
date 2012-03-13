@@ -38,6 +38,13 @@ namespace pinyin{
  *  malloc then free.
  */
 
+/**
+ * MemoryChunk:
+ *
+ * The utility to manage the memory chunks.
+ *
+ */
+
 class MemoryChunk{
     typedef   void (* free_func_t)(void *);
 private:
@@ -100,7 +107,12 @@ private:
     }
     
 public:
-    /* constructors */
+    /**
+     * MemoryChunk::MemoryChunk:
+     *
+     * The constructor of the MemoryChunk.
+     *
+     */
     MemoryChunk(){
 	m_data_begin = NULL;
 	m_data_end = NULL;
@@ -108,36 +120,76 @@ public:
 	m_free_func = NULL;
     }
     
-    /* destructors */
+    /**
+     * MemoryChunk::~MemoryChunk:
+     *
+     * The destructor of the MemoryChunk.
+     *
+     */
     ~MemoryChunk(){
 	reset();
     }
 
-    /* read access method */
+    /**
+     * MemoryChunk::begin:
+     *
+     * Read access method, to get the begin of the MemoryChunk.
+     *
+     */
     void* begin() const{
 	return m_data_begin;
     }
-    
+
+    /**
+     * MemoryChunk::end:
+     *
+     * Write access method, to get the end of the MemoryChunk.
+     *
+     */
     void* end() const{
         return m_data_end;
     }
 
+    /**
+     * MemoryChunk::size:
+     *
+     * Get the size of the content in the MemoryChunk.
+     *
+     */
     size_t size() const{
 	return m_data_end - m_data_begin;
     }
-    
+
+    /**
+     * MemoryChunk::set_size:
+     *
+     * Set the size of the content in the MemoryChunk.
+     *
+     */
     void set_size(size_t newsize){
 	ensure_has_space(newsize);
 	m_data_end = m_data_begin + newsize;
     }
-    
+
+    /**
+     * MemoryChunk::capacity:
+     *
+     * Get the capacity of the MemoryChunk.
+     *
+     */
     size_t capacity(){
 	return m_allocated - m_data_begin;
     }
   
-    /* 
-     *  Transfer management of a memory chunk allocated by other part system
-     *  to the memory chunk.
+    /**
+     * MemoryChunk::set_chunk:
+     * @begin: the begin of the data
+     * @length: the length of the data
+     * @free_func: the function to free the data
+     *
+     * Transfer management of a memory chunk allocated by other part of the
+     * system to the memory chunk.
+     *
      */
     void set_chunk(void* begin, size_t length, free_func_t free_func){
 	if ( m_free_func )
@@ -149,9 +201,17 @@ public:
 	m_free_func = free_func;
     }
   
-    /* subchunk
-     * use set_buffer internally.
-     * new chunk need to be deleted.
+    /**
+     * MemoryChunk::get_sub_chunk:
+     * @offset: the offset in this MemoryChunk.
+     * @length: the data length to be retrieved.
+     * @returns: the newly allocated MemoryChunk.
+     *
+     * Get a sub MemoryChunk from this MemoryChunk.
+     *
+     * Note: use set_chunk internally.
+     * the returned new chunk need to be deleted.
+     *
      */
     MemoryChunk * get_sub_chunk(size_t offset, size_t length){
 	MemoryChunk * retval = new MemoryChunk();
@@ -159,8 +219,16 @@ public:
 	retval->set_chunk(begin_pos, length, NULL);
 	return retval;
     }
-    /* write function
-     * Data are written directly to the memory area.
+
+    /**
+     * MemoryChunk::set_content:
+     * @offset: the offset in this MemoryChunk.
+     * @data: the begin of the data to be copied.
+     * @len: the length of the data to be copied.
+     * @returns: whether the data is copied successfully.
+     *
+     * Data are written directly to the memory area in this MemoryChunk.
+     *
      */
     bool set_content(size_t offset, const void * data, size_t len){
 	size_t cursize = std_lite::max(size(), offset + len);
@@ -169,16 +237,30 @@ public:
 	m_data_end = m_data_begin + cursize;
 	return true;
     }
-    /* append function
-     * Data are appended at the end.
+
+    /**
+     * MemoryChunk::append_content:
+     * @data: the begin of the data to be copied.
+     * @len: the length of the data to be copied.
+     * @returns: whether the data is appended successfully.
+     *
+     * Data are appended at the end of the MemoryChunk.
+     *
      */
     bool append_content(const void * data, size_t len){
         return set_content(size(), data, len);
     }
-    /* insert function
+
+    /**
+     * MemoryChunk::insert_content:
+     * @offset: the offset in this MemoryChunk, which starts from zero.
+     * @data: the begin of the data to be copied.
+     * @length: the length of the data to be copied.
+     * @returns: whether the data is inserted successfully.
+     *
      * Data are written to the memory area,
      * the original content are moved towards the rear.
-     * parameter offset start from zero.
+     *
      */
     bool insert_content(size_t offset, const void * data, size_t length){
 	ensure_has_more_space(length);
@@ -188,9 +270,16 @@ public:
 	m_data_end += length;
 	return true;
     }
-    /* remove function
+
+    /**
+     * MemoryChunk::remove_content:
+     * @offset: the offset in this MemoryChunk.
+     * @length: the length of the removed content.
+     * @returns: whether the content is removed successfully.
+     *
      * Data are removed directly,
      * the following content are moved towards the front.
+     *
      */
     bool remove_content(size_t offset, size_t length){
 	size_t move_size = size() - offset - length;
@@ -199,8 +288,15 @@ public:
 	return true;
     }
 
-    /* get_content function
-     * Get the binary data
+    /**
+     * MemoryChunk::get_content:
+     * @offset: the offset in this MemoryChunk.
+     * @buffer: the buffer to retrieve the content.
+     * @length: the length of content to be retrieved.
+     * @returns: whether the content is retrieved.
+     *
+     * Get the content in this MemoryChunk.
+     *
      */
     bool get_content(size_t offset, void * buffer, size_t length){
 	if ( size() < offset + length )
@@ -209,7 +305,12 @@ public:
 	return true;
     }
 
-    /* compact memory, reduce the size */
+    /**
+     * MemoryChunk::compact_memory:
+     *
+     * Compact memory, reduce the size.
+     *
+     */
     void compact_memory(){
 	if ( m_free_func != free )
 	    return;
@@ -218,7 +319,14 @@ public:
 	m_allocated = m_data_begin + newsize;
     }
   
-    /* file storage  functions */
+    /**
+     * MemoryChunk::load:
+     * @filename: load the MemoryChunk from the filename.
+     * @returns: whether the load is successful.
+     *
+     * Load the content from the filename.
+     *
+     */
     bool load(const char * filename){
 	/* free old data */
 	reset();
@@ -247,6 +355,14 @@ public:
 	return true;
     }
 
+    /**
+     * MemoryChunk::save:
+     * @filename: save this MemoryChunk to the filename.
+     * @returns: whether the save is successful.
+     *
+     * Save the content to the filename.
+     *
+     */
     bool save(const char * filename){
 	FILE* file = fopen(filename, "w");
 	if ( !file )
