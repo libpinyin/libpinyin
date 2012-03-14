@@ -27,19 +27,38 @@
 
 namespace pinyin{
 
+/**
+ * FacadeChewingTable:
+ *
+ * The facade class of chewing large table.
+ *
+ */
+
 class FacadeChewingTable{
 private:
     ChewingLargeTable * m_system_chewing_table;
     ChewingLargeTable * m_user_chewing_table;
 
 public:
-    /* constructor/destructor */
+    /**
+     * FacadeChewingTable::FacadeChewingTable:
+     *
+     * The constructor of the FacadeChewingTable.
+     *
+     */
     FacadeChewingTable() {
         m_system_chewing_table = NULL;
         m_user_chewing_table = NULL;
     }
 
-    /* set options method */
+    /**
+     * FacadeChewingTable::set_options:
+     * @options: the pinyin options.
+     * @returns: whether the setting options is successfully.
+     *
+     * Set the options of the system and user chewing table.
+     *
+     */
     bool set_options(pinyin_option_t options) {
         bool result = false;
         if (m_system_chewing_table)
@@ -49,7 +68,16 @@ public:
         return result;
     }
 
-    /* load/store method */
+    /**
+     * FacadeChewingTable::load:
+     * @options: the pinyin options.
+     * @system: the memory chunk of the system chewing table.
+     * @user: the memory chunk of the user chewing table.
+     * @returns: whether the load operation is successful.
+     *
+     * Load the system or user chewing table from the memory chunks.
+     *
+     */
     bool load(pinyin_option_t options, MemoryChunk * system,
               MemoryChunk * user){
         bool result = false;
@@ -64,7 +92,30 @@ public:
         return result;
     }
 
-    /* search method */
+    /**
+     * FacadeChewingTable::store:
+     * @new_user: the memory chunk to store the user chewing table.
+     * @returns: whether the store operation is successful.
+     *
+     * Store the user chewing table to the memory chunk.
+     *
+     */
+    bool store(MemoryChunk * new_user) {
+        if (NULL == m_user_chewing_table)
+            return false;
+        return m_user_chewing_table->store(new_user);
+    }
+
+    /**
+     * FacadeChewingTable::search:
+     * @phrase_length: the length of the phrase to be searched.
+     * @keys: the pinyin key of the phrase to be searched.
+     * @ranges: the array of GArrays to store the matched phrase token.
+     * @returns: the search result of enum SearchResult.
+     *
+     * Search the phrase tokens according to the pinyin keys.
+     *
+     */
     int search(int phrase_length, /* in */ ChewingKey keys[],
                /* out */ PhraseIndexRanges ranges) const {
 
@@ -87,16 +138,37 @@ public:
         return result;
     }
 
-    /* add/remove index method */
+    /**
+     * FacadeChewingTable::add_index:
+     * @phrase_length: the length of the phrase to be added.
+     * @keys: the pinyin keys of the phrase to be added.
+     * @token: the token of the phrase to be added.
+     * @returns: the add result of enum AddIndexResult.
+     *
+     * Add the phrase token to the user chewing table.
+     *
+     */
     int add_index(int phrase_length, /* in */ ChewingKey keys[],
                   /* in */ phrase_token_t token) {
-        assert(NULL != m_user_chewing_table);
+        if (NULL == m_user_chewing_table)
+            return false;
         return m_user_chewing_table->add_index(phrase_length, keys, token);
     }
 
+    /**
+     * FacadeChewingTable::remove_index:
+     * @phrase_length: the length of the phrase to be removed.
+     * @keys: the pinyin keys of the phrase to be removed.
+     * @token: the token of the phrase to be removed.
+     * @returns: the remove result of enum RemoveIndexResult.
+     *
+     * Remove the phrase token from the user chewing table.
+     *
+     */
     int remove_index(int phrase_length, /* in */ ChewingKey keys[],
                      /* in */ phrase_token_t token) {
-        assert(NULL != m_user_chewing_table);
+        if (NULL == m_user_chewing_table)
+            return false;
         return m_user_chewing_table->remove_index(phrase_length, keys, token);
     }
 };
