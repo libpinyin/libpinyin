@@ -35,6 +35,15 @@ namespace pinyin{
 
 typedef GArray * FlexibleBigramPhraseArray;
 
+/**
+ * FlexibleSingleGram:
+ * @ArrayHeader: the struct ArrayHeader.
+ * @ArrayItem: the struct ArrayItem.
+ *
+ * The flexible single gram is mainly used for training purpose.
+ *
+ */
+
 template<typename ArrayHeader, typename ArrayItem>
 class FlexibleSingleGram{
     template<typename MH, typename AH,
@@ -46,7 +55,12 @@ private:
         m_chunk.set_chunk(buffer, length, NULL);
     }
 public:
-    /* item typedefs */
+    /**
+     * ArrayItemWithToken:
+     *
+     * Define the struct ArrayItemWithToken type.
+     *
+     */
     typedef struct{
         phrase_token_t m_token;
         ArrayItem m_item;
@@ -59,13 +73,25 @@ private:
     }
 
 public:
-    /* Null Constructor */
+    /**
+     * FlexibleSingleGram::FlexibleSingleGram:
+     *
+     * The constructor of the FlexibleSingleGram.
+     *
+     */
     FlexibleSingleGram(){
         m_chunk.set_size(sizeof(ArrayHeader));
         memset(m_chunk.begin(), 0, sizeof(ArrayHeader));
     }
 
-    /* retrieve all items */
+    /**
+     * FlexibleSingleGram::retrieve_all:
+     * @array: the array to store all items in this single gram.
+     * @returns: whether the retrieve operation is successful.
+     *
+     * Retrieve all items in this single gram.
+     *
+     */
     bool retrieve_all(/* out */ FlexibleBigramPhraseArray array){
         const ArrayItemWithToken * begin = (const ArrayItemWithToken *)
             ((const char *)(m_chunk.begin()) + sizeof(ArrayHeader));
@@ -85,8 +111,17 @@ public:
         return true;
     }
 
-    /* search method */
-    /* the array result contains many items */
+    /**
+     * FlexibleSingleGram::search:
+     * @range: the token range.
+     * @array: the array to store the array items with token in the range.
+     * @returns: whether the search operation is successful.
+     *
+     * Search the array items with token in the range.
+     *
+     * Note: The array result may contain many items.
+     *
+     */
     bool search(/* in */ PhraseIndexRange * range,
                 /* out */ FlexibleBigramPhraseArray array){
         const ArrayItemWithToken * begin = (const ArrayItemWithToken *)
@@ -111,7 +146,15 @@ public:
         return true;
     }
 
-    /* insert array item */
+    /**
+     * FlexibleSingleGram::insert_array_item:
+     * @token: the phrase token to be inserted.
+     * @item: the array item of this token.
+     * @returns: whether the insert operation is successful.
+     *
+     * Insert the array item of the token.
+     *
+     */
     bool insert_array_item(/* in */ phrase_token_t token,
                            /* in */ const ArrayItem & item){
         ArrayItemWithToken * begin = (ArrayItemWithToken *)
@@ -145,6 +188,15 @@ public:
         return true;
     }
 
+    /**
+     * FlexibleSingleGram::remove_array_item:
+     * @token: the phrase token to be removed.
+     * @item: the content of the removed array item.
+     * @returns: whether the remove operation is successful.
+     *
+     * Remove the array item of the token.
+     *
+     */
     bool remove_array_item(/* in */ phrase_token_t token,
                            /* out */ ArrayItem & item)
     {
@@ -175,7 +227,15 @@ public:
         return false;
     }
 
-    /* get array item */
+    /**
+     * FlexibleSingleGram::get_array_item:
+     * @token: the phrase token.
+     * @item: the array item of the token.
+     * @returns: whether the get operation is successful.
+     *
+     * Get the array item of the token.
+     *
+     */
     bool get_array_item(/* in */ phrase_token_t token,
                         /* out */ ArrayItem & item)
     {
@@ -203,7 +263,15 @@ public:
         return false;
     }
 
-    /* set array item */
+    /**
+     * FlexibleSingleGram::set_array_item:
+     * @token: the phrase token.
+     * @item: the array item of the token.
+     * @returns: whether the set operation is successful.
+     *
+     * Set the array item of the token.
+     *
+     */
     bool set_array_item(/* in */ phrase_token_t token,
                         /* in */ const ArrayItem & item){
         ArrayItemWithToken * begin = (ArrayItemWithToken *)
@@ -228,7 +296,14 @@ public:
         return false;
     }
 
-    /* get array header */
+    /**
+     * FlexibleSingleGram::get_array_header:
+     * @header: the array header of this single gram.
+     * @returns: whether the get operation is successful.
+     *
+     * Get the array header of this single gram.
+     *
+     */
     bool get_array_header(/* out */ ArrayHeader & header){
         /* clear retval */
         memset(&header, 0, sizeof(ArrayHeader));
@@ -237,7 +312,14 @@ public:
         return true;
     }
 
-    /* set array header */
+    /**
+     * FlexibleSingleGram::set_array_header:
+     * @header: the array header of this single gram.
+     * @returns: whether the set operation is successful.
+     *
+     * Set the array header of this single gram.
+     *
+     */
     bool set_array_header(/* in */ const ArrayHeader & header){
         char * buf_begin = (char *)m_chunk.begin();
         memcpy(buf_begin, &header, sizeof(ArrayHeader));
@@ -245,6 +327,15 @@ public:
     }
 };
 
+/**
+ * FlexibleBigram:
+ * @MagicHeader: the type of the magic header.
+ * @ArrayHeader: the type of the array header.
+ * @ArrayItem: the type of the array item.
+ *
+ * The flexible bi-gram is mainly used for training purpose.
+ *
+ */
 template<typename MagicHeader, typename ArrayHeader,
          typename ArrayItem>
 class FlexibleBigram{
@@ -265,6 +356,13 @@ private:
     }
 
 public:
+    /**
+     * FlexibleBigram::FlexibleBigram:
+     * @magic_number: the 4 bytes magic number of the bi-gram.
+     *
+     * The constructor of the FlexibleBigram.
+     *
+     */
     FlexibleBigram(const char * magic_number){
         m_db = NULL;
         m_magic_header_index[0] = null_token;
@@ -273,11 +371,25 @@ public:
         memcpy(m_magic_number, magic_number, sizeof(m_magic_number));
     }
 
+    /**
+     * FlexibleBigram::~FlexibleBigram:
+     *
+     * The destructor of the FlexibleBigram.
+     *
+     */
     ~FlexibleBigram(){
         reset();
     }
 
-    /* attach berkeley db on filesystem for training purpose. */
+    /**
+     * FlexibleBigram::attach:
+     * @dbfile: the path name of the flexible bi-gram.
+     * @flags: the attach flags for the Berkeley DB.
+     * @returns: whether the attach operation is successful.
+     *
+     * Attach Berkeley DB on filesystem for training purpose.
+     *
+     */
     bool attach(const char * dbfile, guint32 flags){
         reset();
         u_int32_t db_flags = 0;
@@ -338,7 +450,15 @@ public:
         return false;
     }
 
-    /* load/store one array. */
+    /**
+     * FlexibleBigram::load:
+     * @index: the previous token in the flexible bi-gram.
+     * @single_gram: the single gram of the previous token.
+     * @returns: whether the load operation is successful.
+     *
+     * Load the single gram of the previous token.
+     *
+     */
     bool load(phrase_token_t index,
               FlexibleSingleGram<ArrayHeader, ArrayItem> * & single_gram){
         if ( !m_db )
@@ -363,6 +483,15 @@ public:
         return true;
     }
 
+    /**
+     * FlexibleBigram::store:
+     * @index: the previous token in the flexible bi-gram.
+     * @single_gram: the single gram of the previous token.
+     * @returns: whether the store operation is successful.
+     *
+     * Store the single gram of the previous token.
+     *
+     */
     bool store(phrase_token_t index,
                FlexibleSingleGram<ArrayHeader, ArrayItem> * single_gram){
         if ( !m_db )
@@ -381,6 +510,14 @@ public:
         return ret == 0;
     }
 
+    /**
+     * FlexibleBigram::remove:
+     * @index: the previous token in the flexible bi-gram.
+     * @returns: whether the remove operation is successful.
+     *
+     * Remove the single gram of the previous token.
+     *
+     */
     bool remove(phrase_token_t index){
         if ( !m_db )
             return false;
@@ -394,7 +531,14 @@ public:
         return ret == 0;
     }
 
-    /* array of phrase_token_t items, for parameter estimation. */
+    /**
+     * FlexibleBigram::get_all_items:
+     * @items: the GArray to store all previous tokens.
+     * @returns: whether the get operation is successful.
+     *
+     * Get the array of all previous tokens for parameter estimation.
+     *
+     */
     bool get_all_items(GArray * items){
         g_array_set_size(items, 0);
         if ( !m_db )
@@ -432,7 +576,14 @@ public:
         return true;
     }
 
-    /* get/set magic header. */
+    /**
+     * FlexibleBigram::get_magic_header:
+     * @header: the magic header.
+     * @returns: whether the get operation is successful.
+     *
+     * Get the magic header of the flexible bi-gram.
+     *
+     */
     bool get_magic_header(MagicHeader & header){
         /* clear retval */
         memset(&header, 0, sizeof(MagicHeader));
@@ -461,6 +612,14 @@ public:
         return true;
     }
 
+    /**
+     * FlexibleBigram::set_magic_header:
+     * @header: the magic header.
+     * @returns: whether the set operation is successful.
+     *
+     * Set the magic header of the flexible bi-gram.
+     *
+     */
     bool set_magic_header(const MagicHeader & header){
         if ( !m_db )
             return false;
@@ -481,6 +640,15 @@ public:
         return ret == 0;
     }
 
+    /**
+     * FlexibleBigram::get_array_header:
+     * @index: the previous token in the flexible bi-gram.
+     * @header: the array header in the single gram of the previous token.
+     * @returns: whether the get operation is successful.
+     *
+     * Get the array header in the single gram of the previous token.
+     *
+     */
     bool get_array_header(phrase_token_t index, ArrayHeader & header){
         /* clear retval */
         memset(&header, 0, sizeof(ArrayHeader));
@@ -507,6 +675,15 @@ public:
         return true;
     }
 
+    /**
+     * FlexibleBigram::set_array_header:
+     * @index: the previous token of the flexible bi-gram.
+     * @header: the array header in the single gram of the previous token.
+     * @returns: whether the set operation is successful.
+     *
+     * Set the array header in the single gram of the previous token.
+     *
+     */
     bool set_array_header(phrase_token_t index, const ArrayHeader & header){
         if ( !m_db )
             return false;

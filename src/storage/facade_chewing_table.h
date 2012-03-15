@@ -54,7 +54,7 @@ public:
     /**
      * FacadeChewingTable::set_options:
      * @options: the pinyin options.
-     * @returns: whether the setting options is successfully.
+     * @returns: whether the setting options is successful.
      *
      * Set the options of the system and user chewing table.
      *
