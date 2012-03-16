@@ -329,9 +329,9 @@ public:
 
 /**
  * FlexibleBigram:
- * @MagicHeader: the type of the magic header.
- * @ArrayHeader: the type of the array header.
- * @ArrayItem: the type of the array item.
+ * @MagicHeader: the struct type of the magic header.
+ * @ArrayHeader: the struct type of the array header.
+ * @ArrayItem: the struct type of the array item.
  *
  * The flexible bi-gram is mainly used for training purpose.
  *
@@ -358,7 +358,7 @@ private:
 public:
     /**
      * FlexibleBigram::FlexibleBigram:
-     * @magic_number: the 4 bytes magic number of the bi-gram.
+     * @magic_number: the 4 bytes magic number of the flexible bi-gram.
      *
      * The constructor of the FlexibleBigram.
      *

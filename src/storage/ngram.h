@@ -28,15 +28,11 @@ namespace pinyin{
 
 class Bigram;
 
-/* Note:
- * When transfer from system ngram to user ngram, 
- *   if user ngram doesn't exist,
- *     copy total freq from system ngram to user ngram,
- *     so the total freq exists.
- *   if item freq don't exist, copy item freq from system to user ngram,
- *     so the item freq exists.
- *     if user ngram already exists(always true), increases the total freq,
- *     if item ngram already exists(always true), increases the freq.
+/** Note:
+ *  The system single gram contains the trained freqs.
+ *  The user single gram contains the delta freqs.
+ *  During the Viterbi beam search, use merge_single_gram to merge the system
+ *    single gram and the user single gram.
  */
 
 class SingleGram{
@@ -134,6 +130,9 @@ public:
     bool get_all_items(/* out */ GArray * items);
 };
 
+/*  Note: Please keep system and user single gram
+ *          when using merged single gram.
+ */
 bool merge_single_gram(SingleGram * merged, const SingleGram * system,
                        const SingleGram * user);
 

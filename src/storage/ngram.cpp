@@ -410,9 +410,6 @@ bool Bigram::get_all_items(GArray * items){
 namespace pinyin{
 
 /* merge origin system info and delta user info */
-/*  Note: Please keep system and user single gram
- *          when using merged single gram.
- */
 bool merge_single_gram(SingleGram * merged, const SingleGram * system,
                        const SingleGram * user){
     if (NULL == system && NULL == user)
