@@ -35,6 +35,13 @@ class Bigram;
  *    single gram and the user single gram.
  */
 
+
+/**
+ * SingleGram:
+ *
+ * The single gram in the bi-gram.
+ *
+ */
 class SingleGram{
     friend class Bigram;
     friend bool merge_single_gram(SingleGram * merged,
@@ -45,52 +52,122 @@ private:
     MemoryChunk m_chunk;
     SingleGram(void * buffer, size_t length);
 public:
-    /* Null Constructor */
+    /**
+     * SingleGram::SingleGram:
+     *
+     * The constructor of the SingleGram.
+     *
+     */
     SingleGram();
-    /* retrieve all items */
+    /**
+     * SingleGram::retrieve_all:
+     * @array: the GArray to store the retrieved bi-gram phrase item.
+     * @returns: whether the retrieve operation is successful.
+     *
+     * Retrieve all bi-gram phrase items in this single gram.
+     *
+     */
     bool retrieve_all(/* out */ BigramPhraseWithCountArray array) const;
 
-    /* search method */
-    /* the array result contains many items */
+    /**
+     * SingleGram::search:
+     * @range: the token range.
+     * @array: the GArray to store the matched bi-gram phrase item.
+     * @returns: whether the search operation is successful.
+     *
+     * Search the bi-gram phrase items according to the token range.
+     *
+     * Note: the array result may contain many items.
+     *
+     */
     bool search(/* in */ PhraseIndexRange * range,
 	       /* out */ BigramPhraseArray array) const;
 
-    /* insert_freq method
+    /**
+     * SingleGram::insert_freq:
+     * @token: the phrase token.
+     * @freq: the freq of this token.
+     * @returns: whether the insert operation is successful.
+     *
+     * Insert the token with the freq.
+     *
      */
     bool insert_freq(/* in */ phrase_token_t token,
                      /* in */ guint32 freq);
 
-    /* remove_freq method
+    /**
+     * SingleGram::remove_freq:
+     * @token: the phrase token.
+     * @freq: the freq of the removed token.
+     * @returns: whether the remove operation is successful.
+     *
+     * Remove the token.
+     *
      */
     bool remove_freq(/* in */ phrase_token_t token,
                      /* out */ guint32 & freq);
 
-    /* get_freq method
+    /**
+     * SingleGram::get_freq:
+     * @token: the phrase token.
+     * @freq: the freq of the token.
+     * @returns: whether the get operation is successful.
+     *
+     * Get the freq of the token.
+     *
      */
     bool get_freq(/* in */ phrase_token_t token,
 	       /* out */ guint32 & freq) const;
     
-    /* set_freq method
+    /**
+     * SingleGram::set_freq:
+     * @token: the phrase token.
+     * @freq: the freq of the token.
+     * @returns: whether the set operation is successful.
+     *
+     * Set the freq of the token.
+     *
      */
     bool set_freq(/* in */ phrase_token_t token,
 		  /* in */ guint32 freq);
     
-    /* get_total_freq method
-     * used in user bigram table
+    /**
+     * SingleGram::get_total_freq:
+     * @total: the total freq of this single gram.
+     * @returns: whether the get operation is successful.
+     *
+     * Get the total freq of this single gram.
+     *
      */
     bool get_total_freq(guint32 & total) const;
 
-    /* set_total_freq method
-     * used in user bigram table
+    /**
+     * SingleGram::set_total_freq:
+     * @total: the total freq of this single gram.
+     * @returns: whether the set operation is successful.
+     *
+     * Set the total freq of this single gram.
+     *
      */
     bool set_total_freq(guint32 total);
     
-    /* prune one method
-     * only used in training
+    /**
+     * SingleGram::prune:
+     * @returns: whether the prune operation is successful.
+     *
+     * Obsoleted by Katz k mixture model pruning.
+     *
      */
     bool prune();
 };
 
+
+/**
+ * Bigram:
+ *
+ * The Bi-gram class.
+ *
+ */
 class Bigram{
 private:
     DB * m_db;
@@ -104,34 +181,104 @@ private:
     }
 
 public:
+    /**
+     * Bigram::Bigram:
+     *
+     * The constructor of the Bigram.
+     *
+     */
     Bigram(){
 	m_db = NULL;
     }
 
+    /**
+     * Bigram::~Bigram:
+     *
+     * The destructor of the Bigram.
+     *
+     */
     ~Bigram(){
 	reset();
     }
 
-    /* load/save berkeley db in memory. */
+    /**
+     * Bigram::load_db:
+     * @dbfile: the Berkeley DB file name.
+     * @returns: whether the load operation is successful.
+     *
+     * Load the Berkeley DB into memory.
+     *
+     */
     bool load_db(const char * dbfile);
+
+    /**
+     * Bigram::save_db:
+     * @dbfile: the Berkeley DB file name.
+     * @returns: whether the save operation is successful.
+     *
+     * Save the in-memory Berkeley DB into disk.
+     *
+     */
     bool save_db(const char * dbfile);
 
-    /* attach bi-gram */
+    /**
+     * Bigram::attach:
+     * @dbfile: the Berkeley DB file name.
+     * @flags: the flags of enum ATTACH_FLAG.
+     * @returns: whether the attach operation is successful.
+     *
+     * Attach this Bigram with the Berkeley DB.
+     *
+     */
     bool attach(const char * dbfile, guint32 flags);
 
-    /* load/store one single gram */
+    /**
+     * Bigram::load:
+     * @index: the previous token in the bi-gram.
+     * @single_gram: the single gram of the previous token.
+     * @returns: whether the load operation is successful.
+     *
+     * Load the single gram of the previous token into the SingleGram class.
+     *
+     */
     bool load(/* in */ phrase_token_t index,
               /* out */ SingleGram * & single_gram);
 
+    /**
+     * Bigram::store:
+     * @index: the previous token in the bi-gram.
+     * @single_gram: the single gram of the previous token.
+     * @returns: whether the store operation is successful.
+     *
+     * Store the single gram of the previous token from the SingleGram class.
+     *
+     */
     bool store(/* in */ phrase_token_t index,
                /* in */ SingleGram * single_gram);
 
-    /* array of phrase_token_t items, for parameter estimation. */
+    /**
+     * Bigram::get_all_items:
+     * @items: the GArray to store all previous tokens.
+     * @returns: whether the get operation is successful.
+     *
+     * Get the array of all previous tokens for parameter estimation.
+     *
+     */
     bool get_all_items(/* out */ GArray * items);
 };
 
-/*  Note: Please keep system and user single gram
- *          when using merged single gram.
+/**
+ * merge_single_gram:
+ * @merged: the merged single gram of system and user single gram.
+ * @system: the system single gram to be merged.
+ * @user: the user single gram to be merged.
+ * @returns: whether the merge operation is successful.
+ *
+ * Merge the system and user single gram into one merged single gram.
+ *
+ * Note: Please keep system and user single gram
+ * when using merged single gram.
+ *
  */
 bool merge_single_gram(SingleGram * merged, const SingleGram * system,
                        const SingleGram * user);
