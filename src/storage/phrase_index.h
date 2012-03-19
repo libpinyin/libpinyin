@@ -55,13 +55,24 @@ class PinyinLookup;
 
 const size_t phrase_item_header = sizeof(guint8) + sizeof(guint8) + sizeof(guint32);
 
+/**
+ * PhraseItem:
+ *
+ * The PhraseItem to access the items in phrase index.
+ *
+ */
 class PhraseItem{
     friend class SubPhraseIndex;
 private:
     MemoryChunk m_chunk;
     bool set_n_pronunciation(guint8 n_prouns);
 public:
-    /* Null Constructor */
+    /**
+     * PhraseItem::PhraseItem:
+     *
+     * The constructor of the PhraseItem.
+     *
+     */
     PhraseItem(){
 	m_chunk.set_size(phrase_item_header);
 	memset(m_chunk.begin(), 0, m_chunk.size());
@@ -74,24 +85,53 @@ public:
     }
 #endif
 
-    /* functions */
+    /**
+     * PhraseItem::get_phrase_length:
+     * @returns: the length of this phrase item.
+     *
+     * Get the length of this phrase item.
+     *
+     */
     guint8 get_phrase_length(){
 	char * buf_begin = (char *)m_chunk.begin();
 	return (*(guint8 *)buf_begin);
     }
 
+    /**
+     * PhraseItem::get_n_pronunciation:
+     * @returns: the number of the pronunciations.
+     *
+     * Get the number of the pronunciations.
+     *
+     */
     guint8 get_n_pronunciation(){
 	char * buf_begin = ( char *) m_chunk.begin();
 	return (*(guint8 *)(buf_begin + sizeof(guint8)));
     }
 
+    /**
+     * PhraseItem::get_unigram_frequency:
+     * @returns: the uni-gram frequency of this phrase item.
+     *
+     * Get the uni-gram frequency of this phrase item.
+     *
+     */
     guint32 get_unigram_frequency(){
 	char * buf_begin = (char *)m_chunk.begin();
 	return (*(guint32 *)(buf_begin + sizeof(guint8) + sizeof(guint8)));
     }
 
+    /**
+     * PhraseItem::get_pronunciation_possibility:
+     * @options: the pinyin options.
+     * @keys: the pronunciation keys.
+     * @returns: the possibility of this phrase item pronounces the pinyin.
+     *
+     * Get the possibility of this phrase item pronounces the pinyin.
+     *
+     */
     gfloat get_pronunciation_possibility(pinyin_option_t options,
-				  ChewingKey * keys){
+                                         ChewingKey * keys){
 	guint8 phrase_length = get_phrase_length();
 	guint8 npron = get_n_pronunciation();
 	size_t offset = phrase_item_header + phrase_length * sizeof (ucs4_t);
@@ -121,20 +161,75 @@ public:
 	*/
 	return retval;
     }
-    
+
+    /**
+     * PhraseItem::increase_pronunciation_possibility:
+     * @options: the pinyin options.
+     * @keys: the pronunciation keys.
+     * @delta: the delta to be added to the pronunciation keys.
+     *
+     * Add the delta to the pronunciation of the pronunciation keys.
+     *
+     */
     void increase_pronunciation_possibility(pinyin_option_t options,
 				     ChewingKey * keys,
 				     gint32 delta);
 
+    /**
+     * PhraseItem::get_phrase_string:
+     * @phrase: the ucs4 character buffer.
+     * @returns: whether the get operation is successful.
+     *
+     * Get the ucs4 characters of this phrase item.
+     *
+     */
     bool get_phrase_string(ucs4_t * phrase);
+
+    /**
+     * PhraseItem::set_phrase_string:
+     * @phrase_length: the ucs4 character length of this phrase item.
+     * @phrase: the ucs4 character buffer.
+     * @returns: whether the set operation is successful.
+     *
+     * Set the length and ucs4 characters of this phrase item.
+     *
+     */
     bool set_phrase_string(guint8 phrase_length, ucs4_t * phrase);
+
+    /**
+     * PhraseItem::get_nth_pronunciation:
+     * @index: the pronunciation index.
+     * @keys: the pronunciation keys.
+     * @freq: the frequency of the pronunciation.
+     * @returns: whether the get operation is successful.
+     *
+     * Get the nth pronunciation of this phrase item.
+     *
+     */
     bool get_nth_pronunciation(size_t index, 
 			       /* out */ ChewingKey * keys,
 			       /* out */ guint32 & freq);
-    /* Normally don't change the first pronunciation,
-     * which decides the token number.
+
+    /**
+     * PhraseItem::append_pronunciation:
+     * @keys: the pronunciation keys.
+     * @freq: the frequency of the pronunciation.
+     *
+     * Append one pronunciation.
+     *
      */
     void append_pronunciation(ChewingKey * keys, guint32 freq);
+
+    /**
+     * PhraseItem::remove_nth_pronunciation:
+     * @index: the pronunciation index.
+     *
+     * Remove the nth pronunciation.
+     *
+     * Note: Normally don't change the first pronunciation,
+     * which decides the token number.
+     *
+     */
     void remove_nth_pronunciation(size_t index);
 
     bool operator == (const PhraseItem & rhs) const{
@@ -153,58 +248,181 @@ public:
  *  In Sub Phrase Index, token == (token & PHRASE_MASK).
  */
 
+/**
+ * SubPhraseIndex:
+ *
+ * The SubPhraseIndex class for internal usage.
+ *
+ */
 class SubPhraseIndex{
 private:
     guint32 m_total_freq;
     MemoryChunk m_phrase_index;
     MemoryChunk m_phrase_content;
     MemoryChunk * m_chunk;
-public:
-    SubPhraseIndex():m_total_freq(0){
-	m_chunk = NULL;
-    }
-
-    ~SubPhraseIndex(){
-	reset();
-    }
 
     void reset(){
+        m_phrase_index.set_size(0);
+        m_phrase_content.set_size(0);
 	if ( m_chunk ){
 	    delete m_chunk;
 	    m_chunk = NULL;
 	}
-    }    
+    }
+
+public:
+    /**
+     * SubPhraseIndex::SubPhraseIndex:
+     *
+     * The constructor of the SubPhraseIndex.
+     *
+     */
+    SubPhraseIndex():m_total_freq(0){
+	m_chunk = NULL;
+    }
+
+    /**
+     * SubPhraseIndex::~SubPhraseIndex:
+     *
+     * The destructor of the SubPhraseIndex.
+     *
+     */
+    ~SubPhraseIndex(){
+	reset();
+    }
     
-    /* binary memory chunk load/store method */
+    /**
+     * SubPhraseIndex::load:
+     * @chunk: the memory chunk of the binary sub phrase index.
+     * @offset: the begin of binary data in the memory chunk.
+     * @end: the end of binary data in the memory chunk.
+     * @returns: whether the load operation is successful.
+     *
+     * Load the sub phrase index from the memory chunk.
+     *
+     */
     bool load(MemoryChunk * chunk, 
 	      table_offset_t offset, table_offset_t end);
+
+    /**
+     * SubPhraseIndex::store:
+     * @new_chunk: the new memory chunk to store this sub phrase index.
+     * @offset: the begin of binary data in the memory chunk.
+     * @end: the end of stored binary data in the memory chunk.
+     * @returns: whether the store operation is successful.
+     *
+     * Store the sub phrase index to the new memory chunk.
+     *
+     */
     bool store(MemoryChunk * new_chunk, 
 	       table_offset_t offset, table_offset_t & end);
 
-    /* switch to logger format to reduce user storage */
+    /**
+     * SubPhraseIndex::diff:
+     * @oldone: the original content of sub phrase index.
+     * @logger: the delta information of user self-learning data.
+     * @returns: whether the diff operation is successful.
+     *
+     * Compare this sub phrase index with the original content of the system
+     * sub phrase index to generate the logger of difference.
+     *
+     * Note: Switch to logger format to reduce user space storage.
+     *
+     */
     bool diff(SubPhraseIndex * oldone, PhraseIndexLogger * logger);
+
+    /**
+     * SubPhraseIndex::merge:
+     * @logger: the logger of difference in user home directory.
+     * @returns: whether the merge operation is successful.
+     *
+     * Merge the user logger of difference with this sub phrase index.
+     *
+     */
     bool merge(PhraseIndexLogger * logger);
 
-    /* get token range in this sub phrase */
+    /**
+     * SubPhraseIndex::get_range:
+     * @range: the token range.
+     * @returns: whether the get operation is successful.
+     *
+     * Get the token range in this sub phrase index.
+     *
+     */
     int get_range(/* out */ PhraseIndexRange & range);
-    
-    /* Zero-gram */
+
+    /**
+     * SubPhraseIndex::get_phrase_index_total_freq:
+     * @returns: the total frequency of this sub phrase index.
+     *
+     * Get the total frequency of this sub phrase index.
+     *
+     * Note: maybe call it "Zero-gram".
+     *
+     */
     guint32 get_phrase_index_total_freq();
+
+    /**
+     * SubPhraseIndex::add_unigram_frequency:
+     * @token: the phrase token.
+     * @delta: the delta value of the phrase token.
+     * @returns: the status of the add operation.
+     *
+     * Add delta value to the phrase of the token.
+     *
+     * Note: this method is a fast path to add delta value.
+     * Maybe use the get_phrase_item method instead in future.
+     *
+     */
     int add_unigram_frequency(phrase_token_t token, guint32 delta);
 
-    /* get_phrase_item function can't modify the phrase item size,
+    /**
+     * SubPhraseIndex::get_phrase_item:
+     * @token: the phrase token.
+     * @item: the phrase item of the token.
+     * @returns: the status of the get operation.
+     *
+     * Get the phrase item from this sub phrase index.
+     *
+     * Note:get_phrase_item function can't modify the phrase item size,
      * but can increment the freq of the special pronunciation,
      * or change the content without size increasing.
+     *
      */
     int get_phrase_item(phrase_token_t token, PhraseItem & item);
+
+    /**
+     * SubPhraseIndex::add_phrase_item:
+     * @token: the phrase token.
+     * @item: the phrase item of the token.
+     * @returns: the status of the add operation.
+     *
+     * Add the phrase item to this sub phrase index.
+     *
+     */
     int add_phrase_item(phrase_token_t token, PhraseItem * item);
-    /* remove_phrase_item will substract item->get_unigram_frequency()
-     * from m_total_freq
+    /**
+     * SubPhraseIndex::remove_phrase_item:
+     * @token: the phrase token.
+     * @item: the removed phrase item of the token.
+     * @returns: the status of the remove operation.
+     *
+     * Remove the phrase item of the token.
+     *
+     * Note: this remove_phrase_item method will substract the unigram
+     * frequency of the removed item from m_total_freq.
+     *
      */
     int remove_phrase_item(phrase_token_t token, /* out */ PhraseItem * & item);
 
 };
 
+/**
+ * FacadePhraseIndex:
+ *
+ * The facade class of phrase index.
+ *
+ */
 class FacadePhraseIndex{
     friend class PinyinLookup;
 private:
