@@ -262,6 +262,7 @@ private:
     MemoryChunk * m_chunk;
 
     void reset(){
+        m_total_freq = 0;
         m_phrase_index.set_size(0);
         m_phrase_content.set_size(0);
 	if ( m_chunk ){
@@ -401,6 +402,7 @@ public:
      *
      */
     int add_phrase_item(phrase_token_t token, PhraseItem * item);
+
     /**
      * SubPhraseIndex::remove_phrase_item:
      * @token: the phrase token.
@@ -429,11 +431,23 @@ private:
     guint32 m_total_freq;
     SubPhraseIndex * m_sub_phrase_indices[PHRASE_INDEX_LIBRARY_COUNT];
 public:
+    /**
+     * FacadePhraseIndex::FacadePhraseIndex:
+     *
+     * The constructor of the FacadePhraseIndex.
+     *
+     */
     FacadePhraseIndex(){
 	m_total_freq = 0;
 	memset(m_sub_phrase_indices, 0, sizeof(m_sub_phrase_indices));
     }
 
+    /**
+     * FacadePhraseIndex::~FacadePhraseIndex:
+     *
+     * The destructor of the FacadePhraseIndex.
+     *
+     */
     ~FacadePhraseIndex(){
 	for ( size_t i = 0; i < PHRASE_INDEX_LIBRARY_COUNT; ++i){
 	    if ( m_sub_phrase_indices[i] ){
@@ -443,32 +457,132 @@ public:
 	}
     }
 
-    /* load/store single sub phrase index, according to the config files. */
+    /**
+     * FacadePhraseIndex::load_text:
+     * @phrase_index: the index of sub phrase index to be loaded.
+     * @infile: the textual format file of the phrase table.
+     * @returns: whether the load operation is successful.
+     *
+     * Load one sub phrase index from the textual format file.
+     * Note: load sub phrase index according to the config in future.
+     *
+     */
     bool load_text(guint8 phrase_index, FILE * infile);
+
+    /**
+     * FacadePhraseIndex::load:
+     * @phrase_index: the index of sub phrase index to be loaded.
+     * @chunk: the memory chunk of sub phrase index to be loaded.
+     * @returns: whether the load operation is successful.
+     *
+     * Load one sub phrase index from the memory chunk.
+     *
+     */
     bool load(guint8 phrase_index, MemoryChunk * chunk);
+
+    /**
+     * FacadePhraseIndex::store:
+     * @phrase_index: the index of sub phrase index to be stored.
+     * @new_chunk: the memory chunk of sub phrase index to be stored.
+     * @returns: whether the store operation is successful.
+     *
+     * Store one sub phrase index to the memory chunk.
+     *
+     */
     bool store(guint8 phrase_index, MemoryChunk * new_chunk);
+
+    /**
+     * FacadePhraseIndex::unload:
+     * @phrase_index: the index of sub phrase index to be unloaded.
+     * @returns: whether the unload operation is successful.
+     *
+     * Unload one sub phrase index.
+     *
+     */
     bool unload(guint8 phrase_index);
 
-    /* load/store logger format.
-       the ownership of oldchunk and log is transfered to here. */
+
+    /**
+     * FacadePhraseIndex::diff:
+     * @phrase_index: the index of sub phrase index to be differed.
+     * @oldchunk: the original content of sub phrase index.
+     * @newlog: the delta information of user self-learning data.
+     * @returns: whether the diff operation is successful.
+     *
+     * Store user delta information in the logger format.
+     *
+     * Note: the ownership of oldchunk is transfered here.
+     *
+     */
     bool diff(guint8 phrase_index, MemoryChunk * oldchunk,
               MemoryChunk * newlog);
+
+    /**
+     * FacadePhraseIndex::merge:
+     * @phrase_index: the index of sub phrase index to be merged.
+     * @log: the logger of difference in user home directory.
+     * @returns: whether the merge operation is successful.
+     *
+     * Merge the user logger of difference with the sub phrase index.
+     *
+     * Note: the ownership of log is transfered here.
+     *
+     */
     bool merge(guint8 phrase_index, MemoryChunk * log);
 
-    /* compat all SubPhraseIndex m_phrase_content memory usage. */
+    /**
+     * FacadePhraseIndex::compat:
+     * @returns: whether the compat operation is successful.
+     *
+     * Compat all sub phrase index memory usage.
+     *
+     */
     bool compat();
 
-    /* get all available sub phrase indices. */
+    /**
+     * FacadePhraseIndex::get_sub_phrase_range:
+     * @min_index: the minimal sub phrase index.
+     * @max_index: the maximal sub phrase index.
+     * @returns: the status of the get operation.
+     *
+     * Get the minimum and maximum of the sub phrase index.
+     *
+     */
     int get_sub_phrase_range(guint8 & min_index, guint8 & max_index);
 
-    /* get each sub phrase token range with phrase_index added */
+    /**
+     * FacadePhraseIndex::get_range:
+     * @phrase_index: the index of sub phrase index.
+     * @range: the token range of the sub phrase index.
+     * @returns: the status of the get operation.
+     *
+     * Get the token range of the sub phrase index.
+     *
+     */
     int get_range(guint8 phrase_index, /* out */ PhraseIndexRange & range);
 
-    /* Zero-gram */
+    /**
+     * FacadePhraseIndex::get_phrase_index_total_freq:
+     * @returns: the total freq of the facade phrase index.
+     *
+     * Get the total freq of the facade phrase index.
+     *
+     * Note: maybe call it "Zero-gram".
+     *
+     */
     guint32 get_phrase_index_total_freq(){
 	return m_total_freq;
     }
 
+    /**
+     * FacadePhraseIndex::add_unigram_frequency:
+     * @token: the phrase token.
+     * @delta: the delta value of the phrase token.
+     * @returns: the status of the add operation.
+     *
+     * Add delta value to the phrase of the token.
+     *
+     */
     int add_unigram_frequency(phrase_token_t token, guint32 delta){
 	guint8 index = PHRASE_INDEX_LIBRARY_INDEX(token);
 	SubPhraseIndex * sub_phrase = m_sub_phrase_indices[index];
@@ -478,7 +592,15 @@ public:
 	return sub_phrase->add_unigram_frequency(token, delta);
     }
 
-    /* get_phrase_item function can't modify the phrase item */
+    /**
+     * FacadePhraseIndex::get_phrase_item:
+     * @token: the phrase token.
+     * @item: the phrase item of the token.
+     * @returns: the status of the get operation.
+     *
+     * Get the phrase item from the facade phrase index.
+     *
+     */
     int get_phrase_item(phrase_token_t token, PhraseItem & item){
 	guint8 index = PHRASE_INDEX_LIBRARY_INDEX(token);
 	SubPhraseIndex * sub_phrase = m_sub_phrase_indices[index];
@@ -487,6 +609,15 @@ public:
 	return sub_phrase->get_phrase_item(token, item);
     }
 
+    /**
+     * FacadePhraseIndex::add_phrase_item:
+     * @token: the phrase token.
+     * @item: the phrase item of the token.
+     * @returns: the status of the add operation.
+     *
+     * Add the phrase item to the facade phrase index.
+     *
+     */
     int add_phrase_item(phrase_token_t token, PhraseItem * item){
 	guint8 index = PHRASE_INDEX_LIBRARY_INDEX(token);
 	SubPhraseIndex * & sub_phrase = m_sub_phrase_indices[index];
@@ -497,6 +628,15 @@ public:
 	return sub_phrase->add_phrase_item(token, item);
     }
 
+    /**
+     * FacadePhraseIndex::remove_phrase_item:
+     * @token: the phrase token.
+     * @item: the removed phrase item of the token.
+     * @returns: the status of the remove operation.
+     *
+     * Remove the phrase item of the token.
+     *
+     */
     int remove_phrase_item(phrase_token_t token, PhraseItem * & item){
 	guint8 index = PHRASE_INDEX_LIBRARY_INDEX(token);
 	SubPhraseIndex * & sub_phrase = m_sub_phrase_indices[index];
