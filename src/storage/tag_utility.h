@@ -30,40 +30,120 @@
 
 namespace pinyin{
 
+/**
+ * taglib_init:
+ * @returns: whether the initialize operation is successful.
+ *
+ * Initialize the n-gram tag parse library.
+ *
+ */
 bool taglib_init();
 
-/* Note: most tags are separated by ',' or ':' . */
+/**
+ * taglib_add_tag:
+ * @line_type: the line type.
+ * @line_tag: the line tag.
+ * @num_of_values: the number of values following the line tag.
+ * @required_tags: the required tags of the line.
+ * @ignored_tags: the ignored tags of the line.
+ * @returns: whether the add operation is successful.
+ *
+ * Add one line tag to the tag parse library.
+ *
+ * Note: the required and ignored tags are separated by ',' or ':' .
+ *
+ */
 bool taglib_add_tag(int line_type, const char * line_tag, int num_of_values, const char * required_tags, const char * ignored_tags);
 
-/* most parameters are hash table of string (const char *). */
-bool taglib_read(const char * input_line, int & line_type, GPtrArray * values, GHashTable * required);
-
-/* Note: taglib_write is omited, as printf is more suitable for this. */
-
-/* Note the following function is only available when the optional tag exists.
- * bool taglib_report_status(int line_type);
+/**
+ * taglib_read:
+ * @input_line: one input line.
+ * @line_type: the line type.
+ * @values: the values following the line tag.
+ * @required: the required tags of the line type.
+ * @returns: whether the line is parsed ok.
+ *
+ * Parse one input line into line_type, values and required tags.
+ *
+ * Note: most parameters are hash table of string (const char *).
+ *
  */
+bool taglib_read(const char * input_line, int & line_type,
+                 GPtrArray * values, GHashTable * required);
 
-/* remove the tag of type line_type. */
+/**
+ * taglib_remove_tag:
+ * @line_type: the type of the line tag.
+ * @returns: whether the remove operation is successful.
+ *
+ * Remove one line tag.
+ *
+ */
 bool taglib_remove_tag(int line_type);
 
-/* the following functions are used to save current known tag list in stack.
+/**
+ * taglib_push_state:
+ * @returns: whether the push operation is successful.
+ *
+ * Push the current state onto the stack.
+ *
+ * Note: the taglib_push/pop_state functions are used to save
+ * the current known tag list in stack.
  * Used when the parsing context is changed.
  */
 bool taglib_push_state();
+
+/**
+ * taglib_pop_state:
+ * @returns: whether the pop operation is successful.
+ *
+ * Pop the current state off the stack.
+ *
+ */
 bool taglib_pop_state();
 
+/**
+ * taglib_fini:
+ * @returns: whether the finish operation is successful.
+ *
+ * Finish the n-gram tag parse library.
+ *
+ */
 bool taglib_fini();
-
 
 class PhraseLargeTable;
 class FacadePhraseIndex;
 
+
+/**
+ * taglib_string_to_token:
+ * @phrases: the phrase table for token lookup.
+ * @string: the string of the phrase.
+ * @returns: the phrase token found in phrase table.
+ *
+ * Translate one phrase into the token.
+ *
+ */
 phrase_token_t taglib_string_to_token(PhraseLargeTable * phrases,
                                       const char * string);
 
+/**
+ * taglib_token_to_string:
+ * @phrase_index: the phrase index for phrase string lookup.
+ * @token: the phrase token.
+ * @returns: the phrase string found in phrase index.
+ *
+ * Translate one token into the phrase string.
+ *
+ */
 char * taglib_token_to_string(FacadePhraseIndex * phrase_index,
                               phrase_token_t token);
+
+/* Note: the following function is only available when the optional tag exists.
+ * bool taglib_report_status(int line_type);
+ */
+
+/* Note: taglib_write is omited, as printf is more suitable for this. */
 
 };
 

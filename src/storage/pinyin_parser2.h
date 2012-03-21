@@ -120,7 +120,7 @@ public:
      * @options: the pinyin options from pinyin_custom2.h.
      * @keys: the parsed result of struct ChewingKeys.
      * @str: the input of the ascii string.
-     * @len: the length of str.
+     * @len: the length of the str.
      * @returns: the number of chars were actually used.
      *
      * Parse the ascii string into an array of struct ChewingKeys.
