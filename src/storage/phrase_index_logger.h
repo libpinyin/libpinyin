@@ -48,6 +48,13 @@ enum LOG_TYPE{
     LOG_MODIFY_HEADER
 };
 
+
+/**
+ * PhraseIndexLogger:
+ *
+ * The logger of phrase index changes.
+ *
+ */
 class PhraseIndexLogger{
 protected:
     MemoryChunk * m_chunk;
@@ -61,35 +68,88 @@ protected:
         m_offset = 0;
     }
 public:
+    /**
+     * PhraseIndexLogger::PhraseIndexLogger:
+     *
+     * The constructor of the PhraseIndexLogger.
+     *
+     */
     PhraseIndexLogger():m_offset(0){
         m_chunk = new MemoryChunk;
     }
 
+    /**
+     * PhraseIndexLogger::~PhraseIndexLogger:
+     *
+     * The destructor of the PhraseIndexLogger.
+     *
+     */
     ~PhraseIndexLogger(){
         reset();
     }
 
+    /**
+     * PhraseIndexLogger::load:
+     * @chunk: the memory chunk of the logs.
+     * @returns: whether the load operation is successful.
+     *
+     * Load the logs from the memory chunk.
+     *
+     */
     bool load(MemoryChunk * chunk) {
         reset();
         m_chunk = chunk;
         return true;
     }
 
+    /**
+     * PhraseIndexLogger::store:
+     * @new_chunk: the new memory chunk to store the logs.
+     * @returns: whether the store operation is successful.
+     *
+     * Store the logs to the new memory chunk.
+     *
+     */
     bool store(MemoryChunk * new_chunk){
         new_chunk->set_content(0, m_chunk->begin(), m_chunk->size());
         return true;
     }
 
+    /**
+     * PhraseIndexLogger::has_next_record:
+     * @returns: whether this logger has next record.
+     *
+     * Whether this logger has next record.
+     *
+     */
     bool has_next_record(){
         return m_offset < m_chunk->size();
     }
 
+    /**
+     * PhraseIndexLogger::rewind:
+     * @returns: whether the rewind operation is successful.
+     *
+     * Rewind this logger to the begin of logs.
+     *
+     */
     bool rewind(){
         m_offset = 0;
         return true;
     }
 
-    /* prolog: has_next_record() returned true. */
+    /**
+     * PhraseIndexLogger::next_record:
+     * @log_type: the type of this log record.
+     * @token: the token of this log record.
+     * @oldone: the original content of the phrase item.
+     * @newone: the new content of the phrase item.
+     *
+     * Read the next log record.
+     *
+     * Prolog: has_next_record() returned true.
+     *
+     */
     bool next_record(LOG_TYPE & log_type, phrase_token_t & token,
                      MemoryChunk * oldone, MemoryChunk * newone){
         size_t offset = m_offset;
@@ -151,6 +211,16 @@ public:
         return true;
     }
 
+    /**
+     * PhraseIndexLogger::append_record:
+     * @log_type: the type of this log record.
+     * @token: the token of this log record.
+     * @oldone: the original content of the phrase item.
+     * @newone: the new content of the phrase item.
+     *
+     * Append one log record to the logger.
+     *
+     */
     bool append_record(LOG_TYPE log_type, phrase_token_t token,
                        MemoryChunk * oldone, MemoryChunk * newone){
 
