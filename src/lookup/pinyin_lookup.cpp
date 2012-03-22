@@ -609,21 +609,21 @@ bool PinyinLookup::clear_constraint(CandidateConstraints constraints, size_t ind
 	return true;
 }
 
-bool PinyinLookup::validate_constraint(CandidateConstraints constraints, ChewingKeyVector m_parsed_keys){
+bool PinyinLookup::validate_constraint(CandidateConstraints constraints, ChewingKeyVector keys){
     //resize constraints array
     size_t constraints_length = constraints->len;
-    if ( m_parsed_keys->len > constraints_length ){
-	g_array_set_size(constraints, m_parsed_keys->len);
+    if ( keys->len > constraints_length ){
+	g_array_set_size(constraints, keys->len);
 	//initialize new element
-	for( size_t i = constraints_length; i < m_parsed_keys->len; ++i){
+	for( size_t i = constraints_length; i < keys->len; ++i){
 	    lookup_constraint_t * constraint = &g_array_index(constraints, lookup_constraint_t, i);
 	    constraint->m_type = NO_CONSTRAINT;
 	}
-    }else if (m_parsed_keys->len < constraints_length ){
-	g_array_set_size(constraints, m_parsed_keys->len);
+    }else if (keys->len < constraints_length ){
+	g_array_set_size(constraints, keys->len);
     }
     
-    ChewingKey * pinyin_keys = (ChewingKey *)m_parsed_keys->data;
+    ChewingKey * pinyin_keys = (ChewingKey *)keys->data;
     
     for ( size_t i = 0; i < constraints->len; ++i){
 	lookup_constraint_t * constraint = &g_array_index(constraints, lookup_constraint_t, i);
