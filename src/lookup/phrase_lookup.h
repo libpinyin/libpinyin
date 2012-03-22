@@ -26,12 +26,21 @@
 #include "ngram.h"
 #include "lookup.h"
 
-/** @file phrase_lookup.h
- *  @brief the definitions of phrase lookup related classes and structs.
+/**
+ * phrase_lookup.h
+ *
+ * The definitions of phrase lookup related classes and structs.
+ *
  */
 
 namespace pinyin{
 
+/**
+ * PhraseLookup:
+ *
+ * The phrase lookup class to convert the sentence to phrase tokens.
+ *
+ */
 class PhraseLookup{
 private:
     static const gfloat bigram_lambda;
@@ -70,17 +79,55 @@ protected:
 
     bool final_step(MatchResults & results);
 public:
+    /**
+     * PhraseLookup::PhraseLookup:
+     * @phrase_table: the phrase table.
+     * @phrase_index: the phrase index.
+     * @system_bigram: the system bi-gram.
+     * @user_bigram: the user bi-gram.
+     *
+     * The constructor of the PhraseLookup.
+     *
+     */
     PhraseLookup(FacadePhraseTable * phrase_table,
                  FacadePhraseIndex * phrase_index,
                  Bigram * system_bigram,
                  Bigram * user_bigram);
 
+    /**
+     * PhraseLookup::~PhraseLookup:
+     *
+     * The destructor of the PhraseLookup.
+     *
+     */
     ~PhraseLookup();
 
-    /* Note: this method only accepts the characters in phrase large table. */
+    /**
+     * PhraseLookup::get_best_match:
+     * @sentence_length: the length of the sentence in ucs4 characters.
+     * @sentence: the ucs4 characters of the sentence.
+     * @results: the segmented sentence in the form of phrase tokens.
+     * @returns: whether the segment operation is successful.
+     *
+     * Segment the sentence into phrase tokens.
+     *
+     * Note: this method only accepts the characters in phrase large table.
+     *
+     */
     bool get_best_match(int sentence_length, ucs4_t sentence[], MatchResults & results);
 
-    /* Note: free the phrase by g_free */
+    /**
+     * PhraseLookup::convert_to_utf8:
+     * @results: the guessed sentence in the form of phrase tokens.
+     * @delimiter: the delimiter between the phrases.
+     * @result_string: the converted sentence in utf8 string.
+     * @returns: whether the convert operation is successful.
+     *
+     * Convert the sentence from phrase tokens to the utf8 string.
+     *
+     * Note: free the result_string by g_free.
+     *
+     */
     bool convert_to_utf8(MatchResults results,
                          /* in */ const char * delimiter,
                          /* out */ char * & result_string)
