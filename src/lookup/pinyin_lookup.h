@@ -36,8 +36,11 @@ namespace pinyin{
 
 class WinnerTree;
 
-/** @file pinyin_lookup.h
- *  @brief the definitions of pinyin lookup related classes and structs.
+/**
+ * pinyin_lookup.h
+ *
+ * the definitions of pinyin lookup related classes and structs.
+ *
  */
 
 enum constraint_type{NO_CONSTRAINT, CONSTRAINT_ONESTEP, CONSTRAINT_NOSEARCH };
@@ -68,8 +71,13 @@ struct lookup_constraint_t{
 };
 
 
-/* Note:
- *   winner tree for beam search.
+/**
+ * IBranchIterator:
+ *
+ * The iterator to get the 32 highest values.
+ *
+ * Note: The winner tree for Viterbi beam search.
+ *
  */
 class IBranchIterator{
 public:
@@ -77,8 +85,14 @@ public:
   virtual bool has_next() = 0;
   virtual lookup_value_t next() = 0;
   virtual lookup_value_t max() = 0;
-};  
+};
 
+/**
+ * PinyinLookup:
+ *
+ * The pinyin lookup class to convert pinyin keys to guessed sentence.
+ *
+ */
 class PinyinLookup{
 private:
     static const gfloat bigram_lambda;
@@ -112,6 +126,10 @@ protected:
     WinnerTree * m_winner_tree;
 
     size_t prepare_table_cache(int nstep, int total_pinyin);
+    /* init pinyin table lookup array */
+    bool prepare_pinyin_lookup(PhraseIndexRanges ranges);
+    /* destroy pinyin table lookup array */
+    bool destroy_pinyin_lookup(PhraseIndexRanges ranges);
     
     bool search_unigram(IBranchIterator * iter,  int nstep, int npinyin);
     bool search_bigram(IBranchIterator * iter,  int nstep, int npinyin);
@@ -123,21 +141,76 @@ protected:
     
     bool final_step(MatchResults & results);
 public:
+    /**
+     * PinyinLookup::PinyinLookup:
+     * @options: the pinyin options.
+     * @pinyin_table: the pinyin table.
+     * @phrase_index: the phrase index.
+     * @system_bigram: the system bi-gram.
+     * @user_bigram: the user bi-gram.
+     *
+     * The constructor of the PinyinLookup.
+     *
+     */
     PinyinLookup(pinyin_option_t options, FacadeChewingTable * pinyin_table,
                  FacadePhraseIndex * phrase_index, Bigram * system_bigram,
                  Bigram * user_bigram);
 
+    /**
+     * PinyinLookup::~PinyinLookup:
+     *
+     * The destructor of the PinyinLookup.
+     *
+     */
     ~PinyinLookup();
 
+    /**
+     * PinyinLookup::set_options:
+     * @options: the pinyin options.
+     * @returns: whether the set operation is successful.
+     *
+     * Set the pinyin options of this PinyinLookup.
+     *
+     */
     bool set_options(pinyin_option_t options) {
         m_options = options;
         return true;
     }
 
+    /**
+     * PinyinLookup::get_best_match:
+     * @prefixes: the phrase tokens before the guessed sentence.
+     * @keys: the pinyin keys of the guessed sentence.
+     * @constraints: the constraints on the guessed sentence.
+     * @results: the guessed sentence in the form of the phrase tokens.
+     * @returns: whether the guess operation is successful.
+     *
+     * Guess the best sentence according to user inputs.
+     *
+     */
     bool get_best_match(TokenVector prefixes, ChewingKeyVector keys, CandidateConstraints constraints, MatchResults & results);
-    
+
+    /**
+     * PinyinLookup::train_result2:
+     * @keys: the pinyin keys of the guessed sentence.
+     * @constraints: the constraints on the guessed sentence.
+     * @results: the guessed sentence in the form of the phrase tokens.
+     * @returns: whether the train operation is successful.
+     *
+     * Self learning the guessed sentence based on the constraints.
+     *
+     */
     bool train_result2(ChewingKeyVector keys, CandidateConstraints constraints, MatchResults results);
 
+    /**
+     * PinyinLookup::convert_to_utf8:
+     * @results: the guessed sentence in the form of the phrase tokens.
+     * @result_string: the guessed sentence in the utf8 encoding.
+     * @returns: whether the convert operation is successful.
+     *
+     * Convert the guessed sentence from the phrase tokens to the utf8 string.
+     *
+     */
     bool convert_to_utf8(MatchResults results,
                          /* out */ char * & result_string)
     {
@@ -145,17 +218,40 @@ public:
                                        NULL, result_string);
     }
 
-    /* user interactions */
+    /**
+     * PinyinLookup::add_constraint:
+     * @constraints: the constraints on the guessed sentence.
+     * @index: the character offset in the guessed sentence.
+     * @token: the phrase token in the candidate list chosen by user.
+     * @returns: the number of the characters in the chosen token.
+     *
+     * Add one constraint to the constraints on the guessed sentence.
+     *
+     */
     guint8 add_constraint(CandidateConstraints constraints, size_t index, phrase_token_t token);
 
+    /**
+     * PinyinLookup::clear_constraint:
+     * @constraints: the constraints on the guessed sentence.
+     * @index: the character offset in the guessed sentence.
+     * @returns: whether the clear operation is successful.
+     *
+     * Clear one constraint in the constraints on the guessed sentence.
+     *
+     */
     bool clear_constraint(CandidateConstraints constraints, size_t index);
 
-    bool validate_constraint(CandidateConstraints constraints, ChewingKeyVector m_parsed_keys);
+    /**
+     * PinyinLookup::validate_constraint:
+     * @constraints: the constraints on the guessed sentence.
+     * @keys: the pinyin keys of the guessed sentence.
+     * @returns: whether the validate operation is successful.
+     *
+     * Validate the old constraints with the new pinyin keys.
+     *
+     */
+    bool validate_constraint(CandidateConstraints constraints, ChewingKeyVector keys);
 
-    /* init pinyin table lookup array */
-    bool prepare_pinyin_lookup(PhraseIndexRanges ranges);
-    /* destroy pinyin table lookup array */
-    bool destroy_pinyin_lookup(PhraseIndexRanges ranges);
 };
 
 };
