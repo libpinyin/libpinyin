@@ -1,12 +1,20 @@
+version 0.5.92
+* fixes new parsers and chewing large table;
+* improves pinyin_save.
+
+version 0.5.91
+* some code re-factor and simplify;
+* fixes the self-learning work around.
+
 version 0.5.0
 * the first official release of 0.5.x.
 
 version 0.4.93
-* fixes some bugs in new parsers
+* fixes some bugs in new parsers.
 
 version 0.4.92
-* enable parallel make
-	
+* enable parallel make.
+
 version 0.4.91
 * New parsers for full pinyin/double pinyin/chewing.
   * libpinyin now fully supports all pinyin auto corrections in
