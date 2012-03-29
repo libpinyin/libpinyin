@@ -147,8 +147,8 @@ protected:
     int final_step(size_t step_len, ChewingKeyVector & keys,
                    ChewingKeyRestVector & key_rests) const;
 
-    bool post_process(pinyin_option_t options, ChewingKeyVector & keys,
-                      ChewingKeyRestVector & key_rests) const;
+    bool post_process2(pinyin_option_t options, ChewingKeyVector & keys,
+                       ChewingKeyRestVector & key_rests) const;
 
 public:
     FullPinyinParser2();

@@ -433,7 +433,7 @@ int FullPinyinParser2::parse (pinyin_option_t options, ChewingKeyVector & keys,
 
     /* post processing for re-split table. */
     if (options & USE_RESPLIT_TABLE) {
-        post_process(options, keys, key_rests);
+        post_process2(options, keys, key_rests);
     }
 
     g_free(input);
@@ -477,6 +477,7 @@ int FullPinyinParser2::final_step(size_t step_len, ChewingKeyVector & keys,
     return parsed_len;
 }
 
+#if 0
 
 bool FullPinyinParser2::post_process(pinyin_option_t options,
                                      ChewingKeyVector & keys,
@@ -543,6 +544,14 @@ bool FullPinyinParser2::post_process(pinyin_option_t options,
     }
 
     return true;
+}
+
+#endif
+
+bool FullPinyinParser2::post_process2(pinyin_option_t options,
+                                      ChewingKeyVector & keys,
+                                      ChewingKeyRestVector & key_rests) const {
+    assert(FALSE);
 }
 
 #define IS_KEY(x)   (('a' <= x && x <= 'z') || x == ';')
