@@ -37,6 +37,7 @@ def sort_all():
     divided_list = sorted(divided_list, key=operator.itemgetter(0))
     resplit_list = sorted(resplit_list, key=operator.itemgetter(0, 1))
 
+'''
 def get_chewing_string(pinyin):
     #handle shengmu
     if pinyin not in pinyin_list:
@@ -48,19 +49,17 @@ def get_chewing_string(pinyin):
         chewing_key = get_chewing(pinyin)
     chewing_str = 'ChewingKey({0})'.format(', '.join(chewing_key))
     return chewing_str
-
+'''
 
 def gen_divided_table():
     entries = []
     for (pinyin_key, orig_freq, first_key, second_key, new_freq) \
             in divided_list:
-        (pinyin_key, first_key, second_key) = map \
-            (get_chewing_string, (pinyin_key, first_key, second_key))
 
         if orig_freq >= new_freq:
             assert orig_freq > 0, "Expected orig_freq > 0 here."
 
-        entry = '{{{0}, {1}, {{{2}, {3}}}, {4}}}'.format \
+        entry = '{{"{0}", {1}, {{"{2}", "{3}"}}, {4}}}'.format \
             (pinyin_key, orig_freq, first_key, second_key, new_freq)
         entries.append(entry)
     return ',\n'.join(entries)
@@ -70,13 +69,11 @@ def gen_resplit_table():
     entries = []
     for (orig_first_key, orig_second_key, orig_freq, \
         new_first_key, new_second_key, new_freq) in resplit_list:
-        (orig_first_key, orig_second_key, new_first_key, new_second_key) = map\
-            (get_chewing_string, (orig_first_key, orig_second_key, \
-                                      new_first_key, new_second_key))
+
         if orig_freq >= new_freq:
             assert orig_freq > 0, "Expected orig_freq > 0 here."
 
-        entry = '{{{{{0}, {1}}}, {2}, {{{3}, {4}}}, {5}}}'.format \
+        entry = '{{{{"{0}", "{1}"}}, {2}, {{"{3}", "{4}"}}, {5}}}'.format \
             (orig_first_key, orig_second_key, orig_freq,\
                  new_first_key, new_second_key, new_freq)
         entries.append(entry)

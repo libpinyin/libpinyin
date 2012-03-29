@@ -48,16 +48,16 @@ typedef struct {
 } chewing_index_item_t;
 
 typedef struct {
-    ChewingKey   m_orig_key;
+    const char * m_orig_key;
     guint32      m_orig_freq;
-    ChewingKey   m_new_keys[2];
+    const char * m_new_keys[2];
     guint32      m_new_freq;
 } divided_table_item_t;
 
 typedef struct {
-    ChewingKey   m_orig_keys[2];
+    const char * m_orig_keys[2];
     guint32      m_orig_freq;
-    ChewingKey   m_new_keys[2];
+    const char * m_new_keys[2];
     guint32      m_new_freq;
 } resplit_table_item_t;
 
