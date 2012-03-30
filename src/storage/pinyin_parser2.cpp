@@ -433,7 +433,7 @@ int FullPinyinParser2::parse (pinyin_option_t options, ChewingKeyVector & keys,
 
     /* post processing for re-split table. */
     if (options & USE_RESPLIT_TABLE) {
-        post_process2(options, keys, key_rests);
+        post_process2(options, keys, key_rests, str, len);
     }
 
     g_free(input);
@@ -550,8 +550,92 @@ bool FullPinyinParser2::post_process(pinyin_option_t options,
 
 bool FullPinyinParser2::post_process2(pinyin_option_t options,
                                       ChewingKeyVector & keys,
-                                      ChewingKeyRestVector & key_rests) const {
-    assert(FALSE);
+                                      ChewingKeyRestVector & key_rests,
+                                      const char * str,
+                                      int len) const {
+    int i;
+    assert(keys->len == key_rests->len);
+    gint16 num_keys = keys->len;
+
+    ChewingKey * cur_key = NULL, * next_key = NULL;
+    ChewingKeyRest * cur_rest = NULL, * next_rest = NULL;
+    guint16 next_tone = CHEWING_ZERO_TONE;
+
+    for (i = 0; i < num_keys - 1; ++i) {
+        cur_rest = &g_array_index(key_rests, ChewingKeyRest, i);
+        next_rest = &g_array_index(key_rests, ChewingKeyRest, i + 1);
+
+        /* some "'" here */
+        if (cur_rest->m_raw_end != next_rest->m_raw_begin)
+            continue;
+
+        cur_key = &g_array_index(keys, ChewingKey, i);
+        next_key = &g_array_index(keys, ChewingKey, i + 1);
+
+        /* some tone here */
+        if (CHEWING_ZERO_TONE != cur_key->m_tone)
+            continue;
+
+        /* back up tone */
+        if (options & USE_TONE) {
+            next_tone = next_key->m_tone;
+            if (CHEWING_ZERO_TONE != next_tone) {
+                next_key->m_tone = CHEWING_ZERO_TONE;
+                next_rest->m_raw_end --;
+            }
+        }
+
+        /* lookup re-split table */
+        size_t k;
+        const resplit_table_item_t * item = NULL;
+        for (k = 0; k < G_N_ELEMENTS(resplit_table); ++k) {
+            item = resplit_table + k;
+
+            /* no ops */
+            if (item->m_orig_freq >= item->m_new_freq)
+                continue;
+
+            const char * onepinyin = str + cur_rest->m_raw_begin;
+            size_t len = cur_rest->length();
+
+            if (0 != strncmp(onepinyin, item->m_orig_keys[0], len))
+                continue;
+
+            onepinyin = str + next_rest->m_raw_begin;
+            len = next_rest->length();
+
+            if (0 == strncmp(onepinyin, item->m_orig_keys[1], len))
+                break;
+        }
+
+        /* found the match */
+        if (k < G_N_ELEMENTS(resplit_table)) {
+            /* do re-split */
+            item = resplit_table + k;
+
+            const char * onepinyin = str + cur_rest->m_raw_begin;
+            size_t len = strlen(item->m_new_keys[0]);
+
+            assert(parse_one_key(options, *cur_key, onepinyin, len));
+            cur_rest->m_raw_end = cur_rest->m_raw_begin + len;
+
+            next_rest->m_raw_begin = cur_rest->m_raw_end;
+            onepinyin = str + next_rest->m_raw_begin;
+            len = strlen(item->m_new_keys[1]);
+
+            assert(parse_one_key(options, *next_key, onepinyin, len));
+        }
+
+        /* save back tones */
+        if (options & USE_TONE) {
+            if (CHEWING_ZERO_TONE != next_tone) {
+                next_key->m_tone = next_tone;
+                next_rest->m_raw_end ++;
+            }
+        }
+    }
+
+    return true;
 }
 
 #define IS_KEY(x)   (('a' <= x && x <= 'z') || x == ';')
