@@ -596,13 +596,19 @@ bool FullPinyinParser2::post_process2(pinyin_option_t options,
                 continue;
 
             const char * onepinyin = str + cur_rest->m_raw_begin;
-            size_t len = cur_rest->length();
+            size_t len = strlen(item->m_orig_keys[0]);
+
+            if (cur_rest->length() != len)
+                continue;
 
             if (0 != strncmp(onepinyin, item->m_orig_keys[0], len))
                 continue;
 
             onepinyin = str + next_rest->m_raw_begin;
-            len = next_rest->length();
+            len = strlen(item->m_orig_keys[1]);
+
+            if (next_rest->length() != len)
+                continue;
 
             if (0 == strncmp(onepinyin, item->m_orig_keys[1], len))
                 break;
