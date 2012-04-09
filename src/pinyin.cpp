@@ -492,7 +492,7 @@ static gint compare_token( gconstpointer lhs, gconstpointer rhs){
     return token_lhs - token_rhs;
 }
 
-#if 1
+#if 0
 
 /* internal definition */
 typedef struct {
@@ -617,8 +617,7 @@ typedef struct {
 } compare_item_t;
 
 static gint compare_item(gconstpointer lhs,
-                         gconstpointer rhs,
-                         gpointer user_data) {
+                         gconstpointer rhs) {
     compare_item_t * item_lhs = (compare_item_t *)lhs;
     compare_item_t * item_rhs = (compare_item_t *)rhs;
 
@@ -670,7 +669,7 @@ bool pinyin_get_candidates(pinyin_instance_t * instance,
         merge_single_gram(&merged_gram, system_gram, user_gram);
     }
 
-    PhraseIndexRange ranges;
+    PhraseIndexRanges ranges;
     memset(ranges, 0, sizeof(ranges));
 
     guint8 min_index, max_index;
