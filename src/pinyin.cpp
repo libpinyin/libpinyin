@@ -632,6 +632,7 @@ bool pinyin_get_candidates(pinyin_instance_t * instance,
                            TokenVector candidates) {
 
     pinyin_context_t * & context = instance->m_context;
+    pinyin_option_t options = context->m_options;
     ChewingKeyVector & pinyin_keys = instance->m_pinyin_keys;
     g_array_set_size(candidates, 0);
 
@@ -642,20 +643,23 @@ bool pinyin_get_candidates(pinyin_instance_t * instance,
 
     /* lookup the previous token here. */
     phrase_token_t prev_token = null_token;
-    if (0 == offset) {
-        prev_token = sentence_start;
-    } else {
-        assert (0 < offset);
 
-        phrase_token_t cur_token = g_array_index
-            (instance->m_match_results, phrase_token_t, offset);
-        if (null_token != cur_token) {
-            for (i = offset - 1; i >= 0; --i) {
-                cur_token = g_array_index
-                    (instance->m_match_results, phrase_token_t, i);
-                if (null_token != cur_token) {
-                    prev_token = cur_token;
-                    break;
+    if (options & DYNAMIC_ADJUST) {
+        if (0 == offset) {
+            prev_token = sentence_start;
+        } else {
+            assert (0 < offset);
+
+            phrase_token_t cur_token = g_array_index
+                (instance->m_match_results, phrase_token_t, offset);
+            if (null_token != cur_token) {
+                for (i = offset - 1; i >= 0; --i) {
+                    cur_token = g_array_index
+                        (instance->m_match_results, phrase_token_t, i);
+                    if (null_token != cur_token) {
+                        prev_token = cur_token;
+                        break;
+                    }
                 }
             }
         }
@@ -663,10 +667,13 @@ bool pinyin_get_candidates(pinyin_instance_t * instance,
 
     SingleGram merged_gram;
     SingleGram * system_gram = NULL, * user_gram = NULL;
-    if (null_token != prev_token) {
-        context->m_system_bigram->load(prev_token, system_gram);
-        context->m_user_bigram->load(prev_token, user_gram);
-        merge_single_gram(&merged_gram, system_gram, user_gram);
+
+    if (options & DYNAMIC_ADJUST) {
+        if (null_token != prev_token) {
+            context->m_system_bigram->load(prev_token, system_gram);
+            context->m_user_bigram->load(prev_token, user_gram);
+            merge_single_gram(&merged_gram, system_gram, user_gram);
+        }
     }
 
     PhraseIndexRanges ranges;
@@ -731,12 +738,14 @@ bool pinyin_get_candidates(pinyin_instance_t * instance,
             item.m_token = token;
 
             gfloat bigram_poss = 0; guint32 total_freq = 0;
-            if (null_token != prev_token) {
-                guint32 bigram_freq = 0;
-                merged_gram.get_total_freq(total_freq);
-                merged_gram.get_freq(token, bigram_freq);
-                if (0 != total_freq)
-                    bigram_poss = bigram_freq / (gfloat)total_freq;
+            if (options & DYNAMIC_ADJUST) {
+                if (null_token != prev_token) {
+                    guint32 bigram_freq = 0;
+                    merged_gram.get_total_freq(total_freq);
+                    merged_gram.get_freq(token, bigram_freq);
+                    if (0 != total_freq)
+                        bigram_poss = bigram_freq / (gfloat)total_freq;
+                }
             }
 
             /* compute the m_freq. */

@@ -34,7 +34,8 @@ enum PinyinTableFlag{
     CHEWING_INCOMPLETE = 1U << 4,
     USE_TONE = 1U << 5,
     USE_DIVIDED_TABLE = 1U << 6,
-    USE_RESPLIT_TABLE = 1U << 7
+    USE_RESPLIT_TABLE = 1U << 7,
+    DYNAMIC_ADJUST = 1U << 8
 };
 
 /**
