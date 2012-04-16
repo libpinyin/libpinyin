@@ -287,6 +287,8 @@ pinyin_instance_t * pinyin_alloc_instance(pinyin_context_t * context){
     pinyin_instance_t * instance = new pinyin_instance_t;
     instance->m_context = context;
 
+    instance->m_raw_full_pinyin = NULL;
+
     instance->m_prefixes = g_array_new(FALSE, FALSE, sizeof(phrase_token_t));
     instance->m_pinyin_keys = g_array_new(FALSE, FALSE, sizeof(ChewingKey));
     instance->m_pinyin_key_rests =
@@ -300,6 +302,7 @@ pinyin_instance_t * pinyin_alloc_instance(pinyin_context_t * context){
 }
 
 void pinyin_free_instance(pinyin_instance_t * instance){
+    g_free(instance->m_raw_full_pinyin);
     g_array_free(instance->m_prefixes, TRUE);
     g_array_free(instance->m_pinyin_keys, TRUE);
     g_array_free(instance->m_pinyin_key_rests, TRUE);
@@ -424,6 +427,9 @@ bool pinyin_parse_full_pinyin(pinyin_instance_t * instance,
 size_t pinyin_parse_more_full_pinyins(pinyin_instance_t * instance,
                                       const char * pinyins){
     pinyin_context_t * & context = instance->m_context;
+
+    g_free(instance->m_raw_full_pinyin);
+    instance->m_raw_full_pinyin = g_strdup(pinyins);
     int pinyin_len = strlen(pinyins);
 
     int parse_len = context->m_full_pinyin_parser->parse
