@@ -35,6 +35,22 @@ extern "C" {
 
 typedef struct _pinyin_context_t pinyin_context_t;
 typedef struct _pinyin_instance_t pinyin_instance_t;
+typedef struct _lookup_candidate_t lookup_candidate_t;
+
+typedef GArray * CandidateVector; /* GArray of lookup_candidate_t */
+
+enum lookup_candidate_type_t{
+    NORMAL_CANDIDATE = 1,
+    DIVIDED_CANDIDATE,
+    RESPLIT_CANDIDATE
+};
+
+struct _lookup_candidate_t{
+    enum lookup_candidate_type_t m_candidate_type;
+    phrase_token_t m_token;
+    ChewingKeyRest m_orig_rest;
+    gchar * m_new_pinyins;
+};
 
 struct _pinyin_instance_t{
     pinyin_context_t * m_context;
@@ -285,6 +301,10 @@ bool pinyin_get_candidates(pinyin_instance_t * instance,
                            size_t offset,
                            TokenVector candidates);
 
+bool pinyin_get_candidates_v2(pinyin_instance_t * instance,
+                              size_t offset,
+                              CandidateVector candidates);
+
 /**
  * pinyin_choose_candidate:
  * @instance: the pinyin instance.
@@ -298,6 +318,10 @@ bool pinyin_get_candidates(pinyin_instance_t * instance,
 int pinyin_choose_candidate(pinyin_instance_t * instance,
                             size_t offset,
                             phrase_token_t token);
+
+int pinyin_choose_candidate_v2(pinyin_instance_t * instance,
+                               size_t offset,
+                               lookup_candidate_t * candidate);
 
 /**
  * pinyin_clear_constraint:
