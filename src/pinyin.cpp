@@ -823,7 +823,7 @@ int pinyin_choose_candidate(pinyin_instance_t * instance,
     bool retval = context->m_pinyin_lookup->validate_constraint
         (instance->m_constraints, instance->m_pinyin_keys) && len;
 
-    return len;
+    return offset + len;
 }
 
 bool pinyin_clear_constraint(pinyin_instance_t * instance,

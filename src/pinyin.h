@@ -318,7 +318,7 @@ bool pinyin_get_full_pinyin_candidates(pinyin_instance_t * instance,
  * @instance: the pinyin instance.
  * @offset: the offset in the pinyin keys.
  * @token: the selected candidate.
- * @returns: the characters of the chosen candidate.
+ * @returns: the cursor after the chosen candidate.
  *
  * Choose an candidate at the offset.
  *
