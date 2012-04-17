@@ -50,6 +50,14 @@ struct _lookup_candidate_t{
     phrase_token_t m_token;
     ChewingKeyRest m_orig_rest;
     gchar * m_new_pinyins;
+    guint32 m_freq; /* the amplifed gfloat numerical value. */
+public:
+    _lookup_candidate_t() {
+        m_candidate_type = NORMAL_CANDIDATE;
+        m_token = null_token;
+        m_new_pinyins = NULL;
+        m_freq = 0;
+    }
 };
 
 struct _pinyin_instance_t{
@@ -301,9 +309,9 @@ bool pinyin_get_candidates(pinyin_instance_t * instance,
                            size_t offset,
                            TokenVector candidates);
 
-bool pinyin_get_candidates_v2(pinyin_instance_t * instance,
-                              size_t offset,
-                              CandidateVector candidates);
+bool pinyin_get_full_pinyin_candidates(pinyin_instance_t * instance,
+                                       size_t offset,
+                                       CandidateVector candidates);
 
 /**
  * pinyin_choose_candidate:
@@ -319,9 +327,9 @@ int pinyin_choose_candidate(pinyin_instance_t * instance,
                             size_t offset,
                             phrase_token_t token);
 
-int pinyin_choose_candidate_v2(pinyin_instance_t * instance,
-                               size_t offset,
-                               lookup_candidate_t * candidate);
+int pinyin_choose_full_pinyin_candidate(pinyin_instance_t * instance,
+                                        size_t offset,
+                                        lookup_candidate_t * candidate);
 
 /**
  * pinyin_clear_constraint:

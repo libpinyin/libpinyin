@@ -617,9 +617,14 @@ bool pinyin_get_candidates(pinyin_instance_t * instance,
 #endif
 
 /* internal definition */
-typedef struct {
+typedef struct _compare_item_t{
     phrase_token_t m_token;
     guint32 m_freq; /* the amplifed gfloat numerical value. */
+
+public:
+    _compare_item_t(){
+        m_token = null_token; m_freq = 0;
+    }
 } compare_item_t;
 
 static gint compare_item_with_token(gconstpointer lhs,
@@ -730,7 +735,7 @@ bool pinyin_get_candidates(pinyin_instance_t * instance,
                 for (size_t k = range->m_range_begin;
                      k < range->m_range_end; ++k) {
                     compare_item_t item;
-                    item.m_token = k; item.m_freq = 0;
+                    item.m_token = k;
                     g_array_append_val(items, item);
                 }
             }
