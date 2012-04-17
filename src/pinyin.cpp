@@ -654,7 +654,7 @@ bool pinyin_get_candidates(pinyin_instance_t * instance,
                            TokenVector candidates) {
 
     pinyin_context_t * & context = instance->m_context;
-    pinyin_option_t options = context->m_options;
+    pinyin_option_t & options = context->m_options;
     ChewingKeyVector & pinyin_keys = instance->m_pinyin_keys;
     g_array_set_size(candidates, 0);
 
@@ -713,12 +713,6 @@ bool pinyin_get_candidates(pinyin_instance_t * instance,
 
     for (i = pinyin_len; i >= 1; --i) {
         g_array_set_size(items, 0);
-
-        /* clear ranges. */
-        for (size_t m = min_index; m <= max_index; ++m) {
-            if (ranges[m])
-                g_array_set_size(ranges[m], 0);
-        }
 
         /* do pinyin search. */
         int retval = context->m_pinyin_table->search
@@ -811,6 +805,127 @@ bool pinyin_get_candidates(pinyin_instance_t * instance,
         delete user_gram;
     return true;
 }
+
+static gint compare_full_pinyin_item_with_token(gconstpointer lhs,
+                                                gconstpointer rhs) {
+    lookup_candidate_t * item_lhs = (lookup_candidate_t *)lhs;
+    lookup_candidate_t * item_rhs = (lookup_candidate_t *)rhs;
+
+    phrase_token_t token_lhs = item_lhs->m_token;
+    phrase_token_t token_rhs = item_rhs->m_token;
+
+    return (token_lhs - token_rhs);
+}
+
+static gint compare_full_pinyin_item_with_frequency(gconstpointer lhs,
+                                                    gconstpointer rhs) {
+    lookup_candidate_t * item_lhs = (lookup_candidate_t *)lhs;
+    lookup_candidate_t * item_rhs = (lookup_candidate_t *)rhs;
+
+    guint32 freq_lhs = item_lhs->m_freq;
+    guint32 freq_rhs = item_rhs->m_freq;
+
+    return -(freq_lhs - freq_rhs); /* in descendant order */
+}
+
+bool pinyin_get_full_pinyin_candidates(pinyin_instance_t * instance,
+                                       size_t offset,
+                                       CandidateVector candidates){
+
+    pinyin_context_t * & context = instance->m_context;
+    pinyin_option_t & options = context->m_options;
+    ChewingKeyVector & pinyin_keys = instance->m_pinyin_keys;
+    g_array_set_size(candidates, 0);
+
+    ChewingKey * keys = &g_array_index
+        (pinyin_keys, ChewingKey, offset);
+    size_t pinyin_len = pinyin_keys->len - offset;
+    ssize_t i;
+
+    /* lookup the previous token here. */
+    phrase_token_t prev_token = null_token;
+
+    if (options & DYNAMIC_ADJUST) {
+        if (0 == offset) {
+            prev_token = sentence_start;
+        } else {
+            assert (0 < offset);
+
+            phrase_token_t cur_token = g_array_index
+                (instance->m_match_results, phrase_token_t, offset);
+            if (null_token != cur_token) {
+                for (i = offset - 1; i >= 0; --i) {
+                    cur_token = g_array_index
+                        (instance->m_match_results, phrase_token_t, i);
+                    if (null_token != cur_token) {
+                        prev_token = cur_token;
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+    SingleGram merged_gram;
+    SingleGram * system_gram = NULL, * user_gram = NULL;
+
+    if (options & DYNAMIC_ADJUST) {
+        if (null_token != prev_token) {
+            context->m_system_bigram->load(prev_token, system_gram);
+            context->m_user_bigram->load(prev_token, user_gram);
+            merge_single_gram(&merged_gram, system_gram, user_gram);
+        }
+    }
+
+    PhraseIndexRanges ranges;
+    memset(ranges, 0, sizeof(ranges));
+
+    guint8 min_index, max_index;
+    assert( ERROR_OK == context->m_phrase_index->
+            get_sub_phrase_range(min_index, max_index));
+
+    for (size_t m = min_index; m <= max_index; ++m) {
+        ranges[m] = g_array_new(FALSE, FALSE, sizeof(PhraseIndexRange));
+    }
+
+    GArray * items = g_array_new(FALSE, FALSE, sizeof(lookup_candidate_t));
+
+    if (pinyin_len == 1) {
+        if (options & USE_DIVIDED_TABLE) {
+            /* handle "^xian$" -> "xi'an" here */
+            assert(FALSE);
+        }
+    }
+
+    for (i = pinyin_len; i >= 1; --i) {
+        g_array_set_size(items, 0);
+
+        if (2 == i) {
+            /* handle fuzzy pinyin segment here. */
+            if (options & USE_DIVIDED_TABLE) {
+                assert(FALSE);
+            }
+            if (options & USE_RESPLIT_TABLE) {
+                assert(FALSE);
+            }
+        }
+
+    }
+
+    g_array_free(items, TRUE);
+
+    for (size_t m = min_index; m <= max_index; ++m) {
+        if (ranges[m])
+            g_array_free(ranges[m], TRUE);
+    }
+
+    if (system_gram)
+        delete system_gram;
+    if (user_gram)
+        delete user_gram;
+    return true;
+}
+
 
 int pinyin_choose_candidate(pinyin_instance_t * instance,
                             size_t offset,
