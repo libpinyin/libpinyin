@@ -492,13 +492,13 @@ bool pinyin_in_chewing_keyboard(pinyin_instance_t * instance,
         (context->m_options, key, symbol);
 }
 
+#if 0
+
 static gint compare_token( gconstpointer lhs, gconstpointer rhs){
     phrase_token_t token_lhs = *((phrase_token_t *)lhs);
     phrase_token_t token_rhs = *((phrase_token_t *)rhs);
     return token_lhs - token_rhs;
 }
-
-#if 0
 
 /* internal definition */
 typedef struct {
@@ -622,8 +622,19 @@ typedef struct {
     guint32 m_freq; /* the amplifed gfloat numerical value. */
 } compare_item_t;
 
-static gint compare_item(gconstpointer lhs,
-                         gconstpointer rhs) {
+static gint compare_item_with_token(gconstpointer lhs,
+                                    gconstpointer rhs) {
+    compare_item_t * item_lhs = (compare_item_t *)lhs;
+    compare_item_t * item_rhs = (compare_item_t *)rhs;
+
+    phrase_token_t token_lhs = item_lhs->m_token;
+    phrase_token_t token_rhs = item_rhs->m_token;
+
+    return (token_lhs - token_rhs);
+}
+
+static gint compare_item_with_frequency(gconstpointer lhs,
+                                        gconstpointer rhs) {
     compare_item_t * item_lhs = (compare_item_t *)lhs;
     compare_item_t * item_rhs = (compare_item_t *)rhs;
 
@@ -693,16 +704,15 @@ bool pinyin_get_candidates(pinyin_instance_t * instance,
         ranges[m] = g_array_new(FALSE, FALSE, sizeof(PhraseIndexRange));
     }
 
-    GArray * tokens = g_array_new(FALSE, FALSE, sizeof(phrase_token_t));
     GArray * items = g_array_new(FALSE, FALSE, sizeof(compare_item_t));
 
     for (i = pinyin_len; i >= 1; --i) {
-        g_array_set_size(tokens, 0);
         g_array_set_size(items, 0);
 
         /* clear ranges. */
         for (size_t m = min_index; m <= max_index; ++m) {
-            g_array_set_size(ranges[m], 0);
+            if (ranges[m])
+                g_array_set_size(ranges[m], 0);
         }
 
         /* do pinyin search. */
@@ -719,29 +729,31 @@ bool pinyin_get_candidates(pinyin_instance_t * instance,
                     &g_array_index(ranges[m], PhraseIndexRange, n);
                 for (size_t k = range->m_range_begin;
                      k < range->m_range_end; ++k) {
-                    g_array_append_val(tokens, k);
+                    compare_item_t item;
+                    item.m_token = k; item.m_freq = 0;
+                    g_array_append_val(items, item);
                 }
             }
         }
 
-        g_array_sort(tokens, compare_token);
+        g_array_sort(items, compare_item_with_token);
+
         /* remove the duplicated items. */
         phrase_token_t last_token = null_token;
-        for (size_t n = 0; n < tokens->len; ++n) {
-            phrase_token_t token = g_array_index(tokens, phrase_token_t, n);
-            if (last_token == token) {
-                g_array_remove_index(tokens, n);
+        for (size_t n = 0; n < items->len; ++n) {
+            compare_item_t * item = &g_array_index(items, compare_item_t, n);
+            if (last_token == item->m_token) {
+                g_array_remove_index(items, n);
                 n--;
             }
-            last_token = token;
+            last_token = item->m_token;
         }
 
         PhraseItem cached_item;
         /* transfer all tokens to items */
-        for (i = 0; i < tokens->len; ++i) {
-            compare_item_t item;
-            phrase_token_t token = g_array_index(tokens, phrase_token_t, i);
-            item.m_token = token;
+        for (i = 0; i < items->len; ++i) {
+            compare_item_t * item = &g_array_index(items, compare_item_t, i);
+            phrase_token_t & token = item->m_token;
 
             gfloat bigram_poss = 0; guint32 total_freq = 0;
             if (options & DYNAMIC_ADJUST) {
@@ -765,14 +777,11 @@ bool pinyin_get_candidates(pinyin_instance_t * instance,
                             (1 - LAMBDA_PARAMETER) *
                             cached_item.get_unigram_frequency() /
                             (gfloat) total_freq) * 256 * 256 * 256;
-            item.m_freq = freq;
-
-            /* append item. */
-            g_array_append_val(items, item);
+            item->m_freq = freq;
         }
 
         /* sort the candidates of the same length by frequency. */
-        g_array_sort(items, compare_item);
+        g_array_sort(items, compare_item_with_frequency);
 
         /* transfer back items to tokens, and save it into candidates */
         for (i = 0; i < items->len; ++i) {
@@ -785,10 +794,10 @@ bool pinyin_get_candidates(pinyin_instance_t * instance,
     }
 
     g_array_free(items, TRUE);
-    g_array_free(tokens, TRUE);
 
     for (size_t m = min_index; m <= max_index; ++m) {
-        g_array_free(ranges[m], TRUE);
+        if (ranges[m])
+            g_array_free(ranges[m], TRUE);
     }
 
     if (system_gram)
