@@ -20,7 +20,9 @@ LIBPINYIN {
         pinyin_parse_more_chewings;
         pinyin_in_chewing_keyboard;
         pinyin_get_candidates;
+        pinyin_get_full_pinyin_candidates;
         pinyin_choose_candidate;
+        pinyin_choose_full_pinyin_candidate;
         pinyin_clear_constraint;
         pinyin_clear_constraints;
         pinyin_translate_token;
