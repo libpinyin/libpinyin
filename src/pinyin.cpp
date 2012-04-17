@@ -492,21 +492,11 @@ bool pinyin_in_chewing_keyboard(pinyin_instance_t * instance,
         (context->m_options, key, symbol);
 }
 
-/* internal definition */
-typedef struct _compare_item_t{
-    phrase_token_t m_token;
-    guint32 m_freq; /* the amplifed gfloat numerical value. */
-
-public:
-    _compare_item_t(){
-        m_token = null_token; m_freq = 0;
-    }
-} compare_item_t;
 
 static gint compare_item_with_token(gconstpointer lhs,
-                                    gconstpointer rhs) {
-    compare_item_t * item_lhs = (compare_item_t *)lhs;
-    compare_item_t * item_rhs = (compare_item_t *)rhs;
+                                                gconstpointer rhs) {
+    lookup_candidate_t * item_lhs = (lookup_candidate_t *)lhs;
+    lookup_candidate_t * item_rhs = (lookup_candidate_t *)rhs;
 
     phrase_token_t token_lhs = item_lhs->m_token;
     phrase_token_t token_rhs = item_rhs->m_token;
@@ -515,9 +505,9 @@ static gint compare_item_with_token(gconstpointer lhs,
 }
 
 static gint compare_item_with_frequency(gconstpointer lhs,
-                                        gconstpointer rhs) {
-    compare_item_t * item_lhs = (compare_item_t *)lhs;
-    compare_item_t * item_rhs = (compare_item_t *)rhs;
+                                                    gconstpointer rhs) {
+    lookup_candidate_t * item_lhs = (lookup_candidate_t *)lhs;
+    lookup_candidate_t * item_rhs = (lookup_candidate_t *)rhs;
 
     guint32 freq_lhs = item_lhs->m_freq;
     guint32 freq_rhs = item_rhs->m_freq;
@@ -595,7 +585,7 @@ bool pinyin_get_candidates(pinyin_instance_t * instance,
         ranges[m] = g_array_new(FALSE, FALSE, sizeof(PhraseIndexRange));
     }
 
-    GArray * items = g_array_new(FALSE, FALSE, sizeof(compare_item_t));
+    GArray * items = g_array_new(FALSE, FALSE, sizeof(lookup_candidate_t));
 
     for (i = pinyin_len; i >= 1; --i) {
         g_array_set_size(items, 0);
@@ -614,7 +604,7 @@ bool pinyin_get_candidates(pinyin_instance_t * instance,
                     &g_array_index(ranges[m], PhraseIndexRange, n);
                 for (size_t k = range->m_range_begin;
                      k < range->m_range_end; ++k) {
-                    compare_item_t item;
+                    lookup_candidate_t item;
                     item.m_token = k;
                     g_array_append_val(items, item);
                 }
@@ -626,7 +616,8 @@ bool pinyin_get_candidates(pinyin_instance_t * instance,
         /* remove the duplicated items. */
         phrase_token_t last_token = null_token;
         for (size_t n = 0; n < items->len; ++n) {
-            compare_item_t * item = &g_array_index(items, compare_item_t, n);
+            lookup_candidate_t * item = &g_array_index
+                (items, lookup_candidate_t, n);
             if (last_token == item->m_token) {
                 g_array_remove_index(items, n);
                 n--;
@@ -635,9 +626,10 @@ bool pinyin_get_candidates(pinyin_instance_t * instance,
         }
 
         PhraseItem cached_item;
-        /* transfer all tokens to items */
+        /* compute all freqs. */
         for (i = 0; i < items->len; ++i) {
-            compare_item_t * item = &g_array_index(items, compare_item_t, i);
+            lookup_candidate_t * item = &g_array_index
+                (items, lookup_candidate_t, i);
             phrase_token_t & token = item->m_token;
 
             gfloat bigram_poss = 0; guint32 total_freq = 0;
@@ -670,7 +662,8 @@ bool pinyin_get_candidates(pinyin_instance_t * instance,
 
         /* transfer back items to tokens, and save it into candidates */
         for (i = 0; i < items->len; ++i) {
-            compare_item_t * item = &g_array_index(items, compare_item_t, i);
+            lookup_candidate_t * item = &g_array_index
+                (items, lookup_candidate_t, i);
             g_array_append_val(candidates, item->m_token);
         }
 
@@ -692,27 +685,6 @@ bool pinyin_get_candidates(pinyin_instance_t * instance,
     return true;
 }
 
-static gint compare_full_pinyin_item_with_token(gconstpointer lhs,
-                                                gconstpointer rhs) {
-    lookup_candidate_t * item_lhs = (lookup_candidate_t *)lhs;
-    lookup_candidate_t * item_rhs = (lookup_candidate_t *)rhs;
-
-    phrase_token_t token_lhs = item_lhs->m_token;
-    phrase_token_t token_rhs = item_rhs->m_token;
-
-    return (token_lhs - token_rhs);
-}
-
-static gint compare_full_pinyin_item_with_frequency(gconstpointer lhs,
-                                                    gconstpointer rhs) {
-    lookup_candidate_t * item_lhs = (lookup_candidate_t *)lhs;
-    lookup_candidate_t * item_rhs = (lookup_candidate_t *)rhs;
-
-    guint32 freq_lhs = item_lhs->m_freq;
-    guint32 freq_rhs = item_rhs->m_freq;
-
-    return -(freq_lhs - freq_rhs); /* in descendant order */
-}
 
 bool pinyin_get_full_pinyin_candidates(pinyin_instance_t * instance,
                                        size_t offset,
