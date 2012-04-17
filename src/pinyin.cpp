@@ -525,6 +525,33 @@ static gint compare_item_with_frequency(gconstpointer lhs,
     return -(freq_lhs - freq_rhs); /* in descendant order */
 }
 
+static phrase_token_t _get_previous_token(pinyin_instance_t * instance,
+                                          size_t offset) {
+    phrase_token_t prev_token = null_token;
+    ssize_t i;
+
+    if (0 == offset) {
+        prev_token = sentence_start;
+    } else {
+        assert (0 < offset);
+
+        phrase_token_t cur_token = g_array_index
+            (instance->m_match_results, phrase_token_t, offset);
+        if (null_token != cur_token) {
+            for (i = offset - 1; i >= 0; --i) {
+                cur_token = g_array_index
+                    (instance->m_match_results, phrase_token_t, i);
+                if (null_token != cur_token) {
+                    prev_token = cur_token;
+                    break;
+                }
+            }
+        }
+    }
+
+    return prev_token;
+}
+
 bool pinyin_get_candidates(pinyin_instance_t * instance,
                            size_t offset,
                            TokenVector candidates) {
@@ -543,24 +570,7 @@ bool pinyin_get_candidates(pinyin_instance_t * instance,
     phrase_token_t prev_token = null_token;
 
     if (options & DYNAMIC_ADJUST) {
-        if (0 == offset) {
-            prev_token = sentence_start;
-        } else {
-            assert (0 < offset);
-
-            phrase_token_t cur_token = g_array_index
-                (instance->m_match_results, phrase_token_t, offset);
-            if (null_token != cur_token) {
-                for (i = offset - 1; i >= 0; --i) {
-                    cur_token = g_array_index
-                        (instance->m_match_results, phrase_token_t, i);
-                    if (null_token != cur_token) {
-                        prev_token = cur_token;
-                        break;
-                    }
-                }
-            }
-        }
+        prev_token = _get_previous_token(instance, offset);
     }
 
     SingleGram merged_gram;
@@ -722,24 +732,7 @@ bool pinyin_get_full_pinyin_candidates(pinyin_instance_t * instance,
     phrase_token_t prev_token = null_token;
 
     if (options & DYNAMIC_ADJUST) {
-        if (0 == offset) {
-            prev_token = sentence_start;
-        } else {
-            assert (0 < offset);
-
-            phrase_token_t cur_token = g_array_index
-                (instance->m_match_results, phrase_token_t, offset);
-            if (null_token != cur_token) {
-                for (i = offset - 1; i >= 0; --i) {
-                    cur_token = g_array_index
-                        (instance->m_match_results, phrase_token_t, i);
-                    if (null_token != cur_token) {
-                        prev_token = cur_token;
-                        break;
-                    }
-                }
-            }
-        }
+        prev_token = _get_previous_token(instance, offset);
     }
 
     SingleGram merged_gram;
