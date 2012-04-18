@@ -120,15 +120,6 @@ size_t PinyinLookup::prepare_table_cache(int nstep, int total_pinyin){
     g_array_set_size(m_table_cache, MAX_PHRASE_LENGTH + 1);
 
     int len, total_len = std_lite::min(total_pinyin, MAX_PHRASE_LENGTH);
-#if 0
-    /* probe constraint */
-    for ( len = 1; len <= total_len; ++len) {
-        lookup_constraint_t * constraint = &g_array_index(m_constraints, lookup_constraint_t, nstep + len);
-        if (constraint->m_type == CONSTRAINT_ONESTEP)
-            break;
-    }
-    total_len = std_lite::min(len, total_len);
-#endif
 
     for ( len = 1; len <= total_len; ++len){
 	PhraseIndexRanges * ranges = &g_array_index(m_table_cache, PhraseIndexRanges, len);
@@ -178,15 +169,7 @@ bool PinyinLookup::get_best_match(TokenVector prefixes,
         g_hash_table_insert(initial_step_index, GUINT_TO_POINTER(initial_key), GUINT_TO_POINTER(initial_step_content->len - 1));
     }
 
-#if 0
-    /* Note: this section has been dropped to enable pi-gram. */
-    LookupStepContent tmp_step = (LookupStepContent) g_ptr_array_index(m_steps_content, 0);
-    IBranchIterator * iter = m_winner_tree->get_iterator(tmp_step);
-    size_t npinyin = prepare_table_cache(0, keys->len);
-    search_unigram(iter, 0, npinyin);
-    delete iter;
-#endif
-
+    /* begin the Viterbi beam search. */
     for ( int i = 0; i < nstep - 1; ++i ){
 	LookupStepContent tmp_step = (LookupStepContent) g_ptr_array_index(m_steps_content, i);
 	IBranchIterator * iter = m_winner_tree->get_iterator(tmp_step);
@@ -416,69 +399,6 @@ bool PinyinLookup::final_step(MatchResults & results){
     
     return true;
 }
-
-#if 0
-bool PinyinLookup::train_result(ChewingKeyVector keys, CandidateConstraints constraints, MatchResults & results){
-    bool train_next = false;
-    ChewingKey * pinyin_keys = (ChewingKey *)keys->data;
-    //TODO: verify the new training method.
-    phrase_token_t last_token = sentence_start;
-    // constraints->len + 1 == results->len
-    const guint32 train_factor = 23 * 25;
-    for ( size_t i = 0; i < constraints->len; ++i){
-	phrase_token_t * token = &g_array_index(results, phrase_token_t, i);
-	if ( *token == null_token )
-	    continue;
-	lookup_constraint_t * constraint = &g_array_index(constraints, lookup_constraint_t, i);
-	if (train_next || CONSTRAINT_ONESTEP == constraint->m_type ){
-	    if (CONSTRAINT_ONESTEP == constraint->m_type){
-		assert(*token == constraint->m_token);
-		train_next = true;
-	    }else{
-		train_next = false;
-	    }
-            //add pi-gram frequency
-            //printf("i:%d\tlast_token:%d\ttoken:%d\n", i, last_token, *token);
-	    m_phrase_index->get_phrase_item(*token, m_cache_phrase_item);
-	    m_cache_phrase_item.increase_pronunciation_possibility(m_options, pinyin_keys + i, train_factor);
-	    m_phrase_index->add_unigram_frequency(*token, train_factor * 10);
-	    if ( last_token ){
-		SingleGram * system, *user;
-		m_system_bigram->load(last_token, system);
-                m_user_bigram->load(last_token, user);
-		guint32 total_freq;
-		if ( !user ){
-		    total_freq = 0;
-		    if ( system )
-			assert(system->get_total_freq(total_freq));
-		    user = new SingleGram;
-		    user->set_total_freq(total_freq);
-		}
-		guint32 freq = 0;
-		if ( !user->get_freq(*token, freq)){
-		    if (system) system->get_freq(*token, freq);
-		    user->insert_freq(*token, freq);
-		}
-		assert(user->get_total_freq(total_freq));
-		//protect against total_freq overflow.
-		if ( train_factor > 0 && total_freq > total_freq + train_factor)
-		    goto next;
-		assert(user->set_total_freq(total_freq + train_factor));
-		assert(user->get_freq(*token, freq));
-		//if total_freq is not overflow, then freq won't overflow.
-		assert(user->set_freq(*token, freq + train_factor));
-		assert(m_user_bigram->store(last_token, user));
-	    next:
-		if (system) delete system;
-		if (user) delete user;
-	    }
-	}
-	last_token = *token;
-    }
-    return true;
-}
-#endif
-
 
 bool PinyinLookup::train_result2(ChewingKeyVector keys,
                                  CandidateConstraints constraints,
