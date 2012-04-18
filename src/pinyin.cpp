@@ -597,7 +597,7 @@ bool pinyin_get_candidates(pinyin_instance_t * instance,
         if ( !(retval & SEARCH_OK) )
             continue;
 
-        /* reduce to a single GArray. */
+        /* reduce and append to a single GArray. */
         for (size_t m = min_index; m <= max_index; ++m) {
             for (size_t n = 0; n < ranges[m]->len; ++n) {
                 PhraseIndexRange * range =
@@ -693,10 +693,9 @@ bool pinyin_get_full_pinyin_candidates(pinyin_instance_t * instance,
     pinyin_context_t * & context = instance->m_context;
     pinyin_option_t & options = context->m_options;
     ChewingKeyVector & pinyin_keys = instance->m_pinyin_keys;
+    ChewingKeyRestVector & pinyin_key_rests = instance->m_pinyin_key_rests;
     g_array_set_size(candidates, 0);
 
-    ChewingKey * keys = &g_array_index
-        (pinyin_keys, ChewingKey, offset);
     size_t pinyin_len = pinyin_keys->len - offset;
     ssize_t i;
 
@@ -733,8 +732,147 @@ bool pinyin_get_full_pinyin_candidates(pinyin_instance_t * instance,
 
     if (pinyin_len == 1) {
         if (options & USE_DIVIDED_TABLE) {
+            g_array_set_size(items, 0);
             /* handle "^xian$" -> "xi'an" here */
-            assert(FALSE);
+
+            /* because there is only one pinyin left,
+             *  the following for-loop will not produce 2 character candidates.
+             * the if-branch will fill the candidate list with
+             *  2 character candidates.
+             */
+
+            ChewingKey * key = &g_array_index(pinyin_keys, ChewingKey, offset);
+            ChewingKeyRest * rest = &g_array_index(pinyin_key_rests,
+                                                   ChewingKeyRest, offset);
+            ChewingKeyRest orig_rest = *rest;
+            guint16 tone = CHEWING_ZERO_TONE;
+
+            const divided_table_item_t * item = NULL;
+
+            /* back up tone */
+            if (options & USE_TONE) {
+                tone = key->m_tone;
+                if (CHEWING_ZERO_TONE != tone) {
+                    key->m_tone = CHEWING_ZERO_TONE;
+                    rest->m_raw_end --;
+                }
+            }
+
+            item = context->m_full_pinyin_parser->retrieve_divided_item
+                (options, offset, pinyin_keys, pinyin_key_rests,
+                 instance->m_raw_full_pinyin,
+                 strlen(instance->m_raw_full_pinyin));
+
+            ChewingKey divided_keys[2];
+            assert(context->m_full_pinyin_parser->
+                   parse_one_key(options, divided_keys[0], item->m_new_keys[0],
+                                 strlen(item->m_new_keys[0])));
+            assert(context->m_full_pinyin_parser->
+                   parse_one_key(options, divided_keys[1], item->m_new_keys[1],
+                                 strlen(item->m_new_keys[1])));
+
+            gchar * new_pinyins = g_strdup_printf
+                ("%s'%s", item->m_new_keys[0], item->m_new_keys[1]);
+
+            /* propagate the tone */
+            if (options & USE_TONE) {
+                if (CHEWING_ZERO_TONE != tone) {
+                    assert(0 < tone && tone <= 5);
+                    gchar * tmp_str = g_strdup_printf
+                        ("%s%d", new_pinyins, tone);
+                    divided_keys[1].m_tone = tone;
+                    g_free(new_pinyins);
+                    new_pinyins = tmp_str;
+                }
+            }
+
+            /* do pinyin search. */
+            int retval = context->m_pinyin_table->search
+                (2, divided_keys, ranges);
+
+            if (retval & SEARCH_OK) {
+                /* reduce and append to a single GArray. */
+                for (size_t m = min_index; m <= max_index; ++m) {
+                    for (size_t n = 0; n < ranges[m]->len; ++n) {
+                        PhraseIndexRange * range =
+                            &g_array_index(ranges[m], PhraseIndexRange, n);
+                        for (size_t k = range->m_range_begin;
+                             k < range->m_range_end; ++k) {
+                            lookup_candidate_t item;
+                            item.m_candidate_type = DIVIDED_CANDIDATE;
+                            item.m_token = k; item.m_orig_rest = orig_rest;
+                            item.m_new_pinyins = g_strdup(new_pinyins);
+                            g_array_append_val(items, item);
+                        }
+                    }
+                }
+                g_free(new_pinyins);
+
+                g_array_sort(items, compare_item_with_token);
+
+                /* remove the duplicated items. */
+                phrase_token_t last_token = null_token;
+                for (size_t n = 0; n < items->len; ++n) {
+                    lookup_candidate_t * item = &g_array_index
+                        (items, lookup_candidate_t, n);
+                    if (last_token == item->m_token) {
+                        g_array_remove_index(items, n);
+                        n--;
+                    }
+                    last_token = item->m_token;
+                }
+
+                PhraseItem cached_item;
+                /* compute all freqs. */
+                for (i = 0; i < items->len; ++i) {
+                    lookup_candidate_t * item = &g_array_index
+                        (items, lookup_candidate_t, i);
+                    phrase_token_t & token = item->m_token;
+
+                    gfloat bigram_poss = 0; guint32 total_freq = 0;
+                    if (options & DYNAMIC_ADJUST) {
+                        if (null_token != prev_token) {
+                            guint32 bigram_freq = 0;
+                            merged_gram.get_total_freq(total_freq);
+                            merged_gram.get_freq(token, bigram_freq);
+                            if (0 != total_freq)
+                                bigram_poss = bigram_freq / (gfloat)total_freq;
+                        }
+                    }
+
+                    /* compute the m_freq. */
+                    FacadePhraseIndex * & phrase_index = context->m_phrase_index;
+                    phrase_index->get_phrase_item(token, cached_item);
+                    total_freq = phrase_index->get_phrase_index_total_freq();
+                    assert (0 < total_freq);
+
+                    /* Note: possibility value <= 1.0. */
+                    guint32 freq = (LAMBDA_PARAMETER * bigram_poss +
+                                    (1 - LAMBDA_PARAMETER) *
+                                    cached_item.get_unigram_frequency() /
+                                    (gfloat) total_freq) * 256 * 256 * 256;
+                    item->m_freq = freq;
+                }
+
+                /* sort the candidates of the same length by frequency. */
+                g_array_sort(items, compare_item_with_frequency);
+
+                /* transfer back items to tokens, and save it into candidates */
+                for (i = 0; i < items->len; ++i) {
+                    lookup_candidate_t * item = &g_array_index
+                        (items, lookup_candidate_t, i);
+                    g_array_append_val(candidates, item->m_token);
+                }
+
+            }
+
+            /* restore tones */
+            if (options & USE_TONE) {
+                if (CHEWING_ZERO_TONE != tone) {
+                    key->m_tone = tone;
+                    rest->m_raw_end ++;
+                }
+            }
         }
     }
 

@@ -484,7 +484,7 @@ bool FullPinyinParser2::post_process2(pinyin_option_t options,
                                       int len) const {
     int i;
     assert(keys->len == key_rests->len);
-    gint16 num_keys = keys->len;
+    gint num_keys = keys->len;
 
     ChewingKey * cur_key = NULL, * next_key = NULL;
     ChewingKeyRest * cur_rest = NULL, * next_rest = NULL;
@@ -561,7 +561,7 @@ bool FullPinyinParser2::post_process2(pinyin_option_t options,
             assert(parse_one_key(options, *next_key, onepinyin, len));
         }
 
-        /* save back tones */
+        /* restore tones */
         if (options & USE_TONE) {
             if (CHEWING_ZERO_TONE != next_tone) {
                 next_key->m_tone = next_tone;
@@ -571,6 +571,49 @@ bool FullPinyinParser2::post_process2(pinyin_option_t options,
     }
 
     return true;
+}
+
+const divided_table_item_t * FullPinyinParser2::retrieve_divided_item
+(pinyin_option_t options, size_t offset,
+ ChewingKeyVector & keys, ChewingKeyRestVector & key_rests,
+ const char * str, int len) const {
+    assert(keys->len == key_rests->len);
+
+    gint num_keys = keys->len;
+    assert(offset < num_keys);
+
+    ChewingKey * key = &g_array_index(keys, ChewingKey, offset);
+    ChewingKeyRest * rest = &g_array_index(key_rests,
+                                           ChewingKeyRest, offset);
+    guint16 tone = CHEWING_ZERO_TONE;
+
+    /* lookup divided table */
+    size_t k;
+    const divided_table_item_t * item = NULL;
+    for (k = 0; k < G_N_ELEMENTS(divided_table); ++k) {
+        item = divided_table + k;
+
+        /* no ops */
+        assert(item->m_new_freq > 0);
+
+        const char * onepinyin = str + rest->m_raw_begin;
+        size_t len = strlen(item->m_orig_key);
+
+        if (rest->length() != len)
+            continue;
+
+        if (0 == strncmp(onepinyin, item->m_orig_key, len))
+            break;
+    }
+
+    /* found the match */
+    if (k < G_N_ELEMENTS(divided_table)) {
+        /* do divided */
+        item = divided_table + k;
+        return item;
+    }
+
+    return NULL;
 }
 
 #define IS_KEY(x)   (('a' <= x && x <= 'z') || x == ';')

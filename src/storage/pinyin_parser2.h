@@ -152,6 +152,11 @@ protected:
                        const char * str, int len) const;
 
 public:
+    const divided_table_item_t * retrieve_divided_item
+    (pinyin_option_t options, size_t offset,
+     ChewingKeyVector & keys, ChewingKeyRestVector & key_rests,
+     const char * str, int len) const;
+public:
     FullPinyinParser2();
     virtual ~FullPinyinParser2() {
         g_array_free(m_parse_steps, TRUE);
