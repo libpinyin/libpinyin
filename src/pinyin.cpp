@@ -542,6 +542,60 @@ static phrase_token_t _get_previous_token(pinyin_instance_t * instance,
     return prev_token;
 }
 
+static void _remove_duplicated_items(CandidateVector items) {
+    /* remove the duplicated items. */
+    phrase_token_t last_token = null_token;
+    for (size_t n = 0; n < items->len; ++n) {
+        lookup_candidate_t * item = &g_array_index
+            (items, lookup_candidate_t, n);
+        if (last_token == item->m_token) {
+            g_array_remove_index(items, n);
+            n--;
+        }
+        last_token = item->m_token;
+    }
+}
+
+static void _compute_frequency_of_items(pinyin_context_t * context,
+                                        phrase_token_t prev_token,
+                                        SingleGram * merged_gram,
+                                        CandidateVector items) {
+    pinyin_option_t & options = context->m_options;
+    ssize_t i;
+
+    PhraseItem cached_item;
+    /* compute all freqs. */
+    for (i = 0; i < items->len; ++i) {
+        lookup_candidate_t * item = &g_array_index
+            (items, lookup_candidate_t, i);
+        phrase_token_t & token = item->m_token;
+
+        gfloat bigram_poss = 0; guint32 total_freq = 0;
+        if (options & DYNAMIC_ADJUST) {
+            if (null_token != prev_token) {
+                guint32 bigram_freq = 0;
+                merged_gram->get_total_freq(total_freq);
+                merged_gram->get_freq(token, bigram_freq);
+                if (0 != total_freq)
+                    bigram_poss = bigram_freq / (gfloat)total_freq;
+            }
+        }
+
+        /* compute the m_freq. */
+        FacadePhraseIndex * & phrase_index = context->m_phrase_index;
+        phrase_index->get_phrase_item(token, cached_item);
+        total_freq = phrase_index->get_phrase_index_total_freq();
+        assert (0 < total_freq);
+
+        /* Note: possibility value <= 1.0. */
+        guint32 freq = (LAMBDA_PARAMETER * bigram_poss +
+                        (1 - LAMBDA_PARAMETER) *
+                        cached_item.get_unigram_frequency() /
+                        (gfloat) total_freq) * 256 * 256 * 256;
+        item->m_freq = freq;
+    }
+}
+
 bool pinyin_get_candidates(pinyin_instance_t * instance,
                            size_t offset,
                            TokenVector candidates) {
@@ -613,49 +667,9 @@ bool pinyin_get_candidates(pinyin_instance_t * instance,
 
         g_array_sort(items, compare_item_with_token);
 
-        /* remove the duplicated items. */
-        phrase_token_t last_token = null_token;
-        for (size_t n = 0; n < items->len; ++n) {
-            lookup_candidate_t * item = &g_array_index
-                (items, lookup_candidate_t, n);
-            if (last_token == item->m_token) {
-                g_array_remove_index(items, n);
-                n--;
-            }
-            last_token = item->m_token;
-        }
+        _remove_duplicated_items(items);
 
-        PhraseItem cached_item;
-        /* compute all freqs. */
-        for (i = 0; i < items->len; ++i) {
-            lookup_candidate_t * item = &g_array_index
-                (items, lookup_candidate_t, i);
-            phrase_token_t & token = item->m_token;
-
-            gfloat bigram_poss = 0; guint32 total_freq = 0;
-            if (options & DYNAMIC_ADJUST) {
-                if (null_token != prev_token) {
-                    guint32 bigram_freq = 0;
-                    merged_gram.get_total_freq(total_freq);
-                    merged_gram.get_freq(token, bigram_freq);
-                    if (0 != total_freq)
-                        bigram_poss = bigram_freq / (gfloat)total_freq;
-                }
-            }
-
-            /* compute the m_freq. */
-            FacadePhraseIndex * & phrase_index = context->m_phrase_index;
-            phrase_index->get_phrase_item(token, cached_item);
-            total_freq = phrase_index->get_phrase_index_total_freq();
-            assert (0 < total_freq);
-
-            /* Note: possibility value <= 1.0. */
-            guint32 freq = (LAMBDA_PARAMETER * bigram_poss +
-                            (1 - LAMBDA_PARAMETER) *
-                            cached_item.get_unigram_frequency() /
-                            (gfloat) total_freq) * 256 * 256 * 256;
-            item->m_freq = freq;
-        }
+        _compute_frequency_of_items(context, prev_token, &merged_gram, items);
 
         /* sort the candidates of the same length by frequency. */
         g_array_sort(items, compare_item_with_frequency);
@@ -763,6 +777,8 @@ bool pinyin_get_full_pinyin_candidates(pinyin_instance_t * instance,
                  instance->m_raw_full_pinyin,
                  strlen(instance->m_raw_full_pinyin));
 
+            if (item) {
+
             ChewingKey divided_keys[2];
             assert(context->m_full_pinyin_parser->
                    parse_one_key(options, divided_keys[0], item->m_new_keys[0],
@@ -778,9 +794,10 @@ bool pinyin_get_full_pinyin_candidates(pinyin_instance_t * instance,
             if (options & USE_TONE) {
                 if (CHEWING_ZERO_TONE != tone) {
                     assert(0 < tone && tone <= 5);
+                    divided_keys[1].m_tone = tone;
+
                     gchar * tmp_str = g_strdup_printf
                         ("%s%d", new_pinyins, tone);
-                    divided_keys[1].m_tone = tone;
                     g_free(new_pinyins);
                     new_pinyins = tmp_str;
                 }
@@ -810,49 +827,10 @@ bool pinyin_get_full_pinyin_candidates(pinyin_instance_t * instance,
 
                 g_array_sort(items, compare_item_with_token);
 
-                /* remove the duplicated items. */
-                phrase_token_t last_token = null_token;
-                for (size_t n = 0; n < items->len; ++n) {
-                    lookup_candidate_t * item = &g_array_index
-                        (items, lookup_candidate_t, n);
-                    if (last_token == item->m_token) {
-                        g_array_remove_index(items, n);
-                        n--;
-                    }
-                    last_token = item->m_token;
-                }
+                _remove_duplicated_items(items);
 
-                PhraseItem cached_item;
-                /* compute all freqs. */
-                for (i = 0; i < items->len; ++i) {
-                    lookup_candidate_t * item = &g_array_index
-                        (items, lookup_candidate_t, i);
-                    phrase_token_t & token = item->m_token;
-
-                    gfloat bigram_poss = 0; guint32 total_freq = 0;
-                    if (options & DYNAMIC_ADJUST) {
-                        if (null_token != prev_token) {
-                            guint32 bigram_freq = 0;
-                            merged_gram.get_total_freq(total_freq);
-                            merged_gram.get_freq(token, bigram_freq);
-                            if (0 != total_freq)
-                                bigram_poss = bigram_freq / (gfloat)total_freq;
-                        }
-                    }
-
-                    /* compute the m_freq. */
-                    FacadePhraseIndex * & phrase_index = context->m_phrase_index;
-                    phrase_index->get_phrase_item(token, cached_item);
-                    total_freq = phrase_index->get_phrase_index_total_freq();
-                    assert (0 < total_freq);
-
-                    /* Note: possibility value <= 1.0. */
-                    guint32 freq = (LAMBDA_PARAMETER * bigram_poss +
-                                    (1 - LAMBDA_PARAMETER) *
-                                    cached_item.get_unigram_frequency() /
-                                    (gfloat) total_freq) * 256 * 256 * 256;
-                    item->m_freq = freq;
-                }
+                _compute_frequency_of_items(context, prev_token,
+                                            &merged_gram, items);
 
                 /* sort the candidates of the same length by frequency. */
                 g_array_sort(items, compare_item_with_frequency);
@@ -861,9 +839,10 @@ bool pinyin_get_full_pinyin_candidates(pinyin_instance_t * instance,
                 for (i = 0; i < items->len; ++i) {
                     lookup_candidate_t * item = &g_array_index
                         (items, lookup_candidate_t, i);
-                    g_array_append_val(candidates, item->m_token);
+                    g_array_append_val(candidates, *item);
                 }
 
+            }
             }
 
             /* restore tones */
