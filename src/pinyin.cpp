@@ -542,6 +542,36 @@ static phrase_token_t _get_previous_token(pinyin_instance_t * instance,
     return prev_token;
 }
 
+static void _append_items(pinyin_context_t * context,
+                          PhraseIndexRanges ranges,
+                          lookup_candidate_t * template_item,
+                          CandidateVector items) {
+    guint8 min_index, max_index;
+    assert( ERROR_OK == context->m_phrase_index->
+            get_sub_phrase_range(min_index, max_index));
+
+    /* reduce and append to a single GArray. */
+    for (size_t m = min_index; m <= max_index; ++m) {
+        if (NULL == ranges[m])
+            continue;
+
+        for (size_t n = 0; n < ranges[m]->len; ++n) {
+            PhraseIndexRange * range =
+                &g_array_index(ranges[m], PhraseIndexRange, n);
+            for (size_t k = range->m_range_begin;
+                 k < range->m_range_end; ++k) {
+                lookup_candidate_t item;
+                item.m_candidate_type = template_item->m_candidate_type;
+                item.m_token = k;
+                item.m_orig_rest = template_item->m_orig_rest;
+                item.m_new_pinyins = g_strdup(template_item->m_new_pinyins);
+                item.m_freq = template_item->m_freq;
+                g_array_append_val(items, item);
+            }
+        }
+    }
+}
+
 static void _remove_duplicated_items(CandidateVector items) {
     /* remove the duplicated items. */
     phrase_token_t last_token = null_token;
@@ -605,8 +635,6 @@ bool pinyin_get_candidates(pinyin_instance_t * instance,
     ChewingKeyVector & pinyin_keys = instance->m_pinyin_keys;
     g_array_set_size(candidates, 0);
 
-    ChewingKey * keys = &g_array_index
-        (pinyin_keys, ChewingKey, offset);
     size_t pinyin_len = pinyin_keys->len - offset;
     ssize_t i;
 
@@ -644,6 +672,9 @@ bool pinyin_get_candidates(pinyin_instance_t * instance,
     for (i = pinyin_len; i >= 1; --i) {
         g_array_set_size(items, 0);
 
+        ChewingKey * keys = &g_array_index
+            (pinyin_keys, ChewingKey, offset);
+
         /* do pinyin search. */
         int retval = context->m_pinyin_table->search
             (i, keys, ranges);
@@ -651,19 +682,8 @@ bool pinyin_get_candidates(pinyin_instance_t * instance,
         if ( !(retval & SEARCH_OK) )
             continue;
 
-        /* reduce and append to a single GArray. */
-        for (size_t m = min_index; m <= max_index; ++m) {
-            for (size_t n = 0; n < ranges[m]->len; ++n) {
-                PhraseIndexRange * range =
-                    &g_array_index(ranges[m], PhraseIndexRange, n);
-                for (size_t k = range->m_range_begin;
-                     k < range->m_range_end; ++k) {
-                    lookup_candidate_t item;
-                    item.m_token = k;
-                    g_array_append_val(items, item);
-                }
-            }
-        }
+        lookup_candidate_t template_item;
+        _append_items(context, ranges, &template_item, items);
 
         g_array_sort(items, compare_item_with_token);
 
@@ -808,21 +828,13 @@ bool pinyin_get_full_pinyin_candidates(pinyin_instance_t * instance,
                 (2, divided_keys, ranges);
 
             if (retval & SEARCH_OK) {
-                /* reduce and append to a single GArray. */
-                for (size_t m = min_index; m <= max_index; ++m) {
-                    for (size_t n = 0; n < ranges[m]->len; ++n) {
-                        PhraseIndexRange * range =
-                            &g_array_index(ranges[m], PhraseIndexRange, n);
-                        for (size_t k = range->m_range_begin;
-                             k < range->m_range_end; ++k) {
-                            lookup_candidate_t item;
-                            item.m_candidate_type = DIVIDED_CANDIDATE;
-                            item.m_token = k; item.m_orig_rest = orig_rest;
-                            item.m_new_pinyins = g_strdup(new_pinyins);
-                            g_array_append_val(items, item);
-                        }
-                    }
-                }
+                lookup_candidate_t template_item;
+                template_item.m_candidate_type = DIVIDED_CANDIDATE;
+                template_item.m_orig_rest = orig_rest;
+                template_item.m_new_pinyins = new_pinyins;
+
+                _append_items(context, ranges, &template_item, items);
+
                 g_free(new_pinyins);
 
                 g_array_sort(items, compare_item_with_token);
