@@ -765,15 +765,15 @@ bool pinyin_get_full_pinyin_candidates(pinyin_instance_t * instance,
     GArray * items = g_array_new(FALSE, FALSE, sizeof(lookup_candidate_t));
 
     if (pinyin_len == 1) {
+        /* because there is only one pinyin left,
+         *  the following for-loop will not produce 2 character candidates.
+         * the if-branch will fill the candidate list with
+         *  2 character candidates.
+         */
+
         if (options & USE_DIVIDED_TABLE) {
             g_array_set_size(items, 0);
             /* handle "^xian$" -> "xi'an" here */
-
-            /* because there is only one pinyin left,
-             *  the following for-loop will not produce 2 character candidates.
-             * the if-branch will fill the candidate list with
-             *  2 character candidates.
-             */
 
             ChewingKey * key = &g_array_index(pinyin_keys, ChewingKey, offset);
             ChewingKeyRest * rest = &g_array_index(pinyin_key_rests,
@@ -880,6 +880,35 @@ bool pinyin_get_full_pinyin_candidates(pinyin_instance_t * instance,
             }
         }
 
+        ChewingKey * keys = &g_array_index
+            (pinyin_keys, ChewingKey, offset);
+
+        /* do pinyin search. */
+        int retval = context->m_pinyin_table->search
+            (i, keys, ranges);
+
+        if ( !(retval & SEARCH_OK) )
+            continue;
+
+        lookup_candidate_t template_item;
+        _append_items(context, ranges, &template_item, items);
+
+        g_array_sort(items, compare_item_with_token);
+
+        _remove_duplicated_items(items);
+
+        _compute_frequency_of_items(context, prev_token, &merged_gram, items);
+
+        g_array_sort(items, compare_item_with_frequency);
+
+        for (i = 0; i < items->len; ++i) {
+            lookup_candidate_t * item = &g_array_index
+                (items, lookup_candidate_t, i);
+            g_array_append_val(candidates, *item);
+        }
+
+        if (!(retval & SEARCH_CONTINUED))
+            break;
     }
 
     g_array_free(items, TRUE);
