@@ -574,17 +574,8 @@ bool FullPinyinParser2::post_process2(pinyin_option_t options,
 }
 
 const divided_table_item_t * FullPinyinParser2::retrieve_divided_item
-(pinyin_option_t options, size_t offset,
- ChewingKeyVector & keys, ChewingKeyRestVector & key_rests,
+(pinyin_option_t options, ChewingKey * key, ChewingKeyRest * rest,
  const char * str, int len) const {
-    assert(keys->len == key_rests->len);
-
-    gint num_keys = keys->len;
-    assert(offset < num_keys);
-
-    ChewingKey * key = &g_array_index(keys, ChewingKey, offset);
-    ChewingKeyRest * rest = &g_array_index(key_rests,
-                                           ChewingKeyRest, offset);
     guint16 tone = CHEWING_ZERO_TONE;
 
     /* lookup divided table */

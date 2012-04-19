@@ -731,6 +731,10 @@ static bool _try_divided_table(pinyin_instance_t * instance,
     ChewingKeyVector & pinyin_keys = instance->m_pinyin_keys;
     ChewingKeyRestVector & pinyin_key_rests = instance->m_pinyin_key_rests;
 
+    assert(pinyin_keys->len == pinyin_key_rests->len);
+    gint num_keys = pinyin_keys->len;
+    assert(offset < num_keys);
+
     /* handle "^xian$" -> "xi'an" here */
     ChewingKey * key = &g_array_index(pinyin_keys, ChewingKey, offset);
     ChewingKeyRest * rest = &g_array_index(pinyin_key_rests,
@@ -750,8 +754,7 @@ static bool _try_divided_table(pinyin_instance_t * instance,
     }
 
     item = context->m_full_pinyin_parser->retrieve_divided_item
-        (options, offset, pinyin_keys, pinyin_key_rests,
-         instance->m_raw_full_pinyin,
+        (options, key, rest, instance->m_raw_full_pinyin,
          strlen(instance->m_raw_full_pinyin));
 
     if (item) {

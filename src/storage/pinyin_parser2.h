@@ -153,8 +153,7 @@ protected:
 
 public:
     const divided_table_item_t * retrieve_divided_item
-    (pinyin_option_t options, size_t offset,
-     ChewingKeyVector & keys, ChewingKeyRestVector & key_rests,
+    (pinyin_option_t options, ChewingKey * key, ChewingKeyRest * rest,
      const char * str, int len) const;
 public:
     FullPinyinParser2();
