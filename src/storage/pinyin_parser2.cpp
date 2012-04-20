@@ -576,7 +576,6 @@ bool FullPinyinParser2::post_process2(pinyin_option_t options,
 const divided_table_item_t * FullPinyinParser2::retrieve_divided_item
 (pinyin_option_t options, ChewingKey * key, ChewingKeyRest * rest,
  const char * str, int len) const {
-    guint16 tone = CHEWING_ZERO_TONE;
 
     /* lookup divided table */
     size_t k;

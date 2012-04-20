@@ -494,7 +494,7 @@ bool pinyin_in_chewing_keyboard(pinyin_instance_t * instance,
 
 
 static gint compare_item_with_token(gconstpointer lhs,
-                                                gconstpointer rhs) {
+                                    gconstpointer rhs) {
     lookup_candidate_t * item_lhs = (lookup_candidate_t *)lhs;
     lookup_candidate_t * item_rhs = (lookup_candidate_t *)rhs;
 
@@ -505,7 +505,7 @@ static gint compare_item_with_token(gconstpointer lhs,
 }
 
 static gint compare_item_with_frequency(gconstpointer lhs,
-                                                    gconstpointer rhs) {
+                                        gconstpointer rhs) {
     lookup_candidate_t * item_lhs = (lookup_candidate_t *)lhs;
     lookup_candidate_t * item_rhs = (lookup_candidate_t *)rhs;
 
@@ -886,12 +886,13 @@ bool pinyin_get_full_pinyin_candidates(pinyin_instance_t * instance,
     }
 
     for (i = pinyin_len; i >= 1; --i) {
+        bool found = false;
         g_array_set_size(items, 0);
 
         if (2 == i) {
             /* handle fuzzy pinyin segment here. */
             if (options & USE_DIVIDED_TABLE) {
-                _try_divided_table(instance, ranges, offset, items);
+                found = _try_divided_table(instance, ranges, offset, items);
             }
             if (options & USE_RESPLIT_TABLE) {
                 assert(FALSE);
@@ -905,7 +906,9 @@ bool pinyin_get_full_pinyin_candidates(pinyin_instance_t * instance,
         int retval = context->m_pinyin_table->search
             (i, keys, ranges);
 
-        if ( !(retval & SEARCH_OK) )
+        found = (retval & SEARCH_OK) || found;
+
+        if ( !found )
             continue;
 
         lookup_candidate_t template_item;
