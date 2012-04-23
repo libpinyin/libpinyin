@@ -273,7 +273,7 @@ void pinyin_fini(pinyin_context_t * context){
     delete context;
 }
 
-/* copy from custom to context->m_custom. */
+/* copy from options to context->m_options. */
 bool pinyin_set_options(pinyin_context_t * context,
                         pinyin_option_t options){
     context->m_options = options;
