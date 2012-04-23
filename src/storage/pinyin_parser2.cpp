@@ -517,37 +517,17 @@ bool FullPinyinParser2::post_process2(pinyin_option_t options,
         /* lookup re-split table */
         size_t k;
         const resplit_table_item_t * item = NULL;
-        for (k = 0; k < G_N_ELEMENTS(resplit_table); ++k) {
-            item = resplit_table + k;
 
+        item = retrieve_resplit_item_by_original_pinyins
+            (options, cur_key, cur_rest, next_key, next_rest,
+             str, len);
+
+        if (item) {
             /* no ops */
             if (item->m_orig_freq >= item->m_new_freq)
                 continue;
 
-            const char * onepinyin = str + cur_rest->m_raw_begin;
-            size_t len = strlen(item->m_orig_keys[0]);
-
-            if (cur_rest->length() != len)
-                continue;
-
-            if (0 != strncmp(onepinyin, item->m_orig_keys[0], len))
-                continue;
-
-            onepinyin = str + next_rest->m_raw_begin;
-            len = strlen(item->m_orig_keys[1]);
-
-            if (next_rest->length() != len)
-                continue;
-
-            if (0 == strncmp(onepinyin, item->m_orig_keys[1], len))
-                break;
-        }
-
-        /* found the match */
-        if (k < G_N_ELEMENTS(resplit_table)) {
             /* do re-split */
-            item = resplit_table + k;
-
             const char * onepinyin = str + cur_rest->m_raw_begin;
             size_t len = strlen(item->m_new_keys[0]);
 
@@ -583,9 +563,6 @@ const divided_table_item_t * FullPinyinParser2::retrieve_divided_item
     for (k = 0; k < G_N_ELEMENTS(divided_table); ++k) {
         item = divided_table + k;
 
-        /* no ops */
-        assert(item->m_new_freq > 0);
-
         const char * onepinyin = str + rest->m_raw_begin;
         size_t len = strlen(item->m_orig_key);
 
@@ -600,6 +577,87 @@ const divided_table_item_t * FullPinyinParser2::retrieve_divided_item
     if (k < G_N_ELEMENTS(divided_table)) {
         /* do divided */
         item = divided_table + k;
+        return item;
+    }
+
+    return NULL;
+}
+
+
+const resplit_table_item_t * FullPinyinParser2::retrieve_resplit_item_by_original_pinyins
+(pinyin_option_t options,
+ ChewingKey * cur_key, ChewingKeyRest * cur_rest,
+ ChewingKey * next_key, ChewingKeyRest * next_rest,
+ const char * str, int len) const{
+    /* lookup re-split table */
+    size_t k;
+    const resplit_table_item_t * item = NULL;
+
+    for (k = 0; k < G_N_ELEMENTS(resplit_table); ++k) {
+        item = resplit_table + k;
+
+        const char * onepinyin = str + cur_rest->m_raw_begin;
+        size_t len = strlen(item->m_orig_keys[0]);
+
+        if (cur_rest->length() != len)
+            continue;
+
+        if (0 != strncmp(onepinyin, item->m_orig_keys[0], len))
+            continue;
+
+        onepinyin = str + next_rest->m_raw_begin;
+        len = strlen(item->m_orig_keys[1]);
+
+        if (next_rest->length() != len)
+            continue;
+
+        if (0 == strncmp(onepinyin, item->m_orig_keys[1], len))
+            break;
+    }
+
+    /* found the match */
+    if (k < G_N_ELEMENTS(resplit_table)) {
+        item = resplit_table + k;
+        return item;
+    }
+
+    return NULL;
+}
+
+const resplit_table_item_t * FullPinyinParser2::retrieve_resplit_item_by_resplit_pinyins
+(pinyin_option_t options,
+ ChewingKey * cur_key, ChewingKeyRest * cur_rest,
+ ChewingKey * next_key, ChewingKeyRest * next_rest,
+ const char * str, int len) const {
+    /* lookup divide table */
+    size_t k;
+    const resplit_table_item_t * item = NULL;
+
+    for (k = 0; k < G_N_ELEMENTS(resplit_table); ++k) {
+        item = resplit_table + k;
+
+        const char * onepinyin = str + cur_rest->m_raw_begin;
+        size_t len = strlen(item->m_orig_keys[0]);
+
+        if (cur_rest->length() != len)
+            continue;
+
+        if (0 != strncmp(onepinyin, item->m_orig_keys[0], len))
+            continue;
+
+        onepinyin = str + next_rest->m_raw_begin;
+        len = strlen(item->m_orig_keys[1]);
+
+        if (next_rest->length() != len)
+            continue;
+
+        if (0 == strncmp(onepinyin, item->m_orig_keys[1], len))
+            break;
+    }
+
+    /* found the match */
+    if (k < G_N_ELEMENTS(resplit_table)) {
+        item = resplit_table + k;
         return item;
     }
 

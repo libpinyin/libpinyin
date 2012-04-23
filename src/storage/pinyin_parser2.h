@@ -155,6 +155,18 @@ public:
     const divided_table_item_t * retrieve_divided_item
     (pinyin_option_t options, ChewingKey * key, ChewingKeyRest * rest,
      const char * str, int len) const;
+
+    const resplit_table_item_t * retrieve_resplit_item_by_original_pinyins
+    (pinyin_option_t options,
+     ChewingKey * cur_key, ChewingKeyRest * cur_rest,
+     ChewingKey * next_key, ChewingKeyRest * next_rest,
+     const char * str, int len) const;
+    const resplit_table_item_t * retrieve_resplit_item_by_resplit_pinyins
+    (pinyin_option_t options,
+     ChewingKey * cur_key, ChewingKeyRest * cur_rest,
+     ChewingKey * next_key, ChewingKeyRest * next_rest,
+     const char * str, int len) const;
+
 public:
     FullPinyinParser2();
     virtual ~FullPinyinParser2() {

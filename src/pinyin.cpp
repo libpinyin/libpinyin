@@ -758,6 +758,9 @@ static bool _try_divided_table(pinyin_instance_t * instance,
          strlen(instance->m_raw_full_pinyin));
 
     if (item) {
+        /* no ops */
+        assert(item->m_new_freq > 0);
+
         ChewingKey divided_keys[2];
         assert(context->m_full_pinyin_parser->
                parse_one_key(options, divided_keys[0], item->m_new_keys[0],
