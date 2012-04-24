@@ -875,21 +875,42 @@ static bool _try_resplit_table(pinyin_instance_t * instance,
 
     /* there are no same couple of pinyins in re-split table. */
     assert(!(item_by_orig && item_by_new));
-    ChewingKey resplit_keys[2];
 
+    ChewingKey resplit_keys[2];
+    const char * pinyins[2];
+
+    bool tosearch = false;
     if (item_by_orig && item_by_orig->m_new_freq) {
-        const char * pinyin = item_by_orig->m_new_keys[0];
+        pinyins[0] = item_by_orig->m_new_keys[0];
+        pinyins[1] = item_by_orig->m_new_keys[1];
+
         assert(context->m_full_pinyin_parser->
                parse_one_key(options, resplit_keys[0],
-                             pinyin, strlen(pinyin)));
-        pinyin = item_by_orig->m_new_keys[1];
+                             pinyins[0], strlen(pinyins[0])));
+
         assert(context->m_full_pinyin_parser->
                parse_one_key(options, resplit_keys[1],
-                             pinyin, strlen(pinyin)));
+                             pinyins[1], strlen(pinyins[1])));
+        tosearch = true;
+    }
 
+    if (item_by_new && item_by_new->m_orig_freq) {
+        pinyins[0] = item_by_new->m_orig_keys[0];
+        pinyins[1] = item_by_new->m_orig_keys[1];
+
+        assert(context->m_full_pinyin_parser->
+               parse_one_key(options, resplit_keys[0],
+                             pinyins[0], strlen(pinyins[0])));
+
+        assert(context->m_full_pinyin_parser->
+               parse_one_key(options, resplit_keys[1],
+                             pinyins[1], strlen(pinyins[1])));
+        tosearch = true;
+    }
+
+    if (tosearch) {
         gchar * new_pinyins = g_strdup_printf
-            ("%s'%s", item_by_orig->m_new_keys[0],
-             item_by_orig->m_new_keys[1]);
+            ("%s'%s", pinyins[0], pinyins[1]);
 
         /* propagate the tone */
         if (options & USE_TONE) {
@@ -905,49 +926,6 @@ static bool _try_resplit_table(pinyin_instance_t * instance,
         }
 
         /* do pinyin search. */
-        int retval = context->m_pinyin_table->search
-            (2, resplit_keys, ranges);
-
-        if (retval & SEARCH_OK) {
-            lookup_candidate_t template_item;
-            template_item.m_candidate_type = RESPLIT_CANDIDATE;
-            template_item.m_orig_rest = orig_rest;
-            template_item.m_new_pinyins = new_pinyins;
-
-            _append_items(context, ranges, &template_item, items);
-            found = true;
-        }
-        g_free(new_pinyins);
-    }
-
-    if (item_by_new && item_by_new->m_orig_freq) {
-        const char * pinyin = item_by_new->m_orig_keys[0];
-        assert(context->m_full_pinyin_parser->
-               parse_one_key(options, resplit_keys[0],
-                             pinyin, strlen(pinyin)));
-        pinyin = item_by_new->m_orig_keys[1];
-        assert(context->m_full_pinyin_parser->
-               parse_one_key(options, resplit_keys[1],
-                             pinyin, strlen(pinyin)));
-
-        gchar * new_pinyins = g_strdup_printf
-            ("%s'%s", item_by_new->m_orig_keys[0],
-             item_by_new->m_orig_keys[1]);
-
-        /* propagate the tone */
-        if (options & USE_TONE) {
-            if (CHEWING_ZERO_TONE != next_tone) {
-                assert(0 < next_tone && next_tone <= 5);
-                resplit_keys[1].m_tone = next_tone;
-
-                gchar * tmp_str = g_strdup_printf
-                    ("%s%d", new_pinyins, next_tone);
-                g_free(new_pinyins);
-                new_pinyins = tmp_str;
-            }
-        }
-
-        /* do pinyin search */
         int retval = context->m_pinyin_table->search
             (2, resplit_keys, ranges);
 
