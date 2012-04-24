@@ -27,17 +27,15 @@
 /* n-gram based sentence segment. */
 
 /* Note:
- * Currently libpinyin only supports ucs4 characters, as this is a
- * pre-processor tool for raw corpus, it will skip all sentences
- * which contains non-ucs4 characters.
+ * Currently libpinyin supports ucs4 characters.
+ * This is a pre-processor tool for raw corpus,
+ * and skips non-Chinese characters.
  */
 
 /* TODO:
  * Try to add punctuation mark and english support,
  * such as ',', '.', '?', '!', <english>, and other punctuations.
  */
-
-PhraseLookup * g_phrase_lookup = NULL;
 
 enum CONTEXT_STATE{
     CONTEXT_INIT,
@@ -49,20 +47,15 @@ void print_help(){
     printf("Usage: ngseg [--generate-extra-enter]\n");
 }
 
-bool deal_with_segmentable(GArray * current_ucs4){
+bool deal_with_segmentable(PhraseLookup * phrase_lookup,
+                           GArray * current_ucs4){
     char * result_string = NULL;
     MatchResults results = g_array_new(FALSE, FALSE, sizeof(phrase_token_t));
-    g_phrase_lookup->get_best_match(current_ucs4->len, (ucs4_t *) current_ucs4->data, results);
-#if 0
-    for ( size_t i = 0; i < results->len; ++i) {
-        phrase_token_t * token = &g_array_index(results, phrase_token_t, i);
-        if ( *token == null_token )
-            continue;
-        printf("%d:%d\t", i, *token);
-    }
-    printf("\n");
-#endif
-    g_phrase_lookup->convert_to_utf8(results, "\n", result_string);
+    phrase_lookup->get_best_match(current_ucs4->len,
+                                  (ucs4_t *) current_ucs4->data, results);
+
+    phrase_lookup->convert_to_utf8(results, "\n", result_string);
+
     if (result_string) {
         printf("%s\n", result_string);
     } else {
@@ -94,7 +87,7 @@ int main(int argc, char * argv[]){
     bool gen_extra_enter = false;
 
     setlocale(LC_ALL, "");
-    //deal with options.
+    /* deal with options */
     while ( i < argc ){
         if ( strcmp ("--help", argv[i]) == 0 ){
             print_help();
@@ -108,13 +101,13 @@ int main(int argc, char * argv[]){
         ++i;
     }
 
-    //init phrase table
+    /* init phrase table */
     FacadePhraseTable phrase_table;
     MemoryChunk * chunk = new MemoryChunk;
     chunk->load("phrase_index.bin");
     phrase_table.load(chunk, NULL);
 
-    //init phrase index
+    /* init phrase index */
     FacadePhraseIndex phrase_index;
     chunk = new MemoryChunk;
     chunk->load("gb_char.bin");
@@ -123,30 +116,28 @@ int main(int argc, char * argv[]){
     chunk->load("gbk_char.bin");
     phrase_index.load(2, chunk);
 
-    //init bi-gram
+    /* init bi-gram */
     Bigram system_bigram;
     system_bigram.attach("bigram.db", ATTACH_READONLY);
     Bigram user_bigram;
 
-    //init phrase lookup
-    g_phrase_lookup = new PhraseLookup(&phrase_table, &phrase_index,
-                                       &system_bigram, &user_bigram);
+    /* init phrase lookup */
+    PhraseLookup phrase_lookup(&phrase_table, &phrase_index,
+                               &system_bigram, &user_bigram);
 
 
     CONTEXT_STATE state, next_state;
     GArray * current_ucs4 = g_array_new(TRUE, TRUE, sizeof(ucs4_t));
     phrase_token_t token = null_token;
 
-    //split the sentence
-    char * linebuf = NULL;
-    size_t size = 0;
-    ssize_t read;
+    /* split the sentence */
+    char * linebuf = NULL; size_t size = 0; ssize_t read;
     while( (read = getline(&linebuf, &size, stdin)) != -1 ){
         if ( '\n' ==  linebuf[strlen(linebuf) - 1] ) {
             linebuf[strlen(linebuf) - 1] = '\0';
         }
 
-        //check non-ucs4 characters
+        /* check non-ucs4 characters */
         const glong num_of_chars = g_utf8_strlen(linebuf, -1);
         glong len = 0;
         ucs4_t * sentence = g_utf8_to_ucs4(linebuf, -1, NULL, &len, NULL);
@@ -184,7 +175,7 @@ int main(int argc, char * argv[]){
 
             assert ( state != next_state );
             if ( state == CONTEXT_SEGMENTABLE )
-                deal_with_segmentable(current_ucs4);
+                deal_with_segmentable(&phrase_lookup, current_ucs4);
 
             if ( state == CONTEXT_UNKNOWN )
                 deal_with_unknown(current_ucs4);
@@ -198,7 +189,7 @@ int main(int argc, char * argv[]){
         if ( current_ucs4->len ) {
             /* this seems always true. */
             if ( state == CONTEXT_SEGMENTABLE )
-                deal_with_segmentable(current_ucs4);
+                deal_with_segmentable(&phrase_lookup, current_ucs4);
 
             if ( state == CONTEXT_UNKNOWN )
                 deal_with_unknown(current_ucs4);
@@ -210,8 +201,6 @@ int main(int argc, char * argv[]){
             printf("\n");
     }
 
-    delete g_phrase_lookup;
-    g_phrase_lookup = NULL;
     /* print enter at file tail */
     printf("\n");
     g_array_free(current_ucs4, TRUE);
