@@ -299,51 +299,6 @@ int FullPinyinParser2::parse (pinyin_option_t options, ChewingKeyVector & keys,
             next_sep = k;
         }
 
-#if 0
-        /* Heuristic Method:
-         *   do maximum forward match first. */
-        for (size_t pos = i; pos < next_sep; ++pos) {
-            curstep = &g_array_index(m_parse_steps, parse_value_t, pos);
-            size_t try_len = std_lite::min
-                (pos + max_full_pinyin_length, next_sep);
-            for (size_t n = try_len; n > pos; --n) {
-                nextstep = &g_array_index(m_parse_steps, parse_value_t, n);
-
-                /* gen next step */
-                const char * onepinyin = input + pos;
-                gint16 onepinyinlen = n - pos;
-                value = parse_value_t();
-
-                ChewingKey key; ChewingKeyRest rest;
-                bool parsed = parse_one_key
-                    (options, key, onepinyin, onepinyinlen);
-                rest.m_raw_begin = pos; rest.m_raw_end = n;
-
-                if (!parsed)
-                    continue;
-
-                //printf("onepinyin:%s len:%d\n", onepinyin, onepinyinlen);
-                value.m_key = key; value.m_key_rest = rest;
-                value.m_num_keys = curstep->m_num_keys + 1;
-                value.m_parsed_len = curstep->m_parsed_len + onepinyinlen;
-                value.m_last_step = pos;
-
-                /* save next step */
-                if (-1 == nextstep->m_last_step)
-                    *nextstep = value;
-                if (value.m_parsed_len > nextstep->m_parsed_len)
-                    *nextstep = value;
-                if (value.m_parsed_len == nextstep->m_parsed_len &&
-                    value.m_num_keys < nextstep->m_num_keys)
-                    *nextstep = value;
-
-                /* maximum forward, set pos to n in next iteration. */
-                pos = n - 1;
-                break;
-            }
-        }
-#endif
-
         /* dynamic programming here. */
         /* for (size_t m = i; m < next_sep; ++m) */
         {
