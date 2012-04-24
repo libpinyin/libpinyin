@@ -762,12 +762,14 @@ static bool _try_divided_table(pinyin_instance_t * instance,
         assert(item->m_new_freq > 0);
 
         ChewingKey divided_keys[2];
+        const char * pinyin = item->m_new_keys[0];
         assert(context->m_full_pinyin_parser->
-               parse_one_key(options, divided_keys[0], item->m_new_keys[0],
-                             strlen(item->m_new_keys[0])));
+               parse_one_key(options, divided_keys[0],
+                             pinyin, strlen(pinyin)));
+        pinyin = item->m_new_keys[1];
         assert(context->m_full_pinyin_parser->
-               parse_one_key(options, divided_keys[1], item->m_new_keys[1],
-                             strlen(item->m_new_keys[1])));
+               parse_one_key(options, divided_keys[1],
+                             pinyin, strlen(pinyin)));
 
         gchar * new_pinyins = g_strdup_printf
             ("%s'%s", item->m_new_keys[0], item->m_new_keys[1]);
@@ -812,6 +814,165 @@ static bool _try_divided_table(pinyin_instance_t * instance,
     return found;
 }
 
+static bool _try_resplit_table(pinyin_instance_t * instance,
+                               PhraseIndexRanges ranges,
+                               size_t offset,
+                               CandidateVector items){
+    bool found = false;
+
+    pinyin_context_t * & context = instance->m_context;
+    pinyin_option_t & options = context->m_options;
+    ChewingKeyVector & pinyin_keys = instance->m_pinyin_keys;
+    ChewingKeyRestVector & pinyin_key_rests = instance->m_pinyin_key_rests;
+
+    assert(pinyin_keys->len == pinyin_key_rests->len);
+    gint num_keys = pinyin_keys->len;
+    assert(offset + 1 < num_keys);
+
+    guint16 next_tone = CHEWING_ZERO_TONE;
+
+    /* handle "^fa'nan$" -> "fan'an" here */
+    ChewingKeyRest * cur_rest = &g_array_index(pinyin_key_rests,
+                                               ChewingKeyRest, offset);
+    ChewingKeyRest * next_rest = &g_array_index(pinyin_key_rests,
+                                                ChewingKeyRest, offset + 1);
+    /* some "'" here */
+    if (cur_rest->m_raw_end != next_rest->m_raw_begin)
+        return found;
+
+    ChewingKey * cur_key = &g_array_index(pinyin_keys, ChewingKey, offset);
+    ChewingKey * next_key = &g_array_index(pinyin_keys, ChewingKey,
+                                           offset + 1);
+
+    /* some tone here */
+    if (CHEWING_ZERO_TONE != cur_key->m_tone)
+        return found;
+
+    ChewingKeyRest orig_rest;
+    orig_rest.m_raw_begin = cur_rest->m_raw_begin;
+    orig_rest.m_raw_end = next_rest->m_raw_end;
+
+    /* backup tone */
+    if (options & USE_TONE) {
+        next_tone = next_key->m_tone;
+        if (CHEWING_ZERO_TONE != next_tone) {
+            next_key->m_tone = CHEWING_ZERO_TONE;
+            next_rest->m_raw_end --;
+        }
+    }
+
+    /* lookup re-split table */
+    const char * str = instance->m_raw_full_pinyin;
+    const resplit_table_item_t * item_by_orig =
+        context->m_full_pinyin_parser->
+        retrieve_resplit_item_by_original_pinyins
+        (options, cur_key, cur_rest, next_key, next_rest, str, strlen(str));
+
+    const resplit_table_item_t * item_by_new =
+        context->m_full_pinyin_parser->
+        retrieve_resplit_item_by_resplit_pinyins
+        (options, cur_key, cur_rest, next_key, next_rest, str, strlen(str));
+
+    /* there are no same couple of pinyins in re-split table. */
+    assert(!(item_by_orig && item_by_new));
+    ChewingKey resplit_keys[2];
+
+    if (item_by_orig && item_by_orig->m_new_freq) {
+        const char * pinyin = item_by_orig->m_new_keys[0];
+        assert(context->m_full_pinyin_parser->
+               parse_one_key(options, resplit_keys[0],
+                             pinyin, strlen(pinyin)));
+        pinyin = item_by_orig->m_new_keys[1];
+        assert(context->m_full_pinyin_parser->
+               parse_one_key(options, resplit_keys[1],
+                             pinyin, strlen(pinyin)));
+
+        gchar * new_pinyins = g_strdup_printf
+            ("%s'%s", item_by_orig->m_new_keys[0],
+             item_by_orig->m_new_keys[1]);
+
+        /* propagate the tone */
+        if (options & USE_TONE) {
+            if (CHEWING_ZERO_TONE != next_tone) {
+                assert(0 < next_tone && next_tone <= 5);
+                resplit_keys[1].m_tone = next_tone;
+
+                gchar * tmp_str = g_strdup_printf
+                    ("%s%d", new_pinyins, next_tone);
+                g_free(new_pinyins);
+                new_pinyins = tmp_str;
+            }
+        }
+
+        /* do pinyin search. */
+        int retval = context->m_pinyin_table->search
+            (2, resplit_keys, ranges);
+
+        if (retval & SEARCH_OK) {
+            lookup_candidate_t template_item;
+            template_item.m_candidate_type = RESPLIT_CANDIDATE;
+            template_item.m_orig_rest = orig_rest;
+            template_item.m_new_pinyins = new_pinyins;
+
+            _append_items(context, ranges, &template_item, items);
+            found = true;
+        }
+        g_free(new_pinyins);
+    }
+
+    if (item_by_new && item_by_new->m_orig_freq) {
+        const char * pinyin = item_by_new->m_orig_keys[0];
+        assert(context->m_full_pinyin_parser->
+               parse_one_key(options, resplit_keys[0],
+                             pinyin, strlen(pinyin)));
+        pinyin = item_by_new->m_orig_keys[1];
+        assert(context->m_full_pinyin_parser->
+               parse_one_key(options, resplit_keys[1],
+                             pinyin, strlen(pinyin)));
+
+        gchar * new_pinyins = g_strdup_printf
+            ("%s'%s", item_by_new->m_orig_keys[0],
+             item_by_new->m_orig_keys[1]);
+
+        /* propagate the tone */
+        if (options & USE_TONE) {
+            if (CHEWING_ZERO_TONE != next_tone) {
+                assert(0 < next_tone && next_tone <= 5);
+                resplit_keys[1].m_tone = next_tone;
+
+                gchar * tmp_str = g_strdup_printf
+                    ("%s%d", new_pinyins, next_tone);
+                g_free(new_pinyins);
+                new_pinyins = tmp_str;
+            }
+        }
+
+        /* do pinyin search */
+        int retval = context->m_pinyin_table->search
+            (2, resplit_keys, ranges);
+
+        if (retval & SEARCH_OK) {
+            lookup_candidate_t template_item;
+            template_item.m_candidate_type = RESPLIT_CANDIDATE;
+            template_item.m_orig_rest = orig_rest;
+            template_item.m_new_pinyins = new_pinyins;
+
+            _append_items(context, ranges, &template_item, items);
+            found = true;
+        }
+        g_free(new_pinyins);
+    }
+
+    /* restore tones */
+    if (options & USE_TONE) {
+        if (CHEWING_ZERO_TONE != next_tone) {
+            next_key->m_tone = next_tone;
+            next_rest->m_raw_end ++;
+        }
+    }
+
+    return found;
+}
 
 bool pinyin_get_full_pinyin_candidates(pinyin_instance_t * instance,
                                        size_t offset,
@@ -898,7 +1059,7 @@ bool pinyin_get_full_pinyin_candidates(pinyin_instance_t * instance,
                 found = _try_divided_table(instance, ranges, offset, items);
             }
             if (options & USE_RESPLIT_TABLE) {
-                assert(FALSE);
+                found = _try_resplit_table(instance, ranges, offset, items);
             }
         }
 

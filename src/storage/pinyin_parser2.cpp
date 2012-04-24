@@ -470,12 +470,10 @@ bool FullPinyinParser2::post_process2(pinyin_option_t options,
         }
 
         /* lookup re-split table */
-        size_t k;
         const resplit_table_item_t * item = NULL;
 
         item = retrieve_resplit_item_by_original_pinyins
-            (options, cur_key, cur_rest, next_key, next_rest,
-             str, len);
+            (options, cur_key, cur_rest, next_key, next_rest, str, len);
 
         if (item) {
             /* no ops */
