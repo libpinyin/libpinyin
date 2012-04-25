@@ -574,15 +574,17 @@ static void _append_items(pinyin_context_t * context,
 
 static void _remove_duplicated_items(CandidateVector items) {
     /* remove the duplicated items. */
-    phrase_token_t last_token = null_token;
+    phrase_token_t last_token = null_token, saved_token;
     for (size_t n = 0; n < items->len; ++n) {
         lookup_candidate_t * item = &g_array_index
             (items, lookup_candidate_t, n);
-        if (last_token == item->m_token) {
+
+        saved_token = item->m_token;
+        if (last_token == saved_token) {
             g_array_remove_index(items, n);
             n--;
         }
-        last_token = item->m_token;
+        last_token = saved_token;
     }
 }
 
@@ -1045,7 +1047,8 @@ bool pinyin_get_full_pinyin_candidates(pinyin_instance_t * instance,
                 found = _try_divided_table(instance, ranges, offset, items);
             }
             if (options & USE_RESPLIT_TABLE) {
-                found = _try_resplit_table(instance, ranges, offset, items);
+                found = _try_resplit_table(instance, ranges, offset, items) ||
+                    found;
             }
         }
 
