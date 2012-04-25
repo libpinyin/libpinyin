@@ -1044,7 +1044,8 @@ bool pinyin_get_full_pinyin_candidates(pinyin_instance_t * instance,
         if (2 == i) {
             /* handle fuzzy pinyin segment here. */
             if (options & USE_DIVIDED_TABLE) {
-                found = _try_divided_table(instance, ranges, offset, items);
+                found = _try_divided_table(instance, ranges, offset, items) ||
+                    found;
             }
             if (options & USE_RESPLIT_TABLE) {
                 found = _try_resplit_table(instance, ranges, offset, items) ||
