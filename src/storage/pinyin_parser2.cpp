@@ -590,21 +590,21 @@ const resplit_table_item_t * FullPinyinParser2::retrieve_resplit_item_by_resplit
         item = resplit_table + k;
 
         const char * onepinyin = str + cur_rest->m_raw_begin;
-        size_t len = strlen(item->m_orig_keys[0]);
+        size_t len = strlen(item->m_new_keys[0]);
 
         if (cur_rest->length() != len)
             continue;
 
-        if (0 != strncmp(onepinyin, item->m_orig_keys[0], len))
+        if (0 != strncmp(onepinyin, item->m_new_keys[0], len))
             continue;
 
         onepinyin = str + next_rest->m_raw_begin;
-        len = strlen(item->m_orig_keys[1]);
+        len = strlen(item->m_new_keys[1]);
 
         if (next_rest->length() != len)
             continue;
 
-        if (0 == strncmp(onepinyin, item->m_orig_keys[1], len))
+        if (0 == strncmp(onepinyin, item->m_new_keys[1], len))
             break;
     }
 

@@ -959,9 +959,17 @@ bool pinyin_get_full_pinyin_candidates(pinyin_instance_t * instance,
     pinyin_context_t * & context = instance->m_context;
     pinyin_option_t & options = context->m_options;
     ChewingKeyVector & pinyin_keys = instance->m_pinyin_keys;
+
+    /* free memory */
+    for (size_t i = 0; i < candidates->len; ++i) {
+        lookup_candidate_t * candidate = &g_array_index
+            (candidates, lookup_candidate_t, i);
+        g_free(candidate->m_new_pinyins);
+    }
     g_array_set_size(candidates, 0);
 
     size_t pinyin_len = pinyin_keys->len - offset;
+    pinyin_len = std_lite::min((size_t)MAX_PHRASE_LENGTH, pinyin_len);
     ssize_t i;
 
     /* lookup the previous token here. */
@@ -995,7 +1003,7 @@ bool pinyin_get_full_pinyin_candidates(pinyin_instance_t * instance,
 
     GArray * items = g_array_new(FALSE, FALSE, sizeof(lookup_candidate_t));
 
-    if (pinyin_len == 1) {
+    if (1 == pinyin_len) {
         /* because there is only one pinyin left,
          *  the following for-loop will not produce 2 character candidates.
          * the if-branch will fill the candidate list with
@@ -1064,9 +1072,9 @@ bool pinyin_get_full_pinyin_candidates(pinyin_instance_t * instance,
 
         g_array_sort(items, compare_item_with_frequency);
 
-        for (i = 0; i < items->len; ++i) {
+        for (size_t k = 0; k < items->len; ++k) {
             lookup_candidate_t * item = &g_array_index
-                (items, lookup_candidate_t, i);
+                (items, lookup_candidate_t, k);
             g_array_append_val(candidates, *item);
         }
 
