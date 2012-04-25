@@ -28,7 +28,13 @@ int main(int argc, char * argv[]){
     pinyin_context_t * context =
         pinyin_init("../data", "../data");
 
+    pinyin_option_t options =
+        PINYIN_CORRECT_ALL | USE_DIVIDED_TABLE | USE_RESPLIT_TABLE;
+    pinyin_set_options(context, options);
+
     pinyin_instance_t * instance = pinyin_alloc_instance(context);
+    CandidateVector candidates = g_array_new
+        (FALSE, FALSE, sizeof(lookup_candidate_t));
 
     char * prefixbuf = NULL; size_t prefixsize = 0;
     char * linebuf = NULL; size_t linesize = 0;
@@ -64,11 +70,28 @@ int main(int argc, char * argv[]){
             printf("%s\n", sentence);
         g_free(sentence);
 
+        pinyin_get_full_pinyin_candidates(instance, 0, candidates);
+        for (size_t i = 0; i < candidates->len; ++i) {
+            lookup_candidate_t * candidate = &g_array_index
+                (candidates, lookup_candidate_t, i);
+            const char * pinyins = candidate->m_new_pinyins;
+
+            gchar * word = NULL;
+            pinyin_translate_token(instance, candidate->m_token, &word);
+            if (pinyins)
+                printf("%s %s\t", pinyins, word);
+            else
+                printf("%s\t", word);
+            g_free(word);
+        }
+        printf("\n");
+
         pinyin_train(instance);
         pinyin_reset(instance);
         pinyin_save(context);
     }
 
+    g_array_free(candidates, TRUE);
     pinyin_free_instance(instance);
     pinyin_fini(context);
     free(prefixbuf); free(linebuf);
