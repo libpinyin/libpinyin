@@ -1115,6 +1115,45 @@ int pinyin_choose_candidate(pinyin_instance_t * instance,
     return offset + len;
 }
 
+int pinyin_choose_full_pinyin_candidate(pinyin_instance_t * instance,
+                                        size_t offset,
+                                        lookup_candidate_t * candidate){
+    pinyin_context_t * & context = instance->m_context;
+
+    if (DIVIDED_CANDIDATE == candidate->m_candidate_type ||
+        RESPLIT_CANDIDATE == candidate->m_candidate_type) {
+        /* update full pinyin. */
+        gchar * oldpinyins = instance->m_raw_full_pinyin;
+        const ChewingKeyRest rest = candidate->m_orig_rest;
+        oldpinyins[rest.m_raw_begin] = '\0';
+        const gchar * left_part = oldpinyins;
+        const gchar * right_part = oldpinyins + rest.m_raw_end;
+        gchar * newpinyins = g_strconcat(left_part, candidate->m_new_pinyins,
+                                         right_part, NULL);
+        g_free(oldpinyins);
+        instance->m_raw_full_pinyin = newpinyins;
+
+        /* re-parse the full pinyin.  */
+        const gchar * pinyins = instance->m_raw_full_pinyin;
+        int pinyin_len = strlen(pinyins);
+        int parse_len = context->m_full_pinyin_parser->parse
+            (context->m_options, instance->m_pinyin_keys,
+             instance->m_pinyin_key_rests, pinyins, pinyin_len);
+
+        /* Note: there may be some un-parsable input here. */
+    }
+
+    phrase_token_t token = candidate->m_token;
+    guint8 len = context->m_pinyin_lookup->add_constraint
+        (instance->m_constraints, offset, token);
+
+    bool retval = context->m_pinyin_lookup->validate_constraint
+        (instance->m_constraints, instance->m_pinyin_keys) && len;
+
+    return offset + len;
+}
+
+
 bool pinyin_clear_constraint(pinyin_instance_t * instance,
                              size_t offset){
     pinyin_context_t * & context = instance->m_context;
