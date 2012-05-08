@@ -521,8 +521,31 @@ static phrase_token_t _get_previous_token(pinyin_instance_t * instance,
     ssize_t i;
 
     if (0 == offset) {
+        /* get previous token from prefixes. */
         prev_token = sentence_start;
+        size_t prev_token_len = 0;
+
+        pinyin_context_t * context = instance->m_context;
+        TokenVector prefixes = instance->m_prefixes;
+        PhraseItem item;
+
+        for (size_t i = 0; i < prefixes->len; ++i) {
+            phrase_token_t token = g_array_index(prefixes, phrase_token_t, i);
+            if (sentence_start == token)
+                continue;
+
+            int retval = context->m_phrase_index->get_phrase_item(token, item);
+            if (ERROR_OK == retval) {
+                size_t token_len = item.get_phrase_length();
+                if (token_len > prev_token_len) {
+                    /* found longer match, and save it. */
+                    prev_token = token;
+                    prev_token_len = token_len;
+                }
+            }
+        }
     } else {
+        /* get previous token from match results. */
         assert (0 < offset);
 
         phrase_token_t cur_token = g_array_index
