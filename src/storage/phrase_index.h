@@ -650,6 +650,43 @@ public:
 	return result;
     }
 
+    /**
+     * FacadePhraseIndex::prepare_ranges:
+     * @ranges: the ranges to be prepared.
+     * @returns: whether the prepare operation is successful.
+     *
+     * Prepare the ranges.
+     *
+     */
+    bool prepare_ranges(PhraseIndexRanges ranges) {
+        for (size_t i = 0; i < PHRASE_INDEX_LIBRARY_COUNT; ++i) {
+            SubPhraseIndex * sub_phrase = m_sub_phrase_indices[i];
+            if (sub_phrase) {
+                GArray * & onerange = ranges[i];
+                onerange = g_array_new(FALSE, FALSE, sizeof(PhraseIndexRange));
+            }
+        }
+        return true;
+    }
+
+    /**
+     * FacadePhraseIndex::destroy_ranges:
+     * @ranges: the ranges to be destroyed.
+     * @returns: whether the destroy operation is successful.
+     *
+     * Destroy the ranges.
+     *
+     */
+    bool destroy_ranges(PhraseIndexRanges ranges) {
+        for (size_t i = 0; i < PHRASE_INDEX_LIBRARY_COUNT; ++i) {
+            GArray * & onerange = ranges[i];
+            if (onerange) {
+                g_array_free(onerange, TRUE);
+                onerange = NULL;
+            }
+        }
+        return true;
+    }
 };
  
 };
