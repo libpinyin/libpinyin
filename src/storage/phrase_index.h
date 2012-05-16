@@ -426,7 +426,6 @@ public:
  *
  */
 class FacadePhraseIndex{
-    friend class PinyinLookup;
 private:
     guint32 m_total_freq;
     SubPhraseIndex * m_sub_phrase_indices[PHRASE_INDEX_LIBRARY_COUNT];
@@ -659,10 +658,13 @@ public:
      *
      */
     bool prepare_ranges(PhraseIndexRanges ranges) {
+        /* assume memset(ranges, 0, sizeof(ranges)); */
         for (size_t i = 0; i < PHRASE_INDEX_LIBRARY_COUNT; ++i) {
+            GArray * & range = ranges[i];
+            assert(NULL == range);
+
             SubPhraseIndex * sub_phrase = m_sub_phrase_indices[i];
             if (sub_phrase) {
-                GArray * & range = ranges[i];
                 range = g_array_new(FALSE, FALSE, sizeof(PhraseIndexRange));
             }
         }
