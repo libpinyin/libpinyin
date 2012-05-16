@@ -78,25 +78,19 @@ int main(int argc, char * argv[]) {
         PhraseIndexRanges ranges;
         memset(ranges, 0, sizeof(PhraseIndexRanges));
 
-        guint8 min_index, max_index;
-        phrase_index.get_sub_phrase_range(min_index, max_index);
-
-        for (size_t i = min_index; i < max_index; ++i) {
-            ranges[i] = g_array_new(FALSE, FALSE, sizeof(PhraseIndexRange));
-        }
+        phrase_index.prepare_ranges(ranges);
 
         for (size_t i = 0; i < bench_times; ++i) {
             largetable.search(keys->len, (ChewingKey *)keys->data, ranges);
         }
 
-        for (size_t i = min_index; i < max_index; ++i) {
-            g_array_set_size(ranges[i], 0);
-        }
+        phrase_index.clear_ranges(ranges);
+
         print_time(start, bench_times);
 
         largetable.search(keys->len, (ChewingKey *)keys->data, ranges);
 
-        for (size_t i = min_index; i < max_index; ++i) {
+        for (size_t i = 0; i < PHRASE_INDEX_LIBRARY_COUNT; ++i) {
             GArray * & range = ranges[i];
             if (range) {
                 if (range->len)
@@ -141,6 +135,8 @@ int main(int argc, char * argv[]) {
             }
             g_array_set_size(range, 0);
         }
+
+        phrase_index.destroy_ranges(ranges);
 	g_array_free(keys, TRUE);
 	g_array_free(key_rests, TRUE);
     }
