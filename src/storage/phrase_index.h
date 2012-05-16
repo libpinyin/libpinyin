@@ -662,8 +662,8 @@ public:
         for (size_t i = 0; i < PHRASE_INDEX_LIBRARY_COUNT; ++i) {
             SubPhraseIndex * sub_phrase = m_sub_phrase_indices[i];
             if (sub_phrase) {
-                GArray * & onerange = ranges[i];
-                onerange = g_array_new(FALSE, FALSE, sizeof(PhraseIndexRange));
+                GArray * & range = ranges[i];
+                range = g_array_new(FALSE, FALSE, sizeof(PhraseIndexRange));
             }
         }
         return true;
@@ -679,9 +679,9 @@ public:
      */
     bool clear_ranges(PhraseIndexRanges ranges) {
         for  (size_t i = 0; i < PHRASE_INDEX_LIBRARY_COUNT; ++i) {
-            GArray * onerange = ranges[i];
-            if (onerange) {
-                g_array_set_size(onerange, 0);
+            GArray * range = ranges[i];
+            if (range) {
+                g_array_set_size(range, 0);
             }
         }
     }
@@ -696,10 +696,10 @@ public:
      */
     bool destroy_ranges(PhraseIndexRanges ranges) {
         for (size_t i = 0; i < PHRASE_INDEX_LIBRARY_COUNT; ++i) {
-            GArray * & onerange = ranges[i];
-            if (onerange) {
-                g_array_free(onerange, TRUE);
-                onerange = NULL;
+            GArray * & range = ranges[i];
+            if (range) {
+                g_array_free(range, TRUE);
+                range = NULL;
             }
         }
         return true;
