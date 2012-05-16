@@ -569,12 +569,8 @@ static void _append_items(pinyin_context_t * context,
                           PhraseIndexRanges ranges,
                           lookup_candidate_t * template_item,
                           CandidateVector items) {
-    guint8 min_index, max_index;
-    assert( ERROR_OK == context->m_phrase_index->
-            get_sub_phrase_range(min_index, max_index));
-
     /* reduce and append to a single GArray. */
-    for (size_t m = min_index; m <= max_index; ++m) {
+    for (size_t m = 0; m <= PHRASE_INDEX_LIBRARY_COUNT; ++m) {
         if (NULL == ranges[m])
             continue;
 
@@ -683,14 +679,7 @@ bool pinyin_get_candidates(pinyin_instance_t * instance,
 
     PhraseIndexRanges ranges;
     memset(ranges, 0, sizeof(ranges));
-
-    guint8 min_index, max_index;
-    assert( ERROR_OK == context->m_phrase_index->
-            get_sub_phrase_range(min_index, max_index));
-
-    for (size_t m = min_index; m <= max_index; ++m) {
-        ranges[m] = g_array_new(FALSE, FALSE, sizeof(PhraseIndexRange));
-    }
+    context->m_phrase_index->prepare_ranges(ranges);
 
     GArray * items = g_array_new(FALSE, FALSE, sizeof(lookup_candidate_t));
 
@@ -732,10 +721,7 @@ bool pinyin_get_candidates(pinyin_instance_t * instance,
 
     g_array_free(items, TRUE);
 
-    for (size_t m = min_index; m <= max_index; ++m) {
-        if (ranges[m])
-            g_array_free(ranges[m], TRUE);
-    }
+    context->m_phrase_index->destroy_ranges(ranges);
 
     if (system_gram)
         delete system_gram;
@@ -1017,14 +1003,7 @@ bool pinyin_get_full_pinyin_candidates(pinyin_instance_t * instance,
 
     PhraseIndexRanges ranges;
     memset(ranges, 0, sizeof(ranges));
-
-    guint8 min_index, max_index;
-    assert( ERROR_OK == context->m_phrase_index->
-            get_sub_phrase_range(min_index, max_index));
-
-    for (size_t m = min_index; m <= max_index; ++m) {
-        ranges[m] = g_array_new(FALSE, FALSE, sizeof(PhraseIndexRange));
-    }
+    context->m_phrase_index->prepare_ranges(ranges);
 
     GArray * items = g_array_new(FALSE, FALSE, sizeof(lookup_candidate_t));
 
@@ -1111,10 +1090,7 @@ bool pinyin_get_full_pinyin_candidates(pinyin_instance_t * instance,
 
     g_array_free(items, TRUE);
 
-    for (size_t m = min_index; m <= max_index; ++m) {
-        if (ranges[m])
-            g_array_free(ranges[m], TRUE);
-    }
+    context->m_phrase_index->destroy_ranges(ranges);
 
     if (system_gram)
         delete system_gram;
