@@ -73,12 +73,13 @@ PinyinLookup::~PinyinLookup(){
     if ( m_winner_tree )
 	delete m_winner_tree;
     m_winner_tree = NULL;
+
     //free resources
     for ( size_t i = 0; i < m_table_cache->len; ++i){
 	PhraseIndexRanges * ranges = &g_array_index(m_table_cache, PhraseIndexRanges, i);
-	destroy_pinyin_lookup(*ranges);
+	m_phrase_index->destroy_ranges(*ranges);
     }
-    //g_array_set_size(m_table_cache, 1);
+
     g_array_free(m_table_cache, TRUE);
 
     clear_steps(m_steps_index, m_steps_content);
@@ -86,33 +87,11 @@ PinyinLookup::~PinyinLookup(){
     g_ptr_array_free(m_steps_content, TRUE);
 }
 
-bool PinyinLookup::prepare_pinyin_lookup(PhraseIndexRanges ranges){
-    //memset(ranges, 0, sizeof(ranges));
-    for ( size_t i = 0; i < PHRASE_INDEX_LIBRARY_COUNT; ++i ){
-	GArray * & array = ranges[i];
-	assert(NULL == array);
-	if (m_phrase_index->m_sub_phrase_indices[i]){
-	    array = g_array_new(FALSE, FALSE, sizeof (PhraseIndexRange));
-	}
-    }
-	return true;
-}
-
-bool PinyinLookup::destroy_pinyin_lookup(PhraseIndexRanges ranges){
-    for ( size_t i = 0; i < PHRASE_INDEX_LIBRARY_COUNT ; ++i){
-	GArray * & array = ranges[i];
-	if ( array )
-	    g_array_free(array, TRUE);
-	array = NULL;
-    }
-	return true;
-}
-
 size_t PinyinLookup::prepare_table_cache(int nstep, int total_pinyin){
     /* free resources */
     for ( size_t i = 0; i < m_table_cache->len; ++i){
 	PhraseIndexRanges * ranges = &g_array_index(m_table_cache, PhraseIndexRanges, i);
-	destroy_pinyin_lookup(*ranges);
+	m_phrase_index->destroy_ranges(*ranges);
     }
 
     ChewingKey * pinyin_keys = (ChewingKey *)m_keys->data;
@@ -123,7 +102,7 @@ size_t PinyinLookup::prepare_table_cache(int nstep, int total_pinyin){
 
     for ( len = 1; len <= total_len; ++len){
 	PhraseIndexRanges * ranges = &g_array_index(m_table_cache, PhraseIndexRanges, len);
-	prepare_pinyin_lookup(*ranges);
+	m_phrase_index->prepare_ranges(*ranges);
 	int result = m_pinyin_table->search(len, pinyin_keys, *ranges);
 	if (!( result & SEARCH_CONTINUED)){
 	    ++len;

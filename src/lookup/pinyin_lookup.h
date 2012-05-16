@@ -126,10 +126,6 @@ protected:
     WinnerTree * m_winner_tree;
 
     size_t prepare_table_cache(int nstep, int total_pinyin);
-    /* init pinyin table lookup array */
-    bool prepare_pinyin_lookup(PhraseIndexRanges ranges);
-    /* destroy pinyin table lookup array */
-    bool destroy_pinyin_lookup(PhraseIndexRanges ranges);
     
     bool search_unigram(IBranchIterator * iter,  int nstep, int npinyin);
     bool search_bigram(IBranchIterator * iter,  int nstep, int npinyin);
