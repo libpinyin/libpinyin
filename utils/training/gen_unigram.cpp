@@ -26,6 +26,8 @@
 /* increase all unigram frequency by a constant. */
 
 int main(int argc, char * argv[]){
+    MemoryChunk * chunk = NULL;
+
     FacadePhraseIndex phrase_index;
     for (size_t i = 0; i < PHRASE_INDEX_LIBRARY_COUNT; ++i) {
         const char * bin_file = pinyin_phrase_files[i];
