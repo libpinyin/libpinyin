@@ -131,17 +131,14 @@ int main(int argc, char * argv[]){
         if (NULL == bin_file)
             continue;
 
-        gchar * filename = g_build_filename("..", "..", "data",
-                                            bin_file, NULL);
         chunk = new MemoryChunk;
-        bool retval = chunk->load(filename);
+        bool retval = chunk->load(bin_file);
         if (!retval) {
             fprintf(stderr, "open %s failed!\n", bin_file);
             exit(ENOENT);
         }
 
         phrase_index.load(i, chunk);
-        g_free(filename);
     }
 
     KMixtureModelBigram bigram(K_MIXTURE_MODEL_MAGIC_NUMBER);
