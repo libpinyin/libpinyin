@@ -559,3 +559,11 @@ bool FacadePhraseIndex::compat(){
     }
     return true;
 }
+
+
+const char * pinyin_phrase_files[PHRASE_INDEX_LIBRARY_COUNT] =
+    {
+        NULL,
+        "gb_char.bin",
+        "gbk_char.bin"
+    };

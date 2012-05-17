@@ -710,4 +710,6 @@ public:
  
 };
 
+extern const char * pinyin_phrase_files[PHRASE_INDEX_LIBRARY_COUNT];
+
 #endif
