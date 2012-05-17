@@ -56,7 +56,7 @@ int main(int argc, char * argv[]){
     int i = 1;
 
     setlocale(LC_ALL, "");
-    //deal with options.
+    /* deal with options. */
     while ( i < argc ){
         if ( strcmp ("--help", argv[i]) == 0 ){
             print_help();
@@ -69,35 +69,42 @@ int main(int argc, char * argv[]){
     }
 
 
-    //init phrase table
+    /* init phrase table */
     FacadePhraseTable phrase_table;
     MemoryChunk * chunk = new MemoryChunk;
     chunk->load("../../data/phrase_index.bin");
     phrase_table.load(chunk, NULL);
 
-    //init phrase index
+    /* init phrase index */
     FacadePhraseIndex phrase_index;
     for (size_t i = 0; i < PHRASE_INDEX_LIBRARY_COUNT; ++i) {
         const char * bin_file = pinyin_phrase_files[i];
         if (NULL == bin_file)
             continue;
-        gchar * filename = g_build_filename("..", "..", "data", bin_file, NULL);
+
+        gchar * filename = g_build_filename("..", "..", "data",
+                                            bin_file, NULL);
         chunk = new MemoryChunk;
-        chunk->load(filename);
+        bool retval = chunk->load(filename);
+        if (!retval) {
+            fprintf(stderr, "open %s failed!\n", bin_file);
+            exit(ENOENT);
+        }
+
         phrase_index.load(i, chunk);
         g_free(filename);
     }
 
-    //init bi-gram
+    /* init bi-gram */
     Bigram system_bigram;
     system_bigram.attach("../../data/bigram.db", ATTACH_READONLY);
     Bigram user_bigram;
 
-    //init phrase lookup
+    /* init phrase lookup */
     PhraseLookup phrase_lookup(&phrase_table, &phrase_index,
                                &system_bigram, &user_bigram);
 
-    //try one sentence
+    /* try one sentence */
     char * linebuf = NULL;
     size_t size = 0;
     ssize_t read;
@@ -109,7 +116,7 @@ int main(int argc, char * argv[]){
         if ( strcmp ( linebuf, "quit" ) == 0)
             break;
 
-        //check non-ucs4 characters
+        /* check non-ucs4 characters */
         const glong num_of_chars = g_utf8_strlen(linebuf, -1);
         glong len = 0;
         ucs4_t * sentence = g_utf8_to_ucs4(linebuf, -1, NULL, &len, NULL);
