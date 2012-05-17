@@ -26,8 +26,6 @@
 #include <glib.h>
 #include "pinyin_internal.h"
 
-static PhraseLargeTable * g_phrases = NULL;
-
 void print_help(){
     printf("Usage: gen_ngram [--skip-pi-gram-training]\n");
     printf("                 [--bigram-file <FILENAME>]\n");
@@ -58,23 +56,30 @@ int main(int argc, char * argv[]){
 	++i;
     }
     
-    g_phrases = new PhraseLargeTable;
-    //init phrase lookup
+    PhraseLargeTable phrases;
+    /* init phrase table */
     MemoryChunk * chunk = new MemoryChunk;
     chunk->load("phrase_index.bin");
-    g_phrases->load(chunk);
+    phrases.load(chunk);
 
     FacadePhraseIndex phrase_index;
-    
-    //gb_char binary file
-    chunk = new MemoryChunk;
-    chunk->load("gb_char.bin");
-    phrase_index.load(1, chunk);
-    
-    //gbk_char binary file
-    chunk = new MemoryChunk;
-    chunk->load("gbk_char.bin");
-    phrase_index.load(2, chunk);
+    for (size_t i = 0; i < PHRASE_INDEX_LIBRARY_COUNT; ++i) {
+        const char * bin_file = pinyin_phrase_files[i];
+        if (NULL == bin_file)
+            continue;
+
+        gchar * filename = g_build_filename("..", "..", "data",
+                                            bin_file, NULL);
+        chunk = new MemoryChunk;
+        bool retval = chunk->load(filename);
+        if (!retval) {
+            fprintf(stderr, "open %s failed!\n", bin_file);
+            exit(ENOENT);
+        }
+
+        phrase_index.load(i, chunk);
+        g_free(filename);
+    }
     
     Bigram bigram;
     bigram.attach(bigram_filename, ATTACH_CREATE|ATTACH_READWRITE);
@@ -93,7 +98,7 @@ int main(int argc, char * argv[]){
 
 	phrase_token_t token = 0;
         if ( 0 != phrase_len ) {
-            int result = g_phrases->search( phrase_len, phrase, token);
+            int result = phrases.search( phrase_len, phrase, token);
             if ( ! (result & SEARCH_OK) )
                 token = 0;
             g_free(phrase);

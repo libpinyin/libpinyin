@@ -118,22 +118,33 @@ int main(int argc, char * argv[]){
     pinyin_option_t options = USE_TONE;
     FacadeChewingTable largetable;
 
-    MemoryChunk * new_chunk = new MemoryChunk;
-    new_chunk->load("pinyin_index.bin");
-    largetable.load(options, new_chunk, NULL);
+    MemoryChunk * chunk = new MemoryChunk;
+    chunk->load("pinyin_index.bin");
+    largetable.load(options, chunk, NULL);
 
     FacadePhraseIndex phrase_index;
-    new_chunk = new MemoryChunk;
-    new_chunk->load("gb_char.bin");
-    phrase_index.load(1, new_chunk);
-    new_chunk = new MemoryChunk;
-    new_chunk->load("gbk_char.bin");
-    phrase_index.load(2, new_chunk);
+    for (size_t i = 0; i < PHRASE_INDEX_LIBRARY_COUNT; ++i) {
+        const char * bin_file = pinyin_phrase_files[i];
+        if (NULL == bin_file)
+            continue;
+
+        gchar * filename = g_build_filename("..", "..", "data",
+                                            bin_file, NULL);
+        chunk = new MemoryChunk;
+        bool retval = chunk->load(filename);
+        if (!retval) {
+            fprintf(stderr, "open %s failed!\n", bin_file);
+            exit(ENOENT);
+        }
+
+        phrase_index.load(i, chunk);
+        g_free(filename);
+    }
 
     FacadePhraseTable phrases;
-    new_chunk = new MemoryChunk;
-    new_chunk->load("phrase_index.bin");
-    phrases.load(new_chunk, NULL);
+    chunk = new MemoryChunk;
+    chunk->load("phrase_index.bin");
+    phrases.load(chunk, NULL);
 
     Bigram system_bigram;
     system_bigram.attach("bigram.db", ATTACH_READONLY);
