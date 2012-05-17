@@ -77,12 +77,16 @@ int main(int argc, char * argv[]){
 
     //init phrase index
     FacadePhraseIndex phrase_index;
-    chunk = new MemoryChunk;
-    chunk->load("../../data/gb_char.bin");
-    phrase_index.load(1, chunk);
-    chunk = new MemoryChunk;
-    chunk->load("../../data/gbk_char.bin");
-    phrase_index.load(2, chunk);
+    for (size_t i = 0; i < PHRASE_INDEX_LIBRARY_COUNT; ++i) {
+        const char * bin_file = pinyin_phrase_files[i];
+        if (NULL == bin_file)
+            continue;
+        gchar * filename = g_build_filename("..", "..", "data", bin_file,NULL);
+        chunk = new MemoryChunk;
+        chunk->load(filename);
+        phrase_index.load(i, chunk);
+        g_free(filename);
+    }
 
     //init bi-gram
     Bigram system_bigram;
