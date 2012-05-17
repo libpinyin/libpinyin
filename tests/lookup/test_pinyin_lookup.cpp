@@ -19,7 +19,7 @@ int main( int argc, char * argv[]){
         const char * bin_file = pinyin_phrase_files[i];
         if (NULL == bin_file)
             continue;
-        gchar * filename = g_build_filename("..", "..", "data", bin_file,NULL);
+        gchar * filename = g_build_filename("..", "..", "data", bin_file, NULL);
         chunk = new MemoryChunk;
         chunk->load(filename);
         phrase_index.load(i, chunk);

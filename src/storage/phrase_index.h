@@ -686,6 +686,7 @@ public:
                 g_array_set_size(range, 0);
             }
         }
+        return true;
     }
 
     /**
