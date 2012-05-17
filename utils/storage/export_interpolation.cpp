@@ -44,18 +44,26 @@ bool end_data(FILE * output){
 int main(int argc, char * argv[]){
     FILE * output = stdout;
     const char * bigram_filename = "bigram.db";
+    MemoryChunk * chunk = NULL;
 
     FacadePhraseIndex phrase_index;
+    for (size_t i = 0; i < PHRASE_INDEX_LIBRARY_COUNT; ++i) {
+        const char * bin_file = pinyin_phrase_files[i];
+        if (NULL == bin_file)
+            continue;
 
-    //gb_char binary file
-    MemoryChunk * chunk = new MemoryChunk;
-    chunk->load("gb_char.bin");
-    phrase_index.load(1, chunk);
+        gchar * filename = g_build_filename("..", "..", "data",
+                                            bin_file, NULL);
+        chunk = new MemoryChunk;
+        bool retval = chunk->load(filename);
+        if (!retval) {
+            fprintf(stderr, "open %s failed!\n", bin_file);
+            exit(ENOENT);
+        }
 
-    //gbk_char binary file
-    chunk = new MemoryChunk;
-    chunk->load("gbk_char.bin");
-    phrase_index.load(2, chunk);
+        phrase_index.load(i, chunk);
+        g_free(filename);
+    }
 
     Bigram bigram;
     bigram.attach(bigram_filename, ATTACH_READONLY);

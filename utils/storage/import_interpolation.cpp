@@ -207,24 +207,23 @@ int main(int argc, char * argv[]){
     phrases.load(chunk);
 
     FacadePhraseIndex phrase_index;
+    for (size_t i = 0; i < PHRASE_INDEX_LIBRARY_COUNT; ++i) {
+        const char * bin_file = pinyin_phrase_files[i];
+        if (NULL == bin_file)
+            continue;
 
-    //gb_char binary file
-    chunk = new MemoryChunk;
-    retval = chunk->load("gb_char.bin");
-    if (!retval) {
-        fprintf(stderr, "open gb_char.bin failed!\n");
-        exit(ENOENT);
-    }
-    phrase_index.load(1, chunk);
+        gchar * filename = g_build_filename("..", "..", "data",
+                                            bin_file, NULL);
+        chunk = new MemoryChunk;
+        bool retval = chunk->load(filename);
+        if (!retval) {
+            fprintf(stderr, "open %s failed!\n", bin_file);
+            exit(ENOENT);
+        }
 
-    //gbk_char binary file
-    chunk = new MemoryChunk;
-    retval = chunk->load("gbk_char.bin");
-    if (!retval) {
-        fprintf(stderr, "open gbk_char.bin failed!\n");
-        exit(ENOENT);
+        phrase_index.load(i, chunk);
+        g_free(filename);
     }
-    phrase_index.load(2, chunk);
 
     Bigram bigram;
     retval = bigram.attach(bigram_filename, ATTACH_CREATE|ATTACH_READWRITE);
