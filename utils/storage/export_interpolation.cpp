@@ -24,7 +24,7 @@
 #include <assert.h>
 #include <glib.h>
 #include "pinyin_internal.h"
-
+#include "utils_helper.h"
 
 /* export interpolation model as textual format */
 
@@ -47,20 +47,8 @@ int main(int argc, char * argv[]){
     MemoryChunk * chunk = NULL;
 
     FacadePhraseIndex phrase_index;
-    for (size_t i = 0; i < PHRASE_INDEX_LIBRARY_COUNT; ++i) {
-        const char * bin_file = pinyin_phrase_files[i];
-        if (NULL == bin_file)
-            continue;
-
-        chunk = new MemoryChunk;
-        bool retval = chunk->load(bin_file);
-        if (!retval) {
-            fprintf(stderr, "open %s failed!\n", bin_file);
-            exit(ENOENT);
-        }
-
-        phrase_index.load(i, chunk);
-    }
+    if (!init_phrase_index(&phrase_index))
+        exit(ENOENT);
 
     Bigram bigram;
     bigram.attach(bigram_filename, ATTACH_READONLY);
@@ -80,7 +68,7 @@ bool gen_unigram(FILE * output, FacadePhraseIndex * phrase_index) {
 
         PhraseIndexRange range;
         int result = phrase_index->get_range(i, range);
-        if ( result )
+        if (ERROR_OK != result )
             continue;
 
         PhraseItem item;

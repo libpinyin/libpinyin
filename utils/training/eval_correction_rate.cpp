@@ -21,6 +21,7 @@
 
 
 #include "pinyin_internal.h"
+#include "utils_helper.h"
 
 
 void print_help(){
@@ -123,20 +124,8 @@ int main(int argc, char * argv[]){
     largetable.load(options, chunk, NULL);
 
     FacadePhraseIndex phrase_index;
-    for (size_t i = 0; i < PHRASE_INDEX_LIBRARY_COUNT; ++i) {
-        const char * bin_file = pinyin_phrase_files[i];
-        if (NULL == bin_file)
-            continue;
-
-        chunk = new MemoryChunk;
-        bool retval = chunk->load(bin_file);
-        if (!retval) {
-            fprintf(stderr, "open %s failed!\n", bin_file);
-            exit(ENOENT);
-        }
-
-        phrase_index.load(i, chunk);
-    }
+    if (!init_phrase_index(&phrase_index))
+        exit(ENOENT);
 
     FacadePhraseTable phrases;
     chunk = new MemoryChunk;

@@ -19,6 +19,7 @@ INCLUDES                = -I$(top_srcdir)/src \
                           -I$(top_srcdir)/src/include \
                           -I$(top_srcdir)/src/storage \
                           -I$(top_srcdir)/src/lookup \
+			  -I$(top_srcdir)/utils \
                           @GLIB2_CPPFLAGS@
 
 bin_PROGRAMS		 = gen_binary_files \

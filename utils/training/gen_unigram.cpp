@@ -21,7 +21,7 @@
 
 #include <stdio.h>
 #include "pinyin_internal.h"
-
+#include "utils_helper.h"
 
 /* increase all unigram frequency by a constant. */
 
@@ -29,20 +29,8 @@ int main(int argc, char * argv[]){
     MemoryChunk * chunk = NULL;
 
     FacadePhraseIndex phrase_index;
-    for (size_t i = 0; i < PHRASE_INDEX_LIBRARY_COUNT; ++i) {
-        const char * bin_file = pinyin_phrase_files[i];
-        if (NULL == bin_file)
-            continue;
-
-        chunk = new MemoryChunk;
-        bool retval = chunk->load(bin_file);
-        if (!retval) {
-            fprintf(stderr, "open %s failed!\n", bin_file);
-            exit(ENOENT);
-        }
-
-        phrase_index.load(i, chunk);
-    }
+    if (!init_phrase_index(&phrase_index))
+        exit(ENOENT);
 
     /* Note: please increase the value when corpus size becomes larger.
      *  To avoid zero value when computing unigram frequency in float format.

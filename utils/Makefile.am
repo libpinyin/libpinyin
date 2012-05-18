@@ -20,6 +20,8 @@ SUBDIRS 		= storage segment training
 
 MAINTAINERCLEANFILES 	= Makefile.in 
 
-CLEANFILES		= *.bak 
+CLEANFILES		= *.bak
 
 ACLOCAL			= aclocal -I $(ac_aux_dir)
+
+noinst_HEADERS          = utils_helper.h

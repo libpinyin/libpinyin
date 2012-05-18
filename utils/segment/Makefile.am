@@ -21,6 +21,7 @@ INCLUDES		= -I$(top_srcdir)/src \
 			  -I$(top_srcdir)/src/include \
 			  -I$(top_srcdir)/src/storage \
 			  -I$(top_srcdir)/src/lookup \
+			  -I$(top_srcdir)/utils \
 			  @GLIB2_CPPFLAGS@
 
 noinst_PROGRAMS		= spseg ngseg
