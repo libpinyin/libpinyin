@@ -92,46 +92,47 @@ int main(int argc, char * argv[]) {
 
         for (size_t i = 0; i < PHRASE_INDEX_LIBRARY_COUNT; ++i) {
             GArray * & range = ranges[i];
-            if (range) {
-                if (range->len)
-                    printf("range items number:%d\n", range->len);
+            if (!range)
+                continue;
 
-                for (size_t k = 0; k < range->len; ++k) {
-                    PhraseIndexRange * onerange =
-                        &g_array_index(range, PhraseIndexRange, k);
-                    printf("start:%d\tend:%d\n", onerange->m_range_begin,
-                           onerange->m_range_end);
+            if (range->len)
+                printf("range items number:%d\n", range->len);
 
-		    PhraseItem item;
-		    for ( phrase_token_t token = onerange->m_range_begin;
-                          token != onerange->m_range_end; ++token){
+            for (size_t k = 0; k < range->len; ++k) {
+                PhraseIndexRange * onerange =
+                    &g_array_index(range, PhraseIndexRange, k);
+                printf("start:%d\tend:%d\n", onerange->m_range_begin,
+                       onerange->m_range_end);
 
-			phrase_index.get_phrase_item( token, item);
+                PhraseItem item;
+                for ( phrase_token_t token = onerange->m_range_begin;
+                      token != onerange->m_range_end; ++token){
 
-                        /* get phrase string */
-			ucs4_t buffer[MAX_PHRASE_LENGTH + 1];
-			item.get_phrase_string(buffer);
-			char * string = g_ucs4_to_utf8
-			    ( buffer, item.get_phrase_length(),
-			      NULL, NULL, NULL);
-			printf("%s\t", string);
-			g_free(string);
+                    phrase_index.get_phrase_item( token, item);
 
-                        ChewingKey chewing_buffer[MAX_PHRASE_LENGTH];
-                        size_t npron = item.get_n_pronunciation();
-                        guint32 freq;
-                        for (size_t m = 0; m < npron; ++m){
-                            item.get_nth_pronunciation(m, chewing_buffer, freq);
-                            for (size_t n = 0; n < item.get_phrase_length();
-                                  ++n){
-                                printf("%s'",
-                                       chewing_buffer[n].get_pinyin_string());
-                            }
-                            printf("\b\t%d\t", freq);
+                    /* get phrase string */
+                    ucs4_t buffer[MAX_PHRASE_LENGTH + 1];
+                    item.get_phrase_string(buffer);
+                    char * string = g_ucs4_to_utf8
+                        ( buffer, item.get_phrase_length(),
+                          NULL, NULL, NULL);
+                    printf("%s\t", string);
+                    g_free(string);
+
+                    ChewingKey chewing_buffer[MAX_PHRASE_LENGTH];
+                    size_t npron = item.get_n_pronunciation();
+                    guint32 freq;
+                    for (size_t m = 0; m < npron; ++m){
+                        item.get_nth_pronunciation(m, chewing_buffer, freq);
+                        for (size_t n = 0; n < item.get_phrase_length();
+                             ++n){
+                            printf("%s'",
+                                   chewing_buffer[n].get_pinyin_string());
                         }
+                        printf("\b\t%d\t", freq);
                     }
-                    printf("\n");
                 }
+                printf("\n");
             }
             g_array_set_size(range, 0);
         }
