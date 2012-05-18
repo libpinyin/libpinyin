@@ -1,6 +1,29 @@
+/* 
+ *  libpinyin
+ *  Library to deal with pinyin.
+ *  
+ *  Copyright (C) 2012 Peng Wu <alexepico@gmail.com>
+ *  
+ *  This program is free software; you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation; either version 2 of the License, or
+ *  (at your option) any later version.
+ * 
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ *  GNU General Public License for more details.
+ *  
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program; if not, write to the Free Software
+ *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ */
+
+
 #include "timer.h"
 #include <string.h>
 #include "pinyin_internal.h"
+#include "tests_helper.h"
 
 size_t bench_times = 100;
 
@@ -15,23 +38,8 @@ int main( int argc, char * argv[]){
     largetable.load(options, chunk, NULL);
 
     FacadePhraseIndex phrase_index;
-    for (size_t i = 0; i < PHRASE_INDEX_LIBRARY_COUNT; ++i) {
-        const char * bin_file = pinyin_phrase_files[i];
-        if (NULL == bin_file)
-            continue;
-
-        gchar * filename = g_build_filename("..", "..", "data",
-                                            bin_file, NULL);
-        chunk = new MemoryChunk;
-        bool retval = chunk->load(filename);
-        if (!retval) {
-            fprintf(stderr, "open %s failed!\n", bin_file);
-            exit(ENOENT);
-        }
-
-        phrase_index.load(i, chunk);
-        g_free(filename);
-    }
+    if (!init_phrase_index(&phrase_index))
+        exit(ENOENT);
 
     Bigram system_bigram;
     system_bigram.attach("../../data/bigram.db", ATTACH_READONLY);

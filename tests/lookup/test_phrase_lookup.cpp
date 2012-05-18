@@ -23,6 +23,7 @@
 #include <stdio.h>
 #include <locale.h>
 #include "pinyin_internal.h"
+#include "tests_helper.h"
 
 void print_help(){
     printf("Usage: test_phrase_lookup\n");
@@ -77,23 +78,8 @@ int main(int argc, char * argv[]){
 
     /* init phrase index */
     FacadePhraseIndex phrase_index;
-    for (size_t i = 0; i < PHRASE_INDEX_LIBRARY_COUNT; ++i) {
-        const char * bin_file = pinyin_phrase_files[i];
-        if (NULL == bin_file)
-            continue;
-
-        gchar * filename = g_build_filename("..", "..", "data",
-                                            bin_file, NULL);
-        chunk = new MemoryChunk;
-        bool retval = chunk->load(filename);
-        if (!retval) {
-            fprintf(stderr, "open %s failed!\n", bin_file);
-            exit(ENOENT);
-        }
-
-        phrase_index.load(i, chunk);
-        g_free(filename);
-    }
+    if (!init_phrase_index(&phrase_index))
+        exit(ENOENT);
 
     /* init bi-gram */
     Bigram system_bigram;

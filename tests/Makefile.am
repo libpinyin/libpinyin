@@ -30,7 +30,8 @@ INCLUDES                = -I$(top_srcdir)/src \
                           -I$(top_srcdir)/src/lookup \
                           @GLIB2_CPPFLAGS@
 
-noinst_HEADERS          = timer.h
+noinst_HEADERS          = timer.h \
+			  tests_helper.h
 
 noinst_PROGRAMS         = test_pinyin \
 			  test_phrase \
