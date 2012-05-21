@@ -530,13 +530,13 @@ public:
     bool merge(guint8 phrase_index, MemoryChunk * log);
 
     /**
-     * FacadePhraseIndex::compat:
-     * @returns: whether the compat operation is successful.
+     * FacadePhraseIndex::compact:
+     * @returns: whether the compact operation is successful.
      *
      * Compat all sub phrase index memory usage.
      *
      */
-    bool compat();
+    bool compact();
 
     /**
      * FacadePhraseIndex::get_sub_phrase_range:

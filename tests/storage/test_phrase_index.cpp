@@ -89,7 +89,7 @@ int main(int argc, char * argv[]){
         g_free(filename);
     }
 
-    phrase_index.compat();
+    phrase_index.compact();
 
     MemoryChunk* store1 = new MemoryChunk;
     phrase_index_load.store(1, store1);
@@ -99,7 +99,7 @@ int main(int argc, char * argv[]){
     phrase_index_load.store(2, store2);
     phrase_index_load.load(2, store2);
 
-    phrase_index.compat();
+    phrase_index.compact();
 
     phrase_index_load.get_phrase_item(16870553, item2);
     assert( item2.get_phrase_length() == 14);

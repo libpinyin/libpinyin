@@ -190,6 +190,8 @@ bool pinyin_save(pinyin_context_t * context){
     if (!context->m_modified)
         return false;
 
+    context->m_phrase_index->compact();
+
     MemoryChunk * oldchunk = new MemoryChunk;
     MemoryChunk * newlog = new MemoryChunk;
 

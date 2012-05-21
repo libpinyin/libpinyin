@@ -86,7 +86,7 @@ int main(int argc, char * argv[]){
     new_chunk->save("phrase_index.bin");
     phraselargetable.load(new_chunk);
 
-    phrase_index.compat();
+    phrase_index.compact();
 
     if (!save_phrase_index(&phrase_index))
         exit(ENOENT);

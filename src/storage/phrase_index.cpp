@@ -530,7 +530,7 @@ int SubPhraseIndex::get_range(/* out */ PhraseIndexRange & range){
     return ERROR_OK;
 }
 
-bool FacadePhraseIndex::compat(){
+bool FacadePhraseIndex::compact(){
     for ( size_t index = 0; index < PHRASE_INDEX_LIBRARY_COUNT; ++index) {
         SubPhraseIndex * sub_phrase = m_sub_phrase_indices[index];
         if ( !sub_phrase )
