@@ -567,3 +567,10 @@ const char * pinyin_phrase_files[PHRASE_INDEX_LIBRARY_COUNT] =
         "gb_char.bin",
         "gbk_char.bin"
     };
+
+const char * pinyin_table_files[PHRASE_INDEX_LIBRARY_COUNT] =
+    {
+        NULL,
+        "gb_char.table",
+        "gbk_char.table"
+    };
