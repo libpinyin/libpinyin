@@ -35,22 +35,20 @@ int main(int argc, char * argv[]){
     /* Note: please increase the value when corpus size becomes larger.
      *  To avoid zero value when computing unigram frequency in float format.
      */
-    guint32 freq = 1; PhraseIndexRange range;
-    int result = phrase_index.get_range(1, range);
-    if ( result == ERROR_OK ) {
-        for ( size_t i = range.m_range_begin; i <= range.m_range_end; ++i ) {
-            phrase_index.add_unigram_frequency(i, freq);
-        }
-    }
+    for (size_t i = 0; i < PHRASE_INDEX_LIBRARY_COUNT; ++i) {
+        const char * binfile = pinyin_phrase_files[i];
+        if (NULL == binfile)
+            continue;
 
-#if 1
-    result = phrase_index.get_range(2, range);
-    if ( result == ERROR_OK ) {
-        for ( size_t i = range.m_range_begin; i <= range.m_range_end; ++i ) {
-            phrase_index.add_unigram_frequency(i, freq);
+        guint32 freq = 1; PhraseIndexRange range;
+        int result = phrase_index.get_range(i, range);
+        if ( result == ERROR_OK ) {
+            for (size_t token = range.m_range_begin;
+                  token <= range.m_range_end; ++token) {
+                phrase_index.add_unigram_frequency(token, freq);
+            }
         }
     }
-#endif
 
     if (!save_phrase_index(&phrase_index))
         exit(ENOENT);
