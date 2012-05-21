@@ -25,16 +25,16 @@
 static bool load_phrase_index(FacadePhraseIndex * phrase_index){
     MemoryChunk * chunk = NULL;
     for (size_t i = 0; i < PHRASE_INDEX_LIBRARY_COUNT; ++i) {
-        const char * bin_file = pinyin_phrase_files[i];
-        if (NULL == bin_file)
+        const char * binfile = pinyin_phrase_files[i];
+        if (NULL == binfile)
             continue;
 
         gchar * filename = g_build_filename("..", "..", "data",
-                                            bin_file, NULL);
+                                            binfile, NULL);
         chunk = new MemoryChunk;
         bool retval = chunk->load(filename);
         if (!retval) {
-            fprintf(stderr, "open %s failed!\n", bin_file);
+            fprintf(stderr, "open %s failed!\n", binfile);
             return false;
         }
 
