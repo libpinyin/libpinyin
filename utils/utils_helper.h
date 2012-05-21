@@ -33,7 +33,7 @@ static bool load_phrase_index(FacadePhraseIndex * phrase_index) {
         chunk = new MemoryChunk;
         bool retval = chunk->load(bin_file);
         if (!retval) {
-            fprintf(stderr, "open %s failed!\n", bin_file);
+            fprintf(stderr, "load %s failed!\n", bin_file);
             return false;
         }
 
@@ -42,5 +42,24 @@ static bool load_phrase_index(FacadePhraseIndex * phrase_index) {
     return true;
 }
 
+static bool save_phrase_index(FacadePhraseIndex * phrase_index) {
+    MemoryChunk * new_chunk = NULL;
+    for (size_t i = 0; i < PHRASE_INDEX_LIBRARY_COUNT; ++i) {
+        const char * bin_file = pinyin_phrase_files[i];
+        if (NULL == bin_file)
+            continue;
+
+        new_chunk = new MemoryChunk;
+        phrase_index->store(i, new_chunk);
+        bool retval = new_chunk->save(bin_file);
+        if (!retval) {
+            fprintf(stderr, "save %s failed.", bin_file);
+            return false;
+        }
+
+        phrase_index->load(i, new_chunk);
+    }
+    return true;
+}
 
 #endif

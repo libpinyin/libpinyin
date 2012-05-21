@@ -98,15 +98,8 @@ int main(int argc, char * argv[]){
 
     phrase_index.compat();
 
-    new_chunk = new MemoryChunk;
-    phrase_index.store(1, new_chunk);
-    new_chunk->save("gb_char.bin");
-    phrase_index.load(1, new_chunk);
+    if (!save_phrase_index(&phrase_index))
+        exit(ENOENT);
 
-    new_chunk = new MemoryChunk;
-    phrase_index.store(2, new_chunk);
-    new_chunk->save("gbk_char.bin");
-    phrase_index.load(2, new_chunk);
-    
     return 0;
 }

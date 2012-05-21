@@ -251,15 +251,8 @@ int main(int argc, char * argv[]){
 
     taglib_fini();
 
-    chunk = new MemoryChunk;
-    phrase_index.store(1, chunk);
-    chunk->save("gb_char.bin");
-    phrase_index.load(1, chunk);
-
-    chunk = new MemoryChunk;
-    phrase_index.store(2, chunk);
-    chunk->save("gbk_char.bin");
-    phrase_index.load(2, chunk);
+    if (!save_phrase_index(&phrase_index))
+        exit(ENOENT);
 
     return 0;
 }
