@@ -124,7 +124,7 @@ int main(int argc, char * argv[]){
     largetable.load(options, chunk, NULL);
 
     FacadePhraseIndex phrase_index;
-    if (!init_phrase_index(&phrase_index))
+    if (!load_phrase_index(&phrase_index))
         exit(ENOENT);
 
     FacadePhraseTable phrases;

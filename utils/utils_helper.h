@@ -23,7 +23,7 @@
 #ifndef UTILS_HELPER_H
 #define UTILS_HELPER_H
 
-static bool init_phrase_index(FacadePhraseIndex * phrase_index) {
+static bool load_phrase_index(FacadePhraseIndex * phrase_index) {
     MemoryChunk * chunk = NULL;
     for (size_t i = 0; i < PHRASE_INDEX_LIBRARY_COUNT; ++i) {
         const char * bin_file = pinyin_phrase_files[i];

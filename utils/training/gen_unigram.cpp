@@ -29,7 +29,7 @@ int main(int argc, char * argv[]){
     MemoryChunk * chunk = NULL;
 
     FacadePhraseIndex phrase_index;
-    if (!init_phrase_index(&phrase_index))
+    if (!load_phrase_index(&phrase_index))
         exit(ENOENT);
 
     /* Note: please increase the value when corpus size becomes larger.
