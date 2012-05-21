@@ -7,23 +7,23 @@ size_t bench_times = 1000;
 int main(int argc, char * argv[]){
     PhraseLargeTable largetable;
 
-    FILE * gbfile = fopen("../../data/gb_char.table", "r");
-    if ( gbfile == NULL ) {
-        fprintf(stderr, "open gb_char.table failed!\n");
-        return 1;
+    for (size_t i = 0; i < PHRASE_INDEX_LIBRARY_COUNT; ++i) {
+        const char * tablename = pinyin_table_files[i];
+        if (NULL == tablename)
+            continue;
+
+        gchar * filename = g_build_filename("..", "..", "data",
+                                            tablename, NULL);
+        FILE * tablefile = fopen(filename, "r");
+        if ( tablefile == NULL ) {
+            fprintf(stderr, "open %s failed!\n", tablename);
+            return 1;
+        }
+
+        largetable.load_text(tablefile);
+        fclose(tablefile);
+        g_free(filename);
     }
-
-    largetable.load_text(gbfile);
-    fclose(gbfile);
-
-    FILE * gbkfile = fopen("../../data/gbk_char.table", "r");
-    if (gbkfile == NULL ) {
-        fprintf(stderr, "open gbk_char.table failed!\n");
-        return 1;
-    }
-
-    largetable.load_text(gbkfile);
-    fclose(gbkfile);
 
     MemoryChunk * chunk = new MemoryChunk;
     largetable.store(chunk);

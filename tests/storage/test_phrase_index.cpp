@@ -71,24 +71,23 @@ int main(int argc, char * argv[]){
     }
 
     FacadePhraseIndex phrase_index_load;
+    for (size_t i = 0; i < PHRASE_INDEX_LIBRARY_COUNT; ++i) {
+        const char * tablename = pinyin_table_files[i];
+        if (NULL == tablename)
+            continue;
 
-    FILE* infile = fopen("../../data/gb_char.table", "r");
-    if ( NULL == infile ){
-	fprintf(stderr, "open gb_char.table failed!\n");
-	exit(ENOENT);
+        gchar * filename = g_build_filename("..", "..", "data",
+                                            tablename, NULL);
+        FILE* tablefile = fopen(filename, "r");
+        if ( NULL == tablefile ){
+            fprintf(stderr, "open %s failed!\n", tablename);
+            exit(ENOENT);
+        }
+
+        phrase_index_load.load_text(i, tablefile);
+        fclose(tablefile);
+        g_free(filename);
     }
-
-    phrase_index_load.load_text(1, infile);
-    fclose(infile);
-
-    infile = fopen("../../data/gbk_char.table", "r");
-    if ( NULL == infile ){
-	fprintf(stderr, "open gbk_char.table failed!\n");
-	exit(ENOENT);
-    }
-
-    phrase_index_load.load_text(2, infile);
-    fclose(infile);
 
     phrase_index.compat();
 

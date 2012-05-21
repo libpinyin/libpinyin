@@ -31,27 +31,25 @@ int main(int argc, char * argv[]) {
     ChewingLargeTable largetable(options);
     FacadePhraseIndex phrase_index;
 
-    FILE * gbfile = fopen("../../data/gb_char.table", "r");
-    if (NULL == gbfile) {
-	fprintf(stderr, "open gb_char.table failed!\n");
-	exit(ENOENT);
+    for (size_t i = 0; i < PHRASE_INDEX_LIBRARY_COUNT; ++i) {
+        const char * tablename = pinyin_table_files[i];
+        if ( NULL == tablename )
+            continue;
+
+        gchar * filename = g_build_filename("..", "..", "data",
+                                            tablename, NULL);
+        FILE * tablefile = fopen(filename, "r");
+        if (NULL == tablefile) {
+            fprintf(stderr, "open %s failed!\n", tablename);
+            exit(ENOENT);
+        }
+
+        largetable.load_text(tablefile);
+        fseek(tablefile, 0L, SEEK_SET);
+        phrase_index.load_text(i, tablefile);
+        fclose(tablefile);
+        g_free(filename);
     }
-
-    largetable.load_text(gbfile);
-    fseek(gbfile, 0L, SEEK_SET);
-    phrase_index.load_text(1, gbfile);
-    fclose(gbfile);
-
-    FILE * gbkfile = fopen("../../data/gbk_char.table", "r");
-    if (NULL == gbkfile) {
-	fprintf(stderr, "open gbk_char.table failed!\n");
-	exit(ENOENT);
-    }
-
-    largetable.load_text(gbkfile);
-    fseek(gbkfile, 0L, SEEK_SET);
-    phrase_index.load_text(2, gbkfile);
-    fclose(gbkfile);
 
     MemoryChunk * new_chunk = new MemoryChunk;
     largetable.store(new_chunk);
