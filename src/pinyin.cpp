@@ -572,7 +572,7 @@ static void _append_items(pinyin_context_t * context,
                           lookup_candidate_t * template_item,
                           CandidateVector items) {
     /* reduce and append to a single GArray. */
-    for (size_t m = 0; m <= PHRASE_INDEX_LIBRARY_COUNT; ++m) {
+    for (size_t m = 0; m < PHRASE_INDEX_LIBRARY_COUNT; ++m) {
         if (NULL == ranges[m])
             continue;
 
