@@ -1,3 +1,11 @@
+version 0.6.91
+* support ucs4 characters;
+* support guess sentence with prefix;
+* initially support fuzzy pinyin segment.
+
+version 0.6.0
+* the first official release of 0.6.x.
+
 version 0.5.92
 * fixes new parsers and chewing large table;
 * improves pinyin_save.
