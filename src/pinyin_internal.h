@@ -49,4 +49,11 @@
 using namespace pinyin;
 
 
+/* the following fixes build on Debian GNU/kFreeBSD */
+#include <errno.h>
+#ifndef ENODATA
+#define ENODATA ENOENT
+#endif
+
+
 #endif
