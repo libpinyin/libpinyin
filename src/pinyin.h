@@ -350,7 +350,7 @@ typedef ChewingKeyVector PinyinKeyVector;
 typedef ChewingKeyRestVector PinyinKeyPosVector;
 
 
-#define LIBPINYIN_FORMAT_VERSION  "0.5.92"
+#define LIBPINYIN_FORMAT_VERSION  "0.6.0"
 
 };
 
