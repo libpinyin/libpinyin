@@ -12,7 +12,7 @@ int main(int argc, char * argv[]) {
 
     guint32 freq;
 
-    for ( size_t i = 0; i < 6; ++i ){
+    for ( size_t i = 0; i < G_N_ELEMENTS(tokens); ++i ){
         if ( single_gram.get_array_item(tokens[i], freq) )
             assert(single_gram.set_array_item(tokens[i], freqs[i]));
         else
@@ -74,7 +74,7 @@ int main(int argc, char * argv[]) {
     printf("magic header:%d\n", freq);
 
     printf("-----------------------array header---------------------\n");
-    for ( size_t i = 1; i <= 2; ++i){
+    for ( int i = 1; i <= 2; ++i){
         bigram.get_array_header(i, freq);
         printf("single gram: %d, freq:%d\n", i, freq);
     }
@@ -82,7 +82,7 @@ int main(int argc, char * argv[]) {
     bigram.set_array_header(1, 1);
 
     printf("-----------------------array header---------------------\n");
-    for ( size_t i = 1; i <= 2; ++i){
+    for ( int i = 1; i <= 2; ++i){
         bigram.get_array_header(i, freq);
         printf("single gram: %d, freq:%d\n", i, freq);
     }
