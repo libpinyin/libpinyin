@@ -623,6 +623,7 @@ bool DoublePinyinParser2::parse_one_key(pinyin_option_t options,
                                         ChewingKey & key,
                                         const char *str, int len) const {
     options &= ~(PINYIN_CORRECT_ALL|PINYIN_AMB_ALL);
+    options |= PINYIN_CORRECT_UE_VE;
 
     if (1 == len) {
         if (!(options & PINYIN_INCOMPLETE))
