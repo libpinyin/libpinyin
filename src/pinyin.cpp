@@ -711,9 +711,9 @@ bool pinyin_get_candidates(pinyin_instance_t * instance,
         g_array_sort(items, compare_item_with_frequency);
 
         /* transfer back items to tokens, and save it into candidates */
-        for (i = 0; i < items->len; ++i) {
+        for (ssize_t k = 0; k < items->len; ++k) {
             lookup_candidate_t * item = &g_array_index
-                (items, lookup_candidate_t, i);
+                (items, lookup_candidate_t, k);
             g_array_append_val(candidates, item->m_token);
         }
 
