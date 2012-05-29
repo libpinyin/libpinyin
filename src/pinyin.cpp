@@ -1144,11 +1144,16 @@ int pinyin_choose_full_pinyin_candidate(pinyin_instance_t * instance,
         /* Note: there may be some un-parsable input here. */
     }
 
+    /* sync m_constraints to the length of m_pinyin_keys. */
+    bool retval = context->m_pinyin_lookup->validate_constraint
+        (instance->m_constraints, instance->m_pinyin_keys);
+
     phrase_token_t token = candidate->m_token;
     guint8 len = context->m_pinyin_lookup->add_constraint
         (instance->m_constraints, offset, token);
 
-    bool retval = context->m_pinyin_lookup->validate_constraint
+    /* safe guard: validate the m_constraints again. */
+    retval = context->m_pinyin_lookup->validate_constraint
         (instance->m_constraints, instance->m_pinyin_keys) && len;
 
     return offset + len;
