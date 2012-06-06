@@ -646,7 +646,7 @@ bool DoublePinyinParser2::parse_one_key(pinyin_option_t options,
 
     ChewingTone tone = CHEWING_ZERO_TONE;
     options &= ~(PINYIN_INCOMPLETE|CHEWING_INCOMPLETE);
-    options |= PINYIN_CORRECT_UE_VE;
+    options |= PINYIN_CORRECT_UE_VE | PINYIN_CORRECT_V_U;
 
     /* parse tone */
     if (3 == len) {
