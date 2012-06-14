@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <errno.h>
 #include "pinyin_internal.h"
+#include "tests_helper.h"
 
 size_t bench_times = 100000;
 
@@ -37,17 +38,17 @@ int main(int argc, char * argv[]){
     phrase_item.get_phrase_string(&string2);
     assert(string1 == string2);
 
-    FacadePhraseIndex phrase_index;
-    assert(!phrase_index.add_phrase_item(1, &phrase_item));
+    FacadePhraseIndex phrase_index_test;
+    assert(!phrase_index_test.add_phrase_item(1, &phrase_item));
 
     MemoryChunk* chunk = new MemoryChunk;
-    assert(phrase_index.store(0, chunk));
-    assert(phrase_index.load(0, chunk));
+    assert(phrase_index_test.store(0, chunk));
+    assert(phrase_index_test.load(0, chunk));
 
     PhraseItem item2;
     guint32 time = record_time();
     for ( size_t i = 0; i < bench_times; ++i){
-	phrase_index.get_phrase_item(1, item2);
+	phrase_index_test.get_phrase_item(1, item2);
 	assert(item2.get_unigram_frequency() == 0);
 	assert(item2.get_n_pronunciation() == 2);
 	assert(item2.get_phrase_length() == 1);
@@ -57,51 +58,36 @@ int main(int argc, char * argv[]){
 
     {
         PhraseItem item3;
-        phrase_index.get_phrase_item(1, item3);
+        phrase_index_test.get_phrase_item(1, item3);
         item3.increase_pronunciation_possibility(options, &key1, 200);
         assert(item3.get_pronunciation_possibility(options, &key1) == 0.5) ;
     }
 
     {
         PhraseItem item5;
-        phrase_index.get_phrase_item(1, item5);
+        phrase_index_test.get_phrase_item(1, item5);
         gfloat poss = item5.get_pronunciation_possibility(options, &key1);
         printf("pinyin poss:%f\n", poss);
         assert(poss == 0.5);
     }
 
-    FacadePhraseIndex phrase_index_load;
-    for (size_t i = 0; i < PHRASE_INDEX_LIBRARY_COUNT; ++i) {
-        const char * tablename = pinyin_table_files[i];
-        if (NULL == tablename)
-            continue;
-
-        gchar * filename = g_build_filename("..", "..", "data",
-                                            tablename, NULL);
-        FILE* tablefile = fopen(filename, "r");
-        if ( NULL == tablefile ){
-            fprintf(stderr, "open %s failed!\n", tablename);
-            exit(ENOENT);
-        }
-
-        phrase_index_load.load_text(i, tablefile);
-        fclose(tablefile);
-        g_free(filename);
-    }
+    FacadePhraseIndex phrase_index;
+    if (!load_phrase_table(NULL, NULL, &phrase_index))
+        exit(ENOENT);
 
     phrase_index.compact();
 
     MemoryChunk* store1 = new MemoryChunk;
-    phrase_index_load.store(1, store1);
-    phrase_index_load.load(1, store1);
+    phrase_index.store(1, store1);
+    phrase_index.load(1, store1);
 
     MemoryChunk* store2 = new MemoryChunk;
-    phrase_index_load.store(2, store2);
-    phrase_index_load.load(2, store2);
+    phrase_index.store(2, store2);
+    phrase_index.load(2, store2);
 
     phrase_index.compact();
 
-    phrase_index_load.get_phrase_item(16870553, item2);
+    phrase_index.get_phrase_item(16870553, item2);
     assert( item2.get_phrase_length() == 14);
     assert( item2.get_n_pronunciation() == 1);
 
@@ -112,11 +98,11 @@ int main(int argc, char * argv[]){
     g_free(string);
 
     guint32 delta = 3;
-    phrase_index_load.add_unigram_frequency(16870553, delta);
-    phrase_index_load.get_phrase_item(16870553, item2);
+    phrase_index.add_unigram_frequency(16870553, delta);
+    phrase_index.get_phrase_item(16870553, item2);
     assert( item2.get_unigram_frequency() == 3);
 
-    phrase_index_load.get_phrase_item(16777222, item2);
+    phrase_index.get_phrase_item(16777222, item2);
     assert(item2.get_phrase_length() == 1);
     assert(item2.get_n_pronunciation() == 6);
 

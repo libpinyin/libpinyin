@@ -22,7 +22,7 @@
 #include "timer.h"
 #include <string.h>
 #include "pinyin_internal.h"
-
+#include "tests_helper.h"
 
 size_t bench_times = 1000;
 
@@ -31,25 +31,8 @@ int main(int argc, char * argv[]) {
     ChewingLargeTable largetable(options);
     FacadePhraseIndex phrase_index;
 
-    for (size_t i = 0; i < PHRASE_INDEX_LIBRARY_COUNT; ++i) {
-        const char * tablename = pinyin_table_files[i];
-        if ( NULL == tablename )
-            continue;
-
-        gchar * filename = g_build_filename("..", "..", "data",
-                                            tablename, NULL);
-        FILE * tablefile = fopen(filename, "r");
-        if (NULL == tablefile) {
-            fprintf(stderr, "open %s failed!\n", tablename);
-            exit(ENOENT);
-        }
-
-        largetable.load_text(tablefile);
-        fseek(tablefile, 0L, SEEK_SET);
-        phrase_index.load_text(i, tablefile);
-        fclose(tablefile);
-        g_free(filename);
-    }
+    if (!load_phrase_table(&largetable, NULL, &phrase_index))
+        exit(ENOENT);
 
     MemoryChunk * new_chunk = new MemoryChunk;
     largetable.store(new_chunk);

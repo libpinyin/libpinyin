@@ -44,4 +44,34 @@ static bool load_phrase_index(FacadePhraseIndex * phrase_index){
     return true;
 }
 
+static bool load_phrase_table(ChewingLargeTable * chewing_table,
+                              PhraseLargeTable * phrase_table,
+                              FacadePhraseIndex * phrase_index){
+    for (size_t i = 0; i < PHRASE_INDEX_LIBRARY_COUNT; ++i) {
+        const char * tablename = pinyin_table_files[i];
+        if ( NULL == tablename )
+            continue;
+
+        gchar * filename = g_build_filename("..", "..", "data",
+                                            tablename, NULL);
+        FILE * tablefile = fopen(filename, "r");
+        if (NULL == tablefile) {
+            fprintf(stderr, "open %s failed!\n", tablename);
+            return false;
+        }
+        g_free(filename);
+
+        if (chewing_table)
+            chewing_table->load_text(tablefile);
+        fseek(tablefile, 0L, SEEK_SET);
+        if (phrase_table)
+            phrase_table->load_text(tablefile);
+        fseek(tablefile, 0L, SEEK_SET);
+        if (phrase_index)
+            phrase_index->load_text(i, tablefile);
+        fclose(tablefile);
+    }
+    return true;
+}
+
 #endif

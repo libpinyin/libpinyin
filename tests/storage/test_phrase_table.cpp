@@ -1,29 +1,15 @@
 #include "timer.h"
 #include <string.h>
 #include "pinyin_internal.h"
+#include "tests_helper.h"
 
 size_t bench_times = 1000;
 
 int main(int argc, char * argv[]){
     PhraseLargeTable largetable;
 
-    for (size_t i = 0; i < PHRASE_INDEX_LIBRARY_COUNT; ++i) {
-        const char * tablename = pinyin_table_files[i];
-        if (NULL == tablename)
-            continue;
-
-        gchar * filename = g_build_filename("..", "..", "data",
-                                            tablename, NULL);
-        FILE * tablefile = fopen(filename, "r");
-        if ( tablefile == NULL ) {
-            fprintf(stderr, "open %s failed!\n", tablename);
-            return 1;
-        }
-
-        largetable.load_text(tablefile);
-        fclose(tablefile);
-        g_free(filename);
-    }
+    if (!load_phrase_table(NULL, &largetable, NULL))
+        exit(ENOENT);
 
     MemoryChunk * chunk = new MemoryChunk;
     largetable.store(chunk);
