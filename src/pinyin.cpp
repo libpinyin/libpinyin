@@ -84,10 +84,12 @@ static bool check_format(const char * userdir){
         if (NULL == phrasefilename)
             continue;
 
+#if 0
         /* remove bin file. */
         gchar * filename = g_build_filename(userdir, phrasefilename, NULL);
         unlink(filename);
         g_free(filename);
+#endif
 
         gchar * dbinfilename = get_dbin_filename(phrasefilename);
 
@@ -214,8 +216,8 @@ bool pinyin_load_phrase_library(pinyin_context_t * context,
         g_free(dbinfilename);
 
         MemoryChunk * log = new MemoryChunk;
-        log->load(dbinfilename);
-        g_free(dbinfilename);
+        log->load(chunkfilename);
+        g_free(chunkfilename);
 
         /* merge the chunk log. */
         context->m_phrase_index->merge(index, log);
