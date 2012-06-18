@@ -47,6 +47,8 @@ struct _pinyin_context_t{
     char * m_system_dir;
     char * m_user_dir;
     bool m_modified;
+
+    gchar * m_phrase_indices[PHRASE_INDEX_LIBRARY_COUNT];
 };
 
 
@@ -106,6 +108,9 @@ pinyin_context_t * pinyin_init(const char * systemdir, const char * userdir){
     context->m_user_dir = g_strdup(userdir);
     context->m_modified = false;
 
+    memset(context->m_phrase_indices, 0,
+           sizeof(context->m_phrase_indices));
+
     check_format(context->m_user_dir);
 
     context->m_pinyin_table = new FacadeChewingTable;
@@ -135,6 +140,8 @@ pinyin_context_t * pinyin_init(const char * systemdir, const char * userdir){
     context->m_phrase_table->load(chunk, NULL);
 
     context->m_phrase_index = new FacadePhraseIndex;
+
+    context->m_phrase_indices[1] = g_strdup("gb_char.bin");
     MemoryChunk * log = new MemoryChunk; chunk = new MemoryChunk;
     filename = g_build_filename(context->m_system_dir, "gb_char.bin", NULL);
     if (!chunk->load(filename)) {
@@ -148,6 +155,7 @@ pinyin_context_t * pinyin_init(const char * systemdir, const char * userdir){
     g_free(filename);
     context->m_phrase_index->merge(1, log);
 
+    context->m_phrase_indices[2] = g_strdup("gbk_char.bin");
     log = new MemoryChunk; chunk = new MemoryChunk;
     filename = g_build_filename(context->m_system_dir, "gbk_char.bin", NULL);
     if (!chunk->load(filename)) {
@@ -271,6 +279,9 @@ void pinyin_fini(pinyin_context_t * context){
     g_free(context->m_system_dir);
     g_free(context->m_user_dir);
     context->m_modified = false;
+
+    g_free(context->m_phrase_indices[1]);
+    g_free(context->m_phrase_indices[2]);
 
     delete context;
 }

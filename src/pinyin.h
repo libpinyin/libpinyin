@@ -81,6 +81,13 @@ struct _pinyin_instance_t{
  */
 pinyin_context_t * pinyin_init(const char * systemdir, const char * userdir);
 
+bool pinyin_load_phrase_library(pinyin_context_t * context,
+                                guint8 index,
+                                const char * filename);
+
+bool pinyin_unload_phrase_library(pinyin_context_t * context,
+                                  guint8 index);
+
 /**
  * pinyin_save:
  * @context: the pinyin context to be saved into user directory.
