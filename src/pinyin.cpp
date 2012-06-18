@@ -191,6 +191,81 @@ pinyin_context_t * pinyin_init(const char * systemdir, const char * userdir){
     return context;
 }
 
+bool pinyin_load_phrase_library(pinyin_context_t * context,
+                                guint8 index,
+                                const char * filename){
+    assert(index < PHRASE_INDEX_LIBRARY_COUNT);
+    gchar * & phrasefilename = context->m_phrase_indices[index];
+    assert(NULL == phrasefilename);
+
+    /* save phrase file name to context. */
+    phrasefilename = filename;
+
+    /* check the suffix. */
+    assert(g_str_has_suffix(phrasefilename, ".bin"));
+
+    MemoryChunk * chunk = new MemoryChunk;
+    /* check bin file in system dir. */
+    gchar * chunkfilename = g_build_filename(context->m_system_dir,
+                                             phrasefilename, NULL);
+    if (chunk->load(chunkfilename)) {
+        /* system phrase library */
+        g_free(chunkfilename);
+        context->m_phrase_index->load(index, chunk);
+
+        /* compute the delta bin file name. */
+        gchar * tmp = g_strdup(phrasefilename);
+        tmp[strlen(tmp) - 4] = '\0'; /* remove ".bin" */
+        gchar * dbinfilename = g_strdup_printf("%s.dbin", tmp);
+        g_free(tmp);
+
+        chunkfilename = g_build_filename(context->m_user_dir,
+                                         dbinfilename, NULL);
+        g_free(dbinfilename);
+
+        MemoryChunk * log = new MemoryChunk;
+        log->load(dbinfilename);
+        g_free(dbinfilename);
+
+        /* merge the chunk log. */
+        context->m_phrase_index->merge(index, log);
+        return true;
+    } else {
+        /* user phrase library */
+        g_free(chunkfilename);
+
+        chunkfilename = g_build_filename(context->m_user_dir,
+                                         phrasefilename, NULL);
+
+        chunk->load(chunkfilename);
+        g_free(chunkfilename);
+
+        context->m_phrase_index->load(index, chunk);
+        return true;
+    }
+
+    return false;
+}
+
+bool pinyin_unload_phrase_library(pinyin_context_t * context,
+                                  guint8 index){
+    /* gb_char.bin can't be unloaded. */
+    if (1 == index)
+        return false;
+
+    assert(index < PHRASE_INDEX_LIBRARY_COUNT);
+    gchar * & phrasefilename = context->m_phrase_indices[index];
+
+    /* check the suffix. */
+    assert(g_str_has_suffix(phrasefilename, ".bin"));
+
+    context->m_phrase_index->unload(index);
+
+    phrasefilename = NULL;
+    return true;
+}
+
+
 bool pinyin_save(pinyin_context_t * context){
     if (!context->m_user_dir)
         return false;
@@ -200,41 +275,51 @@ bool pinyin_save(pinyin_context_t * context){
 
     context->m_phrase_index->compact();
 
-    MemoryChunk * oldchunk = new MemoryChunk;
-    MemoryChunk * newlog = new MemoryChunk;
+    /* skip the reserved zero phrase library. */
+    for (size_t i = 1; i < PHRASE_INDEX_LIBRARY_COUNT; ++i) {
+        if (NULL == context->m_phrase_indices[i])
+            continue;
 
-    gchar * filename = g_build_filename(context->m_system_dir,
-                                        "gb_char.bin", NULL);
-    oldchunk->load(filename);
-    g_free(filename);
+        MemoryChunk * chunk = new MemoryChunk;
+        MemoryChunk * log = new MemoryChunk;
+        /* check bin file in system dir. */
+        gchar * chunkfilename = g_build_filename(context->m_system_dir,
+                                                 phrasefilename, NULL);
 
-    context->m_phrase_index->diff(1, oldchunk, newlog);
-    gchar * tmpfilename = g_build_filename(context->m_user_dir,
-                                           "gb_char.dbin.tmp", NULL);
-    filename = g_build_filename(context->m_user_dir,
-                                "gb_char.dbin", NULL);
-    newlog->save(tmpfilename);
-    rename(tmpfilename, filename);
-    g_free(tmpfilename);
-    g_free(filename);
-    delete newlog;
+        if (chunk->load(chunkfilename)) {
+            /* system phrase library */
+            g_free(chunkfilename);
+            context->m_phrase_index->diff(i, chunk, log);
 
-    oldchunk = new MemoryChunk; newlog = new MemoryChunk;
-    filename = g_build_filename(context->m_system_dir,
-                                "gbk_char.bin", NULL);
-    oldchunk->load(filename);
-    g_free(filename);
+            /* compute the delta bin file name. */
+            gchar * tmp = g_strdup(phrasefilename);
+            tmp[strlen(tmp) - 4] = '\0'; /* remove ".bin" */
+            gchar * dbinfilename = g_strdup_printf("%s.dbin", tmp);
+            gchar * tmpfilename = g_strdup_printf("%s.tmp", dbinfilename);
+            g_free(tmp);
 
-    context->m_phrase_index->diff(2, oldchunk, newlog);
-    tmpfilename = g_build_filename(context->m_user_dir,
-                                   "gbk_char.dbin.tmp", NULL);
-    filename = g_build_filename(context->m_user_dir,
-                                "gbk_char.dbin", NULL);
-    newlog->save(tmpfilename);
-    rename(tmpfilename, filename);
-    g_free(tmpfilename);
-    g_free(filename);
-    delete newlog;
+            gchar * tmppathname = g_build_filename(context->m_user_dir,
+                                                   tmpfilename, NULL);
+            g_free(tmpfilename);
+            gchar * chunkpathname = g_build_filename(context->m_user_dir,
+                                                dbinfilename, NULL);
+            g_free(dbinfilename);
+
+            log->save(tmppathname);
+            rename(tmppathname, chunkpathname);
+            g_free(tmppathname); g_free(chunkpathname);
+            delete log;
+        } else {
+            /* user phrase library */
+            g_free(chunkfilename);
+            chunkfilename = g_build_filename(context->m_user_dir,
+                                             phrasefilename, NULL);
+            context->m_phrase_index->store(i, chunk);
+            chunk->save(chunkfilename);
+            g_free(chunkfilename);
+            delete chunk; delete log;
+        }
+    }
 
     tmpfilename = g_build_filename(context->m_user_dir,
                                    "user.db.tmp", NULL);
