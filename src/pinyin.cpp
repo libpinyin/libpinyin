@@ -70,15 +70,30 @@ static bool check_format(const char * userdir){
         return exists;
 
     /* clean up files, if version mis-matches. */
-    filename = g_build_filename
-        (userdir, "gb_char.dbin", NULL);
-    g_unlink(filename);
-    g_free(filename);
+    for (size_t i = 1; i < PHRASE_INDEX_LIBRARY_COUNT; ++i) {
+        const char * phrasefilename = pinyin_phrase_files[i];
 
-    filename = g_build_filename
-        (userdir, "gbk_char.dbin", NULL);
-    g_unlink(filename);
-    g_free(filename);
+        if (NULL == phrasefilename)
+            continue;
+
+        /* remove bin file. */
+        gchar * filename = g_build_filename(userdir, phrasefilename, NULL);
+        unlink(filename);
+        g_free(filename);
+
+        /* compute the delta bin file name. */
+        gchar * tmp = g_strdup(phrasefilename);
+        tmp[strlen(tmp) - 4] = '\0'; /* remove ".bin" */
+        gchar * dbinfilename = g_strdup_printf("%s.dbin", tmp);
+        g_free(tmp);
+
+        /* remove dbin file. */
+        filename = g_build_filename(userdir, dbinfilename, NULL);
+        unlink(filename);
+        g_free(filename);
+
+        g_free(dbinfilename);
+    }
 
     filename = g_build_filename
         (userdir, "user.db", NULL);
@@ -141,33 +156,8 @@ pinyin_context_t * pinyin_init(const char * systemdir, const char * userdir){
 
     context->m_phrase_index = new FacadePhraseIndex;
 
-    context->m_phrase_indices[1] = g_strdup("gb_char.bin");
-    MemoryChunk * log = new MemoryChunk; chunk = new MemoryChunk;
-    filename = g_build_filename(context->m_system_dir, "gb_char.bin", NULL);
-    if (!chunk->load(filename)) {
-        fprintf(stderr, "open %s failed!\n", filename);
-        return NULL;
-    }
-    g_free(filename);
-    context->m_phrase_index->load(1, chunk);
-    filename = g_build_filename(context->m_user_dir, "gb_char.dbin", NULL);
-    log->load(filename);
-    g_free(filename);
-    context->m_phrase_index->merge(1, log);
-
-    context->m_phrase_indices[2] = g_strdup("gbk_char.bin");
-    log = new MemoryChunk; chunk = new MemoryChunk;
-    filename = g_build_filename(context->m_system_dir, "gbk_char.bin", NULL);
-    if (!chunk->load(filename)) {
-        fprintf(stderr, "open %s failed!\n", filename);
-        return NULL;
-    }
-    g_free(filename);
-    context->m_phrase_index->load(2, chunk);
-    filename = g_build_filename(context->m_user_dir, "gbk_char.dbin", NULL);
-    log->load(filename);
-    g_free(filename);
-    context->m_phrase_index->merge(2, log);
+    /* hack here: directly call load phrase library. */
+    pinyin_load_phrase_library(context, 1, pinyin_phrase_files[1]);
 
     context->m_system_bigram = new Bigram;
     filename = g_build_filename(context->m_system_dir, "bigram.db", NULL);
@@ -199,7 +189,7 @@ bool pinyin_load_phrase_library(pinyin_context_t * context,
     assert(NULL == phrasefilename);
 
     /* save phrase file name to context. */
-    phrasefilename = filename;
+    phrasefilename = g_strdup(filename);
 
     /* check the suffix. */
     assert(g_str_has_suffix(phrasefilename, ".bin"));
@@ -277,7 +267,9 @@ bool pinyin_save(pinyin_context_t * context){
 
     /* skip the reserved zero phrase library. */
     for (size_t i = 1; i < PHRASE_INDEX_LIBRARY_COUNT; ++i) {
-        if (NULL == context->m_phrase_indices[i])
+        gchar * & phrasefilename = context->m_phrase_indices[i];
+
+        if (NULL == phrasefilename)
             continue;
 
         MemoryChunk * chunk = new MemoryChunk;
@@ -321,10 +313,10 @@ bool pinyin_save(pinyin_context_t * context){
         }
     }
 
-    tmpfilename = g_build_filename(context->m_user_dir,
+    gchar * tmpfilename = g_build_filename(context->m_user_dir,
                                    "user.db.tmp", NULL);
     unlink(tmpfilename);
-    filename = g_build_filename(context->m_user_dir, "user.db", NULL);
+    gchar * filename = g_build_filename(context->m_user_dir, "user.db", NULL);
     context->m_user_bigram->save_db(tmpfilename);
     rename(tmpfilename, filename);
     g_free(tmpfilename);
