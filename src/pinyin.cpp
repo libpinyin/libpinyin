@@ -51,6 +51,14 @@ struct _pinyin_context_t{
     gchar * m_phrase_indices[PHRASE_INDEX_LIBRARY_COUNT];
 };
 
+static gchar * get_dbin_filename(const gchar * filename){
+    /* compute the delta bin file name. */
+    gchar * tmp = g_strdup(filename);
+    tmp[strlen(tmp) - 4] = '\0'; /* remove ".bin" */
+    gchar * dbinfilename = g_strdup_printf("%s.dbin", tmp);
+    g_free(tmp);
+    return dbinfilename;
+}
 
 static bool check_format(const char * userdir){
     gchar * filename = g_build_filename
@@ -81,11 +89,7 @@ static bool check_format(const char * userdir){
         unlink(filename);
         g_free(filename);
 
-        /* compute the delta bin file name. */
-        gchar * tmp = g_strdup(phrasefilename);
-        tmp[strlen(tmp) - 4] = '\0'; /* remove ".bin" */
-        gchar * dbinfilename = g_strdup_printf("%s.dbin", tmp);
-        g_free(tmp);
+        gchar * dbinfilename = get_dbin_filename(phrasefilename);
 
         /* remove dbin file. */
         filename = g_build_filename(userdir, dbinfilename, NULL);
@@ -203,11 +207,7 @@ bool pinyin_load_phrase_library(pinyin_context_t * context,
         g_free(chunkfilename);
         context->m_phrase_index->load(index, chunk);
 
-        /* compute the delta bin file name. */
-        gchar * tmp = g_strdup(phrasefilename);
-        tmp[strlen(tmp) - 4] = '\0'; /* remove ".bin" */
-        gchar * dbinfilename = g_strdup_printf("%s.dbin", tmp);
-        g_free(tmp);
+        gchar * dbinfilename = get_dbin_filename(phrasefilename);
 
         chunkfilename = g_build_filename(context->m_user_dir,
                                          dbinfilename, NULL);
@@ -283,12 +283,8 @@ bool pinyin_save(pinyin_context_t * context){
             g_free(chunkfilename);
             context->m_phrase_index->diff(i, chunk, log);
 
-            /* compute the delta bin file name. */
-            gchar * tmp = g_strdup(phrasefilename);
-            tmp[strlen(tmp) - 4] = '\0'; /* remove ".bin" */
-            gchar * dbinfilename = g_strdup_printf("%s.dbin", tmp);
+            gchar * dbinfilename = get_dbin_filename(phrasefilename);
             gchar * tmpfilename = g_strdup_printf("%s.tmp", dbinfilename);
-            g_free(tmp);
 
             gchar * tmppathname = g_build_filename(context->m_user_dir,
                                                    tmpfilename, NULL);
