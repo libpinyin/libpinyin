@@ -229,6 +229,7 @@ bool pinyin_load_phrase_library(pinyin_context_t * context,
         chunkfilename = g_build_filename(context->m_user_dir,
                                          phrasefilename, NULL);
 
+	/* TODO: check bin file exists. if not, create a new one. */
         chunk->load(chunkfilename);
         g_free(chunkfilename);
 
@@ -303,12 +304,21 @@ bool pinyin_save(pinyin_context_t * context){
         } else {
             /* user phrase library */
             g_free(chunkfilename);
-            chunkfilename = g_build_filename(context->m_user_dir,
-                                             phrasefilename, NULL);
+
+            gchar * tmpfilename = g_strdup_printf("%s.tmp", phrasefilename);
             context->m_phrase_index->store(i, chunk);
-            chunk->save(chunkfilename);
-            g_free(chunkfilename);
-            delete chunk; delete log;
+            gchar * chunkpathname = g_build_filename(context->m_user_dir,
+                                                     phrasefilename, NULL);
+            gchar * tmppathname = g_build_filename(context->m_user_dir,
+                                                   tmpfilename, NULL);
+            g_free(tmpfilename);
+
+            chunk->save(tmppathname);
+            rename(tmppathname, chunkpathname);
+            g_free(chunkpathname);
+            g_free(tmppathname);
+            delete chunk;
+            delete log;
         }
     }
 
