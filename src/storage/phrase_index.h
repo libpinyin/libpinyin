@@ -708,6 +708,14 @@ public:
         return true;
     }
 
+    /**
+     * FacadePhraseIndex::create_sub_phrase:
+     * @index: the phrase index to be created.
+     * @returns: the result of the create operation.
+     *
+     * Create the sub phrase index.
+     *
+     */
     int create_sub_phrase(guint8 index) {
 	SubPhraseIndex * & sub_phrase = m_sub_phrase_indices[index];
 	if (sub_phrase) {
