@@ -355,8 +355,12 @@ void pinyin_fini(pinyin_context_t * context){
     g_free(context->m_user_dir);
     context->m_modified = false;
 
-    g_free(context->m_phrase_indices[1]);
-    g_free(context->m_phrase_indices[2]);
+    for (size_t i = 0; i < PHRASE_INDEX_LIBRARY_COUNT; ++i) {
+        gchar * & phrasefilename = context->m_phrase_indices[i];
+        if (phrasefilename) {
+            g_free(phrasefilename);
+        }
+    }
 
     delete context;
 }
