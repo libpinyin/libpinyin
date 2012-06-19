@@ -253,6 +253,7 @@ bool pinyin_unload_phrase_library(pinyin_context_t * context,
 
     context->m_phrase_index->unload(index);
 
+    g_free(phrasefilename);
     phrasefilename = NULL;
     return true;
 }
