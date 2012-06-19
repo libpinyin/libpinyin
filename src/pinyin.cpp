@@ -229,11 +229,15 @@ bool pinyin_load_phrase_library(pinyin_context_t * context,
         chunkfilename = g_build_filename(context->m_user_dir,
                                          phrasefilename, NULL);
 
-	/* TODO: check bin file exists. if not, create a new one. */
-        chunk->load(chunkfilename);
-        g_free(chunkfilename);
+	/* check bin file exists. if not, create a new one. */
+        if (chunk->load(chunkfilename)) {
+            context->m_phrase_index->load(index, chunk);
+        } else {
+            delete chunk;
+            context->m_phrase_index->create_sub_phrase(index);
+        }
 
-        context->m_phrase_index->load(index, chunk);
+        g_free(chunkfilename);
         return true;
     }
 
@@ -1321,9 +1325,5 @@ bool pinyin_reset(pinyin_instance_t * instance){
 }
 
 /**
- *  TODO: to be implemented.
- *    Note: prefix is the text before the pre-edit string.
- *  bool pinyin_get_guessed_sentence_with_prefix(...);
- *  bool pinyin_get_candidates_with_prefix(...);
- *  For context-dependent order of the candidates list.
+ *  Note: prefix is the text before the pre-edit string.
  */

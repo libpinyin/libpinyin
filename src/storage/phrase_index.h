@@ -707,6 +707,17 @@ public:
         }
         return true;
     }
+
+    int create_sub_phrase(guint8 index) {
+	SubPhraseIndex * & sub_phrase = m_sub_phrase_indices[index];
+	if (sub_phrase) {
+	    return ERROR_ALREADY_EXISTS;
+	}
+
+        sub_phrase = new SubPhraseIndex;
+
+        return ERROR_OK;
+    }
 };
  
 };

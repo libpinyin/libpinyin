@@ -90,7 +90,8 @@ enum PhraseIndexResult{
     ERROR_NO_ITEM,               /* item has a null slot */
     ERROR_OUT_OF_RANGE,          /* beyond the end of the sub phrase index */
     ERROR_FILE_CORRUPTION,       /* file is corrupted */
-    ERROR_INTEGER_OVERFLOW       /* integer is overflowed */
+    ERROR_INTEGER_OVERFLOW,      /* integer is overflowed */
+    ERROR_ALREADY_EXISTS         /* the sub phrase already exists. */
 };
 
 /* For N-gram */
