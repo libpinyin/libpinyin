@@ -242,7 +242,9 @@ int PhraseBitmapIndexLevel::remove_index( int phrase_length, /* in */ ucs4_t phr
 }
 
 int PhraseLengthIndexLevel::add_index( int phrase_length, /* in */ ucs4_t phrase[], /* in */ phrase_token_t token){
-    assert(phrase_length + 1 < MAX_PHRASE_LENGTH);
+    if (!(phrase_length + 1 < MAX_PHRASE_LENGTH))
+        return ERROR_PHRASE_TOO_LONG;
+
     if ( m_phrase_array_indexes -> len <= phrase_length )
         g_array_set_size(m_phrase_array_indexes, phrase_length + 1);
 
@@ -280,7 +282,9 @@ int PhraseLengthIndexLevel::add_index( int phrase_length, /* in */ ucs4_t phrase
 }
 
 int PhraseLengthIndexLevel::remove_index( int phrase_length, /* in */ ucs4_t phrase[], /* out */ phrase_token_t & token){
-    assert(phrase_length + 1 < MAX_PHRASE_LENGTH);
+    if (!(phrase_length + 1 < MAX_PHRASE_LENGTH))
+        return ERROR_PHRASE_TOO_LONG;
+
     if ( m_phrase_array_indexes -> len <= phrase_length )
         return ERROR_REMOVE_ITEM_DONOT_EXISTS;
 #define CASE(len) case len:                                             \

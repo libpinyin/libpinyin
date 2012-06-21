@@ -78,6 +78,7 @@ enum ErrorResult{
     ERROR_OK = 0,                /* operate ok */
     ERROR_INSERT_ITEM_EXISTS,    /* item already exists */
     ERROR_REMOVE_ITEM_DONOT_EXISTS, /* item don't exists */
+    ERROR_PHRASE_TOO_LONG,       /* the phrase is too long */
     ERROR_NO_SUB_PHRASE_INDEX,   /* sub phrase index is not loaded */
     ERROR_NO_ITEM,               /* item has a null slot */
     ERROR_OUT_OF_RANGE,          /* beyond the end of the sub phrase index */
