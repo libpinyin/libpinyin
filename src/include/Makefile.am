@@ -17,7 +17,7 @@
 
 MAINTAINERCLEANFILES    = Makefile.in
 
-libpinyinincludedir	= $(includedir)/libpinyin-@LIBPINYIN_BINARY_VERSION@
+libpinyinincludedir	= $(includedir)/libpinyin-@VERSION@
 
 libpinyininclude_HEADERS= novel_types.h
 

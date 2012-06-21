@@ -19,7 +19,7 @@ INCLUDES                = -I$(top_srcdir)/src/include \
 			  -I$(top_srcdir)/src/storage \
 			  @GLIB2_CPPFLAGS@
 
-libpinyinincludedir	= $(includedir)/libpinyin-@LIBPINYIN_BINARY_VERSION@
+libpinyinincludedir	= $(includedir)/libpinyin-@VERSION@
 
 libpinyininclude_HEADERS= chewing_enum.h \
 			  chewing_key.h \

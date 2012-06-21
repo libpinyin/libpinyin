@@ -2,14 +2,30 @@
 # Process this file with autoconf to produce a configure script.
 
 
+m4_define([libpinyin_major_version], [0])
+m4_define([libpinyin_minor_version], [6])
+m4_define([libpinyin_micro_version], [91])
+m4_define([libpinyin_abi_current], [2])
+m4_define([libpinyin_abi_revision], [0])
+
+m4_define([libpinyin_version],
+          [libpinyin_major_version.libpinyin_minor_version.libpinyin_micro_version])
+m4_define([libpinyin_binary_version],
+          [libpinyin_abi_current.libpinyin_abi_revision])
+
 AC_PREREQ(2.60)
-AC_INIT(libpinyin, 0.6.91, alexepico@gmail.com)
+AC_INIT([libpinyin], [libpinyin_version], [https://github.com/libpinyin/libpinyin/issues/new])
 AM_INIT_AUTOMAKE
 AC_CONFIG_SRCDIR([config.h.in])
 AC_CONFIG_HEADER([config.h])
 
 # Define a string for binary compatibility
-LIBPINYIN_BINARY_VERSION=0.3
+m4_define([lt_current], [libpinyin_abi_current])
+m4_define([lt_revision], [libpinyin_abi_revision])
+LT_VERSION_INFO="lt_current:lt_revision"
+AC_SUBST(LT_VERSION_INFO)
+
+LIBPINYIN_BINARY_VERSION="libpinyin_binary_version"
 AC_SUBST(LIBPINYIN_BINARY_VERSION)
 
 # Checks for programs.
