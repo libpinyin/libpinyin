@@ -52,6 +52,9 @@ struct _pinyin_context_t{
 };
 
 static gchar * get_dbin_filename(const gchar * filename){
+    /* check the suffix. */
+    assert(g_str_has_suffix(filename, ".bin"));
+
     /* compute the delta bin file name. */
     gchar * tmp = g_strdup(filename);
     tmp[strlen(tmp) - 4] = '\0'; /* remove ".bin" */
@@ -280,6 +283,9 @@ bool pinyin_save(pinyin_context_t * context){
         if (NULL == phrasefilename)
             continue;
 
+        /* check the suffix. */
+        assert(g_str_has_suffix(phrasefilename, ".bin"));
+
         MemoryChunk * chunk = new MemoryChunk;
         MemoryChunk * log = new MemoryChunk;
         /* check bin file in system dir. */
@@ -372,7 +378,11 @@ void pinyin_fini(pinyin_context_t * context){
 
     for (size_t i = 0; i < PHRASE_INDEX_LIBRARY_COUNT; ++i) {
         gchar * & phrasefilename = context->m_phrase_indices[i];
+
         if (phrasefilename) {
+            /* check the suffix. */
+            assert(g_str_has_suffix(phrasefilename, ".bin"));
+
             g_free(phrasefilename);
         }
     }
