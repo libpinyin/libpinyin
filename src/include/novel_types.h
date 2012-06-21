@@ -73,19 +73,11 @@ enum SearchResult{
     SEARCH_CONTINUED = 0x02       /* has longer word in the storage to search */
 };
 
-enum AddIndexResult{
-    INSERT_OK = 0 ,            /* insert ok */         
-    INSERT_ITEM_EXISTS         /* item already exists */
-};
-
-enum RemoveIndexResult{
-    REMOVE_OK = 0,             /* remove ok */
-    REMOVE_ITEM_DONOT_EXISTS   /* item don't exists */
-};
-
 /* For Phrase Index */
-enum PhraseIndexResult{
+enum ErrorResult{
     ERROR_OK = 0,                /* operate ok */
+    ERROR_INSERT_ITEM_EXISTS,    /* item already exists */
+    ERROR_REMOVE_ITEM_DONOT_EXISTS, /* item don't exists */
     ERROR_NO_SUB_PHRASE_INDEX,   /* sub phrase index is not loaded */
     ERROR_NO_ITEM,               /* item has a null slot */
     ERROR_OUT_OF_RANGE,          /* beyond the end of the sub phrase index */
@@ -121,17 +113,6 @@ struct BigramPhraseItemWithCount{
 
 typedef GArray * BigramPhraseArray; /* Array of BigramPhraseItem */
 typedef GArray * BigramPhraseWithCountArray; /* Array of BigramPhraseItemWithCount */
-
-/* 
- *  n-gram Definition
- *  n-gram library
- */
-
-enum AttachOption{
-    ATTACH_NEW_FILE = 1,
-    ATTACH_READ = 2,
-    ATTACH_READ_WRITE = 3
-};
 
 #define MAX_PHRASE_LENGTH 16
 
