@@ -727,10 +727,22 @@ public:
         return ERROR_OK;
     }
 };
+
+typedef enum {
+    NOT_USED,                /* not used. */
+    SYSTEM_FILE,             /* system phrase file. */
+    USER_FILE,               /* user only phrase file. */
+} PHRASE_FILE_TYPE;
+
+typedef struct {
+    const char * m_table_filename;
+    const char * m_system_filename;
+    const char * m_user_filename;
+    PHRASE_FILE_TYPE m_file_type;
+} pinyin_table_info_t;
+
+extern const pinyin_table_info_t pinyin_phrase_files[PHRASE_INDEX_LIBRARY_COUNT];
  
 };
-
-extern const char * pinyin_phrase_files[PHRASE_INDEX_LIBRARY_COUNT];
-extern const char * pinyin_table_files[PHRASE_INDEX_LIBRARY_COUNT];
 
 #endif
