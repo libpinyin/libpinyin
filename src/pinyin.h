@@ -85,15 +85,13 @@ pinyin_context_t * pinyin_init(const char * systemdir, const char * userdir);
  * pinyin_load_phrase_library:
  * @context: the pinyin context.
  * @index: the phrase index to be loaded.
- * @filename: the file name of the phrase index.
  * @returns: whether the load succeeded.
  *
  * Load the sub phrase library of the index.
  *
  */
 bool pinyin_load_phrase_library(pinyin_context_t * context,
-                                guint8 index,
-                                const char * filename);
+                                guint8 index);
 
 /**
  * pinyin_unload_phrase_library:

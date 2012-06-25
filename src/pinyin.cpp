@@ -47,21 +47,7 @@ struct _pinyin_context_t{
     char * m_system_dir;
     char * m_user_dir;
     bool m_modified;
-
-    gchar * m_phrase_indices[PHRASE_INDEX_LIBRARY_COUNT];
 };
-
-static gchar * get_dbin_filename(const gchar * filename){
-    /* check the suffix. */
-    assert(g_str_has_suffix(filename, ".bin"));
-
-    /* compute the delta bin file name. */
-    gchar * tmp = g_strdup(filename);
-    tmp[strlen(tmp) - 4] = '\0'; /* remove ".bin" */
-    gchar * dbinfilename = g_strdup_printf("%s.dbin", tmp);
-    g_free(tmp);
-    return dbinfilename;
-}
 
 static bool check_format(const char * userdir){
     gchar * filename = g_build_filename
@@ -82,26 +68,20 @@ static bool check_format(const char * userdir){
 
     /* clean up files, if version mis-matches. */
     for (size_t i = 1; i < PHRASE_INDEX_LIBRARY_COUNT; ++i) {
-        const char * phrasefilename = pinyin_phrase_files[i];
+        const pinyin_table_info_t * table_info = pinyin_phrase_files + i;
 
-        if (NULL == phrasefilename)
+        if (NOT_USED == table_info->m_file_type)
             continue;
 
-#if 0
-        /* remove bin file. */
-        gchar * filename = g_build_filename(userdir, phrasefilename, NULL);
-        unlink(filename);
-        g_free(filename);
-#endif
+        if (NULL == table_info->m_user_filename)
+            continue;
 
-        gchar * dbinfilename = get_dbin_filename(phrasefilename);
+        const char * userfilename = table_info->m_user_filename;
 
         /* remove dbin file. */
-        filename = g_build_filename(userdir, dbinfilename, NULL);
+        filename = g_build_filename(userdir, userfilename, NULL);
         unlink(filename);
         g_free(filename);
-
-        g_free(dbinfilename);
     }
 
     filename = g_build_filename
@@ -131,9 +111,6 @@ pinyin_context_t * pinyin_init(const char * systemdir, const char * userdir){
     context->m_system_dir = g_strdup(systemdir);
     context->m_user_dir = g_strdup(userdir);
     context->m_modified = false;
-
-    memset(context->m_phrase_indices, 0,
-           sizeof(context->m_phrase_indices));
 
     check_format(context->m_user_dir);
 
@@ -166,7 +143,7 @@ pinyin_context_t * pinyin_init(const char * systemdir, const char * userdir){
     context->m_phrase_index = new FacadePhraseIndex;
 
     /* hack here: directly call load phrase library. */
-    pinyin_load_phrase_library(context, 1, pinyin_phrase_files[1]);
+    pinyin_load_phrase_library(context, 1);
 
     context->m_system_bigram = new Bigram;
     filename = g_build_filename(context->m_system_dir, "bigram.db", NULL);
@@ -191,32 +168,27 @@ pinyin_context_t * pinyin_init(const char * systemdir, const char * userdir){
 }
 
 bool pinyin_load_phrase_library(pinyin_context_t * context,
-                                guint8 index,
-                                const char * filename){
+                                guint8 index){
     assert(index < PHRASE_INDEX_LIBRARY_COUNT);
-    gchar * & phrasefilename = context->m_phrase_indices[index];
-    assert(NULL == phrasefilename);
+    const pinyin_table_info_t * table_info = pinyin_phrase_files + index;
 
-    /* save phrase file name to context. */
-    phrasefilename = g_strdup(filename);
-
-    /* check the suffix. */
-    assert(g_str_has_suffix(phrasefilename, ".bin"));
-
-    MemoryChunk * chunk = new MemoryChunk;
-    /* check bin file in system dir. */
-    gchar * chunkfilename = g_build_filename(context->m_system_dir,
-                                             phrasefilename, NULL);
-    if (chunk->load(chunkfilename)) {
+    if (SYSTEM_FILE == table_info->m_file_type) {
         /* system phrase library */
+        MemoryChunk * chunk = new MemoryChunk;
+
+        const char * systemfilename = table_info->m_system_filename;
+        /* check bin file in system dir. */
+        gchar * chunkfilename = g_build_filename(context->m_system_dir,
+                                                 systemfilename, NULL);
+        chunk->load(chunkfilename);
         g_free(chunkfilename);
+
         context->m_phrase_index->load(index, chunk);
 
-        gchar * dbinfilename = get_dbin_filename(phrasefilename);
+        const char * userfilename = table_info->m_user_filename;
 
         chunkfilename = g_build_filename(context->m_user_dir,
-                                         dbinfilename, NULL);
-        g_free(dbinfilename);
+                                         userfilename, NULL);
 
         MemoryChunk * log = new MemoryChunk;
         log->load(chunkfilename);
@@ -225,12 +197,15 @@ bool pinyin_load_phrase_library(pinyin_context_t * context,
         /* merge the chunk log. */
         context->m_phrase_index->merge(index, log);
         return true;
-    } else {
-        /* user phrase library */
-        g_free(chunkfilename);
+    }
 
-        chunkfilename = g_build_filename(context->m_user_dir,
-                                         phrasefilename, NULL);
+    if (USER_FILE == table_info->m_file_type) {
+        /* user phrase library */
+        MemoryChunk * chunk = new MemoryChunk;
+        const char * userfilename = table_info->m_user_filename;
+
+        gchar * chunkfilename = g_build_filename(context->m_user_dir,
+                                         userfilename, NULL);
 
 	/* check bin file exists. if not, create a new one. */
         if (chunk->load(chunkfilename)) {
@@ -254,15 +229,8 @@ bool pinyin_unload_phrase_library(pinyin_context_t * context,
         return false;
 
     assert(index < PHRASE_INDEX_LIBRARY_COUNT);
-    gchar * & phrasefilename = context->m_phrase_indices[index];
-
-    /* check the suffix. */
-    assert(g_str_has_suffix(phrasefilename, ".bin"));
 
     context->m_phrase_index->unload(index);
-
-    g_free(phrasefilename);
-    phrasefilename = NULL;
     return true;
 }
 
@@ -278,47 +246,60 @@ bool pinyin_save(pinyin_context_t * context){
 
     /* skip the reserved zero phrase library. */
     for (size_t i = 1; i < PHRASE_INDEX_LIBRARY_COUNT; ++i) {
-        gchar * & phrasefilename = context->m_phrase_indices[i];
+        PhraseIndexRange range;
+        int retval = context->m_phrase_index->get_range(i, range);
 
-        if (NULL == phrasefilename)
+        if (ERROR_NO_SUB_PHRASE_INDEX == retval)
             continue;
 
-        /* check the suffix. */
-        assert(g_str_has_suffix(phrasefilename, ".bin"));
+        const pinyin_table_info_t * table_info = pinyin_phrase_files + i;
 
-        MemoryChunk * chunk = new MemoryChunk;
-        MemoryChunk * log = new MemoryChunk;
-        /* check bin file in system dir. */
-        gchar * chunkfilename = g_build_filename(context->m_system_dir,
-                                                 phrasefilename, NULL);
+        if (NOT_USED == table_info->m_file_type)
+            continue;
 
-        if (chunk->load(chunkfilename)) {
+        const char * userfilename = table_info->m_user_filename;
+
+        if (NULL == userfilename)
+            continue;
+
+        if (SYSTEM_FILE == table_info->m_file_type) {
             /* system phrase library */
+            MemoryChunk * chunk = new MemoryChunk;
+            MemoryChunk * log = new MemoryChunk;
+            const char * systemfilename = table_info->m_system_filename;
+
+            /* check bin file in system dir. */
+            gchar * chunkfilename = g_build_filename(context->m_system_dir,
+                                                     systemfilename, NULL);
+            chunk->load(chunkfilename);
             g_free(chunkfilename);
             context->m_phrase_index->diff(i, chunk, log);
 
-            gchar * dbinfilename = get_dbin_filename(phrasefilename);
-            gchar * tmpfilename = g_strdup_printf("%s.tmp", dbinfilename);
+            const char * userfilename = table_info->m_user_filename;
+            gchar * tmpfilename = g_strdup_printf("%s.tmp", userfilename);
 
             gchar * tmppathname = g_build_filename(context->m_user_dir,
                                                    tmpfilename, NULL);
             g_free(tmpfilename);
-            gchar * chunkpathname = g_build_filename(context->m_user_dir,
-                                                dbinfilename, NULL);
-            g_free(dbinfilename);
 
+            gchar * chunkpathname = g_build_filename(context->m_user_dir,
+                                                     userfilename, NULL);
             log->save(tmppathname);
             rename(tmppathname, chunkpathname);
-            g_free(tmppathname); g_free(chunkpathname);
+            g_free(tmppathname);
+            g_free(chunkpathname);
             delete log;
-        } else {
-            /* user phrase library */
-            g_free(chunkfilename);
+        }
 
-            gchar * tmpfilename = g_strdup_printf("%s.tmp", phrasefilename);
+        if (USER_FILE == table_info->m_file_type) {
+            /* user phrase library */
+            MemoryChunk * chunk = new MemoryChunk;
             context->m_phrase_index->store(i, chunk);
+
+            const char * userfilename = table_info->m_user_filename;
+            gchar * tmpfilename = g_strdup_printf("%s.tmp", userfilename);
             gchar * chunkpathname = g_build_filename(context->m_user_dir,
-                                                     phrasefilename, NULL);
+                                                     userfilename, NULL);
             gchar * tmppathname = g_build_filename(context->m_user_dir,
                                                    tmpfilename, NULL);
             g_free(tmpfilename);
@@ -328,7 +309,6 @@ bool pinyin_save(pinyin_context_t * context){
             g_free(chunkpathname);
             g_free(tmppathname);
             delete chunk;
-            delete log;
         }
     }
 
@@ -375,19 +355,6 @@ void pinyin_fini(pinyin_context_t * context){
     g_free(context->m_system_dir);
     g_free(context->m_user_dir);
     context->m_modified = false;
-
-    for (size_t i = 0; i < PHRASE_INDEX_LIBRARY_COUNT; ++i) {
-        gchar * & phrasefilename = context->m_phrase_indices[i];
-
-        if (phrasefilename) {
-            /* check the suffix. */
-            assert(g_str_has_suffix(phrasefilename, ".bin"));
-
-            g_free(phrasefilename);
-        }
-    }
-
-    delete context;
 }
 
 /* copy from options to context->m_options. */
