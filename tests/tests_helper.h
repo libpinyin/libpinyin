@@ -25,9 +25,12 @@
 static bool load_phrase_index(FacadePhraseIndex * phrase_index){
     MemoryChunk * chunk = NULL;
     for (size_t i = 0; i < PHRASE_INDEX_LIBRARY_COUNT; ++i) {
-        const char * binfile = pinyin_phrase_files[i];
-        if (NULL == binfile)
+        const pinyin_table_info_t * table_info = pinyin_phrase_files + i;
+
+        if (SYSTEM_FILE != table_info->m_file_type)
             continue;
+
+        const char * binfile = table_info->m_system_filename;
 
         gchar * filename = g_build_filename("..", "..", "data",
                                             binfile, NULL);
@@ -48,9 +51,12 @@ static bool load_phrase_table(ChewingLargeTable * chewing_table,
                               PhraseLargeTable * phrase_table,
                               FacadePhraseIndex * phrase_index){
     for (size_t i = 0; i < PHRASE_INDEX_LIBRARY_COUNT; ++i) {
-        const char * tablename = pinyin_table_files[i];
-        if ( NULL == tablename )
+        const pinyin_table_info_t * table_info = pinyin_phrase_files + i;
+
+        if (SYSTEM_FILE != table_info->m_file_type)
             continue;
+
+        const char * tablename = table_info->m_table_filename;
 
         gchar * filename = g_build_filename("..", "..", "data",
                                             tablename, NULL);
