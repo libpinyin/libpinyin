@@ -55,9 +55,12 @@ int main(int argc, char * argv[]){
     /* generate phrase index */
     FacadePhraseIndex phrase_index;
     for (size_t i = 0; i < PHRASE_INDEX_LIBRARY_COUNT; ++i) {
-        const char * tablename = pinyin_table_files[i];
-        if (NULL == tablename)
+        const pinyin_table_info_t * table_info = pinyin_phrase_files + i;
+
+        if (SYSTEM_FILE != table_info->m_file_type)
             continue;
+
+        const char * tablename = table_info->m_table_filename;
 
         gchar * filename = g_build_filename(table_dir, tablename, NULL);
         FILE * tablefile = fopen(filename, "r");

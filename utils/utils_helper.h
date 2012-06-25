@@ -26,9 +26,12 @@
 static bool load_phrase_index(FacadePhraseIndex * phrase_index) {
     MemoryChunk * chunk = NULL;
     for (size_t i = 0; i < PHRASE_INDEX_LIBRARY_COUNT; ++i) {
-        const char * binfile = pinyin_phrase_files[i];
-        if (NULL == binfile)
+        const pinyin_table_info_t * table_info = pinyin_phrase_files + i;
+
+        if (SYSTEM_FILE != table_info->m_file_type)
             continue;
+
+        const char * binfile = table_info->m_system_filename;
 
         chunk = new MemoryChunk;
         bool retval = chunk->load(binfile);
@@ -45,9 +48,12 @@ static bool load_phrase_index(FacadePhraseIndex * phrase_index) {
 static bool save_phrase_index(FacadePhraseIndex * phrase_index) {
     MemoryChunk * new_chunk = NULL;
     for (size_t i = 0; i < PHRASE_INDEX_LIBRARY_COUNT; ++i) {
-        const char * binfile = pinyin_phrase_files[i];
-        if (NULL == binfile)
+        const pinyin_table_info_t * table_info = pinyin_phrase_files + i;
+
+        if (SYSTEM_FILE != table_info->m_file_type)
             continue;
+
+        const char * binfile = table_info->m_system_filename;
 
         new_chunk = new MemoryChunk;
         phrase_index->store(i, new_chunk);

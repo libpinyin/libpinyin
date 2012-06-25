@@ -36,9 +36,12 @@ int main(int argc, char * argv[]){
      *  To avoid zero value when computing unigram frequency in float format.
      */
     for (size_t i = 0; i < PHRASE_INDEX_LIBRARY_COUNT; ++i) {
-        const char * binfile = pinyin_phrase_files[i];
-        if (NULL == binfile)
+        const pinyin_table_info_t * table_info = pinyin_phrase_files + i;
+
+        if (SYSTEM_FILE != table_info->m_file_type)
             continue;
+
+        const char * binfile = table_info->m_system_filename;
 
         guint32 freq = 1; PhraseIndexRange range;
         int result = phrase_index.get_range(i, range);
