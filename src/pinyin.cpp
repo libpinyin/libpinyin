@@ -49,6 +49,10 @@ struct _pinyin_context_t{
     bool m_modified;
 };
 
+struct _import_iterator_t{
+    guint8 m_phrase_index;
+};
+
 static bool check_format(const char * userdir){
     gchar * filename = g_build_filename
         (userdir, "version", NULL);

@@ -37,6 +37,8 @@ typedef struct _pinyin_context_t pinyin_context_t;
 typedef struct _pinyin_instance_t pinyin_instance_t;
 typedef struct _lookup_candidate_t lookup_candidate_t;
 
+typedef struct _import_iterator_t import_iterator_t;
+
 typedef GArray * CandidateVector; /* GArray of lookup_candidate_t */
 
 enum lookup_candidate_type_t{
@@ -104,6 +106,15 @@ bool pinyin_load_phrase_library(pinyin_context_t * context,
  */
 bool pinyin_unload_phrase_library(pinyin_context_t * context,
                                   guint8 index);
+
+import_iterator_t * pinyin_begin_add_phrases(pinyin_context_t * context,
+                                             guint8 index);
+
+bool pinyin_add_phrase(import_iterator_t * iterator,
+                       const char * phrase,
+                       const char * pinyin);
+
+void pinyin_end_add_phrases(import_iterator_t * iterator);
 
 /**
  * pinyin_save:

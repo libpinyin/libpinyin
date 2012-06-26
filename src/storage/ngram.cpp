@@ -274,7 +274,7 @@ bool Bigram::load_db(const char * dbfile){
 bool Bigram::save_db(const char * dbfile){
     DB * tmp_db = NULL;
 
-    int ret = g_unlink(dbfile);
+    int ret = unlink(dbfile);
     if ( ret != 0 && errno != ENOENT)
         return false;
 
