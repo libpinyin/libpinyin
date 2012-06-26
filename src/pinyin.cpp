@@ -86,7 +86,7 @@ static bool check_format(const char * userdir){
 
     filename = g_build_filename
         (userdir, "user.db", NULL);
-    g_unlink(filename);
+    unlink(filename);
     g_free(filename);
 
     return exists;
@@ -205,7 +205,7 @@ bool pinyin_load_phrase_library(pinyin_context_t * context,
         const char * userfilename = table_info->m_user_filename;
 
         gchar * chunkfilename = g_build_filename(context->m_user_dir,
-                                         userfilename, NULL);
+                                                 userfilename, NULL);
 
 	/* check bin file exists. if not, create a new one. */
         if (chunk->load(chunkfilename)) {
@@ -286,8 +286,8 @@ bool pinyin_save(pinyin_context_t * context){
                                                      userfilename, NULL);
             log->save(tmppathname);
             rename(tmppathname, chunkpathname);
-            g_free(tmppathname);
             g_free(chunkpathname);
+            g_free(tmppathname);
             delete log;
         }
 
@@ -298,11 +298,12 @@ bool pinyin_save(pinyin_context_t * context){
 
             const char * userfilename = table_info->m_user_filename;
             gchar * tmpfilename = g_strdup_printf("%s.tmp", userfilename);
-            gchar * chunkpathname = g_build_filename(context->m_user_dir,
-                                                     userfilename, NULL);
             gchar * tmppathname = g_build_filename(context->m_user_dir,
                                                    tmpfilename, NULL);
             g_free(tmpfilename);
+
+            gchar * chunkpathname = g_build_filename(context->m_user_dir,
+                                                     userfilename, NULL);
 
             chunk->save(tmppathname);
             rename(tmppathname, chunkpathname);
