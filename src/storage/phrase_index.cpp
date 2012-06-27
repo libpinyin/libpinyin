@@ -490,7 +490,9 @@ bool FacadePhraseIndex::load_text(guint8 phrase_index, FILE * infile){
 
     add_phrase_item( cur_token, item_ptr);
     delete item_ptr;
+#if 0
     m_total_freq += m_sub_phrase_indices[phrase_index]->get_phrase_index_total_freq();
+#endif
     return true;
 }
 

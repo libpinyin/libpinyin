@@ -61,7 +61,7 @@ int main( int argc, char * argv[]){
 	    break;
 	
 	FullPinyinParser2 parser;
-	ChewingKeyVector keys  = g_array_new(FALSE, FALSE, sizeof(ChewingKey));
+	ChewingKeyVector keys = g_array_new(FALSE, FALSE, sizeof(ChewingKey));
 	ChewingKeyRestVector key_rests =
             g_array_new(FALSE, FALSE, sizeof(ChewingKeyRest));
 	parser.parse(options, keys, key_rests, linebuf, strlen(linebuf));
