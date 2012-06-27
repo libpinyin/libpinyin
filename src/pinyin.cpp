@@ -50,6 +50,7 @@ struct _pinyin_context_t{
 };
 
 struct _import_iterator_t{
+    pinyin_context_t * m_context;
     guint8 m_phrase_index;
 };
 
@@ -238,6 +239,20 @@ bool pinyin_unload_phrase_library(pinyin_context_t * context,
     return true;
 }
 
+import_iterator_t * pinyin_begin_add_phrases(pinyin_context_t * context,
+                                             guint8 index){
+    import_iterator_t * iter = new import_iterator_t;
+    iter->m_context = context;
+    iter->m_phrase_index = index;
+    return iter;
+}
+
+
+void pinyin_end_add_phrases(import_iterator_t * iter){
+    /* compact the content memory chunk of phrase index. */
+    iter->m_context->m_phrase_index->compact();
+    delete iter;
+}
 
 bool pinyin_save(pinyin_context_t * context){
     if (!context->m_user_dir)

@@ -110,11 +110,12 @@ bool pinyin_unload_phrase_library(pinyin_context_t * context,
 import_iterator_t * pinyin_begin_add_phrases(pinyin_context_t * context,
                                              guint8 index);
 
-bool pinyin_add_phrase(import_iterator_t * iterator,
-                       const char * phrase,
-                       const char * pinyin);
+bool pinyin_iterator_add_phrase(import_iterator_t * iter,
+                                const char * phrase,
+                                const char * pinyin,
+                                gint count);
 
-void pinyin_end_add_phrases(import_iterator_t * iterator);
+void pinyin_end_add_phrases(import_iterator_t * iter);
 
 /**
  * pinyin_save:
