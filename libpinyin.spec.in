@@ -65,8 +65,8 @@ find $RPM_BUILD_ROOT -name '*.la' -exec rm -f {} ';'
 
 %files devel
 %doc
-%dir %{_includedir}/libpinyin-0.3
-%{_includedir}/libpinyin-0.3/*
+%dir %{_includedir}/libpinyin-@VERSION@
+%{_includedir}/libpinyin-@VERSION@/*
 %{_libdir}/*.so
 %{_libdir}/pkgconfig/libpinyin.pc
 
