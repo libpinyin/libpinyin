@@ -112,10 +112,10 @@ int PhraseBitmapIndexLevel::search( int phrase_length, /* in */ ucs4_t phrase[],
     assert(phrase_length > 0);
 
     int result = SEARCH_NONE;
-    /* use the lower 16-bit for bitmap index,
+    /* use the first 8-bit of the lower 16-bit for bitmap index,
      * as most the higher 16-bit are zero.
      */
-    guint16 first_key = phrase[0] & 0xFFFF;
+    guint8 first_key = (phrase[0] & 0xFF00) >> 8;
 
     PhraseLengthIndexLevel * phrase_array = m_phrase_length_indexes[first_key];
     if ( phrase_array )
@@ -225,7 +225,8 @@ int PhraseArrayIndexLevel<phrase_length>::search(/* in */ ucs4_t phrase[], /* ou
 }
 
 int PhraseBitmapIndexLevel::add_index( int phrase_length, /* in */ ucs4_t phrase[], /* in */ phrase_token_t token){
-    guint16 first_key =  phrase[0] & 0xFFFF;
+    guint8 first_key =  (phrase[0] & 0xFF00) >> 8;
+
     PhraseLengthIndexLevel * & length_array = m_phrase_length_indexes[first_key];
     if ( !length_array ){
         length_array = new PhraseLengthIndexLevel();
@@ -234,7 +235,8 @@ int PhraseBitmapIndexLevel::add_index( int phrase_length, /* in */ ucs4_t phrase
 }
 
 int PhraseBitmapIndexLevel::remove_index( int phrase_length, /* in */ ucs4_t phrase[], /* out */ phrase_token_t & token){
-    guint16 first_key = phrase[0] & 0xFFFF;
+    guint8 first_key = (phrase[0] & 0xFF00) >> 8;
+
     PhraseLengthIndexLevel * &length_array = m_phrase_length_indexes[first_key];
     if ( length_array )
         return length_array->remove_index(phrase_length, phrase, token);

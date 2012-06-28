@@ -28,7 +28,7 @@
 
 namespace pinyin{
 
-const size_t PHRASE_NUMBER_OF_BITMAP_INDEX = 1<<(sizeof(ucs4_t) / 2 * 8);
+const size_t PHRASE_NUMBER_OF_BITMAP_INDEX = 1<<(sizeof(ucs4_t) / 4 * 8);
 
 class PhraseLengthIndexLevel;
 
