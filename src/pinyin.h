@@ -362,7 +362,7 @@ bool pinyin_in_chewing_keyboard(pinyin_instance_t * instance,
  * pinyin_get_candidates:
  * @instance: the pinyin instance.
  * @offset: the offset in the pinyin keys.
- * @candidates: The GArray of token candidates.
+ * @candidates: The GArray of lookup_candidate_t candidates.
  * @returns: whether a list of tokens are gotten.
  *
  * Get the candidates at the offset.
@@ -370,7 +370,7 @@ bool pinyin_in_chewing_keyboard(pinyin_instance_t * instance,
  */
 bool pinyin_get_candidates(pinyin_instance_t * instance,
                            size_t offset,
-                           TokenVector candidates);
+                           CandidateVector candidates);
 
 /**
  * pinyin_get_full_pinyin_candidates:
@@ -390,7 +390,7 @@ bool pinyin_get_full_pinyin_candidates(pinyin_instance_t * instance,
  * pinyin_choose_candidate:
  * @instance: the pinyin instance.
  * @offset: the offset in the pinyin keys.
- * @token: the selected candidate.
+ * @candidate: the selected candidate.
  * @returns: the cursor after the chosen candidate.
  *
  * Choose an candidate at the offset.
@@ -398,13 +398,13 @@ bool pinyin_get_full_pinyin_candidates(pinyin_instance_t * instance,
  */
 int pinyin_choose_candidate(pinyin_instance_t * instance,
                             size_t offset,
-                            phrase_token_t token);
+                            lookup_candidate_t * candidate);
 
 /**
  * pinyin_choose_full_pinyin_candidate:
  * @instance: the pinyin instance.
  * @offset: the offset in the pinyin keys.
- * @candidate: the selected lookup_candidate_t candidate.
+ * @candidate: the selected candidate.
  * @returns: the cursor after the chosen candidate.
  *
  * Choose a full pinyin candidate at the offset.

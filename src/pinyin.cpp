@@ -900,7 +900,7 @@ static void _compute_frequency_of_items(pinyin_context_t * context,
 
 bool pinyin_get_candidates(pinyin_instance_t * instance,
                            size_t offset,
-                           TokenVector candidates) {
+                           CandidateVector candidates) {
 
     pinyin_context_t * & context = instance->m_context;
     pinyin_option_t & options = context->m_options;
@@ -960,10 +960,10 @@ bool pinyin_get_candidates(pinyin_instance_t * instance,
         g_array_sort(items, compare_item_with_frequency);
 
         /* transfer back items to tokens, and save it into candidates */
-        for (ssize_t k = 0; k < items->len; ++k) {
+        for (size_t k = 0; k < items->len; ++k) {
             lookup_candidate_t * item = &g_array_index
                 (items, lookup_candidate_t, k);
-            g_array_append_val(candidates, item->m_token);
+            g_array_append_val(candidates, *item);
         }
 
         if (!(retval & SEARCH_CONTINUED))
@@ -1353,8 +1353,12 @@ bool pinyin_get_full_pinyin_candidates(pinyin_instance_t * instance,
 
 int pinyin_choose_candidate(pinyin_instance_t * instance,
                             size_t offset,
-                            phrase_token_t token){
+                            lookup_candidate_t * candidate){
     pinyin_context_t * & context = instance->m_context;
+
+    assert(NORMAL_CANDIDATE == candidate->m_candidate_type);
+
+    phrase_token_t token = candidate->m_token;
 
     guint8 len = context->m_pinyin_lookup->add_constraint
         (instance->m_constraints, offset, token);
