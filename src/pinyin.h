@@ -107,14 +107,41 @@ bool pinyin_load_phrase_library(pinyin_context_t * context,
 bool pinyin_unload_phrase_library(pinyin_context_t * context,
                                   guint8 index);
 
+/**
+ * pinyin_begin_add_phrases:
+ * @context: the pinyin context.
+ * @index: the phrase index to be imported.
+ * @returns: the import iterator.
+ *
+ * Begin to add phrases.
+ *
+ */
 import_iterator_t * pinyin_begin_add_phrases(pinyin_context_t * context,
                                              guint8 index);
 
+/**
+ * pinyin_iterator_add_phrase:
+ * @iter: the import iterator.
+ * @phrase: the phrase string.
+ * @pinyin: the pinyin string.
+ * @count: the count of the phrase/pinyin pair, -1 to use the default value.
+ * @returns: whether the add operation succeeded.
+ *
+ * Add a pair of phrase and pinyin with count.
+ *
+ */
 bool pinyin_iterator_add_phrase(import_iterator_t * iter,
                                 const char * phrase,
                                 const char * pinyin,
                                 gint count);
 
+/**
+ * pinyin_end_add_phrases:
+ * @iter: the import iterator.
+ *
+ * End adding phrases.
+ *
+ */
 void pinyin_end_add_phrases(import_iterator_t * iter);
 
 /**
