@@ -119,7 +119,14 @@ pinyin_context_t * pinyin_init(const char * systemdir, const char * userdir){
 
     check_format(context->m_user_dir);
 
+    context->m_full_pinyin_parser = new FullPinyinParser2;
+    context->m_double_pinyin_parser = new DoublePinyinParser2;
+    context->m_chewing_parser = new ChewingParser2;
+
+    /* load chewing table. */
     context->m_pinyin_table = new FacadeChewingTable;
+
+    /* load system chewing table. */
     MemoryChunk * chunk = new MemoryChunk;
     gchar * filename = g_build_filename
         (context->m_system_dir, "pinyin_index.bin", NULL);
@@ -129,21 +136,44 @@ pinyin_context_t * pinyin_init(const char * systemdir, const char * userdir){
     }
     g_free(filename);
 
-    context->m_pinyin_table->load(context->m_options, chunk, NULL);
+    /* load user chewing table */
+    MemoryChunk * userchunk = new MemoryChunk;
+    filename = g_build_filename
+        (context->m_user_dir, "user_pinyin_index.bin", NULL);
+    if (!userchunk->load(filename)) {
+        /* hack here: use local Chewing Table to create empty memory chunk. */
+        ChewingLargeTable table(context->m_options);
+        table.store(userchunk);
+    }
+    g_free(filename);
 
-    context->m_full_pinyin_parser = new FullPinyinParser2;
-    context->m_double_pinyin_parser = new DoublePinyinParser2;
-    context->m_chewing_parser = new ChewingParser2;
+    context->m_pinyin_table->load(context->m_options, chunk, userchunk);
 
+    /* load phrase table */
     context->m_phrase_table = new FacadePhraseTable;
+
+    /* load system phrase table */
     chunk = new MemoryChunk;
-    filename = g_build_filename(context->m_system_dir, "phrase_index.bin", NULL);
+    filename = g_build_filename
+        (context->m_system_dir, "phrase_index.bin", NULL);
     if (!chunk->load(filename)) {
         fprintf(stderr, "open %s failed!\n", filename);
         return NULL;
     }
     g_free(filename);
-    context->m_phrase_table->load(chunk, NULL);
+
+    /* load user phrase table */
+    userchunk = new MemoryChunk;
+    filename = g_build_filename
+        (context->m_user_dir, "user_phrase_index.bin", NULL);
+    if (!userchunk->load(filename)) {
+        /* hack here: use local Phrase Table to create empty memory chunk. */
+        PhraseLargeTable table;
+        table.store(userchunk);
+    }
+    g_free(filename);
+
+    context->m_phrase_table->load(chunk, userchunk);
 
     context->m_phrase_index = new FacadePhraseIndex;
 
@@ -418,10 +448,41 @@ bool pinyin_save(pinyin_context_t * context){
         }
     }
 
-    gchar * tmpfilename = g_build_filename(context->m_user_dir,
-                                   "user.db.tmp", NULL);
+    /* save user chewing table */
+    gchar * tmpfilename = g_build_filename
+        (context->m_user_dir, "user_pinyin_index.bin.tmp", NULL);
     unlink(tmpfilename);
-    gchar * filename = g_build_filename(context->m_user_dir, "user.db", NULL);
+    gchar * filename = g_build_filename
+        (context->m_user_dir, "user_pinyin_index.bin", NULL);
+
+    MemoryChunk * chunk = new MemoryChunk;
+    context->m_pinyin_table->store(chunk);
+    chunk->save(tmpfilename);
+    delete chunk;
+    rename(tmpfilename, filename);
+    g_free(tmpfilename);
+    g_free(filename);
+
+    /* save user phrase table */
+    tmpfilename = g_build_filename
+        (context->m_user_dir, "user_phrase_index.bin.tmp", NULL);
+    unlink(tmpfilename);
+    filename = g_build_filename
+        (context->m_user_dir, "user_phrase_index.bin", NULL);
+
+    chunk = new MemoryChunk;
+    context->m_phrase_table->store(chunk);
+    chunk->save(tmpfilename);
+    delete chunk;
+    rename(tmpfilename, filename);
+    g_free(tmpfilename);
+    g_free(filename);
+
+    /* save user bi-gram */
+    tmpfilename = g_build_filename
+        (context->m_user_dir, "user.db.tmp", NULL);
+    unlink(tmpfilename);
+    filename = g_build_filename(context->m_user_dir, "user.db", NULL);
     context->m_user_bigram->save_db(tmpfilename);
     rename(tmpfilename, filename);
     g_free(tmpfilename);
