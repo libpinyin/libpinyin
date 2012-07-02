@@ -969,40 +969,45 @@ static bool _remove_duplicated_items_by_phrase_string
 
     /* mark duplicated items as zombie candidate */
     lookup_candidate_t * cur_item, * saved_item = NULL;
-    for (i = 0; i < candidates->len; ++i) {
-        cur_item = &g_array_index(candidates, lookup_candidate_t, i);
-        if (saved_item) {
-            if (0 == strcmp(saved_item->m_phrase_string,
-                            cur_item->m_phrase_string)) {
-                /* found duplicated candidates */
+    for (i = 0; i < indices->len; ++i) {
+        size_t cur_index = g_array_index(indices, size_t, i);
+        cur_item = &g_array_index(candidates, lookup_candidate_t, cur_index);
 
-                /* keep best match candidate */
-                if (BEST_MATCH_CANDIDATE == saved_item->m_candidate_type) {
-                    cur_item->m_candidate_type = ZOMBIE_CANDIDATE;
-                    continue;
-                }
+        if (!saved_item) {
+            saved_item = cur_item;
+            continue;
+        }
 
-                if (BEST_MATCH_CANDIDATE == cur_item->m_candidate_type) {
-                    saved_item->m_candidate_type = ZOMBIE_CANDIDATE;
-                    saved_item = cur_item;
-                    continue;
-                }
+        if (0 == strcmp(saved_item->m_phrase_string,
+                        cur_item->m_phrase_string)) {
+            /* found duplicated candidates */
 
-                /* keep the higher possiblity one
-                   to quickly move the word forward in the candidate list */
-                if (cur_item->m_freq > saved_item->m_freq) {
-                    /* find better candidate */
-                    saved_item->m_candidate_type = ZOMBIE_CANDIDATE;
-                    saved_item = cur_item;
-                    continue;
-                } else {
-                    cur_item->m_candidate_type = ZOMBIE_CANDIDATE;
-                    continue;
-                }
-            } else {
-                /* keep the current candidate */
-                saved_item = cur_item;
+            /* keep best match candidate */
+            if (BEST_MATCH_CANDIDATE == saved_item->m_candidate_type) {
+                cur_item->m_candidate_type = ZOMBIE_CANDIDATE;
+                continue;
             }
+
+            if (BEST_MATCH_CANDIDATE == cur_item->m_candidate_type) {
+                saved_item->m_candidate_type = ZOMBIE_CANDIDATE;
+                saved_item = cur_item;
+                continue;
+            }
+
+            /* keep the higher possiblity one
+               to quickly move the word forward in the candidate list */
+            if (cur_item->m_freq > saved_item->m_freq) {
+                /* find better candidate */
+                saved_item->m_candidate_type = ZOMBIE_CANDIDATE;
+                saved_item = cur_item;
+                continue;
+            } else {
+                cur_item->m_candidate_type = ZOMBIE_CANDIDATE;
+                continue;
+            }
+        } else {
+            /* keep the current candidate */
+            saved_item = cur_item;
         }
     }
 
