@@ -973,6 +973,7 @@ static bool _remove_duplicated_items_by_phrase_string
         size_t cur_index = g_array_index(indices, size_t, i);
         cur_item = &g_array_index(candidates, lookup_candidate_t, cur_index);
 
+        /* handle the first candidate */
         if (!saved_item) {
             saved_item = cur_item;
             continue;
