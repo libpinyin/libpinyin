@@ -911,8 +911,8 @@ static bool _prepend_sentence_candidate(CandidateVector candidates) {
     return true;
 }
 
-static bool _compute_strings_of_items(pinyin_instance_t * instance,
-                                      CandidateVector candidates) {
+static bool _compute_phrase_strings_of_items(pinyin_instance_t * instance,
+                                             CandidateVector candidates) {
     /* populate m_phrase_string in lookup_candidate_t. */
 
     for(size_t i = 0; i < candidates->len; ++i) {
@@ -931,6 +931,91 @@ static bool _compute_strings_of_items(pinyin_instance_t * instance,
             break;
         case ZOMBIE_CANDIDATE:
             break;
+        }
+    }
+
+    return true;
+}
+
+static gint compare_indexed_item_with_phrase_string(gconstpointer lhs,
+                                                    gconstpointer rhs,
+                                                    gpointer userdata) {
+    size_t index_lhs = *((size_t *) lhs);
+    size_t index_rhs = *((size_t *) rhs);
+    CandidateVector candidates = (CandidateVector) userdata;
+
+    lookup_candidate_t * candidate_lhs =
+        &g_array_index(candidates, lookup_candidate_t, index_lhs);
+    lookup_candidate_t * candidate_rhs =
+        &g_array_index(candidates, lookup_candidate_t, index_rhs);
+
+    return -strcmp(candidate_lhs->m_phrase_string,
+                   candidate_rhs->m_phrase_string); /* in descendant order */
+}
+
+
+static bool _remove_duplicated_items_by_phrase_string
+(pinyin_instance_t * instance,
+ CandidateVector candidates) {
+    size_t i;
+    /* create the GArray of indexed item */
+    GArray * indices = g_array_new(FALSE, FALSE, sizeof(size_t));
+    for (i = 0; i < candidates->len; ++i)
+        g_array_append_val(indices, i);
+
+    /* sort the indices array by phrase array */
+    g_array_sort_with_data
+        (indices, compare_indexed_item_with_phrase_string, candidates);
+
+    /* mark duplicated items as zombie candidate */
+    lookup_candidate_t * cur_item, * saved_item = NULL;
+    for (i = 0; i < candidates->len; ++i) {
+        cur_item = &g_array_index(candidates, lookup_candidate_t, i);
+        if (saved_item) {
+            if (0 == strcmp(saved_item->m_phrase_string,
+                            cur_item->m_phrase_string)) {
+                /* found duplicated candidates */
+
+                /* keep best match candidate */
+                if (BEST_MATCH_CANDIDATE == saved_item->m_candidate_type) {
+                    cur_item->m_candidate_type = ZOMBIE_CANDIDATE;
+                    continue;
+                }
+
+                if (BEST_MATCH_CANDIDATE == cur_item->m_candidate_type) {
+                    saved_item->m_candidate_type = ZOMBIE_CANDIDATE;
+                    saved_item = cur_item;
+                    continue;
+                }
+
+                /* keep the higher possiblity one
+                   to quickly move the word forward in the candidate list */
+                if (cur_item->m_freq > saved_item->m_freq) {
+                    /* find better candidate */
+                    saved_item->m_candidate_type = ZOMBIE_CANDIDATE;
+                    saved_item = cur_item;
+                    continue;
+                } else {
+                    cur_item->m_candidate_type = ZOMBIE_CANDIDATE;
+                    continue;
+                }
+            } else {
+                /* keep the current candidate */
+                saved_item = cur_item;
+            }
+        }
+    }
+
+    g_array_free(indices, TRUE);
+
+    /* remove zombie candidate from the returned candidates */
+    for (i = 0; i < candidates->len; ++i) {
+        lookup_candidate_t * candidate = &g_array_index
+            (candidates, lookup_candidate_t, i);
+
+        if (ZOMBIE_CANDIDATE == candidate->m_candidate_type) {
+            g_array_remove_index(candidates, i);
+            i--;
         }
     }
 
