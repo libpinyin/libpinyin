@@ -1508,9 +1508,9 @@ bool pinyin_get_full_pinyin_candidates(pinyin_instance_t * instance,
 }
 
 
-int pinyin_choose_full_pinyin_candidate(pinyin_instance_t * instance,
-                                        size_t offset,
-                                        lookup_candidate_t * candidate){
+int pinyin_choose_candidate(pinyin_instance_t * instance,
+                            size_t offset,
+                            lookup_candidate_t * candidate){
     pinyin_context_t * & context = instance->m_context;
 
     if (DIVIDED_CANDIDATE == candidate->m_candidate_type ||
