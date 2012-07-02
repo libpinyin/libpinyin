@@ -1555,7 +1555,6 @@ int pinyin_choose_candidate(pinyin_instance_t * instance,
 bool pinyin_free_candidates(pinyin_instance_t * instance,
                             CandidateVector candidates) {
     _free_candidates(candidates);
-    g_array_free(candidates, TRUE);
     return true;
 }
 
