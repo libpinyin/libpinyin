@@ -42,13 +42,16 @@ typedef struct _import_iterator_t import_iterator_t;
 typedef GArray * CandidateVector; /* GArray of lookup_candidate_t */
 
 enum lookup_candidate_type_t{
-    NORMAL_CANDIDATE = 1,
+    BEST_MATCH_CANDIDATE = 1,
+    NORMAL_CANDIDATE,
     DIVIDED_CANDIDATE,
-    RESPLIT_CANDIDATE
+    RESPLIT_CANDIDATE,
+    ZOMBIE_CANDIDATE
 };
 
 struct _lookup_candidate_t{
     enum lookup_candidate_type_t m_candidate_type;
+    gchar * m_phrase_string;
     phrase_token_t m_token;
     ChewingKeyRest m_orig_rest;
     gchar * m_new_pinyins;
@@ -56,6 +59,7 @@ struct _lookup_candidate_t{
 public:
     _lookup_candidate_t() {
         m_candidate_type = NORMAL_CANDIDATE;
+        m_phrase_string = NULL;
         m_token = null_token;
         m_new_pinyins = NULL;
         m_freq = 0;

@@ -743,7 +743,7 @@ bool pinyin_in_chewing_keyboard(pinyin_instance_t * instance,
         (context->m_options, key, symbol);
 }
 
-
+#if 0
 static gint compare_item_with_token(gconstpointer lhs,
                                     gconstpointer rhs) {
     lookup_candidate_t * item_lhs = (lookup_candidate_t *)lhs;
@@ -754,6 +754,7 @@ static gint compare_item_with_token(gconstpointer lhs,
 
     return (token_lhs - token_rhs);
 }
+#endif
 
 static gint compare_item_with_frequency(gconstpointer lhs,
                                         gconstpointer rhs) {
@@ -842,6 +843,7 @@ static void _append_items(pinyin_context_t * context,
     }
 }
 
+#if 0
 static void _remove_duplicated_items(CandidateVector items) {
     /* remove the duplicated items. */
     phrase_token_t last_token = null_token, saved_token;
@@ -857,6 +859,7 @@ static void _remove_duplicated_items(CandidateVector items) {
         last_token = saved_token;
     }
 }
+#endif
 
 static void _compute_frequency_of_items(pinyin_context_t * context,
                                         phrase_token_t prev_token,
@@ -950,9 +953,11 @@ bool pinyin_get_candidates(pinyin_instance_t * instance,
         lookup_candidate_t template_item;
         _append_items(context, ranges, &template_item, items);
 
+#if 0
         g_array_sort(items, compare_item_with_token);
 
         _remove_duplicated_items(items);
+#endif
 
         _compute_frequency_of_items(context, prev_token, &merged_gram, items);
 
@@ -1270,9 +1275,11 @@ bool pinyin_get_full_pinyin_candidates(pinyin_instance_t * instance,
 
             if (_try_divided_table(instance, ranges, offset, items)) {
 
+#if 0
                 g_array_sort(items, compare_item_with_token);
 
                 _remove_duplicated_items(items);
+#endif
 
                 _compute_frequency_of_items(context, prev_token,
                                             &merged_gram, items);
@@ -1321,9 +1328,11 @@ bool pinyin_get_full_pinyin_candidates(pinyin_instance_t * instance,
         lookup_candidate_t template_item;
         _append_items(context, ranges, &template_item, items);
 
+#if 0
         g_array_sort(items, compare_item_with_token);
 
         _remove_duplicated_items(items);
+#endif
 
         _compute_frequency_of_items(context, prev_token, &merged_gram, items);
 
