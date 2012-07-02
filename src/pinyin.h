@@ -391,20 +391,6 @@ bool pinyin_get_full_pinyin_candidates(pinyin_instance_t * instance,
                                        CandidateVector candidates);
 
 /**
- * pinyin_choose_candidate:
- * @instance: the pinyin instance.
- * @offset: the offset in the pinyin keys.
- * @candidate: the selected candidate.
- * @returns: the cursor after the chosen candidate.
- *
- * Choose an candidate at the offset.
- *
- */
-int pinyin_choose_candidate(pinyin_instance_t * instance,
-                            size_t offset,
-                            lookup_candidate_t * candidate);
-
-/**
  * pinyin_choose_full_pinyin_candidate:
  * @instance: the pinyin instance.
  * @offset: the offset in the pinyin keys.
