@@ -65,25 +65,17 @@ int main(int argc, char * argv[]){
         pinyin_parse_more_full_pinyins(instance, linebuf);
         pinyin_guess_sentence_with_prefix(instance, prefixbuf);
 
-        char * sentence = NULL;
-        pinyin_get_sentence (instance, &sentence);
-        if (sentence)
-            printf("%s\n", sentence);
-        g_free(sentence);
-
         pinyin_get_full_pinyin_candidates(instance, 0, candidates);
         for (size_t i = 0; i < candidates->len; ++i) {
             lookup_candidate_t * candidate = &g_array_index
                 (candidates, lookup_candidate_t, i);
             const char * pinyins = candidate->m_new_pinyins;
+            const char * word = candidate->m_phrase_string;
 
-            gchar * word = NULL;
-            pinyin_translate_token(instance, candidate->m_token, &word);
             if (pinyins)
                 printf("%s %s\t", pinyins, word);
             else
                 printf("%s\t", word);
-            g_free(word);
         }
         printf("\n");
 
