@@ -901,6 +901,42 @@ static void _compute_frequency_of_items(pinyin_context_t * context,
     }
 }
 
+static bool _prepend_sentence_candidate(CandidateVector candidates) {
+    /* prepend best match candidate to candidates. */
+
+    lookup_candidate_t candidate;
+    candidate.m_candidate_type = BEST_MATCH_CANDIDATE;
+    g_array_prepend_val(candidates, candidate);
+
+    return true;
+}
+
+static bool _compute_strings_of_items(pinyin_instance_t * instance,
+                                      CandidateVector candidates) {
+    /* populate m_phrase_string in lookup_candidate_t. */
+
+    for(size_t i = 0; i < candidates->len; ++i) {
+        lookup_candidate_t * candidate = &g_array_index
+            (candidates, lookup_candidate_t, i);
+
+        switch(candidate->m_candidate_type) {
+        case BEST_MATCH_CANDIDATE:
+            pinyin_get_sentence(instance, &(candidate->m_phrase_string));
+            break;
+        case NORMAL_CANDIDATE:
+        case DIVIDED_CANDIDATE:
+        case RESPLIT_CANDIDATE:
+            pinyin_translate_token
+                (instance, candidate->m_token, &(candidate->m_phrase_string));
+            break;
+        case ZOMBIE_CANDIDATE:
+            break;
+        }
+    }
+
+    return true;
+}
+
 bool pinyin_get_candidates(pinyin_instance_t * instance,
                            size_t offset,
                            CandidateVector candidates) {
