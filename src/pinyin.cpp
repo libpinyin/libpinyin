@@ -901,9 +901,15 @@ static void _compute_frequency_of_items(pinyin_context_t * context,
     }
 }
 
-static bool _prepend_sentence_candidate(CandidateVector candidates) {
-    /* prepend best match candidate to candidates. */
+static bool _prepend_sentence_candidate(pinyin_instance_t * instance,
+                                        CandidateVector candidates) {
+    /* check whether the best match candidate exists. */
+    gchar * sentence = NULL;
+    pinyin_get_sentence(instance, &sentence);
+    if (NULL == sentence)
+        return false;
 
+    /* prepend best match candidate to candidates. */
     lookup_candidate_t candidate;
     candidate.m_candidate_type = BEST_MATCH_CANDIDATE;
     g_array_prepend_val(candidates, candidate);
@@ -1125,7 +1131,7 @@ bool pinyin_get_candidates(pinyin_instance_t * instance,
 
     /* post process to remove duplicated candidates */
 
-    _prepend_sentence_candidate(candidates);
+    _prepend_sentence_candidate(instance, candidates);
 
     _compute_phrase_strings_of_items(instance, candidates);
 
@@ -1499,7 +1505,7 @@ bool pinyin_get_full_pinyin_candidates(pinyin_instance_t * instance,
 
     /* post process to remove duplicated candidates */
 
-    _prepend_sentence_candidate(candidates);
+    _prepend_sentence_candidate(instance, candidates);
 
     _compute_phrase_strings_of_items(instance, candidates);
 
