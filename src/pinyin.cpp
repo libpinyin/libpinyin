@@ -918,6 +918,7 @@ static bool _prepend_sentence_candidate(pinyin_instance_t * instance,
 }
 
 static bool _compute_phrase_strings_of_items(pinyin_instance_t * instance,
+                                             size_t offset,
                                              CandidateVector candidates) {
     /* populate m_phrase_string in lookup_candidate_t. */
 
@@ -926,9 +927,14 @@ static bool _compute_phrase_strings_of_items(pinyin_instance_t * instance,
             (candidates, lookup_candidate_t, i);
 
         switch(candidate->m_candidate_type) {
-        case BEST_MATCH_CANDIDATE:
-            pinyin_get_sentence(instance, &(candidate->m_phrase_string));
+        case BEST_MATCH_CANDIDATE: {
+            gchar * sentence = NULL;
+            pinyin_get_sentence(instance, &sentence);
+            candidate->m_phrase_string = g_strdup
+                (g_utf8_offset_to_pointer(sentence, offset));
+            g_free(sentence);
             break;
+        }
         case NORMAL_CANDIDATE:
         case DIVIDED_CANDIDATE:
         case RESPLIT_CANDIDATE:
@@ -1133,7 +1139,7 @@ bool pinyin_get_candidates(pinyin_instance_t * instance,
 
     _prepend_sentence_candidate(instance, candidates);
 
-    _compute_phrase_strings_of_items(instance, candidates);
+    _compute_phrase_strings_of_items(instance, offset, candidates);
 
     _remove_duplicated_items_by_phrase_string(instance, candidates);
 
@@ -1507,7 +1513,7 @@ bool pinyin_get_full_pinyin_candidates(pinyin_instance_t * instance,
 
     _prepend_sentence_candidate(instance, candidates);
 
-    _compute_phrase_strings_of_items(instance, candidates);
+    _compute_phrase_strings_of_items(instance, offset, candidates);
 
     _remove_duplicated_items_by_phrase_string(instance, candidates);
 
