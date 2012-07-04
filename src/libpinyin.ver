@@ -4,6 +4,8 @@ LIBPINYIN {
         pinyin_save;
         pinyin_set_double_pinyin_scheme;
         pinyin_set_chewing_scheme;
+        pinyin_load_phrase_library;
+        pinyin_unload_phrase_library;
         pinyin_fini;
         pinyin_set_options;
         pinyin_alloc_instance;
