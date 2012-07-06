@@ -908,6 +908,7 @@ static bool _prepend_sentence_candidate(pinyin_instance_t * instance,
     pinyin_get_sentence(instance, &sentence);
     if (NULL == sentence)
         return false;
+    g_free(sentence);
 
     /* prepend best match candidate to candidates. */
     lookup_candidate_t candidate;
