@@ -131,6 +131,8 @@ include_directories(
     ${PROJECT_SOURCE_DIR}/src/include
     ${PROJECT_SOURCE_DIR}/src/storage
     ${PROJECT_SOURCE_DIR}/src/lookup
+    ${PROJECT_SOURCE_DIR}/utils
+    ${PROJECT_SOURCE_DIR}/tests
 )
 
 ######## Subdirectories
