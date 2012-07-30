@@ -315,6 +315,8 @@ bool pinyin_iterator_add_phrase(import_iterator_t * iter,
 
         if (ERROR_OK == retval) {
             token = range.m_range_end;
+            if ( 0x00000000 == (token & PHRASE_MASK))
+                token++;
 
             /* parse the pinyin. */
             parser.parse(options, keys, key_rests, pinyin, strlen(pinyin));
@@ -1125,8 +1127,10 @@ bool pinyin_get_candidates(pinyin_instance_t * instance,
             g_array_append_val(candidates, *item);
         }
 
+#if 0
         if (!(retval & SEARCH_CONTINUED))
             break;
+#endif
     }
 
     g_array_free(items, TRUE);
@@ -1499,8 +1503,10 @@ bool pinyin_get_full_pinyin_candidates(pinyin_instance_t * instance,
             g_array_append_val(candidates, *item);
         }
 
+#if 0
         if (!(retval & SEARCH_CONTINUED))
             break;
+#endif
     }
 
     g_array_free(items, TRUE);
