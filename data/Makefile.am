@@ -36,7 +36,8 @@ CLEANFILES		= $(binary_model_data)
 
 interpolation.text:
 	wget https://github.com/downloads/libpinyin/libpinyin/model.text.tar.gz
-	tar xvf model.text.tar.gz
+	tar xvf model.text.tar.gz -C $(top_srcdir)/data
+
 
 gb_char.table gbk_char.table: interpolation.text
 
