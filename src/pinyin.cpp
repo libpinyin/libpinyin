@@ -315,13 +315,13 @@ bool pinyin_iterator_add_phrase(import_iterator_t * iter,
 
         if (ERROR_OK == retval) {
             token = range.m_range_end;
-            if ( 0x00000000 == (token & PHRASE_MASK))
+            if (0x00000000 == (token & PHRASE_MASK))
                 token++;
 
             /* parse the pinyin. */
             parser.parse(options, keys, key_rests, pinyin, strlen(pinyin));
 
-            if ( len_phrase == keys->len ) { /* valid pinyin */
+            if (len_phrase == keys->len) { /* valid pinyin */
                 phrase_table->add_index(len_phrase, ucs4_phrase, token);
                 pinyin_table->add_index
                     (keys->len, (ChewingKey *)(keys->data), token);
