@@ -24,9 +24,9 @@ enable_testing()
 set (PACKAGE_URL https://github.com/libpinyin/libpinyin)
 set (PACKAGE_BUGREPORT https://github.com/libpinyin/libpinyin/issues)
 set (LIBPINYIN_VERSION_MAJOR 0)
-set (LIBPINYIN_VERSION_MINOR 2)
-set (LIBPINYIN_VERSION_REVISION 99)
-set (LIBPINYIN_BINARY_VERSION 0.3)
+set (LIBPINYIN_VERSION_MINOR 7)
+set (LIBPINYIN_VERSION_REVISION 0)
+set (LIBPINYIN_BINARY_VERSION 2.0)
 
 if (CMAKE_BUILD_TYPE MATCHES Debug)
     set (version_suffix .Debug)
@@ -137,7 +137,7 @@ include_directories(
 
 ######## Subdirectories
 
-add_subdirectory(data)
 add_subdirectory(src)
 add_subdirectory(tests)
 add_subdirectory(utils)
+add_subdirectory(data)

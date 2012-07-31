@@ -35,6 +35,19 @@ add_custom_target(
 
 add_custom_command(
     OUTPUT
+        ${CMAKE_SOURCE_DIR}/data/gb_char.table
+        ${CMAKE_SOURCE_DIR}/data/gbk_char.table
+        ${CMAKE_SOURCE_DIR}/data/interpolation.text
+    COMMENT
+        "Downloading textual model data..."
+    COMMAND
+       wget https://github.com/downloads/libpinyin/libpinyin/model.text.tar.gz
+    COMMAND
+       tar xvf model.text.tar.gz -C ${CMAKE_SOURCE_DIR}/data
+)
+
+add_custom_command(
+    OUTPUT
         gb_char.bin
         gbk_char.bin
         phrase_index.bin
@@ -45,6 +58,8 @@ add_custom_command(
         ${gen_binary_files_BIN} --table-dir ${CMAKE_SOURCE_DIR}/data
     DEPENDS
         gen_binary_files
+	${CMAKE_SOURCE_DIR}/data/gb_char.table
+	${CMAKE_SOURCE_DIR}/data/gbk_char.table
 )
 
 add_custom_command(
@@ -56,6 +71,7 @@ add_custom_command(
         ${import_interpolation_BIN} < ${CMAKE_SOURCE_DIR}/data/interpolation.text
     DEPENDS
         import_interpolation
+	${CMAKE_SOURCE_DIR}/data/interpolation.text
 )
 
 install(
