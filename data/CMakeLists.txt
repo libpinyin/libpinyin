@@ -26,6 +26,11 @@ set(
     ${CMAKE_BINARY_DIR}/utils/storage/import_interpolation
 )
 
+set(
+    gen_unigram_BIN
+    ${CMAKE_BINARY_DIR}/utils/training/gen_unigram
+)
+
 add_custom_target(
     data
     ALL
@@ -69,6 +74,8 @@ add_custom_command(
         "Building binary bigram data..."
     COMMAND
         ${import_interpolation_BIN} < ${CMAKE_SOURCE_DIR}/data/interpolation.text
+    COMMAND
+        ${gen_unigram_BIN}
     DEPENDS
         import_interpolation
 	${CMAKE_SOURCE_DIR}/data/interpolation.text
