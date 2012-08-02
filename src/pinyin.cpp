@@ -282,7 +282,8 @@ bool pinyin_iterator_add_phrase(import_iterator_t * iter,
                                 const char * pinyin,
                                 gint count){
     /* if -1 == count, use the default value. */
-    const int default_count = 100;
+    const gint default_count = 100;
+    const guint32 unigram_factor = 7;
     if (-1 == count)
         count = default_count;
 
@@ -329,6 +330,8 @@ bool pinyin_iterator_add_phrase(import_iterator_t * iter,
                 item.set_phrase_string(len_phrase, ucs4_phrase);
                 item.append_pronunciation((ChewingKey *)(keys->data), count);
                 phrase_index->add_phrase_item(token, &item);
+                phrase_index->add_unigram_frequency(token,
+                                                    count * unigram_factor);
                 result = true;
             }
         }
