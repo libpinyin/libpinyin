@@ -1604,6 +1604,17 @@ bool pinyin_clear_constraints(pinyin_instance_t * instance){
     return retval;
 }
 
+bool pinyin_lookup_token(pinyin_instance_t * instance,
+                         const char * phrase, phrase_token_t * token){
+    pinyin_context_t * & context = instance->m_context;
+    glong ucs4_len = 0;
+    ucs4_t * ucs4_phrase = g_utf8_to_ucs4(phrase, -1, NULL, &ucs4_len, NULL);
+
+    int retval = context->m_phrase_table->search(ucs4_len, ucs4_phrase, *token);
+
+    return SEARCH_OK == retval;
+}
+
 /* the returned word should be freed by g_free. */
 bool pinyin_translate_token(pinyin_instance_t * instance,
                             phrase_token_t token, char ** word){
@@ -1617,6 +1628,27 @@ bool pinyin_translate_token(pinyin_instance_t * instance,
     *word = g_ucs4_to_utf8(buffer, length, NULL, NULL, NULL);
     return ERROR_OK == retval;
 }
+
+bool pinyin_get_pinyins_from_token(pinyin_instance_t * instance,
+                                   phrase_token_t token, GArray * pinyinkeys){
+    pinyin_context_t * & context = instance->m_context;
+    FacadePhraseIndex * & phrase_index = context->m_phrase_index;
+    PhraseItem item;
+
+    int retval = phrase_index->get_phrase_item(token, item);
+    if (1 != item.get_phrase_length())
+        return false;
+
+    guint8 npinyin = item.get_n_pronunciation();
+    size_t i;
+    ChewingKey onekey; guint32 freq;
+    for (i = 0; i < npinyin; ++i){
+        item.get_nth_pronunciation(i, &onekey, freq);
+        g_array_append_val(pinyinkeys, onekey);
+    }
+    return true;
+}
+
 
 bool pinyin_train(pinyin_instance_t * instance){
     if (!instance->m_context->m_user_dir)

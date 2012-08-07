@@ -438,6 +438,9 @@ bool pinyin_clear_constraint(pinyin_instance_t * instance,
  */
 bool pinyin_clear_constraints(pinyin_instance_t * instance);
 
+bool pinyin_lookup_token(pinyin_instance_t * instance,
+                         const char * phrase, phrase_token_t * token);
+
 /**
  * pinyin_translate_token:
  * @instance: the pinyin instance.
@@ -452,6 +455,9 @@ bool pinyin_clear_constraints(pinyin_instance_t * instance);
  */
 bool pinyin_translate_token(pinyin_instance_t * instance,
                             phrase_token_t token, char ** word);
+
+bool pinyin_get_pinyins_from_token(pinyin_instance_t * instance,
+                                   phrase_token_t token, GArray * pinyinkeys);
 
 /**
  * pinyin_train:
