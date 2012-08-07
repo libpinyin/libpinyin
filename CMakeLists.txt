@@ -37,6 +37,8 @@ set (
     ${LIBPINYIN_VERSION_MAJOR}.${LIBPINYIN_VERSION_MINOR}.${LIBPINYIN_VERSION_REVISION}${version_suffix}
 )
 
+set (VERSION ${LIBPINYIN_VERSION})
+
 ######## Validation
 
 include(CheckIncludeFileCXX)
@@ -102,6 +104,12 @@ set (DIR_SHARE_LIBPINYIN ${DIR_SHARE}/libpinyin)
 set (DIR_INCLUDE_LIBPINYIN ${DIR_INCLUDE}/libpinyin-${LIBPINYIN_BINARY_VERSION})
 
 ######## Configuration
+
+set (prefix ${DIR_PREFIX})
+set (exec_prefix ${DIR_PREFIX})
+set (libdir ${DIR_LIBRARY})
+set (includedir ${DIR_INCLUDE})
+set (datadir ${DIR_SHARE})
 
 configure_file(
     libpinyin.pc.in
