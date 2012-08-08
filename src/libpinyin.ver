@@ -30,7 +30,9 @@ LIBPINYIN {
         pinyin_free_candidates;
         pinyin_clear_constraint;
         pinyin_clear_constraints;
+        pinyin_lookup_token;
         pinyin_translate_token;
+        pinyin_get_pinyins_from_token;
         pinyin_train;
         pinyin_reset;
         _ZN6pinyin10ChewingKey*;
