@@ -204,7 +204,8 @@ pinyin_context_t * pinyin_init(const char * systemdir, const char * userdir){
 
 bool pinyin_load_phrase_library(pinyin_context_t * context,
                                 guint8 index){
-    assert(index < PHRASE_INDEX_LIBRARY_COUNT);
+    if (!(index < PHRASE_INDEX_LIBRARY_COUNT))
+        return false;
     const pinyin_table_info_t * table_info = pinyin_phrase_files + index;
 
     if (SYSTEM_FILE == table_info->m_file_type) {
