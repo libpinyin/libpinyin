@@ -57,8 +57,10 @@ struct PhraseIndexRange{
     phrase_token_t m_range_end; /* pass the last item like stl */
 };
 
-/*Array of PhraseIndexRange*/
+/* Array of PhraseIndexRange */
 typedef GArray * PhraseIndexRanges[PHRASE_INDEX_LIBRARY_COUNT];
+/* Array of Token */
+typedef GArray * PhraseTokens[PHRASE_INDEX_LIBRARY_COUNT];
 
 /* 
  *  PinYin Table Definition
