@@ -51,7 +51,7 @@ public:
 };
 
 template<size_t phrase_length>
-class PhraseArrayIndexLevel{
+class PhraseArrayIndexLevel2{
 protected:
     MemoryChunk m_chunk;
 public:
@@ -69,3 +69,31 @@ public:
 };
 
 using namespace pinyin;
+
+/* class implementation */
+
+template<size_t phrase_length>
+struct PhraseIndexItem{
+    phrase_token_t m_token;
+    ucs4_t m_phrase[phrase_length];
+public:
+    PhraseIndexItem<phrase_length>(ucs4_t phrase[], phrase_token_t token){
+        memmove(m_phrase, phrase, sizeof(ucs4_t) * phrase_length);
+        m_token = token;
+    }
+};
+
+template<size_t phrase_length>
+static int phrase_compare(const PhraseIndexItem<phrase_length> &lhs,
+                          const PhraseIndexItem<phrase_length> &rhs){
+    ucs4_t * phrase_lhs = (ucs4_t *) lhs.m_phrase;
+    ucs4_t * phrase_rhs = (ucs4_t *) rhs.m_phrase;
+
+    return memcmp(phrase_lhs, phrase_rhs, sizeof(ucs4_t) * phrase_length);
+}
+
+template<size_t phrase_length>
+static bool phrase_less_than(const PhraseIndexItem<phrase_length> & lhs,
+                             const PhraseIndexItem<phrase_length> & rhs){
+    return 0 > phrase_compare(lhs, rhs);
+}
