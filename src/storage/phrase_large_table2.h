@@ -45,7 +45,7 @@ public:
 
     /* load/store method */
     bool load(MemoryChunk * chunk, table_offset_t offset, table_offset_t end);
-    bool store(MemoryChunk * newchunk, table_offset_t offset, table_offset_t & end);
+    bool store(MemoryChunk * new_chunk, table_offset_t offset, table_offset_t & end);
 
     /* search method */
     int search(int phrase_length, /* in */ ucs4_t phrase[],
@@ -85,9 +85,9 @@ public:
         return m_bitmap_table.load(chunk, 0, chunk->size());
     }
 
-    bool store(MemoryChunk * newchunk){
+    bool store(MemoryChunk * new_chunk){
         table_offset_t end;
-        return m_bitmap_table.store(newchunk, 0, end);
+        return m_bitmap_table.store(new_chunk, 0, end);
     }
 
     bool load_text(FILE * file);
@@ -103,7 +103,7 @@ public:
         return m_bitmap_table.add_index(phrase_length, phrase, token);
     }
 
-    int remove_index(int phrase_length, /* in */ ucs4_t phrase[], /* out */ phrase_token_t token) {
+    int remove_index(int phrase_length, /* in */ ucs4_t phrase[], /* in */ phrase_token_t token) {
         return m_bitmap_table.remove_index(phrase_length, phrase, token);
     }
 };
