@@ -30,6 +30,7 @@ noinst_HEADERS		= pinyin_parser2.h \
 			  phrase_index.h \
 			  phrase_index_logger.h \
 			  phrase_large_table.h \
+			  phrase_large_table2.h \
 			  ngram.h \
 			  flexible_ngram.h \
 			  tag_utility.h \
@@ -50,6 +51,7 @@ libstorage_la_LDFLAGS	= -static
 
 libstorage_la_SOURCES    = phrase_index.cpp \
 			   phrase_large_table.cpp \
+			   phrase_large_table2.cpp \
 			   ngram.cpp \
 			   tag_utility.cpp \
 			   pinyin_parser2.cpp \
