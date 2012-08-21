@@ -131,6 +131,10 @@ typedef double parameter_t;
 
 #define LAMBDA_PARAMETER 0.330642
 
+/* Array of ChewingKey/ChewingKeyRest */
+typedef GArray * ChewingKeyVector;
+typedef GArray * ChewingKeyRestVector;
+
 /* Array of phrase_token_t */
 typedef GArray * TokenVector;
 typedef TokenVector MatchResults;

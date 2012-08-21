@@ -79,8 +79,6 @@ typedef struct {
     const char m_tone;
 } chewing_tone_item_t;
 
-typedef GArray * ChewingKeyVector;
-typedef GArray * ChewingKeyRestVector;
 typedef GArray * ParseValueVector;
 
 
