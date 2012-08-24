@@ -1613,7 +1613,7 @@ bool pinyin_lookup_token(pinyin_instance_t * instance,
 
     int retval = context->m_phrase_table->search(ucs4_len, ucs4_phrase, *token);
 
-    return SEARCH_OK == retval;
+    return SEARCH_OK & retval;
 }
 
 /* the returned word should be freed by g_free. */
