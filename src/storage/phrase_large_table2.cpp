@@ -132,3 +132,87 @@ int PhraseBitmapIndexLevel2::search(int phrase_length,
         return phrase_array->search(phrase_length, phrase, tokens);
     return result;
 }
+
+PhraseLengthIndexLevel2::PhraseLengthIndexLevel2(){
+    m_phrase_array_indexes = g_array_new(FALSE, TRUE, sizeof(void *));
+}
+
+PhraseLengthIndexLevel2::~PhraseLengthIndexLevel2(){
+#define CASE(len) case len:                                             \
+    {                                                                   \
+        PhraseArrayIndexLevel2<len> * & array =  g_array_index          \
+            (m_phrase_array_indexes, PhraseArrayIndexLevel2<len> *, len - 1); \
+        if ( array ) {                                                  \
+            delete array;                                               \
+            array = NULL;                                               \
+        }                                                               \
+        break;                                                          \
+    }
+
+    for (size_t i = 1; i <= m_phrase_array_indexes->len; ++i){
+        switch (i){
+	    CASE(1);
+	    CASE(2);
+	    CASE(3);
+	    CASE(4);
+	    CASE(5);
+	    CASE(6);
+	    CASE(7);
+	    CASE(8);
+	    CASE(9);
+	    CASE(10);
+	    CASE(11);
+	    CASE(12);
+	    CASE(13);
+	    CASE(14);
+	    CASE(15);
+	    CASE(16);
+	default:
+	    assert(false);
+        }
+    }
+    g_array_free(m_phrase_array_indexes, TRUE);
+#undef CASE
+}
+
+int PhraseLengthIndexLevel2::search(int phrase_length,
+                                    /* in */ ucs4_t phrase[],
+                                    /* out */ PhraseTokens tokens) const {
+    int result = SEARCH_NONE;
+    if(m_phrase_array_indexes->len < phrase_length)
+        return result;
+    if (m_phrase_array_indexes->len > phrase_length)
+        result |= SEARCH_CONTINUED;
+
+#define CASE(len) case len:                                             \
+    {                                                                   \
+        PhraseArrayIndexLevel2<len> * array = g_array_index             \
+            (m_phrase_array_indexes, PhraseArrayIndexLevel2<len> *, len - 1); \
+        if ( !array )                                                   \
+            return result;                                              \
+        result |= array->search(phrase, tokens);                        \
+        return result;                                                  \
+    }
+
+    switch ( phrase_length ){
+	CASE(1);
+	CASE(2);
+	CASE(3);
+	CASE(4);
+	CASE(5);
+	CASE(6);
+	CASE(7);
+	CASE(8);
+	CASE(9);
+	CASE(10);
+	CASE(11);
+	CASE(12);
+	CASE(13);
+	CASE(14);
+	CASE(15);
+	CASE(16);
+    default:
+	assert(false);
+    }
+#undef CASE
+}
