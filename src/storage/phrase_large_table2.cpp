@@ -102,3 +102,33 @@ static bool phrase_less_than(const PhraseIndexItem2<phrase_length> & lhs,
                              const PhraseIndexItem2<phrase_length> & rhs){
     return 0 > phrase_compare(lhs, rhs);
 }
+
+PhraseBitmapIndexLevel2::PhraseBitmapIndexLevel2(){
+    memset(m_phrase_length_indexes, 0, sizeof(m_phrase_length_indexes));
+}
+
+void PhraseBitmapIndexLevel2::reset(){
+    for ( size_t i = 0; i < PHRASE_NUMBER_OF_BITMAP_INDEX; i++){
+        PhraseLengthIndexLevel2 * length_array =
+            m_phrase_length_indexes[i];
+        if ( length_array )
+            delete length_array;
+    }
+}
+
+int PhraseBitmapIndexLevel2::search(int phrase_length,
+                                    /* in */ ucs4_t phrase[],
+                                    /* out */ PhraseTokens tokens) const {
+    assert(phrase_length > 0);
+
+    int result = SEARCH_NONE;
+    /* use the first 8-bit of the lower 16-bit for bitmap index,
+     * as most the higher 16-bit are zero.
+     */
+    guint8 first_key = (phrase[0] & 0xFF00) >> 8;
+
+    PhraseLengthIndexLevel2 * phrase_array = m_phrase_length_indexes[first_key];
+    if ( phrase_array )
+        return phrase_array->search(phrase_length, phrase, tokens);
+    return result;
+}
