@@ -218,7 +218,7 @@ inline void compute_upper_value2(pinyin_option_t options,
 }
 
 
-template<int phrase_length>
+template<size_t phrase_length>
 struct PinyinIndexItem2{
     phrase_token_t m_token;
     ChewingKey m_keys[phrase_length];
@@ -231,7 +231,7 @@ public:
 
 
 /* for find the element in the phrase array */
-template<int phrase_length>
+template<size_t phrase_length>
 inline int phrase_exact_compare2(const PinyinIndexItem2<phrase_length> &lhs,
                                  const PinyinIndexItem2<phrase_length> &rhs)
 {
@@ -240,7 +240,7 @@ inline int phrase_exact_compare2(const PinyinIndexItem2<phrase_length> &lhs,
     return pinyin_exact_compare2(keys_lhs, keys_rhs, phrase_length);
 }
 
-template<int phrase_length>
+template<size_t phrase_length>
 inline bool phrase_exact_less_than2(const PinyinIndexItem2<phrase_length> &lhs,
                                     const PinyinIndexItem2<phrase_length> &rhs)
 {

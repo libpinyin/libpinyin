@@ -56,7 +56,7 @@ public:
 };
 
 
-template<int phrase_length>
+template<size_t phrase_length>
 class ChewingArrayIndexLevel{
 protected:
     typedef PinyinIndexItem2<phrase_length> IndexItem;
@@ -384,7 +384,7 @@ int ChewingLengthIndexLevel::search(pinyin_option_t options, int phrase_length,
 }
 
 
-template<int phrase_length>
+template<size_t phrase_length>
 int ChewingArrayIndexLevel<phrase_length>::search
 (pinyin_option_t options, /* in */ChewingKey keys[],
  /* out */ PhraseIndexRanges ranges) const {
@@ -410,7 +410,7 @@ int ChewingArrayIndexLevel<phrase_length>::search
 }
 
 /* compress consecutive tokens */
-template<int phrase_length>
+template<size_t phrase_length>
 int ChewingArrayIndexLevel<phrase_length>::convert
 (pinyin_option_t options, ChewingKey keys[],
  IndexItem * begin, IndexItem * end,
@@ -573,7 +573,7 @@ int ChewingLengthIndexLevel::remove_index(int phrase_length,
 #undef CASE
 }
 
-template<int phrase_length>
+template<size_t phrase_length>
 int ChewingArrayIndexLevel<phrase_length>::add_index
 (/* in */ ChewingKey keys[], /* in */ phrase_token_t token) {
     IndexItem * begin, * end;
@@ -600,7 +600,7 @@ int ChewingArrayIndexLevel<phrase_length>::add_index
     return ERROR_OK;
 }
 
-template<int phrase_length>
+template<size_t phrase_length>
 int ChewingArrayIndexLevel<phrase_length>::remove_index
 (/* in */ ChewingKey keys[], /* in */ phrase_token_t token) {
     IndexItem * begin, * end;
@@ -874,7 +874,7 @@ bool ChewingLengthIndexLevel::store(MemoryChunk * new_chunk,
     return true;
 }
 
-template<int phrase_length>
+template<size_t phrase_length>
 bool ChewingArrayIndexLevel<phrase_length>::
 load(MemoryChunk * chunk, table_offset_t offset, table_offset_t end) {
     char * begin = (char *) chunk->begin();
@@ -882,7 +882,7 @@ load(MemoryChunk * chunk, table_offset_t offset, table_offset_t end) {
     return true;
 }
 
-template<int phrase_length>
+template<size_t phrase_length>
 bool ChewingArrayIndexLevel<phrase_length>::
 store(MemoryChunk * new_chunk, table_offset_t offset, table_offset_t & end) {
     new_chunk->set_content(offset, m_chunk.begin(), m_chunk.size());
