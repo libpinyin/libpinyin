@@ -216,3 +216,44 @@ int PhraseLengthIndexLevel2::search(int phrase_length,
     }
 #undef CASE
 }
+
+template<size_t phrase_length>
+int PhraseArrayIndexLevel2<phrase_length>::search
+(/* in */ ucs4_t phrase[], /* out */ PhraseTokens tokens) const {
+    int result = SEARCH_NONE;
+
+    IndexItem * chunk_begin = NULL, * chunk_end = NULL;
+    chunk_begin = (IndexItem *) m_chunk.begin();
+    chunk_end = (IndexItem *) m_chunk.end();
+
+    /* do the search */
+    IndexItem item(phrase, -1);
+    std_lite::pair<IndexItem *, IndexItem *> range;
+    range = std_lite::equal_range
+        (chunk_begin, chunk_end, item,
+         phrase_less_than<phrase_length>);
+
+    const IndexItem * const begin = range.first;
+    const IndexItem * const end = range.second;
+    if (begin == end)
+        return result;
+
+    const IndexItem * iter = NULL;
+    GArray * array = NULL;
+
+    for (iter = begin; iter != end; ++iter) {
+        phrase_token_t token = iter->m_token;
+
+        /* filter out disabled sub phrase indices. */
+        array = tokens[PHRASE_INDEX_LIBRARY_INDEX(token)];
+        if (NULL == array)
+            continue;
+
+        result |= SEARCH_OK;
+
+        g_array_append_val(array, token);
+    }
+
+    return result;
+}
+
