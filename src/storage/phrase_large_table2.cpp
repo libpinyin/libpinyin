@@ -257,3 +257,30 @@ int PhraseArrayIndexLevel2<phrase_length>::search
     return result;
 }
 
+int PhraseBitmapIndexLevel2::add_index(int phrase_length,
+                                       /* in */ ucs4_t phrase[],
+                                       /* in */ phrase_token_t token){
+    guint8 first_key =  (phrase[0] & 0xFF00) >> 8;
+
+    PhraseLengthIndexLevel2 * & length_array =
+        m_phrase_length_indexes[first_key];
+
+    if ( !length_array ){
+        length_array = new PhraseLengthIndexLevel2();
+    }
+    return length_array->add_index(phrase_length, phrase, token);
+}
+
+int PhraseBitmapIndexLevel2::remove_index(int phrase_length,
+                                         /* in */ ucs4_t phrase[],
+                                         /* in */ phrase_token_t token){
+    guint8 first_key = (phrase[0] & 0xFF00) >> 8;
+
+    PhraseLengthIndexLevel2 * & length_array =
+        m_phrase_length_indexes[first_key];
+
+    if ( length_array )
+        return length_array->remove_index(phrase_length, phrase, token);
+
+    return ERROR_REMOVE_ITEM_DONOT_EXISTS;
+}
