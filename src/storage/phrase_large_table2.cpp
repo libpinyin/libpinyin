@@ -257,6 +257,9 @@ int PhraseArrayIndexLevel2<phrase_length>::search
     return result;
 }
 
+
+/* add/remove index method */
+
 int PhraseBitmapIndexLevel2::add_index(int phrase_length,
                                        /* in */ ucs4_t phrase[],
                                        /* in */ phrase_token_t token){
@@ -421,4 +424,31 @@ int PhraseArrayIndexLevel2<phrase_length>::remove_index
     int offset = (cur_elem - begin) * sizeof(IndexItem);
     m_chunk.remove_content(offset, sizeof(IndexItem));
     return ERROR_OK;
+}
+
+
+/* load text method */
+
+bool PhraseLargeTable2::load_text(FILE * infile){
+    char pinyin[256];
+    char phrase[256];
+    phrase_token_t token;
+    size_t freq;
+
+    while ( !feof(infile) ) {
+        fscanf(infile, "%s", pinyin);
+        fscanf(infile, "%s", phrase);
+        fscanf(infile, "%u", &token);
+        fscanf(infile, "%ld", &freq);
+
+        if ( feof(infile) )
+            break;
+
+        glong phrase_len = g_utf8_strlen(phrase, -1);
+        ucs4_t * new_phrase = g_utf8_to_ucs4(phrase, -1, NULL, NULL, NULL);
+        add_index(phrase_len, new_phrase, token);
+
+        g_free(new_phrase);
+    }
+    return true;
 }
