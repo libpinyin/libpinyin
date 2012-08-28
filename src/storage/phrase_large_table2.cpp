@@ -284,3 +284,86 @@ int PhraseBitmapIndexLevel2::remove_index(int phrase_length,
 
     return ERROR_REMOVE_ITEM_DONOT_EXISTS;
 }
+
+int PhraseLengthIndexLevel2::add_index(int phrase_length,
+                                       /* in */ ucs4_t phrase[],
+                                       /* in */ phrase_token_t token) {
+    if (phrase_length >= MAX_PHRASE_LENGTH)
+        return ERROR_PHRASE_TOO_LONG;
+
+    if (m_phrase_array_indexes->len < phrase_length)
+        g_array_set_size(m_phrase_array_indexes, phrase_length);
+
+#define CASE(len) case len:                                             \
+    {                                                                   \
+        PhraseArrayIndexLevel2<len> * & array = g_array_index           \
+            (m_phrase_array_indexes, PhraseArrayIndexLevel2<len> *, len - 1); \
+        if ( !array )                                                   \
+            array = new PhraseArrayIndexLevel2<len>;                    \
+        return array->add_index(phrase, token);                         \
+    }
+
+    switch(phrase_length){
+	CASE(1);
+	CASE(2);
+	CASE(3);
+	CASE(4);
+	CASE(5);
+	CASE(6);
+	CASE(7);
+	CASE(8);
+	CASE(9);
+	CASE(10);
+	CASE(11);
+	CASE(12);
+	CASE(13);
+	CASE(14);
+	CASE(15);
+        CASE(16);
+    default:
+	assert(false);
+    }
+
+#undef CASE
+}
+
+int PhraseLengthIndexLevel2::remove_index(int phrase_length,
+                                          /* in */ ucs4_t phrase[],
+                                          /* in */ phrase_token_t token) {
+    if (phrase_length >= MAX_PHRASE_LENGTH)
+        return ERROR_PHRASE_TOO_LONG;
+
+    if (m_phrase_array_indexes->len < phrase_length)
+        return ERROR_REMOVE_ITEM_DONOT_EXISTS;
+
+#define CASE(len) case len:                                             \
+    {                                                                   \
+        PhraseArrayIndexLevel2<len> * & array =  g_array_index          \
+            (m_phrase_array_indexes, PhraseArrayIndexLevel2<len> *, len - 1); \
+        if ( !array )                                                   \
+            return ERROR_REMOVE_ITEM_DONOT_EXISTS;                      \
+        return array->remove_index(phrase, token);                      \
+    }
+
+    switch(phrase_length){
+	CASE(1);
+	CASE(2);
+	CASE(3);
+	CASE(4);
+	CASE(5);
+	CASE(6);
+	CASE(7);
+	CASE(8);
+	CASE(9);
+	CASE(10);
+	CASE(11);
+	CASE(12);
+	CASE(13);
+	CASE(14);
+	CASE(15);
+	CASE(16);
+    default:
+	assert(false);
+    }
+#undef CASE
+}
