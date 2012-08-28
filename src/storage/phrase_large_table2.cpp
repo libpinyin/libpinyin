@@ -116,6 +116,9 @@ void PhraseBitmapIndexLevel2::reset(){
     }
 }
 
+
+/* search method */
+
 int PhraseBitmapIndexLevel2::search(int phrase_length,
                                     /* in */ ucs4_t phrase[],
                                     /* out */ PhraseTokens tokens) const {

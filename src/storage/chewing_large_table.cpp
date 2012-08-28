@@ -114,7 +114,7 @@ void ChewingBitmapIndexLevel::reset() {
 }
 
 
-/* search methods */
+/* search method */
 
 int ChewingBitmapIndexLevel::search(int phrase_length,
                                     /* in */ ChewingKey keys[],
