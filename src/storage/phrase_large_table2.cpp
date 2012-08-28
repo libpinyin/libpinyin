@@ -89,8 +89,8 @@ using namespace pinyin;
 /* class implementation */
 
 template<size_t phrase_length>
-static int phrase_compare(const PhraseIndexItem2<phrase_length> &lhs,
-                          const PhraseIndexItem2<phrase_length> &rhs){
+static int phrase_compare2(const PhraseIndexItem2<phrase_length> &lhs,
+                           const PhraseIndexItem2<phrase_length> &rhs){
     ucs4_t * phrase_lhs = (ucs4_t *) lhs.m_phrase;
     ucs4_t * phrase_rhs = (ucs4_t *) rhs.m_phrase;
 
@@ -98,9 +98,9 @@ static int phrase_compare(const PhraseIndexItem2<phrase_length> &lhs,
 }
 
 template<size_t phrase_length>
-static bool phrase_less_than(const PhraseIndexItem2<phrase_length> & lhs,
-                             const PhraseIndexItem2<phrase_length> & rhs){
-    return 0 > phrase_compare(lhs, rhs);
+static bool phrase_less_than2(const PhraseIndexItem2<phrase_length> & lhs,
+                              const PhraseIndexItem2<phrase_length> & rhs){
+    return 0 > phrase_compare2(lhs, rhs);
 }
 
 PhraseBitmapIndexLevel2::PhraseBitmapIndexLevel2(){
@@ -231,7 +231,7 @@ int PhraseArrayIndexLevel2<phrase_length>::search
     std_lite::pair<IndexItem *, IndexItem *> range;
     range = std_lite::equal_range
         (chunk_begin, chunk_end, item,
-         phrase_less_than<phrase_length>);
+         phrase_less_than2<phrase_length>);
 
     const IndexItem * const begin = range.first;
     const IndexItem * const end = range.second;
