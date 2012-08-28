@@ -227,10 +227,10 @@ int PhraseArrayIndexLevel2<phrase_length>::search
     chunk_end = (IndexItem *) m_chunk.end();
 
     /* do the search */
-    IndexItem item(phrase, -1);
+    IndexItem search_elem(phrase, -1);
     std_lite::pair<IndexItem *, IndexItem *> range;
     range = std_lite::equal_range
-        (chunk_begin, chunk_end, item,
+        (chunk_begin, chunk_end, search_elem,
          phrase_less_than2<phrase_length>);
 
     const IndexItem * const begin = range.first;
@@ -366,4 +366,59 @@ int PhraseLengthIndexLevel2::remove_index(int phrase_length,
 	assert(false);
     }
 #undef CASE
+}
+
+template<size_t phrase_length>
+int PhraseArrayIndexLevel2<phrase_length>::add_index
+(/* in */ ucs4_t phrase[], /* in */ phrase_token_t token){
+    IndexItem * begin, * end;
+
+    IndexItem add_elem(phrase, token);
+    begin = (IndexItem *) m_chunk.begin();
+    end   = (IndexItem *) m_chunk.end();
+
+    std_lite::pair<IndexItem *, IndexItem *> range;
+    range = std_lite::equal_range
+        (begin, end, add_elem, phrase_less_than2<phrase_length>);
+
+    IndexItem * cur_elem;
+    for (cur_elem = range.first;
+         cur_elem != range.second; ++cur_elem) {
+        if (cur_elem->m_token == token)
+            return ERROR_INSERT_ITEM_EXISTS;
+        if (cur_elem->m_token > token)
+            break;
+    }
+
+    int offset = (cur_elem - begin) * sizeof(IndexItem);
+    m_chunk.insert_content(offset, &add_elem, sizeof(IndexItem));
+    return ERROR_OK;
+}
+
+template<size_t phrase_length>
+int PhraseArrayIndexLevel2<phrase_length>::remove_index
+(/* in */ ucs4_t phrase[], /* in */ phrase_token_t token) {
+    IndexItem * begin, * end;
+
+    IndexItem remove_elem(phrase, token);
+    begin = (IndexItem *) m_chunk.begin();
+    end   = (IndexItem *) m_chunk.end();
+
+    std_lite::pair<IndexItem *, IndexItem *> range;
+    range = std_lite::equal_range
+        (begin, end, remove_elem, phrase_less_than2<phrase_length>);
+
+    IndexItem * cur_elem;
+    for (cur_elem = range.first;
+         cur_elem != range.second; ++cur_elem) {
+        if (cur_elem->m_token == token)
+            break;
+    }
+
+    if (cur_elem == range.second)
+        return ERROR_REMOVE_ITEM_DONOT_EXISTS;
+
+    int offset = (cur_elem - begin) * sizeof(IndexItem);
+    m_chunk.remove_content(offset, sizeof(IndexItem));
+    return ERROR_OK;
 }
