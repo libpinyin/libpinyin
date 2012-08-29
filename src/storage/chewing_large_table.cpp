@@ -829,7 +829,7 @@ bool ChewingLengthIndexLevel::store(MemoryChunk * new_chunk,
 #define CASE(len) case len:                                             \
         {                                                               \
             ChewingArrayIndexLevel<len> * phrase = g_array_index        \
-                (m_chewing_array_indexes, ChewingArrayIndexLevel<len> *, i); \
+                (m_chewing_array_indexes, ChewingArrayIndexLevel<len> *, len); \
             if (NULL == phrase) {                                       \
                 new_chunk->set_content                                  \
                     (index, &offset, sizeof(table_offset_t));           \
