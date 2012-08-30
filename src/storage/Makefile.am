@@ -40,7 +40,8 @@ noinst_HEADERS		= pinyin_parser2.h \
 			  pinyin_phrase2.h \
 			  chewing_large_table.h \
 			  facade_chewing_table.h \
-			  facade_phrase_table.h
+			  facade_phrase_table.h \
+			  facade_phrase_table2.h
 
 
 noinst_LTLIBRARIES      = libstorage.la

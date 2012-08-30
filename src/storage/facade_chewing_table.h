@@ -143,7 +143,7 @@ public:
      * @phrase_length: the length of the phrase to be added.
      * @keys: the pinyin keys of the phrase to be added.
      * @token: the token of the phrase to be added.
-     * @returns: the add result of enum AddIndexResult.
+     * @returns: the add result of enum ErrorResult.
      *
      * Add the phrase token to the user chewing table.
      *
@@ -160,7 +160,7 @@ public:
      * @phrase_length: the length of the phrase to be removed.
      * @keys: the pinyin keys of the phrase to be removed.
      * @token: the token of the phrase to be removed.
-     * @returns: the remove result of enum RemoveIndexResult.
+     * @returns: the remove result of enum ErrorResult.
      *
      * Remove the phrase token from the user chewing table.
      *
