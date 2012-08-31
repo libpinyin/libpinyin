@@ -175,8 +175,8 @@ bool PinyinLookup::search_unigram(IBranchIterator * iter, int nstep, int npinyin
 	bool found = false;
 	for ( size_t i = 1; i < m_table_cache->len && i <= MAX_PHRASE_LENGTH; ++i){
 	lookup_constraint_t * constraint = &g_array_index(m_constraints, lookup_constraint_t, nstep + i - 1);
-	if ( constraint->m_type != NO_CONSTRAINT )
-	    continue;
+	if ( constraint->m_type == CONSTRAINT_NOSEARCH )
+	    break;
 	    PhraseIndexRanges * ranges = &g_array_index(m_table_cache,PhraseIndexRanges, i);
 	    for ( size_t m = 0; m < PHRASE_INDEX_LIBRARY_COUNT; ++m){
 		GArray * array = (*ranges)[m];
