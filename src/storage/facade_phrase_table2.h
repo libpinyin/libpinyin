@@ -62,11 +62,11 @@ public:
     bool load(MemoryChunk * system, MemoryChunk * user) {
         bool result = false;
         if (system) {
-            m_system_phrase_table = new PhraseLargeTable;
+            m_system_phrase_table = new PhraseLargeTable2;
             result = m_system_phrase_table->load(system) || result;
         }
         if (user) {
-            m_user_phrase_table = new PhraseLargeTable;
+            m_user_phrase_table = new PhraseLargeTable2;
             result = m_user_phrase_table->load(user) || result;
         }
         return result;
