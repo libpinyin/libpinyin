@@ -672,24 +672,6 @@ public:
     }
 
     /**
-     * FacadePhraseIndex::clear_ranges:
-     * @ranges: the ranges to be cleared.
-     * @returns: whether the clear operation is successful.
-     *
-     * Clear the ranges.
-     *
-     */
-    bool clear_ranges(PhraseIndexRanges ranges) {
-        for  (size_t i = 0; i < PHRASE_INDEX_LIBRARY_COUNT; ++i) {
-            GArray * range = ranges[i];
-            if (range) {
-                g_array_set_size(range, 0);
-            }
-        }
-        return true;
-    }
-
-    /**
      * FacadePhraseIndex::destroy_ranges:
      * @ranges: the ranges to be destroyed.
      * @returns: whether the destroy operation is successful.

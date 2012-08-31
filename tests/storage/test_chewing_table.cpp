@@ -63,9 +63,13 @@ int main(int argc, char * argv[]) {
 
         for (size_t i = 0; i < bench_times; ++i) {
             largetable.search(keys->len, (ChewingKey *)keys->data, ranges);
-        }
 
-        phrase_index.clear_ranges(ranges);
+            /* clear ranges. */
+            for (size_t i = 0; i < PHRASE_INDEX_LIBRARY_COUNT; ++i) {
+                if (ranges[i])
+                    g_array_set_size(ranges[i], 0);
+            }
+        }
 
         print_time(start, bench_times);
 
