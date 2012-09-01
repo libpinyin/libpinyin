@@ -691,6 +691,47 @@ public:
     }
 
     /**
+     * FacadePhraseIndex::prepare_tokens:
+     * @tokens: the tokens to be prepared.
+     * @returns: whether the prepare operation is successful.
+     *
+     * Prepare the tokens.
+     *
+     */
+    bool prepare_tokens(PhraseTokens tokens) {
+        /* assume memset(tokens, 0, sizeof(tokens)); */
+        for (size_t i = 0; i < PHRASE_INDEX_LIBRARY_COUNT; ++i) {
+            GArray * & token = tokens[i];
+            assert(NULL == token);
+
+            SubPhraseIndex * sub_phrase = m_sub_phrase_indices[i];
+            if (sub_phrase) {
+                token = g_array_new(FALSE, FALSE, sizeof(phrase_token_t));
+            }
+        }
+        return true;
+    }
+
+    /**
+     * FacadePhraseIndex::destroy_tokens:
+     * @tokens: the tokens to be destroyed.
+     * @returns: whether the destroy operation is successful.
+     *
+     * Destroy the tokens.
+     *
+     */
+    bool destroy_tokens(PhraseTokens tokens) {
+        for (size_t i = 0; i < PHRASE_INDEX_LIBRARY_COUNT; ++i) {
+            GArray * & token = tokens[i];
+            if (token) {
+                g_array_free(token, TRUE);
+                token = NULL;
+            }
+        }
+        return true;
+    }
+
+    /**
      * FacadePhraseIndex::create_sub_phrase:
      * @index: the phrase index to be created.
      * @returns: the result of the create operation.
