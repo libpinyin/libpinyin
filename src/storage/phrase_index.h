@@ -48,8 +48,6 @@
 
 namespace pinyin{
 
-class PinyinLookup;
-
 /* Store delta info by phrase index logger in user home directory.
  */
 
