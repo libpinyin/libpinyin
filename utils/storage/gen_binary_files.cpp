@@ -49,8 +49,8 @@ int main(int argc, char * argv[]){
 
     /* generate pinyin index*/
     pinyin_option_t options = USE_TONE;
-    ChewingLargeTable chewinglargetable(options);
-    PhraseLargeTable2 phraselargetable;
+    ChewingLargeTable chewing_table(options);
+    PhraseLargeTable2 phrase_table;
 
     /* generate phrase index */
     FacadePhraseIndex phrase_index;
@@ -70,9 +70,9 @@ int main(int argc, char * argv[]){
             exit(ENOENT);
         }
 
-        chewinglargetable.load_text(tablefile);
+        chewing_table.load_text(tablefile);
         fseek(tablefile, 0L, SEEK_SET);
-        phraselargetable.load_text(tablefile);
+        phrase_table.load_text(tablefile);
         fseek(tablefile, 0L, SEEK_SET);
         phrase_index.load_text(i, tablefile);
         fclose(tablefile);
@@ -80,14 +80,14 @@ int main(int argc, char * argv[]){
     }
 
     MemoryChunk * new_chunk = new MemoryChunk;
-    chewinglargetable.store(new_chunk);
+    chewing_table.store(new_chunk);
     new_chunk->save("pinyin_index.bin");
-    chewinglargetable.load(new_chunk);
+    chewing_table.load(new_chunk);
     
     new_chunk = new MemoryChunk;
-    phraselargetable.store(new_chunk);
+    phrase_table.store(new_chunk);
     new_chunk->save("phrase_index.bin");
-    phraselargetable.load(new_chunk);
+    phrase_table.load(new_chunk);
 
     phrase_index.compact();
 
