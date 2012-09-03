@@ -4,7 +4,7 @@
 #include <assert.h>
 #include "novel_types.h"
 #include "phrase_index.h"
-#include "phrase_large_table.h"
+#include "phrase_large_table2.h"
 #include "tag_utility.h"
 
 namespace pinyin{
@@ -330,15 +330,24 @@ static phrase_token_t taglib_special_string_to_token(const char * string){
     return 0;
 }
 
-phrase_token_t taglib_string_to_token(PhraseLargeTable * phrases, const char * string){
-    phrase_token_t token = 0;
+phrase_token_t taglib_string_to_token(PhraseLargeTable2 * phrase_table,
+                                      FacadePhraseIndex * phrase_index,
+                                      const char * string){
+    phrase_token_t token = null_token;
     if ( string[0] == '<' ) {
         return taglib_special_string_to_token(string);
     }
 
     glong phrase_len = g_utf8_strlen(string, -1);
     ucs4_t * phrase = g_utf8_to_ucs4(string, -1, NULL, NULL, NULL);
-    int result = phrases->search(phrase_len, phrase, token);
+
+    PhraseTokens tokens;
+    memset(tokens, 0, sizeof(PhraseTokens));
+    phrase_index->prepare_tokens(tokens);
+    int result = phrase_table->search(phrase_len, phrase, tokens);
+    int num = get_first_token(tokens, token);
+    phrase_index->destroy_tokens(tokens);
+
     if ( !(result & SEARCH_OK) )
         fprintf(stderr, "error: unknown token:%s.\n", string);
 
