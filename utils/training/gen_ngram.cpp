@@ -57,11 +57,11 @@ int main(int argc, char * argv[]){
 	++i;
     }
     
-    PhraseLargeTable2 phrases;
+    PhraseLargeTable2 phrase_table;
     /* init phrase table */
     MemoryChunk * chunk = new MemoryChunk;
     chunk->load("phrase_index.bin");
-    phrases.load(chunk);
+    phrase_table.load(chunk);
 
     FacadePhraseIndex phrase_index;
     if (!load_phrase_index(&phrase_index))
@@ -87,7 +87,7 @@ int main(int argc, char * argv[]){
 
 	phrase_token_t token = null_token;
         if ( 0 != phrase_len ) {
-            int result = phrases.search( phrase_len, phrase, tokens);
+            int result = phrase_table.search(phrase_len, phrase, tokens);
             int num = get_first_token(tokens, token);
             if ( !(result & SEARCH_OK) )
                 token = null_token;
