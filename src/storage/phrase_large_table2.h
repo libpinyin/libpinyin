@@ -108,6 +108,26 @@ public:
     }
 };
 
+/* for compatibility. */
+static inline int get_first_token(PhraseTokens tokens,
+                                  /* out */ phrase_token_t & token){
+    int num = 0; token = null_token;
+
+    for (size_t i = 0; i < PHRASE_INDEX_LIBRARY_COUNT; ++i) {
+        GArray * array = tokens[i];
+        if (NULL == array || 0 == array->len)
+            continue;
+
+        num += array->len;
+
+        if (null_token == token) {
+            token = g_array_index(array, phrase_token_t, 0);
+        }
+    }
+
+    return num;
+}
+
 };
 
 #endif
