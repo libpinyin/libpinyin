@@ -50,7 +50,7 @@ private:
     SingleGram m_merged_single_gram;
 protected:
     //saved varibles
-    FacadePhraseTable * m_phrase_table;
+    FacadePhraseTable2 * m_phrase_table;
     FacadePhraseIndex * m_phrase_index;
     Bigram * m_system_bigram;
     Bigram * m_user_bigram;
@@ -89,7 +89,7 @@ public:
      * The constructor of the PhraseLookup.
      *
      */
-    PhraseLookup(FacadePhraseTable * phrase_table,
+    PhraseLookup(FacadePhraseTable2 * phrase_table,
                  FacadePhraseIndex * phrase_index,
                  Bigram * system_bigram,
                  Bigram * user_bigram);

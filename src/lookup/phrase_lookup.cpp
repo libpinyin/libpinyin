@@ -23,7 +23,7 @@
 #include "stl_lite.h"
 #include "novel_types.h"
 #include "phrase_index.h"
-#include "facade_phrase_table.h"
+#include "facade_phrase_table2.h"
 #include "ngram.h"
 #include "phrase_lookup.h"
 
@@ -49,7 +49,7 @@ static void clear_steps(GPtrArray * steps_index,
     }
 }
 
-PhraseLookup::PhraseLookup(FacadePhraseTable * phrase_table,
+PhraseLookup::PhraseLookup(FacadePhraseTable2 * phrase_table,
                            FacadePhraseIndex * phrase_index,
                            Bigram * system_bigram,
                            Bigram * user_bigram){
@@ -95,20 +95,42 @@ bool PhraseLookup::get_best_match(int sentence_length, ucs4_t sentence[],
     GHashTable * initial_step_index = (GHashTable *) g_ptr_array_index(m_steps_index, 0);
     g_hash_table_insert(initial_step_index, GUINT_TO_POINTER(initial_key), GUINT_TO_POINTER(initial_step_content->len - 1));
 
+    PhraseTokens tokens;
+    memset(tokens, 0, sizeof(PhraseTokens));
+    m_phrase_index->prepare_tokens(tokens);
+
     for ( int i = 0; i < nstep - 1; ++i ){
         for ( int m = i + 1; m < nstep; ++m ){
-            phrase_token_t next_token = null_token;
-            int result = m_phrase_table->search(m - i, sentence + i, next_token);
+
+            /* do one phrase table search. */
+            int result = m_phrase_table->search(m - i, sentence + i, tokens);
+
             /* found next phrase */
             if ( result & SEARCH_OK ) {
-                search_bigram(i, next_token),
-                    search_unigram(i, next_token);
+                /* iterate every token. */
+                for (size_t n = 0; n < PHRASE_INDEX_LIBRARY_COUNT; ++n) {
+                    GArray * array = tokens[n];
+                    if (NULL == array)
+                        continue;
+
+                    /* just skip the loop when the length is zero. */
+                    for (size_t k = 0; k < array->len; ++k) {
+                        phrase_token_t next_token =
+                            g_array_index(array, phrase_token_t, k);
+                        search_bigram(i, next_token),
+                            search_unigram(i, next_token);
+                    }
+                }
             }
+
             /* no longer phrase */
             if (!(result & SEARCH_CONTINUED))
                 break;
         }
     }
+
+    m_phrase_index->destroy_tokens(tokens);
+
     return final_step(results);
 }
 
