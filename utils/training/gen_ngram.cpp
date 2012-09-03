@@ -57,7 +57,7 @@ int main(int argc, char * argv[]){
 	++i;
     }
     
-    PhraseLargeTable phrases;
+    PhraseLargeTable2 phrases;
     /* init phrase table */
     MemoryChunk * chunk = new MemoryChunk;
     chunk->load("phrase_index.bin");
@@ -69,6 +69,10 @@ int main(int argc, char * argv[]){
     
     Bigram bigram;
     bigram.attach(bigram_filename, ATTACH_CREATE|ATTACH_READWRITE);
+
+    PhraseTokens tokens;
+    memset(tokens, 0, sizeof(PhraseTokens));
+    phrase_index.prepare_tokens(tokens);
     
     char* linebuf = NULL;
     size_t size = 0;
@@ -81,11 +85,12 @@ int main(int argc, char * argv[]){
         glong phrase_len = 0;
         ucs4_t * phrase = g_utf8_to_ucs4(linebuf, -1, NULL, &phrase_len, NULL);
 
-	phrase_token_t token = 0;
+	phrase_token_t token = null_token;
         if ( 0 != phrase_len ) {
-            int result = phrases.search( phrase_len, phrase, token);
-            if ( ! (result & SEARCH_OK) )
-                token = 0;
+            int result = phrases.search( phrase_len, phrase, tokens);
+            int num = get_first_token(tokens, token);
+            if ( !(result & SEARCH_OK) )
+                token = null_token;
             g_free(phrase);
             phrase = NULL;
         }
@@ -97,7 +102,7 @@ int main(int argc, char * argv[]){
         if ( null_token == cur_token )
             continue;
 
-        //training uni-gram
+        /* training uni-gram */
         phrase_index.add_unigram_frequency(cur_token, 1);
 
         /* skip pi-gram training. */
@@ -107,7 +112,7 @@ int main(int argc, char * argv[]){
             last_token = sentence_start;
         }
 
-        //train bi-gram
+        /* train bi-gram */
         SingleGram * single_gram = NULL;
         bigram.load(last_token, single_gram);
 
@@ -115,12 +120,12 @@ int main(int argc, char * argv[]){
             single_gram = new SingleGram;
         }
         guint32 freq, total_freq;
-        //increase freq
+        /* increase freq */
         if (single_gram->get_freq(cur_token, freq))
             assert(single_gram->set_freq(cur_token, freq + 1));
         else
             assert(single_gram->insert_freq(cur_token, 1));
-        //increase total freq
+        /* increase total freq */
         single_gram->get_total_freq(total_freq);
         single_gram->set_total_freq(total_freq + 1);
 
@@ -128,6 +133,7 @@ int main(int argc, char * argv[]){
         delete single_gram;
     }
 
+    phrase_index.destroy_tokens(tokens);
     free(linebuf);
     
     if (!save_phrase_index(&phrase_index))
