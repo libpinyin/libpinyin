@@ -23,6 +23,7 @@
 #include <glib.h>
 #include <locale.h>
 #include "pinyin_internal.h"
+#include "utils_helper.h"
 #include "k_mixture_model.h"
 
 /* Hash token of Hash token of word count. */
@@ -45,9 +46,15 @@ void print_help(){
 }
 
 
-bool read_document(PhraseLargeTable * phrases, FILE * document,
+bool read_document(PhraseLargeTable2 * phrase_table,
+                   FacadePhraseIndex * phrase_index,
+                   FILE * document,
                    HashofDocument hash_of_document,
                    HashofUnigram hash_of_unigram){
+    PhraseTokens tokens;
+    memset(tokens, 0, sizeof(PhraseTokens));
+    phrase_index->prepare_tokens(tokens);
+
     char * linebuf = NULL;
     size_t size = 0;
     phrase_token_t last_token, cur_token = last_token = 0;
@@ -61,11 +68,15 @@ bool read_document(PhraseLargeTable * phrases, FILE * document,
         glong phrase_len = 0;
         ucs4_t * phrase = g_utf8_to_ucs4(linebuf, -1, NULL, &phrase_len, NULL);
 
-        phrase_token_t token = 0;
+        phrase_token_t token = null_token;
         if ( 0 != phrase_len ) {
-            int search_result = phrases->search( phrase_len, phrase, token );
-            if ( ! (search_result & SEARCH_OK) )
-                token = 0;
+            int search_result = phrase_table->search
+                (phrase_len, phrase, tokens);
+            int num = get_first_token(tokens, token);
+
+            if ( !(search_result & SEARCH_OK) )
+                token = null_token;
+
             g_free(phrase);
             phrase = NULL;
         }
@@ -128,6 +139,8 @@ bool read_document(PhraseLargeTable * phrases, FILE * document,
     }
 
     free(linebuf);
+
+    phrase_index->destroy_tokens(tokens);
 
     return true;
 }
@@ -343,10 +356,14 @@ int main(int argc, char * argv[]){
         ++i;
     }
 
-    PhraseLargeTable phrases;
+    PhraseLargeTable2 phrase_table;
     MemoryChunk * chunk = new MemoryChunk;
     chunk->load("phrase_index.bin");
-    phrases.load(chunk);
+    phrase_table.load(chunk);
+
+    FacadePhraseIndex phrase_index;
+    if (!load_phrase_index(&phrase_index))
+        exit(ENOENT);
 
     KMixtureModelBigram bigram(K_MIXTURE_MODEL_MAGIC_NUMBER);
     bigram.attach(k_mixture_model_filename, ATTACH_READWRITE|ATTACH_CREATE);
@@ -366,7 +383,7 @@ int main(int argc, char * argv[]){
         HashofUnigram hash_of_unigram = g_hash_table_new
             (g_direct_hash, g_direct_equal);
 
-        assert(read_document(&phrases, document,
+        assert(read_document(&phrase_table, &phrase_index, document,
                              hash_of_document, hash_of_unigram));
         fclose(document);
         document = NULL;
