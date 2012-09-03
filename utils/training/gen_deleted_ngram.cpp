@@ -25,8 +25,7 @@
 #include <locale.h>
 #include <glib.h>
 #include "pinyin_internal.h"
-
-static PhraseLargeTable * g_phrases = NULL;
+#include "utils_helper.h"
 
 void print_help(){
     printf("Usage: gen_deleted_ngram [--skip-pi-gram-training]\n");
@@ -58,14 +57,22 @@ int main(int argc, char * argv[]){
 	++i;
     }
     
-    PhraseLargeTable phrases;
-    //init phrase lookup
+    /* load phrase table. */
+    PhraseLargeTable2 phrase_table;
     MemoryChunk * new_chunk = new MemoryChunk;
     new_chunk->load("phrase_index.bin");
-    phrases.load(new_chunk);
+    phrase_table.load(new_chunk);
+
+    FacadePhraseIndex phrase_index;
+    if (!load_phrase_index(&phrase_index))
+        exit(ENODATA);
 
     Bigram bigram;
     bigram.attach(bigram_filename, ATTACH_CREATE|ATTACH_READWRITE);
+
+    PhraseTokens tokens;
+    memset(tokens, 0, sizeof(PhraseTokens));
+    phrase_index.prepare_tokens(tokens);
 
     char* linebuf = NULL;
     size_t size = 0;
@@ -79,11 +86,13 @@ int main(int argc, char * argv[]){
         glong phrase_len = 0;
         ucs4_t * phrase = g_utf8_to_ucs4(linebuf, -1, NULL, &phrase_len, NULL);
 
-	phrase_token_t token = 0;
+	phrase_token_t token = null_token;
         if ( 0 != phrase_len ) {
-            int result = phrases.search( phrase_len, phrase, token);
-            if ( ! (result & SEARCH_OK) )
-                token = 0;
+            int result = phrase_table.search( phrase_len, phrase, tokens);
+            int num = get_first_token(tokens, token);
+
+            if ( !(result & SEARCH_OK) )
+                token = null_token;
             g_free(phrase);
             phrase = NULL;
         }
@@ -122,6 +131,8 @@ int main(int argc, char * argv[]){
         bigram.store(last_token, single_gram);
         delete single_gram;
     }
+
+    phrase_index.destroy_tokens(tokens);
 
     free(linebuf);
     return 0;

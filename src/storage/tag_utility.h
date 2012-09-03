@@ -111,7 +111,7 @@ bool taglib_pop_state();
  */
 bool taglib_fini();
 
-class PhraseLargeTable;
+class PhraseLargeTable2;
 class FacadePhraseIndex;
 
 
