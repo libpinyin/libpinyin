@@ -100,8 +100,8 @@ public:
                /* out */ PhraseTokens tokens) const {
         /* clear ranges. */
         for (size_t i = 0; i < PHRASE_INDEX_LIBRARY_COUNT; ++i) {
-            if (ranges[i])
-                g_array_set_size(ranges[i], 0);
+            if (tokens[i])
+                g_array_set_size(tokens[i], 0);
         }
 
         int result = SEARCH_NONE;
