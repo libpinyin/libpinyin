@@ -103,7 +103,7 @@ int main(int argc, char * argv[]){
     }
 
     /* init phrase table */
-    FacadePhraseTable phrase_table;
+    FacadePhraseTable2 phrase_table;
     MemoryChunk * chunk = new MemoryChunk;
     chunk->load("phrase_index.bin");
     phrase_table.load(chunk, NULL);
@@ -125,7 +125,10 @@ int main(int argc, char * argv[]){
 
     CONTEXT_STATE state, next_state;
     GArray * current_ucs4 = g_array_new(TRUE, TRUE, sizeof(ucs4_t));
-    phrase_token_t token = null_token;
+
+    PhraseTokens tokens;
+    memset(tokens, 0, sizeof(PhraseTokens));
+    phrase_index.prepare_tokens(tokens);
 
     /* split the sentence */
     char * linebuf = NULL; size_t size = 0; ssize_t read;
@@ -151,7 +154,7 @@ int main(int argc, char * argv[]){
         }
 
         state = CONTEXT_INIT;
-        bool result = phrase_table.search( 1, sentence, token);
+        bool result = phrase_table.search( 1, sentence, tokens);
         g_array_append_val( current_ucs4, sentence[0]);
         if ( result & SEARCH_OK )
             state = CONTEXT_SEGMENTABLE;
@@ -159,7 +162,7 @@ int main(int argc, char * argv[]){
             state = CONTEXT_UNKNOWN;
 
         for ( int i = 1; i < num_of_chars; ++i) {
-            bool result = phrase_table.search( 1, sentence + i, token);
+            bool result = phrase_table.search( 1, sentence + i, tokens);
             if ( result & SEARCH_OK )
                 next_state = CONTEXT_SEGMENTABLE;
             else
@@ -197,6 +200,7 @@ int main(int argc, char * argv[]){
         if ( gen_extra_enter )
             printf("\n");
     }
+    phrase_index.destroy_tokens(tokens);
 
     /* print enter at file tail */
     printf("\n");

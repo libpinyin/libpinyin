@@ -24,6 +24,7 @@
 #include <locale.h>
 #include <glib.h>
 #include "pinyin_internal.h"
+#include "utils_helper.h"
 
 /* graph shortest path sentence segment. */
 
@@ -43,7 +44,7 @@ struct SegmentStep{
     gint m_backward_nstep;
 public:
     SegmentStep(){
-        m_handle = 0;
+        m_handle = null_token;
         m_phrase = NULL;
         m_phrase_len = 0;
         m_nword = UINT_MAX;
@@ -54,7 +55,8 @@ public:
 bool backtrace(GArray * steps, glong phrase_len, GArray * strings);
 
 //Note: do not free phrase, as it is used by strings (array of segment).
-bool segment(PhraseLargeTable * phrases, //Lookup Phrase
+bool segment(FacadePhraseTable2 * phrase_table,
+             FacadePhraseIndex * phrase_index,
              ucs4_t * phrase,
              glong phrase_len,
              GArray * strings /* Array of Segment *. */){
@@ -68,6 +70,10 @@ bool segment(PhraseLargeTable * phrases, //Lookup Phrase
     SegmentStep * first_step = &g_array_index(steps, SegmentStep, 0);
     first_step->m_nword = 0;
 
+    PhraseTokens tokens;
+    memset(tokens, 0, sizeof(PhraseTokens));
+    phrase_index->prepare_tokens(tokens);
+
     for ( glong i = 0; i < phrase_len + 1; ++i ) {
         SegmentStep * step_begin = &g_array_index(steps, SegmentStep, i);
         size_t nword = step_begin->m_nword;
@@ -75,14 +81,17 @@ bool segment(PhraseLargeTable * phrases, //Lookup Phrase
             size_t len = k - i;
             ucs4_t * cur_phrase = phrase + i;
 
-            phrase_token_t token = 0;
-            int result = phrases->search(len, cur_phrase, token);
+            phrase_token_t token = null_token;
+            int result = phrase_table->search(len, cur_phrase, tokens);
+            int num = get_first_token(tokens, token);
+
             if ( !(result & SEARCH_OK) ){
-                token = 0;
+                token = null_token;
                 if ( 1 != len )
                     continue;
             }
             ++nword;
+
             SegmentStep * step_end = &g_array_index(steps, SegmentStep, k);
             if ( nword < step_end->m_nword ) {
                 step_end->m_handle = token;
@@ -95,6 +104,8 @@ bool segment(PhraseLargeTable * phrases, //Lookup Phrase
                 break;
         }
     }
+    phrase_index->destroy_tokens(tokens);
+
     return backtrace(steps, phrase_len, strings);
 }
 
@@ -148,11 +159,16 @@ int main(int argc, char * argv[]){
         ++i;
     }
 
-    //init phrase table
-    PhraseLargeTable phrase_table;
+    /* init phrase table */
+    FacadePhraseTable2 phrase_table;
     MemoryChunk * chunk = new MemoryChunk;
     chunk->load("phrase_index.bin");
-    phrase_table.load(chunk);
+    phrase_table.load(chunk, NULL);
+
+    /* init phrase index */
+    FacadePhraseIndex phrase_index;
+    if (!load_phrase_index(&phrase_index))
+        exit(ENOENT);
 
     char * linebuf = NULL;
     size_t size = 0;
@@ -174,7 +190,7 @@ int main(int argc, char * argv[]){
 
         //do segment stuff
         GArray * strings = g_array_new(TRUE, TRUE, sizeof(SegmentStep));
-        segment(&phrase_table, sentence, len, strings);
+        segment(&phrase_table, &phrase_index, sentence, len, strings);
 
         //print out the split phrase
         for ( glong i = 0; i < strings->len; ++i ) {
