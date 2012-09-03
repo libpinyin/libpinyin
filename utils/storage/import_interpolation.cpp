@@ -40,10 +40,10 @@ static GHashTable * required = NULL;
 static char * linebuf = NULL;
 static size_t len = 0;
 
-bool parse_unigram(FILE * input, PhraseLargeTable * phrases,
+bool parse_unigram(FILE * input, PhraseLargeTable2 * phrase_table,
                    FacadePhraseIndex * phrase_index);
 
-bool parse_bigram(FILE * input, PhraseLargeTable * phrases,
+bool parse_bigram(FILE * input, PhraseLargeTable2 * phrase_table,
                   FacadePhraseIndex * phrase_index,
                   Bigram * bigram);
 
@@ -56,7 +56,7 @@ static ssize_t my_getline(FILE * input){
     return result;
 }
 
-bool parse_body(FILE * input, PhraseLargeTable * phrases,
+bool parse_body(FILE * input, PhraseLargeTable2 * phrase_table,
                 FacadePhraseIndex * phrase_index,
                 Bigram * bigram){
     taglib_push_state();
@@ -73,11 +73,11 @@ bool parse_body(FILE * input, PhraseLargeTable * phrases,
             goto end;
         case GRAM_1_LINE:
             my_getline(input);
-            parse_unigram(input, phrases, phrase_index);
+            parse_unigram(input, phrase_table, phrase_index);
             goto retry;
         case GRAM_2_LINE:
             my_getline(input);
-            parse_bigram(input, phrases, phrase_index, bigram);
+            parse_bigram(input, phrase_table, phrase_index, bigram);
             goto retry;
         default:
             assert(false);
@@ -89,7 +89,7 @@ bool parse_body(FILE * input, PhraseLargeTable * phrases,
     return true;
 }
 
-bool parse_unigram(FILE * input, PhraseLargeTable * phrases,
+bool parse_unigram(FILE * input, PhraseLargeTable2 * phrase_table,
                    FacadePhraseIndex * phrase_index){
     taglib_push_state();
 
@@ -101,7 +101,8 @@ bool parse_unigram(FILE * input, PhraseLargeTable * phrases,
         case GRAM_1_ITEM_LINE:{
             /* handle \item in \1-gram */
             const char * string = (const char *) g_ptr_array_index(values, 0);
-            phrase_token_t token = taglib_string_to_token(phrases, string);
+            phrase_token_t token = taglib_string_to_token
+                (phrase_table, phrase_index, string);
             gpointer value = NULL;
             assert(g_hash_table_lookup_extended(required, "count", NULL, &value));
             glong count = atol((const char *)value);
@@ -122,7 +123,7 @@ bool parse_unigram(FILE * input, PhraseLargeTable * phrases,
     return true;
 }
 
-bool parse_bigram(FILE * input, PhraseLargeTable * phrases,
+bool parse_bigram(FILE * input, PhraseLargeTable2 * phrase_table,
                   FacadePhraseIndex * phrase_index,
                   Bigram * bigram){
     taglib_push_state();
@@ -137,9 +138,11 @@ bool parse_bigram(FILE * input, PhraseLargeTable * phrases,
             /* handle \item in \2-gram */
             /* two tokens */
             const char * string = (const char *) g_ptr_array_index(values, 0);
-            phrase_token_t token1 = taglib_string_to_token(phrases, string);
+            phrase_token_t token1 = taglib_string_to_token
+                (phrase_table, phrase_index, string);
             string = (const char *) g_ptr_array_index(values, 1);
-            phrase_token_t token2 = taglib_string_to_token(phrases, string);
+            phrase_token_t token2 = taglib_string_to_token
+                (phrase_table, phrase_index, string);
 
             gpointer value = NULL;
             /* tag: count */
@@ -197,7 +200,7 @@ int main(int argc, char * argv[]){
     FILE * input = stdin;
     const char * bigram_filename = "bigram.db";
 
-    PhraseLargeTable phrases;
+    PhraseLargeTable2 phrase_table;
 
     MemoryChunk * chunk = new MemoryChunk;
     bool retval = chunk->load("phrase_index.bin");
@@ -205,7 +208,7 @@ int main(int argc, char * argv[]){
         fprintf(stderr, "open phrase_index.bin failed!\n");
         exit(ENOENT);
     }
-    phrases.load(chunk);
+    phrase_table.load(chunk);
 
     FacadePhraseIndex phrase_index;
     if (!load_phrase_index(&phrase_index))
@@ -247,7 +250,7 @@ int main(int argc, char * argv[]){
 
     result = my_getline(input);
     if ( result != -1 )
-        parse_body(input, &phrases, &phrase_index, &bigram);
+        parse_body(input, &phrase_table, &phrase_index, &bigram);
 
     taglib_fini();
 

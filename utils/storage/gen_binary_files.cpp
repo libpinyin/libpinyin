@@ -50,7 +50,7 @@ int main(int argc, char * argv[]){
     /* generate pinyin index*/
     pinyin_option_t options = USE_TONE;
     ChewingLargeTable chewinglargetable(options);
-    PhraseLargeTable phraselargetable;
+    PhraseLargeTable2 phraselargetable;
 
     /* generate phrase index */
     FacadePhraseIndex phrase_index;
