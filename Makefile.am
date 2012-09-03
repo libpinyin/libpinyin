@@ -18,7 +18,7 @@
 EXTRA_DIST		= COPYING
 
 AUTOMAKE_OPTIONS 	= gnu
-SUBDIRS 		= src utils tests data doc
+SUBDIRS 		= src tests utils data doc
 
 MAINTAINERCLEANFILES 	= Makefile.in 
 

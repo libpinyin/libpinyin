@@ -71,7 +71,7 @@ int main(int argc, char * argv[]){
 
 
     /* init phrase table */
-    FacadePhraseTable phrase_table;
+    FacadePhraseTable2 phrase_table;
     MemoryChunk * chunk = new MemoryChunk;
     chunk->load("../../data/phrase_index.bin");
     phrase_table.load(chunk, NULL);
