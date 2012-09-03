@@ -21,6 +21,7 @@
 
 #include <stdio.h>
 #include "pinyin_internal.h"
+#include "utils_helper.h"
 #include "k_mixture_model.h"
 
 enum LINE_TYPE{
@@ -39,10 +40,12 @@ static GHashTable * required = NULL;
 static char * linebuf = NULL;
 static size_t len = 0;
 
-bool parse_unigram(FILE * input, PhraseLargeTable * phrases,
+bool parse_unigram(FILE * input, PhraseLargeTable2 * phrase_table,
+                   FacadePhraseIndex * phrase_index,
                    KMixtureModelBigram * bigram);
 
-bool parse_bigram(FILE * input, PhraseLargeTable * phrases,
+bool parse_bigram(FILE * input, PhraseLargeTable2 * phrase_table,
+                  FacadePhraseIndex * phrase_index,
                   KMixtureModelBigram * bigram);
 
 void print_help(){
@@ -58,7 +61,8 @@ static ssize_t my_getline(FILE * input){
     return result;
 }
 
-bool parse_body(FILE * input, PhraseLargeTable * phrases,
+bool parse_body(FILE * input, PhraseLargeTable2 * phrase_table,
+                FacadePhraseIndex * phrase_index,
                 KMixtureModelBigram * bigram){
     taglib_push_state();
 
@@ -74,11 +78,11 @@ bool parse_body(FILE * input, PhraseLargeTable * phrases,
             goto end;
         case GRAM_1_LINE:
             my_getline(input);
-            parse_unigram(input, phrases, bigram);
+            parse_unigram(input, phrase_table, phrase_index, bigram);
             goto retry;
         case GRAM_2_LINE:
             my_getline(input);
-            parse_bigram(input, phrases, bigram);
+            parse_bigram(input, phrase_table, phrase_index, bigram);
             goto retry;
         default:
             assert(false);
@@ -90,7 +94,8 @@ bool parse_body(FILE * input, PhraseLargeTable * phrases,
     return true;
 }
 
-bool parse_unigram(FILE * input, PhraseLargeTable * phrases,
+bool parse_unigram(FILE * input, PhraseLargeTable2 * phrase_table,
+                   FacadePhraseIndex * phrase_index,
                    KMixtureModelBigram * bigram){
     taglib_push_state();
 
@@ -102,7 +107,8 @@ bool parse_unigram(FILE * input, PhraseLargeTable * phrases,
         case GRAM_1_ITEM_LINE:{
             /* handle \item in \1-gram */
             const char * string = (const char *) g_ptr_array_index(values, 0);
-            phrase_token_t token = taglib_string_to_token(phrases, string);
+            phrase_token_t token = taglib_string_to_token
+                (phrase_table, phrase_index, string);
             gpointer value = NULL;
             assert(g_hash_table_lookup_extended(required, "count",
                                                 NULL, &value));
@@ -131,14 +137,15 @@ bool parse_unigram(FILE * input, PhraseLargeTable * phrases,
     return true;
 }
 
-bool parse_bigram(FILE * input, PhraseLargeTable * phrases,
+bool parse_bigram(FILE * input, PhraseLargeTable2 * phrase_table,
+                  FacadePhraseIndex * phrase_index,
                   KMixtureModelBigram * bigram){
     taglib_push_state();
 
     assert(taglib_add_tag(GRAM_2_ITEM_LINE, "\\item", 2,
                           "count:T:N_n_0:n_1:Mr", ""));
 
-    phrase_token_t last_token = 0;
+    phrase_token_t last_token = null_token;
     KMixtureModelSingleGram * last_single_gram = NULL;
     do {
         assert(taglib_read(linebuf, line_type, values, required));
@@ -147,9 +154,11 @@ bool parse_bigram(FILE * input, PhraseLargeTable * phrases,
             /* handle \item in \2-gram */
             /* two tokens */
             const char * string = (const char *) g_ptr_array_index(values, 0);
-            phrase_token_t token1 = taglib_string_to_token(phrases, string);
+            phrase_token_t token1 = taglib_string_to_token
+                (phrase_table, phrase_index, string);
             string = (const char *) g_ptr_array_index(values, 1);
-            phrase_token_t token2 = taglib_string_to_token(phrases, string);
+            phrase_token_t token2 = taglib_string_to_token
+                (phrase_table, phrase_index, string);
 
             gpointer value = NULL;
             /* tag: count */
@@ -178,14 +187,14 @@ bool parse_bigram(FILE * input, PhraseLargeTable * phrases,
                 if ( last_token && last_single_gram ) {
                     bigram->store(last_token, last_single_gram);
                     delete last_single_gram;
-                    //safe guard
-                    last_token = 0;
+                    /* safe guard */
+                    last_token = null_token;
                     last_single_gram = NULL;
                 }
                 KMixtureModelSingleGram * single_gram = NULL;
                 bigram->load(token1, single_gram);
 
-                //create the new single gram
+                /* create the new single gram */
                 if ( single_gram == NULL )
                     single_gram = new KMixtureModelSingleGram;
                 last_token = token1;
@@ -207,8 +216,8 @@ bool parse_bigram(FILE * input, PhraseLargeTable * phrases,
     if ( last_token && last_single_gram ) {
         bigram->store(last_token, last_single_gram);
         delete last_single_gram;
-        //safe guard
-        last_token = 0;
+        /* safe guard */
+        last_token = null_token;
         last_single_gram = NULL;
     }
 
@@ -238,21 +247,29 @@ int main(int argc, char * argv[]){
         ++i;
     }
 
-    PhraseLargeTable phrases;
-
+    PhraseLargeTable2 phrase_table;
     MemoryChunk * chunk = new MemoryChunk;
     chunk->load("phrase_index.bin");
-    phrases.load(chunk);
+    phrase_table.load(chunk);
+
+    FacadePhraseIndex phrase_index;
+    if (!load_phrase_index(&phrase_index))
+        exit(ENOENT);
 
     KMixtureModelBigram bigram(K_MIXTURE_MODEL_MAGIC_NUMBER);
     bigram.attach(k_mixture_model_filename, ATTACH_READWRITE|ATTACH_CREATE);
 
+    PhraseTokens tokens;
+    memset(tokens, 0, sizeof(PhraseTokens));
+    phrase_index.prepare_tokens(tokens);
+
     taglib_init();
 
+    /* prepare to read n-gram model */
     values = g_ptr_array_new();
     required = g_hash_table_new(g_str_hash, g_str_equal);
 
-    //enter "\data" line
+    /* enter "\data" line */
     assert(taglib_add_tag(BEGIN_LINE, "\\data", 0, "model:count:N:total_freq", ""));
     ssize_t result = my_getline(input);
     if ( result == -1 ) {
@@ -260,7 +277,7 @@ int main(int argc, char * argv[]){
         exit(ENODATA);
     }
 
-    //read "\data" line
+    /* read "\data" line */
     if ( !taglib_read(linebuf, line_type, values, required) ) {
         fprintf(stderr, "error: k mixture model expected.\n");
         exit(ENODATA);
@@ -289,9 +306,11 @@ int main(int argc, char * argv[]){
 
     result = my_getline(input);
     if ( result != -1 )
-        parse_body(input, &phrases,  &bigram);
+        parse_body(input, &phrase_table, &phrase_index, &bigram);
 
     taglib_fini();
+
+    phrase_index.destroy_tokens(tokens);
 
     return 0;
 }
