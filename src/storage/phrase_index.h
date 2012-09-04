@@ -670,6 +670,24 @@ public:
     }
 
     /**
+     * FacadePhraseIndex::clear_ranges:
+     * @ranges: the ranges to be cleared.
+     * @returns: whether the clear operation is successful.
+     *
+     * Clear the ranges.
+     *
+     */
+    bool clear_ranges(PhraseIndexRanges ranges) {
+        for (size_t i = 0; i < PHRASE_INDEX_LIBRARY_COUNT; ++i) {
+            GArray * range = ranges[i];
+            if (range) {
+                g_array_set_size(range, 0);
+            }
+        }
+        return true;
+    }
+
+    /**
      * FacadePhraseIndex::destroy_ranges:
      * @ranges: the ranges to be destroyed.
      * @returns: whether the destroy operation is successful.
@@ -705,6 +723,24 @@ public:
             SubPhraseIndex * sub_phrase = m_sub_phrase_indices[i];
             if (sub_phrase) {
                 token = g_array_new(FALSE, FALSE, sizeof(phrase_token_t));
+            }
+        }
+        return true;
+    }
+
+    /**
+     * FacadePhraseIndex::clear_tokens:
+     * @tokens: the tokens to be cleared.
+     * @return: whether the clear operation is successful.
+     *
+     * Clear the tokens.
+     *
+     */
+    bool clear_tokens(PhraseTokens tokens) {
+        for (size_t i = 0; i < PHRASE_INDEX_LIBRARY_COUNT; ++i) {
+            GArray * token = tokens[i];
+            if (token) {
+                g_array_set_size(token, 0);
             }
         }
         return true;
