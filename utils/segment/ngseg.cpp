@@ -154,7 +154,7 @@ int main(int argc, char * argv[]){
         }
 
         state = CONTEXT_INIT;
-        bool result = phrase_table.search( 1, sentence, tokens);
+        int result = phrase_table.search( 1, sentence, tokens);
         g_array_append_val( current_ucs4, sentence[0]);
         if ( result & SEARCH_OK )
             state = CONTEXT_SEGMENTABLE;
@@ -162,7 +162,7 @@ int main(int argc, char * argv[]){
             state = CONTEXT_UNKNOWN;
 
         for ( int i = 1; i < num_of_chars; ++i) {
-            bool result = phrase_table.search( 1, sentence + i, tokens);
+            int result = phrase_table.search( 1, sentence + i, tokens);
             if ( result & SEARCH_OK )
                 next_state = CONTEXT_SEGMENTABLE;
             else
