@@ -125,6 +125,9 @@ static inline int get_first_token(PhraseTokens tokens,
         }
     }
 
+    /* the following line will be removed in future after code are verified. */
+    assert(0 == num || 1 == num);
+
     return num;
 }
 
