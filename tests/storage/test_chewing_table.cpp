@@ -62,17 +62,12 @@ int main(int argc, char * argv[]) {
         phrase_index.prepare_ranges(ranges);
 
         for (size_t i = 0; i < bench_times; ++i) {
+            phrase_index.clear_ranges(ranges);
             largetable.search(keys->len, (ChewingKey *)keys->data, ranges);
-
-            /* clear ranges. */
-            for (size_t i = 0; i < PHRASE_INDEX_LIBRARY_COUNT; ++i) {
-                if (ranges[i])
-                    g_array_set_size(ranges[i], 0);
-            }
         }
-
         print_time(start, bench_times);
 
+        phrase_index.clear_ranges(ranges);
         largetable.search(keys->len, (ChewingKey *)keys->data, ranges);
 
         for (size_t i = 0; i < PHRASE_INDEX_LIBRARY_COUNT; ++i) {

@@ -33,16 +33,12 @@ int main(int argc, char * argv[]){
 
         guint32 start = record_time();
         for ( size_t i = 0; i < bench_times; ++i){
+            phrase_index.clear_tokens(tokens);
             largetable.search(phrase_len, new_phrase, tokens);
-
-            /* clear tokens. */
-            for (size_t i = 0; i < PHRASE_INDEX_LIBRARY_COUNT; ++i) {
-                if (tokens[i])
-                    g_array_set_size(tokens[i], 0);
-            }
         }
         print_time(start, bench_times);
 
+        phrase_index.clear_tokens(tokens);
         int retval = largetable.search(phrase_len, new_phrase, tokens);
         int num = get_first_token(tokens, token);
 
