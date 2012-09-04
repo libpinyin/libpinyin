@@ -70,6 +70,7 @@ bool read_document(PhraseLargeTable2 * phrase_table,
 
         phrase_token_t token = null_token;
         if ( 0 != phrase_len ) {
+            phrase_index->clear_tokens(tokens);
             int search_result = phrase_table->search
                 (phrase_len, phrase, tokens);
             int num = get_first_token(tokens, token);

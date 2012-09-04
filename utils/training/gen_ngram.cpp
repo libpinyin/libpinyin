@@ -87,6 +87,7 @@ int main(int argc, char * argv[]){
 
 	phrase_token_t token = null_token;
         if ( 0 != phrase_len ) {
+            phrase_index.clear_tokens(tokens);
             int result = phrase_table.search(phrase_len, phrase, tokens);
             int num = get_first_token(tokens, token);
             if ( !(result & SEARCH_OK) )
