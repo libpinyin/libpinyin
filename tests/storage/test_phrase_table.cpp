@@ -16,15 +16,20 @@ int main(int argc, char * argv[]){
     largetable.store(chunk);
     largetable.load(chunk);
 
-    char * linebuf = NULL;
-    size_t size = 0;
-    while( getline(&linebuf, &size, stdin) ){
-        linebuf[strlen(linebuf) - 1] = '\0';
+    char* linebuf = NULL; size_t size = 0; ssize_t read;
+    while ((read = getline(&linebuf, &size, stdin)) != -1) {
+        if ( '\n' == linebuf[strlen(linebuf) - 1] ) {
+            linebuf[strlen(linebuf) - 1] = '\0';
+        }
+
         if ( strcmp ( linebuf, "quit" ) == 0)
             break;
 
         glong phrase_len = g_utf8_strlen(linebuf, -1);
         ucs4_t * new_phrase = g_utf8_to_ucs4(linebuf, -1, NULL, NULL, NULL);
+
+        if (0 == phrase_len)
+            continue;
 
         PhraseTokens tokens;
         memset(tokens, 0, sizeof(PhraseTokens));
