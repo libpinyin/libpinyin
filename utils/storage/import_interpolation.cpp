@@ -40,6 +40,8 @@ static GHashTable * required = NULL;
 static char * linebuf = NULL;
 static size_t len = 0;
 
+bool parse_headline();
+
 bool parse_unigram(FILE * input, PhraseLargeTable2 * phrase_table,
                    FacadePhraseIndex * phrase_index);
 
@@ -52,8 +54,31 @@ static ssize_t my_getline(FILE * input){
     if ( result == -1 )
         return result;
 
-    linebuf[strlen(linebuf) - 1] = '\0';
+    if ( '\n' == linebuf[strlen(linebuf) - 1] ) {
+        linebuf[strlen(linebuf) - 1] = '\0';
+    }
     return result;
+}
+
+bool parse_headline(){
+    /* enter "\data" line */
+    assert(taglib_add_tag(BEGIN_LINE, "\\data", 0, "model", ""));
+
+    /* read "\data" line */
+    if ( !taglib_read(linebuf, line_type, values, required) ) {
+        fprintf(stderr, "error: interpolation model expected.\n");
+        return false;
+    }
+
+    assert(line_type == BEGIN_LINE);
+    char * value = NULL;
+    assert(g_hash_table_lookup_extended
+           (required, "model", NULL, (gpointer *)&value));
+    if ( !( strcmp("interpolation", value) == 0 ) ) {
+        fprintf(stderr, "error: interpolation model expected.\n");
+        return false;
+    }
+    return true;
 }
 
 bool parse_body(FILE * input, PhraseLargeTable2 * phrase_table,
@@ -226,27 +251,15 @@ int main(int argc, char * argv[]){
     values = g_ptr_array_new();
     required = g_hash_table_new(g_str_hash, g_str_equal);
 
-    //enter "\data" line
-    assert(taglib_add_tag(BEGIN_LINE, "\\data", 0, "model", ""));
+    /* read first line */
     ssize_t result = my_getline(input);
     if ( result == -1 ) {
         fprintf(stderr, "empty file input.\n");
         exit(ENODATA);
     }
 
-    //read "\data" line
-    if ( !taglib_read(linebuf, line_type, values, required) ) {
-        fprintf(stderr, "error: interpolation model expected.\n");
+    if (!parse_headline())
         exit(ENODATA);
-    }
-
-    assert(line_type == BEGIN_LINE);
-    char * value = NULL;
-    assert(g_hash_table_lookup_extended(required, "model", NULL, (gpointer *)&value));
-    if ( !( strcmp("interpolation", value) == 0 ) ) {
-        fprintf(stderr, "error: interpolation model expected.\n");
-        exit(ENODATA);
-    }
 
     result = my_getline(input);
     if ( result != -1 )
