@@ -40,6 +40,8 @@ static GHashTable * required = NULL;
 static char * linebuf = NULL;
 static size_t len = 0;
 
+bool parse_headline(KMixtureModelBigram * bigram);
+
 bool parse_unigram(FILE * input, PhraseLargeTable2 * phrase_table,
                    FacadePhraseIndex * phrase_index,
                    KMixtureModelBigram * bigram);
@@ -57,8 +59,45 @@ static ssize_t my_getline(FILE * input){
     if ( result == -1 )
         return result;
 
-    linebuf[strlen(linebuf) - 1] = '\0';
+    if ( '\n' == linebuf[strlen(linebuf) - 1] ) {
+        linebuf[strlen(linebuf) - 1] = '\0';
+    }
     return result;
+}
+
+bool parse_headline(KMixtureModelBigram * bigram){
+    /* enter "\data" line */
+    assert(taglib_add_tag(BEGIN_LINE, "\\data", 0, "model:count:N:total_freq", ""));
+
+    /* read "\data" line */
+    if ( !taglib_read(linebuf, line_type, values, required) ) {
+        fprintf(stderr, "error: k mixture model expected.\n");
+        return false;
+    }
+
+    assert(line_type == BEGIN_LINE);
+    gpointer value = NULL;
+    assert(g_hash_table_lookup_extended(required, "model", NULL, &value));
+    const char * model = (const char *)value;
+    if ( !( strcmp("k mixture model", model) == 0 ) ) {
+        fprintf(stderr, "error: k mixture model expected.\n");
+        return false;
+    }
+
+    assert(g_hash_table_lookup_extended(required, "count", NULL, &value));
+    glong count = atol((char *)value);
+    assert(g_hash_table_lookup_extended(required, "N", NULL, &value));
+    glong N = atol((char *) value);
+    assert(g_hash_table_lookup_extended(required, "total_freq", NULL, &value));
+    glong total_freq = atol((char *)value);
+
+    KMixtureModelMagicHeader magic_header;
+    memset(&magic_header, 0, sizeof(KMixtureModelMagicHeader));
+    magic_header.m_WC =count; magic_header.m_N = N;
+    magic_header.m_total_freq = total_freq;
+    bigram->set_magic_header(magic_header);
+
+    return true;
 }
 
 bool parse_body(FILE * input, PhraseLargeTable2 * phrase_table,
@@ -269,40 +308,14 @@ int main(int argc, char * argv[]){
     values = g_ptr_array_new();
     required = g_hash_table_new(g_str_hash, g_str_equal);
 
-    /* enter "\data" line */
-    assert(taglib_add_tag(BEGIN_LINE, "\\data", 0, "model:count:N:total_freq", ""));
     ssize_t result = my_getline(input);
     if ( result == -1 ) {
         fprintf(stderr, "empty file input.\n");
         exit(ENODATA);
     }
 
-    /* read "\data" line */
-    if ( !taglib_read(linebuf, line_type, values, required) ) {
-        fprintf(stderr, "error: k mixture model expected.\n");
+    if (!parse_headline(&bigram))
         exit(ENODATA);
-    }
-
-    assert(line_type == BEGIN_LINE);
-    gpointer value = NULL;
-    assert(g_hash_table_lookup_extended(required, "model", NULL, &value));
-    const char * model = (const char *)value;
-    if ( !( strcmp("k mixture model", model) == 0 ) ) {
-        fprintf(stderr, "error: k mixture model expected.\n");
-        exit(ENODATA);
-    }
-    assert(g_hash_table_lookup_extended(required, "count", NULL, &value));
-    glong count = atol((char *)value);
-    assert(g_hash_table_lookup_extended(required, "N", NULL, &value));
-    glong N = atol((char *) value);
-    assert(g_hash_table_lookup_extended(required, "total_freq", NULL, &value));
-    glong total_freq = atol((char *)value);
-
-    KMixtureModelMagicHeader magic_header;
-    memset(&magic_header, 0, sizeof(KMixtureModelMagicHeader));
-    magic_header.m_WC =count; magic_header.m_N = N;
-    magic_header.m_total_freq = total_freq;
-    bigram.set_magic_header(magic_header);
 
     result = my_getline(input);
     if ( result != -1 )
