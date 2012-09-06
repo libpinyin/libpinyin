@@ -23,6 +23,25 @@
 #ifndef UTILS_HELPER_H
 #define UTILS_HELPER_H
 
+#define TAGLIB_GET_VALUE(var, index)                                    \
+    phrase_token_t var = null_token;                                    \
+    {                                                                   \
+        const char * string = (const char *) g_ptr_array_index          \
+            (values, index);                                            \
+        var = taglib_string_to_token                                    \
+            (phrase_table, phrase_index, string);                       \
+    }
+
+#define TAGLIB_GET_TAGVALUE(type, var, conv)                            \
+    type var;                                                           \
+    {                                                                   \
+        gpointer value = NULL;                                          \
+        assert(g_hash_table_lookup_extended                             \
+               (required, #var, NULL, &value));                         \
+        var = conv((const char *)value);                                \
+    }
+
+
 static bool load_phrase_index(FacadePhraseIndex * phrase_index) {
     MemoryChunk * chunk = NULL;
     for (size_t i = 0; i < PHRASE_INDEX_LIBRARY_COUNT; ++i) {

@@ -20,16 +20,7 @@
  */
 
 #include "pinyin_internal.h"
-
-#define TAGLIB_GET_TAGVALUE(type, var, conv)                            \
-    type var;                                                           \
-    {                                                                   \
-        gpointer value = NULL;                                          \
-        assert(g_hash_table_lookup_extended                             \
-               (required, #var, NULL, &value));                         \
-        var = conv((const char *)value);                                \
-    }
-
+#include "utils_helper.h"
 
 enum LINE_TYPE{
     BEGIN_LINE = 1,

@@ -24,24 +24,6 @@
 #include "pinyin_internal.h"
 #include "utils_helper.h"
 
-#define TAGLIB_GET_VALUE(var, index)                                    \
-    phrase_token_t var = null_token;                                    \
-    {                                                                   \
-        const char * string = (const char *) g_ptr_array_index          \
-            (values, index);                                            \
-        var = taglib_string_to_token                                    \
-            (phrase_table, phrase_index, string);                       \
-    }
-
-#define TAGLIB_GET_TAGVALUE(type, var, conv)                            \
-    type var;                                                           \
-    {                                                                   \
-        gpointer value = NULL;                                          \
-        assert(g_hash_table_lookup_extended                             \
-               (required, #var, NULL, &value));                         \
-        var = conv((const char *)value);                                \
-    }
-
 enum LINE_TYPE{
     BEGIN_LINE = 1,
     END_LINE,
