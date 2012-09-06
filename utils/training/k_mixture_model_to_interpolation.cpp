@@ -21,6 +21,16 @@
 
 #include "pinyin_internal.h"
 
+#define TAGLIB_GET_TAGVALUE(type, var, conv)                            \
+    type var;                                                           \
+    {                                                                   \
+        gpointer value = NULL;                                          \
+        assert(g_hash_table_lookup_extended                             \
+               (required, #var, NULL, &value));                         \
+        var = conv((const char *)value);                                \
+    }
+
+
 enum LINE_TYPE{
     BEGIN_LINE = 1,
     END_LINE,
@@ -37,6 +47,8 @@ static GHashTable * required = NULL;
 static char * linebuf = NULL;
 static size_t len = 0;
 
+bool parse_headline(FILE * input, FILE * output);
+
 bool parse_unigram(FILE * input, FILE * output);
 
 bool parse_bigram(FILE * input, FILE * output);
@@ -48,6 +60,30 @@ static ssize_t my_getline(FILE * input){
 
     linebuf[strlen(linebuf) - 1] = '\0';
     return result;
+}
+
+bool parse_headline(FILE * input, FILE * output) {
+    /* enter "\data" line */
+    assert(taglib_add_tag(BEGIN_LINE, "\\data", 0, "model",
+                          "count:N:total_freq"));
+
+    /* read "\data" line */
+    if ( !taglib_read(linebuf, line_type, values, required) ) {
+        fprintf(stderr, "error: k mixture model expected.\n");
+        return false;
+    }
+
+    assert(line_type == BEGIN_LINE);
+    TAGLIB_GET_TAGVALUE(const char *, model, (const char *));
+    if ( !( strcmp("k mixture model", model) == 0 ) ){
+        fprintf(stderr, "error: k mixture model expected.\n");
+        return false;
+    }
+
+    /* print header */
+    fprintf(output, "\\data model interpolation\n");
+
+    return true;
 }
 
 bool parse_body(FILE * input, FILE * output){
@@ -98,13 +134,12 @@ bool parse_unigram(FILE * input, FILE * output){
             /* remove the "<start>" in the uni-gram of interpolation model */
             if ( strcmp("<start>", string) == 0 )
                 break;
-            gpointer value = NULL;
-            assert(g_hash_table_lookup_extended(required, "freq",
-                                                NULL, &value));
-            glong freq = atol ((const char *) value);
+
+            TAGLIB_GET_TAGVALUE(glong, freq, atol);
+
             /* ignore zero unigram freq item */
             if ( 0 != freq )
-                fprintf(output, "\\item %s count %d\n", string, freq);
+                fprintf(output, "\\item %s count %ld\n", string, freq);
             break;
         }
         case END_LINE:
@@ -136,11 +171,8 @@ bool parse_bigram(FILE * input, FILE * output){
             const char * string1 = (const char *) g_ptr_array_index(values, 0);
             const char * string2 = (const char *) g_ptr_array_index(values, 1);
 
-            gpointer value = NULL;
-            /* tag: count */
-            assert(g_hash_table_lookup_extended(required, "count", NULL, &value));
-            const char * count = (const char *)value;
-            fprintf(output, "\\item %s %s count %s\n", string1, string2, count);
+            TAGLIB_GET_TAGVALUE(glong, count, atol);
+            fprintf(output, "\\item %s %s count %ld\n", string1, string2, count);
             break;
         }
         case END_LINE:
@@ -166,31 +198,14 @@ int main(int argc, char * argv[]){
     values = g_ptr_array_new();
     required = g_hash_table_new(g_str_hash, g_str_equal);
 
-    //enter "\data" line
-    assert(taglib_add_tag(BEGIN_LINE, "\\data", 0, "model",
-                          "count:N:total_freq"));
     ssize_t result = my_getline(input);
     if ( result == -1 ) {
         fprintf(stderr, "empty file input.\n");
         exit(ENODATA);
     }
 
-    //read "\data" line
-    if ( !taglib_read(linebuf, line_type, values, required) ) {
-        fprintf(stderr, "error: k mixture model expected.\n");
+    if (!parse_headline(input, output))
         exit(ENODATA);
-    }
-
-    assert(line_type == BEGIN_LINE);
-    gpointer value = NULL;
-    assert(g_hash_table_lookup_extended(required, "model", NULL, &value));
-    const char * model = (const char *) value;
-    if ( !( strcmp("k mixture model", model) == 0 ) ){
-        fprintf(stderr, "error: k mixture model expected.\n");
-        exit(ENODATA);
-    }
-
-    fprintf(output, "\\data model interpolation\n");
 
     result = my_getline(input);
     if ( result != -1 )
