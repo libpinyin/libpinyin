@@ -33,6 +33,14 @@
             (phrase_table, phrase_index, string);                       \
     }
 
+#define TAGLIB_GET_TAGVALUE(type, var, conv)                            \
+    type var;                                                           \
+    {                                                                   \
+        gpointer value = NULL;                                          \
+        assert(g_hash_table_lookup_extended                             \
+               (required, #var, NULL, &value));                         \
+        var = conv((const char *)value);                                \
+    }
 
 enum LINE_TYPE{
     BEGIN_LINE = 1,
@@ -81,10 +89,9 @@ bool parse_headline(){
     }
 
     assert(line_type == BEGIN_LINE);
-    char * value = NULL;
-    assert(g_hash_table_lookup_extended
-           (required, "model", NULL, (gpointer *)&value));
-    if ( !( strcmp("interpolation", value) == 0 ) ) {
+    /* check header */
+    TAGLIB_GET_TAGVALUE(const char *, model, (const char *));
+    if ( !( strcmp("interpolation", model) == 0 ) ) {
         fprintf(stderr, "error: interpolation model expected.\n");
         return false;
     }
@@ -137,9 +144,7 @@ bool parse_unigram(FILE * input, PhraseLargeTable2 * phrase_table,
             /* handle \item in \1-gram */
             TAGLIB_GET_VALUE(token, 0);
 
-            gpointer value = NULL;
-            assert(g_hash_table_lookup_extended(required, "count", NULL, &value));
-            glong count = atol((const char *)value);
+            TAGLIB_GET_TAGVALUE(glong, count, atol);
             phrase_index->add_unigram_frequency(token, count);
             break;
         }
@@ -174,10 +179,7 @@ bool parse_bigram(FILE * input, PhraseLargeTable2 * phrase_table,
             TAGLIB_GET_VALUE(token1, 0);
             TAGLIB_GET_VALUE(token2, 1);
 
-            gpointer value = NULL;
-            /* tag: count */
-            assert(g_hash_table_lookup_extended(required, "count", NULL, &value));
-            glong count = atol((const char *)value);
+            TAGLIB_GET_TAGVALUE(glong, count, atol);
 
             if ( last_token != token1 ) {
                 if ( last_token && last_single_gram ) {

@@ -33,6 +33,16 @@
             (phrase_table, phrase_index, string);                       \
     }
 
+#define TAGLIB_GET_TAGVALUE(type, var, conv)                            \
+    type var;                                                           \
+    {                                                                   \
+        gpointer value = NULL;                                          \
+        assert(g_hash_table_lookup_extended                             \
+               (required, #var, NULL, &value));                         \
+        var = conv((const char *)value);                                \
+    }
+
+
 enum LINE_TYPE{
     BEGIN_LINE = 1,
     END_LINE,
@@ -85,20 +95,16 @@ bool parse_headline(KMixtureModelBigram * bigram){
     }
 
     assert(line_type == BEGIN_LINE);
-    gpointer value = NULL;
-    assert(g_hash_table_lookup_extended(required, "model", NULL, &value));
-    const char * model = (const char *)value;
+    /* check header */
+    TAGLIB_GET_TAGVALUE(const char *, model, (const char *));
     if ( !( strcmp("k mixture model", model) == 0 ) ) {
         fprintf(stderr, "error: k mixture model expected.\n");
         return false;
     }
 
-    assert(g_hash_table_lookup_extended(required, "count", NULL, &value));
-    glong count = atol((char *)value);
-    assert(g_hash_table_lookup_extended(required, "N", NULL, &value));
-    glong N = atol((char *) value);
-    assert(g_hash_table_lookup_extended(required, "total_freq", NULL, &value));
-    glong total_freq = atol((char *)value);
+    TAGLIB_GET_TAGVALUE(glong, count, atol);
+    TAGLIB_GET_TAGVALUE(glong, N, atol);
+    TAGLIB_GET_TAGVALUE(glong, total_freq, atol);
 
     KMixtureModelMagicHeader magic_header;
     memset(&magic_header, 0, sizeof(KMixtureModelMagicHeader));
@@ -156,13 +162,8 @@ bool parse_unigram(FILE * input, PhraseLargeTable2 * phrase_table,
             /* handle \item in \1-gram */
             TAGLIB_GET_VALUE(token, 0);
 
-            gpointer value = NULL;
-            assert(g_hash_table_lookup_extended(required, "count",
-                                                NULL, &value));
-            glong count = atol((const char *)value);
-            assert(g_hash_table_lookup_extended(required, "freq",
-                                                NULL, &value));
-            glong freq = atol((const char *)value);
+            TAGLIB_GET_TAGVALUE(glong, count, atol);
+            TAGLIB_GET_TAGVALUE(glong, freq, atol);
 
             KMixtureModelArrayHeader array_header;
             memset(&array_header, 0, sizeof(KMixtureModelArrayHeader));
@@ -203,23 +204,12 @@ bool parse_bigram(FILE * input, PhraseLargeTable2 * phrase_table,
             TAGLIB_GET_VALUE(token1, 0);
             TAGLIB_GET_VALUE(token2, 1);
 
-            gpointer value = NULL;
-            /* tag: count */
-            assert(g_hash_table_lookup_extended(required, "count", NULL, &value));
-            glong count = atol((char *)value);
-            /* tag: T */
-            assert(g_hash_table_lookup_extended(required, "T", NULL, &value));
-            glong T = atol((char *)value);
+            TAGLIB_GET_TAGVALUE(glong, count, atol);
+            TAGLIB_GET_TAGVALUE(glong, T, atol);
             assert(count == T);
-            /* tag: N_n_0 */
-            assert(g_hash_table_lookup_extended(required, "N_n_0", NULL, &value));
-            glong N_n_0 = atol((char *)value);
-            /* tag: n_1 */
-            assert(g_hash_table_lookup_extended(required, "n_1", NULL, &value));
-            glong n_1 = atol((char *)value);
-            /* tag: Mr */
-            assert(g_hash_table_lookup_extended(required, "Mr", NULL, &value));
-            glong Mr = atol((char *)value);
+            TAGLIB_GET_TAGVALUE(glong, N_n_0, atol);
+            TAGLIB_GET_TAGVALUE(glong, n_1, atol);
+            TAGLIB_GET_TAGVALUE(glong, Mr, atol);
 
             KMixtureModelArrayItem array_item;
             memset(&array_item, 0, sizeof(KMixtureModelArrayItem));
