@@ -24,6 +24,16 @@
 #include "pinyin_internal.h"
 #include "utils_helper.h"
 
+#define TAGLIB_GET_VALUE(var, index)                                    \
+    phrase_token_t var = null_token;                                    \
+    {                                                                   \
+        const char * string = (const char *) g_ptr_array_index          \
+            (values, index);                                            \
+        var = taglib_string_to_token                                    \
+            (phrase_table, phrase_index, string);                       \
+    }
+
+
 enum LINE_TYPE{
     BEGIN_LINE = 1,
     END_LINE,
@@ -125,9 +135,8 @@ bool parse_unigram(FILE * input, PhraseLargeTable2 * phrase_table,
         switch (line_type) {
         case GRAM_1_ITEM_LINE:{
             /* handle \item in \1-gram */
-            const char * string = (const char *) g_ptr_array_index(values, 0);
-            phrase_token_t token = taglib_string_to_token
-                (phrase_table, phrase_index, string);
+            TAGLIB_GET_VALUE(token, 0);
+
             gpointer value = NULL;
             assert(g_hash_table_lookup_extended(required, "count", NULL, &value));
             glong count = atol((const char *)value);
@@ -162,12 +171,8 @@ bool parse_bigram(FILE * input, PhraseLargeTable2 * phrase_table,
         case GRAM_2_ITEM_LINE:{
             /* handle \item in \2-gram */
             /* two tokens */
-            const char * string = (const char *) g_ptr_array_index(values, 0);
-            phrase_token_t token1 = taglib_string_to_token
-                (phrase_table, phrase_index, string);
-            string = (const char *) g_ptr_array_index(values, 1);
-            phrase_token_t token2 = taglib_string_to_token
-                (phrase_table, phrase_index, string);
+            TAGLIB_GET_VALUE(token1, 0);
+            TAGLIB_GET_VALUE(token2, 1);
 
             gpointer value = NULL;
             /* tag: count */
