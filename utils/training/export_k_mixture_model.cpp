@@ -130,7 +130,10 @@ int main(int argc, char * argv[]){
         exit(ENOENT);
 
     KMixtureModelBigram bigram(K_MIXTURE_MODEL_MAGIC_NUMBER);
-    bigram.attach(k_mixture_model_filename, ATTACH_READONLY);
+    if (!bigram.attach(k_mixture_model_filename, ATTACH_READONLY)) {
+        fprintf(stderr, "open %s failed.\n", k_mixture_model_filename);
+        exit(ENOENT);
+    }
 
     print_k_mixture_model_magic_header(output, &bigram);
     print_k_mixture_model_array_headers(output, &bigram, &phrase_index);
