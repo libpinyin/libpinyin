@@ -23,6 +23,7 @@ INCLUDES		= -I$(top_srcdir)/src/include \
 
 noinst_HEADERS		= lookup.h \
 			  pinyin_lookup.h \
+			  pinyin_lookup2.h \
 			  phrase_lookup.h \
 			  winner_tree.h
 
@@ -33,6 +34,7 @@ liblookup_la_CXXFLAGS	= "-fPIC"
 liblookup_la_LDFLAGS	= -static
 
 liblookup_la_SOURCES	= pinyin_lookup.cpp \
+			  pinyin_lookup2.cpp \
 			  winner_tree.cpp \
 			  phrase_lookup.cpp \
 			  lookup.cpp

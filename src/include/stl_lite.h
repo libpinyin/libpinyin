@@ -35,5 +35,11 @@ namespace std_lite{
     using std::equal_range;
 
 
+    using std::make_heap;
+
+
+    using std::pop_heap;
+
+
 }
 #endif
