@@ -27,6 +27,42 @@ using namespace pinyin;
 /* internal definition */
 static const size_t nbeam = 32;
 
+static bool dump_max_value(GPtrArray * values){
+    if (0 == values->len)
+        return false;
+
+    const lookup_value_t * max =
+        (const lookup_value_t *) g_ptr_array_index(values, 0);
+
+    for (size_t i = 1; i < values->len; ++i) {
+        const lookup_value_t * cur =
+            (const lookup_value_t *) g_ptr_array_index(values, i);
+
+        if (cur->m_poss > max->m_poss)
+            max = cur;
+    }
+
+    printf("max value: %f\n", max->m_poss);
+
+    return true;
+}
+
+static bool dump_all_values(GPtrArray * values) {
+    if (0 == values->len)
+        return false;
+
+    printf("values:");
+    for (size_t i = 0; i < values->len; ++i) {
+        const lookup_value_t * cur =
+            (const lookup_value_t *) g_ptr_array_index(values, i);
+
+        printf("%f\t", cur->m_poss);
+    }
+    printf("\n");
+
+    return true;
+}
+
 /* populate the candidates. */
 static bool populate_candidates(/* out */ GPtrArray * candidates,
                                 /* in */ LookupStepContent step) {
@@ -41,6 +77,8 @@ static bool populate_candidates(/* out */ GPtrArray * candidates,
 
         g_ptr_array_add(candidates, value);
     }
+
+    dump_max_value(candidates);
 
     return true;
 }
@@ -74,6 +112,8 @@ static bool get_top_results(/* out */ GPtrArray * topresults,
         if (topresults->len >= nbeam)
             break;
     }
+
+    dump_all_values(topresults);
 
     return true;
 }
