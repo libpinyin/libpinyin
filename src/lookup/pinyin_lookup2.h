@@ -104,9 +104,9 @@ protected:
     /* Array of LookupStepContent */
 
 
-    bool search_unigram2(GPtrArray * topresults, int nstep, int npinyin,
+    bool search_unigram2(GPtrArray * topresults, int nstep,
                          PhraseIndexRanges ranges);
-    bool search_bigram2(GPtrArray * topresults, int nstep, int npinyin,
+    bool search_bigram2(GPtrArray * topresults, int nstep,
                         PhraseIndexRanges ranges);
 
     bool unigram_gen_next_step(int nstep, lookup_value_t * cur_step, phrase_token_t token);
