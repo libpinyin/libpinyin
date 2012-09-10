@@ -204,3 +204,70 @@ PinyinLookup2::~PinyinLookup2(){
     g_ptr_array_free(m_steps_content, TRUE);
 }
 
+
+bool PinyinLookup2::get_best_match(TokenVector prefixes,
+                                   ChewingKeyVector keys,
+                                   CandidateConstraints constraints,
+                                   MatchResults & results){
+    m_constraints = constraints;
+    m_keys = keys;
+    int nstep = keys->len + 1;
+
+    clear_steps(m_steps_index, m_steps_content);
+
+    init_steps(m_steps_index, m_steps_content, nstep);
+
+    populate_prefixes(m_steps_index, m_steps_content, prefixes);
+
+    PhraseIndexRanges ranges;
+    memset(ranges, 0, sizeof(PhraseIndexRanges));
+    m_phrase_index->prepare_ranges(ranges);
+
+    GPtrArray * candidates = g_ptr_array_new();
+    GPtrArray * topresults = g_ptr_array_new();
+
+    /* begin the viterbi beam search. */
+    for ( int i = 0; i < nstep - 1; ++i ){
+        lookup_constraint_t * cur_constraint = &g_array_index
+            (m_constraints, lookup_constraint_t, i);
+
+        if (CONSTRAINT_NOSEARCH == cur_constraint->m_type)
+            continue;
+
+        LookupStepContent step = (LookupStepContent)
+            g_ptr_array_index(m_steps_content, i);
+
+        for ( int m = i + 1; m < nstep; ++m ){
+            const int len = m - i;
+            if (len > MAX_PHRASE_LENGTH)
+                break;
+
+            lookup_constraint_t * next_constraint = &g_array_index
+                (m_constraints, lookup_constraint_t, m);
+
+            if (CONSTRAINT_NOSEARCH == next_constraint->m_type)
+                break;
+
+            ChewingKey * pinyin_keys = (ChewingKey *)m_keys->data;
+            /* do one pinyin table search. */
+            int result = m_pinyin_table->search(len, pinyin_keys + i, ranges);
+
+            populate_candidates(candidates, step);
+            get_top_results(topresults, candidates);
+
+            search_bigram(topresults, i, m, ranges),
+                search_unigram(topresults, i, m, ranges);
+
+            /* no longer pinyin */
+            if (!(result & SEARCH_CONTINUED))
+                break;
+        }
+    }
+
+    m_phrase_index->destroy_ranges(ranges);
+
+    g_ptr_array_free(candidates, TRUE);
+    g_ptr_array_free(topresults, TRUE);
+
+    return final_step(results);
+}
