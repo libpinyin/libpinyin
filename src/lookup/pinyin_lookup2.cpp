@@ -19,10 +19,15 @@
  *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
+#include <math.h>
 #include "pinyin_lookup2.h"
 #include "stl_lite.h"
 
 using namespace pinyin;
+
+const gfloat PinyinLookup2::bigram_lambda = LAMBDA_PARAMETER;
+const gfloat PinyinLookup2::unigram_lambda = 1 - LAMBDA_PARAMETER;
+
 
 /* internal definition */
 static const size_t nbeam = 32;
@@ -116,5 +121,64 @@ static bool get_top_results(/* out */ GPtrArray * topresults,
     dump_all_values(topresults);
 
     return true;
+}
+
+static bool populate_prefixes(GPtrArray * steps_index,
+                              GPtrArray * steps_content,
+                              TokenVector prefixes) {
+    assert(prefixes->len > 0);
+
+    for (size_t i = 0; i < prefixes->len; ++i) {
+        phrase_token_t token = g_array_index(prefixes, phrase_token_t, i);
+        lookup_key_t initial_key = token;
+        lookup_value_t initial_value(log(1));
+        initial_value.m_handles[1] = token;
+
+        GArray * initial_step_content = (GArray *)
+            g_ptr_array_index(steps_content, 0);
+        initial_step_content = g_array_append_val
+            (initial_step_content, initial_value);
+
+        GHashTable * initial_step_index = (GHashTable *)
+            g_ptr_array_index(steps_index, 0);
+        g_hash_table_insert(initial_step_index,
+                            GUINT_TO_POINTER(initial_key),
+                            GUINT_TO_POINTER(initial_step_content->len - 1));
+    }
+
+    return true;
+}
+
+static bool init_steps(GPtrArray * steps_index,
+                       GPtrArray * steps_content,
+                       int nstep){
+    /* add null start step */
+    g_ptr_array_set_size(steps_index, nstep);
+    g_ptr_array_set_size(steps_content, nstep);
+
+    for (int i = 0; i < nstep; ++i) {
+	/* initialize m_steps_index */
+	g_ptr_array_index(steps_index, i) = g_hash_table_new(g_direct_hash, g_direct_equal);
+	/* initialize m_steps_content */
+	g_ptr_array_index(steps_content, i) = g_array_new(FALSE, FALSE, sizeof(lookup_value_t));
+    }
+
+    return true;
+}
+
+static void clear_steps(GPtrArray * steps_index, GPtrArray * steps_content){
+    /* clear steps_index */
+    for ( size_t i = 0; i < steps_index->len; ++i){
+	GHashTable * table = (GHashTable *) g_ptr_array_index(steps_index, i);
+	g_hash_table_destroy(table);
+	g_ptr_array_index(steps_index, i) = NULL;
+    }
+
+    /* clear steps_content */
+    for ( size_t i = 0; i < steps_content->len; ++i){
+	GArray * array = (GArray *) g_ptr_array_index(steps_content, i);
+	g_array_free(array, TRUE);
+	g_ptr_array_index(steps_content, i) = NULL;
+    }
 }
 
