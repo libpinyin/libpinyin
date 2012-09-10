@@ -182,3 +182,25 @@ static void clear_steps(GPtrArray * steps_index, GPtrArray * steps_content){
     }
 }
 
+
+PinyinLookup2::PinyinLookup2(pinyin_option_t options,
+                             FacadeChewingTable * pinyin_table,
+                             FacadePhraseIndex * phrase_index,
+                             Bigram * system_bigram,
+                             Bigram * user_bigram){
+    m_options = options;
+    m_pinyin_table = pinyin_table;
+    m_phrase_index = phrase_index;
+    m_system_bigram = system_bigram;
+    m_user_bigram = user_bigram;
+
+    m_steps_index = g_ptr_array_new();
+    m_steps_content = g_ptr_array_new();
+}
+
+PinyinLookup2::~PinyinLookup2(){
+    clear_steps(m_steps_index, m_steps_content);
+    g_ptr_array_free(m_steps_index, TRUE);
+    g_ptr_array_free(m_steps_content, TRUE);
+}
+
