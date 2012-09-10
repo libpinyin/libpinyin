@@ -238,6 +238,9 @@ bool PinyinLookup2::get_best_match(TokenVector prefixes,
         LookupStepContent step = (LookupStepContent)
             g_ptr_array_index(m_steps_content, i);
 
+        populate_candidates(candidates, step);
+        get_top_results(topresults, candidates);
+
         for ( int m = i + 1; m < nstep; ++m ){
             const int len = m - i;
             if (len > MAX_PHRASE_LENGTH)
@@ -253,11 +256,10 @@ bool PinyinLookup2::get_best_match(TokenVector prefixes,
             /* do one pinyin table search. */
             int result = m_pinyin_table->search(len, pinyin_keys + i, ranges);
 
-            populate_candidates(candidates, step);
-            get_top_results(topresults, candidates);
-
-            search_bigram2(topresults, i, ranges),
-                search_unigram2(topresults, i, ranges);
+            if (result & SEARCH_OK) {
+                search_bigram2(topresults, i, ranges),
+                    search_unigram2(topresults, i, ranges);
+            }
 
             /* no longer pinyin */
             if (!(result & SEARCH_CONTINUED))
