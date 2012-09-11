@@ -57,7 +57,7 @@ bool get_possible_pinyin(FacadePhraseIndex * phrase_index,
     return true;
 }
 
-bool get_best_match(PinyinLookup * pinyin_lookup,
+bool get_best_match(PinyinLookup2 * pinyin_lookup,
                     ChewingKeyVector keys, TokenVector tokens){
     /* prepare the prefixes for get_best_match. */
     TokenVector prefixes = g_array_new
@@ -81,7 +81,7 @@ bool get_best_match(PinyinLookup * pinyin_lookup,
     return retval;
 }
 
-bool do_one_test(PinyinLookup * pinyin_lookup,
+bool do_one_test(PinyinLookup2 * pinyin_lookup,
                  FacadePhraseIndex * phrase_index,
                  TokenVector tokens){
     bool retval = false;
@@ -137,7 +137,7 @@ int main(int argc, char * argv[]){
     Bigram user_bigram;
     user_bigram.attach(NULL, ATTACH_CREATE|ATTACH_READWRITE);
 
-    PinyinLookup pinyin_lookup(options, &largetable, &phrase_index,
+    PinyinLookup2 pinyin_lookup(options, &largetable, &phrase_index,
                                &system_bigram, &user_bigram);
 
     /* open evals.text. */

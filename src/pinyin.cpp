@@ -41,7 +41,7 @@ struct _pinyin_context_t{
     Bigram * m_system_bigram;
     Bigram * m_user_bigram;
 
-    PinyinLookup * m_pinyin_lookup;
+    PinyinLookup2 * m_pinyin_lookup;
     PhraseLookup * m_phrase_lookup;
 
     char * m_system_dir;
@@ -190,7 +190,7 @@ pinyin_context_t * pinyin_init(const char * systemdir, const char * userdir){
     context->m_user_bigram->load_db(filename);
     g_free(filename);
 
-    context->m_pinyin_lookup = new PinyinLookup
+    context->m_pinyin_lookup = new PinyinLookup2
         ( context->m_options, context->m_pinyin_table,
           context->m_phrase_index, context->m_system_bigram,
           context->m_user_bigram);

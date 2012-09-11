@@ -46,7 +46,7 @@ int main( int argc, char * argv[]){
     Bigram user_bigram;
     user_bigram.attach(NULL, ATTACH_CREATE|ATTACH_READWRITE);
     
-    PinyinLookup pinyin_lookup(options, &largetable, &phrase_index,
+    PinyinLookup2 pinyin_lookup(options, &largetable, &phrase_index,
                                &system_bigram, &user_bigram);
     
     char* linebuf = NULL;

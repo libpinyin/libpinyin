@@ -22,10 +22,8 @@ INCLUDES		= -I$(top_srcdir)/src/include \
 			  @GLIB2_CPPFLAGS@
 
 noinst_HEADERS		= lookup.h \
-			  pinyin_lookup.h \
 			  pinyin_lookup2.h \
-			  phrase_lookup.h \
-			  winner_tree.h
+			  phrase_lookup.h
 
 noinst_LTLIBRARIES	= liblookup.la
 
@@ -33,8 +31,6 @@ liblookup_la_CXXFLAGS	= "-fPIC"
 
 liblookup_la_LDFLAGS	= -static
 
-liblookup_la_SOURCES	= pinyin_lookup.cpp \
-			  pinyin_lookup2.cpp \
-			  winner_tree.cpp \
+liblookup_la_SOURCES	= pinyin_lookup2.cpp \
 			  phrase_lookup.cpp \
 			  lookup.cpp
