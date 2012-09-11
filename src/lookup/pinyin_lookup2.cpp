@@ -241,6 +241,9 @@ bool PinyinLookup2::get_best_match(TokenVector prefixes,
         populate_candidates(candidates, step);
         get_top_results(topresults, candidates);
 
+        if (0 == topresults->len)
+            continue;
+
         for ( int m = i + 1; m < nstep; ++m ){
             const int len = m - i;
             if (len > MAX_PHRASE_LENGTH)
@@ -257,6 +260,7 @@ bool PinyinLookup2::get_best_match(TokenVector prefixes,
             int result = m_pinyin_table->search(len, pinyin_keys + i, ranges);
 
             if (result & SEARCH_OK) {
+                /* assume topresults always contains items. */
                 search_bigram2(topresults, i, ranges),
                     search_unigram2(topresults, i, ranges);
             }
@@ -277,8 +281,6 @@ bool PinyinLookup2::get_best_match(TokenVector prefixes,
 
 bool PinyinLookup2::search_unigram2(GPtrArray * topresults, int nstep,
                                     PhraseIndexRanges ranges) {
-    if (0 == topresults->len)
-        return false;
 
     lookup_value_t * max = (lookup_value_t *)
         g_ptr_array_index(topresults, 0);
@@ -311,10 +313,8 @@ bool PinyinLookup2::search_unigram2(GPtrArray * topresults, int nstep,
 
 bool PinyinLookup2::search_bigram2(GPtrArray * topresults, int nstep,
                                    PhraseIndexRanges ranges) {
-    if (0 == topresults->len)
-        return false;
 
-    lookup_constraint_t* constraint =
+    lookup_constraint_t * constraint =
         &g_array_index(m_constraints, lookup_constraint_t, nstep);
 
     bool found = false;
