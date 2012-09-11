@@ -84,7 +84,7 @@ static bool populate_candidates(/* out */ GPtrArray * candidates,
         g_ptr_array_add(candidates, value);
     }
 
-    dump_max_value(candidates);
+    /* dump_max_value(candidates); */
 
     return true;
 }
@@ -119,7 +119,7 @@ static bool get_top_results(/* out */ GPtrArray * topresults,
             break;
     }
 
-    dump_all_values(topresults);
+    /* dump_all_values(topresults); */
 
     return true;
 }
