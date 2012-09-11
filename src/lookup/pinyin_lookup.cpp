@@ -334,7 +334,7 @@ bool PinyinLookup::save_next_step(int next_step_pos, lookup_value_t * cur_step, 
 
 bool PinyinLookup::final_step(MatchResults & results){
     //reset results
-    g_array_set_size(results, m_steps_content->len);
+    g_array_set_size(results, m_steps_content->len - 1);
     for ( size_t i = 0 ; i < results->len ; ++i){
 	phrase_token_t * token = &g_array_index(results, phrase_token_t, i);
 	*token = null_token;
