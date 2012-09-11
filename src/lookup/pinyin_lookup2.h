@@ -205,7 +205,7 @@ public:
      * Add one constraint to the constraints on the guessed sentence.
      *
      */
-    guint8 add_constraint(CandidateConstraints constraints, size_t index, phrase_token_t token);
+    int add_constraint(CandidateConstraints constraints, size_t index, phrase_token_t token);
 
     /**
      * PinyinLookup2::clear_constraint:
@@ -216,7 +216,7 @@ public:
      * Clear one constraint in the constraints on the guessed sentence.
      *
      */
-    bool clear_constraint(CandidateConstraints constraints, size_t index);
+    bool clear_constraint(CandidateConstraints constraints, int index);
 
     /**
      * PinyinLookup2::validate_constraint:

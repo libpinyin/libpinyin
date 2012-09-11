@@ -516,3 +516,196 @@ bool PinyinLookup2::final_step(MatchResults & results){
     /* no need to reverse the result */
     return true;
 }
+
+
+bool PinyinLookup2::train_result2(ChewingKeyVector keys,
+                                  CandidateConstraints constraints,
+                                  MatchResults results) {
+    const guint32 initial_seed = 23 * 15;
+    const guint32 expand_factor = 2;
+    const guint32 unigram_factor = 7;
+    const guint32 pinyin_factor = 1;
+    const guint32 ceiling_seed = 23 * 15 * 64;
+
+    /* begin training based on constraints and results. */
+    bool train_next = false;
+    ChewingKey * pinyin_keys = (ChewingKey *) keys->data;
+
+    phrase_token_t last_token = sentence_start;
+    /* constraints->len + 1 == results->len */
+    for (size_t i = 0; i < constraints->len; ++i) {
+        phrase_token_t * token = &g_array_index(results, phrase_token_t, i);
+        if (null_token == *token)
+            continue;
+
+        lookup_constraint_t * constraint = &g_array_index
+            (constraints, lookup_constraint_t, i);
+        if (train_next || CONSTRAINT_ONESTEP == constraint->m_type) {
+            if (CONSTRAINT_ONESTEP == constraint->m_type) {
+                assert(*token == constraint->m_token);
+                train_next = true;
+            } else {
+                train_next = false;
+            }
+
+            guint32 seed = initial_seed;
+            /* train bi-gram first, and get train seed. */
+            if (last_token) {
+                SingleGram * user = NULL;
+                m_user_bigram->load(last_token, user);
+
+                guint32 total_freq = 0;
+                if (!user) {
+                    user = new SingleGram;
+                }
+                assert(user->get_total_freq(total_freq));
+
+                guint32 freq = 0;
+                /* compute train factor */
+                if (!user->get_freq(*token, freq)) {
+                    assert(user->insert_freq(*token, 0));
+                    seed = initial_seed;
+                } else {
+                    seed = std_lite::max(freq, initial_seed);
+                    seed *= expand_factor;
+                    seed = std_lite::min(seed, ceiling_seed);
+                }
+
+                /* protect against total_freq overflow */
+                if (seed > 0 && total_freq > total_freq + seed)
+                    goto next;
+
+                assert(user->set_total_freq(total_freq + seed));
+                /* if total_freq is not overflow, then freq won't overflow. */
+                assert(user->set_freq(*token, freq + seed));
+                assert(m_user_bigram->store(last_token, user));
+            next:
+                if (user)
+                    delete user;
+            }
+
+            /* train uni-gram */
+	    m_phrase_index->get_phrase_item(*token, m_cache_phrase_item);
+	    m_cache_phrase_item.increase_pronunciation_possibility
+                (m_options, pinyin_keys + i, seed * pinyin_factor);
+	    m_phrase_index->add_unigram_frequency
+                (*token, seed * unigram_factor);
+        }
+        last_token = *token;
+    }
+    return true;
+}
+
+
+int PinyinLookup2::add_constraint(CandidateConstraints constraints,
+                                  size_t index,
+                                  phrase_token_t token) {
+
+    if (m_phrase_index->get_phrase_item(token, m_cache_phrase_item))
+	return 0;
+
+    size_t phrase_length = m_cache_phrase_item.get_phrase_length();
+    if ( index + phrase_length > constraints->len )
+	return 0;
+
+    for (size_t i = index; i < index + phrase_length; ++i){
+	clear_constraint(constraints, i);
+    }
+
+    /* store one step constraint */
+    lookup_constraint_t * constraint = &g_array_index
+        (constraints, lookup_constraint_t, index);
+    constraint->m_type = CONSTRAINT_ONESTEP;
+    constraint->m_token = token;
+
+    /* propagate no search constraint */
+    for (size_t i = 1; i < phrase_length; ++i){
+	constraint = &g_array_index(constraints, lookup_constraint_t, index + i);
+	constraint->m_type = CONSTRAINT_NOSEARCH;
+	constraint->m_constraint_step = index;
+    }
+
+    return phrase_length;
+}
+
+bool PinyinLookup2::clear_constraint(CandidateConstraints constraints,
+                                    int index) {
+    if (index < 0 || index >= constraints->len)
+	return false;
+
+    lookup_constraint_t * constraint = &g_array_index
+        (constraints, lookup_constraint_t, index);
+
+    if (NO_CONSTRAINT == constraint->m_type)
+	return false;
+
+    if (CONSTRAINT_NOSEARCH == constraint->m_type){
+	index = constraint->m_constraint_step;
+	constraint = &g_array_index(constraints, lookup_constraint_t, index);
+    }
+
+    /* now var constraint points to the one step constraint. */
+    assert(constraint->m_type == CONSTRAINT_ONESTEP);
+
+    phrase_token_t token = constraint->m_token;
+    if (m_phrase_index->get_phrase_item(token, m_cache_phrase_item))
+	return false;
+
+    size_t phrase_length = m_cache_phrase_item.get_phrase_length();
+    for ( size_t i = 0; i < phrase_length; ++i){
+	if (index + i >= constraints->len)
+	    continue;
+
+	constraint = &g_array_index
+            (constraints, lookup_constraint_t, index + i);
+	constraint->m_type = NO_CONSTRAINT;
+    }
+
+    return true;
+}
+
+bool PinyinLookup2::validate_constraint(CandidateConstraints constraints,
+                                        ChewingKeyVector keys) {
+    /* resize constraints array first */
+    size_t constraints_length = constraints->len;
+
+    if ( keys->len > constraints_length ){
+	g_array_set_size(constraints, keys->len);
+
+	/* initialize new element */
+	for( size_t i = constraints_length; i < keys->len; ++i){
+	    lookup_constraint_t * constraint = &g_array_index(constraints, lookup_constraint_t, i);
+	    constraint->m_type = NO_CONSTRAINT;
+	}
+
+    }else if (keys->len < constraints_length ){
+        /* just shrink it */
+	g_array_set_size(constraints, keys->len);
+    }
+
+    for ( size_t i = 0; i < constraints->len; ++i){
+	lookup_constraint_t * constraint = &g_array_index
+            (constraints, lookup_constraint_t, i);
+
+        /* handle one step constraint */
+	if ( constraint->m_type == CONSTRAINT_ONESTEP ){
+
+	    phrase_token_t token = constraint->m_token;
+	    m_phrase_index->get_phrase_item(token, m_cache_phrase_item);
+	    size_t phrase_length = m_cache_phrase_item.get_phrase_length();
+
+	    /* clear too long constraint */
+	    if (i + phrase_length > constraints->len){
+		clear_constraint(constraints, i);
+		continue;
+	    }
+
+            ChewingKey * pinyin_keys = (ChewingKey *)keys->data;
+	    /* clear invalid pinyin */
+	    gfloat pinyin_poss = m_cache_phrase_item.get_pronunciation_possibility(m_options, pinyin_keys + i);
+	    if (pinyin_poss < FLT_EPSILON)
+		clear_constraint(constraints, i);
+	}
+    }
+    return true;
+}
