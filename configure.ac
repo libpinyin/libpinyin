@@ -18,6 +18,7 @@ AC_INIT([libpinyin], [libpinyin_version], [https://github.com/libpinyin/libpinyi
 AM_INIT_AUTOMAKE
 AC_CONFIG_SRCDIR([config.h.in])
 AC_CONFIG_HEADER([config.h])
+m4_ifdef([AM_SILENT_RULES],[AM_SILENT_RULES([yes])])
 
 # Define a string for binary compatibility
 m4_define([lt_current], [libpinyin_abi_current])
