@@ -135,12 +135,12 @@ static bool populate_prefixes(GPtrArray * steps_index,
         lookup_value_t initial_value(log(1));
         initial_value.m_handles[1] = token;
 
-        GArray * initial_step_content = (GArray *)
+        LookupStepContent initial_step_content = (LookupStepContent)
             g_ptr_array_index(steps_content, 0);
         initial_step_content = g_array_append_val
             (initial_step_content, initial_value);
 
-        GHashTable * initial_step_index = (GHashTable *)
+        LookupStepIndex initial_step_index = (LookupStepIndex)
             g_ptr_array_index(steps_index, 0);
         g_hash_table_insert(initial_step_index,
                             GUINT_TO_POINTER(initial_key),
@@ -158,9 +158,9 @@ static bool init_steps(GPtrArray * steps_index,
     g_ptr_array_set_size(steps_content, nstep);
 
     for (int i = 0; i < nstep; ++i) {
-	/* initialize m_steps_index */
+	/* initialize steps_index */
 	g_ptr_array_index(steps_index, i) = g_hash_table_new(g_direct_hash, g_direct_equal);
-	/* initialize m_steps_content */
+	/* initialize steps_content */
 	g_ptr_array_index(steps_content, i) = g_array_new(FALSE, FALSE, sizeof(lookup_value_t));
     }
 
