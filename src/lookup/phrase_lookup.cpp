@@ -246,45 +246,54 @@ bool PhraseLookup::save_next_step(int next_step_pos, lookup_value_t * cur_value,
 }
 
 bool PhraseLookup::final_step(MatchResults & results ){
-    //reset results
-    g_array_set_size(results, m_steps_content->len);
+    /* reset results */
+    g_array_set_size(results, m_steps_content->len - 1);
     for ( size_t i = 0; i < results->len; ++i ){
         phrase_token_t * token = &g_array_index(results, phrase_token_t, i);
         *token = null_token;
     }
 
-    //find max element
+    /* find max element */
     size_t last_step_pos = m_steps_content->len - 1;
-    GArray * last_step_content =  (GArray *) g_ptr_array_index(m_steps_content, last_step_pos);
+    LookupStepContent last_step_content =  (LookupStepContent) g_ptr_array_index
+        (m_steps_content, last_step_pos);
     if ( last_step_content->len == 0 )
         return false;
 
-    lookup_value_t * max_value = &g_array_index(last_step_content, lookup_value_t, 0);
+    lookup_value_t * max_value = &g_array_index
+        (last_step_content, lookup_value_t, 0);
     for ( size_t i = 1; i < last_step_content->len; ++i ){
-        lookup_value_t * cur_value = &g_array_index(last_step_content, lookup_value_t, i);
+        lookup_value_t * cur_value = &g_array_index
+            (last_step_content, lookup_value_t, i);
         if ( cur_value->m_poss > max_value->m_poss )
             max_value = cur_value;
     }
 
-    //backtracing
+    /* backtracing */
     while( true ){
         int cur_step_pos = max_value->m_last_step;
         if ( -1 == cur_step_pos )
             break;
 
-        phrase_token_t * token = &g_array_index(results, phrase_token_t, cur_step_pos);
+        phrase_token_t * token = &g_array_index
+            (results, phrase_token_t, cur_step_pos);
         *token = max_value->m_handles[1];
 
         phrase_token_t last_token = max_value->m_handles[0];
-        GHashTable * lookup_step_index = (GHashTable *) g_ptr_array_index(m_steps_index, cur_step_pos);
-        gpointer key, value;
-        gboolean result = g_hash_table_lookup_extended(lookup_step_index, GUINT_TO_POINTER(last_token), &key, &value);
+        LookupStepIndex lookup_step_index = (LookupStepIndex) g_ptr_array_index(m_steps_index, cur_step_pos);
+
+        gpointer key = NULL, value = NULL;
+        gboolean result = g_hash_table_lookup_extended
+            (lookup_step_index, GUINT_TO_POINTER(last_token), &key, &value);
         if ( !result )
             return false;
-        GArray * lookup_step_content = (GArray *) g_ptr_array_index(m_steps_content, cur_step_pos);
-        max_value = &g_array_index(lookup_step_content, lookup_value_t, GPOINTER_TO_UINT(value));
+
+        LookupStepContent lookup_step_content = (LookupStepContent)
+            g_ptr_array_index(m_steps_content, cur_step_pos);
+        max_value = &g_array_index
+            (lookup_step_content, lookup_value_t, GPOINTER_TO_UINT(value));
     }
 
-    //no need to reverse the result
+    /* no need to reverse the result */
     return true;
 }
