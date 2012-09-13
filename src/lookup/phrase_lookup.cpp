@@ -43,8 +43,7 @@ static bool populate_prefixes(GPtrArray * steps_index,
 
     LookupStepContent initial_step_content = (LookupStepContent)
         g_ptr_array_index(steps_content, 0);
-    initial_step_content = g_array_append_val
-        (initial_step_content, initial_value);
+    g_array_append_val(initial_step_content, initial_value);
 
     LookupStepIndex initial_step_index = (LookupStepIndex)
         g_ptr_array_index(steps_index, 0);
