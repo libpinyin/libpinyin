@@ -282,6 +282,9 @@ bool PinyinLookup2::get_best_match(TokenVector prefixes,
 bool PinyinLookup2::search_unigram2(GPtrArray * topresults, int nstep,
                                     PhraseIndexRanges ranges) {
 
+    if (0 == topresults->len)
+        return false;
+
     lookup_value_t * max = (lookup_value_t *)
         g_ptr_array_index(topresults, 0);
 
