@@ -301,6 +301,7 @@ bool PinyinLookup2::search_unigram2(GPtrArray * topresults, int nstep,
         for ( size_t m = 0; m < PHRASE_INDEX_LIBRARY_COUNT; ++m){
             GArray * array = ranges[m];
             if ( !array ) continue;
+
             for ( size_t n = 0; n < array->len; ++n){
                 PhraseIndexRange * range = &g_array_index(array, PhraseIndexRange, n);
                 for ( phrase_token_t token = range->m_range_begin;

@@ -1053,6 +1053,7 @@ static bool _remove_duplicated_items_by_phrase_string
             (candidates, lookup_candidate_t, i);
 
         if (ZOMBIE_CANDIDATE == candidate->m_candidate_type) {
+            g_free(candidate->m_phrase_string);
             g_array_remove_index(candidates, i);
             i--;
         }
