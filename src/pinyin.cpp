@@ -1054,6 +1054,7 @@ static bool _remove_duplicated_items_by_phrase_string
 
         if (ZOMBIE_CANDIDATE == candidate->m_candidate_type) {
             g_free(candidate->m_phrase_string);
+            g_free(candidate->m_new_pinyins);
             g_array_remove_index(candidates, i);
             i--;
         }
