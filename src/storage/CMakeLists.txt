@@ -11,7 +11,7 @@ set(
 set(
     LIBSTORAGE_SOURCES
     phrase_index.cpp
-    phrase_large_table.cpp
+    phrase_large_table2.cpp
     ngram.cpp
     tag_utility.cpp
     pinyin_parser2.cpp
