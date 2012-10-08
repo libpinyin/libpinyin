@@ -52,6 +52,9 @@ int main(int argc, char * argv[]){
             prefixbuf[strlen(prefixbuf) - 1] = '\0';
         }
 
+        fprintf(stdout, "pinyin:");
+        fflush(stdout);
+
         if ((read = getline(&linebuf, &linesize, stdin)) == -1)
             break;
 
