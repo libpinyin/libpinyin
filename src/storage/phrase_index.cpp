@@ -361,7 +361,11 @@ bool SubPhraseIndex::merge(PhraseIndexLogger * logger){
     PhraseItem olditem, newitem, item, * tmpitem;
 
     while(logger->has_next_record()){
-        logger->next_record(log_type, token, &oldchunk, &newchunk);
+        bool retval = logger->next_record
+            (log_type, token, &oldchunk, &newchunk);
+
+        if (!retval)
+            break;
 
         switch(log_type){
         case LOG_ADD_RECORD:{

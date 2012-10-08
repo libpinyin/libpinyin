@@ -59,6 +59,7 @@ class PhraseIndexLogger{
 protected:
     MemoryChunk * m_chunk;
     size_t m_offset;
+    bool m_error;
 
     void reset(){
         if ( m_chunk ){
@@ -66,6 +67,7 @@ protected:
             m_chunk = NULL;
         }
         m_offset = 0;
+        m_error = false;
     }
 public:
     /**
@@ -74,7 +76,7 @@ public:
      * The constructor of the PhraseIndexLogger.
      *
      */
-    PhraseIndexLogger():m_offset(0){
+    PhraseIndexLogger():m_offset(0), m_error(false){
         m_chunk = new MemoryChunk;
     }
 
@@ -123,6 +125,9 @@ public:
      *
      */
     bool has_next_record(){
+        if (m_error)
+            return false;
+
         return m_offset < m_chunk->size();
     }
 
@@ -204,7 +209,8 @@ public:
             break;
         }
         default:
-            assert(false);
+            m_error = true;
+            return false;
         }
 
         m_offset = offset;
