@@ -58,14 +58,10 @@ int main(int argc, char * argv[]){
     assert(chunk->get_content(sizeof(int), &tmp, sizeof(int)));
     printf("%d\n", tmp);
 
-    //clean up chunk
-    delete chunk;
-
     const char * filename =  "/tmp/version";
     const char * version = "0.2.0";
 
-    //testing version check.
-    chunk =  new MemoryChunk;
+    /* testing version check. */
     bool retval = chunk->load(filename);
     if ( !retval ){
         fprintf(stderr, "can't find chunk\n");
@@ -82,6 +78,8 @@ int main(int argc, char * argv[]){
     } else if ( memcmp(version, chunk->begin(), strlen(version) + 1) == 0){
         printf("match\n");
     }
+
+    delete chunk;
 
     return 0;
 }
