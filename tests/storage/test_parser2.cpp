@@ -102,12 +102,14 @@ int main(int argc, char * argv[]) {
             break;
 
 #if 0
-        ChewingKey key; ChewingKeyRest key_rest;
-        bool success = parser->parse_one_key(options, key, key_rest,
+        ChewingKey key;
+        bool success = parser->parse_one_key(options, key,
                                              linebuf, strlen(linebuf));
-        if (success)
-            printf("pinyin:%s\t%d\t%d\n", key.get_pinyin_string(),
-                   key_rest.m_raw_begin, key_rest.m_raw_end);
+        if (success) {
+            gchar * pinyins = key.get_pinyin_string();
+            printf("pinyin:%s\n", pinyins);
+            g_free(pinyins);
+        }
 #endif
 
 #if 1
