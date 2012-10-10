@@ -694,10 +694,11 @@ bool ChewingBitmapIndexLevel::load(MemoryChunk * chunk, table_offset_t offset,
                     if (phrase_begin == phrase_end) /* null pointer */
                         continue;
 
+                    /* after reset() all phrases are null pointer. */
                     ChewingLengthIndexLevel * phrases = new ChewingLengthIndexLevel;
-                    phrases->load(chunk, phrase_begin, phrase_end - 1);
                     m_chewing_length_indexes[k][l][m][n] = phrases;
 
+                    phrases->load(chunk, phrase_begin, phrase_end - 1);
                     assert(phrase_end <= end);
                     assert(*(begin + phrase_end - 1)  == c_separate);
                 }
@@ -758,7 +759,7 @@ bool ChewingLengthIndexLevel::load(MemoryChunk * chunk, table_offset_t offset,
         (begin + offset + sizeof(guint32));
 
     table_offset_t phrase_begin, phrase_end = *index;
-    m_chewing_array_indexes = g_array_new(FALSE, TRUE, sizeof(void *));
+    g_array_set_size(m_chewing_array_indexes, 0);
     for (guint32 i = 0; i < nindex; ++i) {
         phrase_begin = phrase_end;
         index++;
