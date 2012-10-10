@@ -133,20 +133,8 @@ bool PhraseLookup::get_best_match(int sentence_length, ucs4_t sentence[],
 
             /* found next phrase */
             if ( result & SEARCH_OK ) {
-                /* iterate every token. */
-                for (size_t n = 0; n < PHRASE_INDEX_LIBRARY_COUNT; ++n) {
-                    GArray * array = tokens[n];
-                    if (NULL == array)
-                        continue;
-
-                    /* just skip the loop when the length is zero. */
-                    for (size_t k = 0; k < array->len; ++k) {
-                        phrase_token_t next_token =
-                            g_array_index(array, phrase_token_t, k);
-                        search_bigram(i, next_token),
-                            search_unigram(i, next_token);
-                    }
-                }
+                search_bigram2(i, tokens),
+                    search_unigram2(i, tokens);
             }
 
             /* no longer phrase */
@@ -159,6 +147,8 @@ bool PhraseLookup::get_best_match(int sentence_length, ucs4_t sentence[],
 
     return final_step(results);
 }
+
+#if 0
 
 bool PhraseLookup::search_unigram(int nstep, phrase_token_t token){
 
@@ -202,6 +192,98 @@ bool PhraseLookup::search_bigram(int nstep, phrase_token_t token){
             m_merged_single_gram.get_total_freq(total_freq);
             gfloat bigram_poss = freq / (gfloat) total_freq;
             found = bigram_gen_next_step(nstep, cur_value, token, bigram_poss) || found;
+        }
+
+        if (system)
+            delete system;
+        if (user)
+            delete user;
+    }
+
+    return found;
+}
+
+#endif
+
+bool PhraseLookup::search_unigram2(int nstep, PhraseTokens tokens){
+    bool found = false;
+
+    LookupStepContent lookup_content = (LookupStepContent)
+        g_ptr_array_index(m_steps_content, nstep);
+    if ( 0 == lookup_content->len )
+        return found;
+
+    /* find the maximum node */
+    lookup_value_t * max_value = &g_array_index
+        (lookup_content, lookup_value_t, 0);
+
+    for (size_t i = 1; i < lookup_content->len; ++i) {
+        lookup_value_t * cur_value = &g_array_index
+            (lookup_content, lookup_value_t, i);
+        if (cur_value->m_poss > max_value->m_poss)
+            max_value = cur_value;
+    }
+
+    /* iterate over tokens */
+    for (size_t n = 0; n < PHRASE_INDEX_LIBRARY_COUNT; ++n) {
+        GArray * array = tokens[n];
+        if (NULL == array)
+            continue;
+
+        /* just skip the loop when the length is zero. */
+        for (size_t k = 0; k < array->len; ++k) {
+            phrase_token_t token =
+                g_array_index(array, phrase_token_t, k);
+
+            found = unigram_gen_next_step
+                (nstep, max_value, token) || found;
+        }
+    }
+
+    return found;
+}
+
+bool PhraseLookup::search_bigram2(int nstep, PhraseTokens tokens){
+    bool found = false;
+
+    LookupStepContent lookup_content = (LookupStepContent)
+        g_ptr_array_index(m_steps_content, nstep);
+    if (0 == lookup_content->len)
+        return found;
+
+    for (size_t i = 0; i < lookup_content->len; ++i) {
+        lookup_value_t * cur_value = &g_array_index
+            (lookup_content, lookup_value_t, i);
+        phrase_token_t index_token = cur_value->m_handles[1];
+
+        SingleGram * system = NULL, * user = NULL;
+        m_system_bigram->load(index_token, system);
+        m_user_bigram->load(index_token, user);
+
+        if (!merge_single_gram
+            (&m_merged_single_gram, system, user))
+            continue;
+
+        /* iterate over tokens */
+        for (size_t n = 0; n < PHRASE_INDEX_LIBRARY_COUNT; ++n) {
+            GArray * array = tokens[n];
+            if (NULL == array)
+                continue;
+
+            /* just skip the loop when the length is zero. */
+            for (size_t k = 0; k < array->len; ++k) {
+                phrase_token_t token =
+                    g_array_index(array, phrase_token_t, k);
+
+                guint32 freq = 0;
+                if (m_merged_single_gram.get_freq(token, freq)) {
+                    guint32 total_freq = 0;
+                    m_merged_single_gram.get_total_freq(total_freq);
+
+                    gfloat bigram_poss = freq / (gfloat) total_freq;
+                    found = bigram_gen_next_step(nstep, cur_value, token, bigram_poss) || found;
+                }
+            }
         }
 
         if (system)

@@ -69,8 +69,8 @@ protected:
     /* Explicitly search the next phrase,
      *  to avoid double phrase lookup as the next token has only one.
      */
-    bool search_unigram(int nstep, phrase_token_t token);
-    bool search_bigram(int nstep, phrase_token_t token);
+    bool search_unigram2(int nstep, PhraseTokens tokens);
+    bool search_bigram2(int nstep, PhraseTokens tokens);
 
     bool unigram_gen_next_step(int nstep, lookup_value_t * cur_value, phrase_token_t token);
     bool bigram_gen_next_step(int nstep, lookup_value_t * cur_value, phrase_token_t token, gfloat bigram_poss);
