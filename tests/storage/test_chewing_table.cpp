@@ -109,8 +109,10 @@ int main(int argc, char * argv[]) {
                         item.get_nth_pronunciation(m, chewing_buffer, freq);
                         for (size_t n = 0; n < item.get_phrase_length();
                              ++n){
-                            printf("%s'",
-                                   chewing_buffer[n].get_pinyin_string());
+                            gchar * pinyins =
+                                chewing_buffer[n].get_pinyin_string();
+                            printf("%s'", pinyins);
+                            g_free(pinyins);
                         }
                         printf("\b\t%d\t", freq);
                     }
