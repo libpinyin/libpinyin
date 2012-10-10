@@ -109,10 +109,11 @@ PhraseBitmapIndexLevel2::PhraseBitmapIndexLevel2(){
 
 void PhraseBitmapIndexLevel2::reset(){
     for ( size_t i = 0; i < PHRASE_NUMBER_OF_BITMAP_INDEX; i++){
-        PhraseLengthIndexLevel2 * length_array =
+        PhraseLengthIndexLevel2 * & length_array =
             m_phrase_length_indexes[i];
         if ( length_array )
             delete length_array;
+        length_array = NULL;
     }
 }
 
@@ -474,8 +475,11 @@ bool PhraseBitmapIndexLevel2::load(MemoryChunk * chunk,
         phrase_end = *index;
         if ( phrase_begin == phrase_end ) //null pointer
             continue;
+
+        /* after reset() all phrases are null pointer. */
         PhraseLengthIndexLevel2 * phrases = new PhraseLengthIndexLevel2;
         m_phrase_length_indexes[i] = phrases;
+
         phrases->load(chunk, phrase_begin, phrase_end - 1);
         assert( phrase_end <= end );
         assert( *(buf_begin + phrase_end - 1) == c_separate);
@@ -524,7 +528,7 @@ bool PhraseLengthIndexLevel2::load(MemoryChunk * chunk,
         (buf_begin + offset + sizeof(guint32));
 
     table_offset_t phrase_begin, phrase_end = *index;
-    m_phrase_array_indexes = g_array_new(FALSE, TRUE, sizeof(void *));
+    g_array_set_size(m_phrase_array_indexes, 0);
     for (size_t i = 1; i <= nindex; ++i) {
         phrase_begin = phrase_end;
         index++;
