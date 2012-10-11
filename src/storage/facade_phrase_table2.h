@@ -38,6 +38,18 @@ private:
     PhraseLargeTable2 * m_system_phrase_table;
     PhraseLargeTable2 * m_user_phrase_table;
 
+    void reset(){
+        if (m_system_phrase_table) {
+            delete m_system_phrase_table;
+            m_system_phrase_table = NULL;
+        }
+
+        if (m_user_phrase_table) {
+            delete m_user_phrase_table;
+            m_user_phrase_table = NULL;
+        }
+    }
+
 public:
     /**
      * FacadePhraseTable2::FacadePhraseTable2:
@@ -51,6 +63,16 @@ public:
     }
 
     /**
+     * FacadePhraseTable2::~FacadePhraseTable2:
+     *
+     * The destructor of the FacadePhraseTable2.
+     *
+     */
+    ~FacadePhraseTable2() {
+        reset();
+    }
+
+    /**
      * FacadePhraseTable2::load:
      * @system: the memory chunk of the system phrase table.
      * @user: the memory chunk of the user phrase table.
@@ -60,6 +82,8 @@ public:
      *
      */
     bool load(MemoryChunk * system, MemoryChunk * user) {
+        reset();
+
         bool result = false;
         if (system) {
             m_system_phrase_table = new PhraseLargeTable2;
