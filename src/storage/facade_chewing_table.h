@@ -39,6 +39,17 @@ private:
     ChewingLargeTable * m_system_chewing_table;
     ChewingLargeTable * m_user_chewing_table;
 
+    void reset() {
+        if (m_system_chewing_table) {
+            delete m_system_chewing_table;
+            m_system_chewing_table = NULL;
+        }
+
+        if (m_user_chewing_table) {
+            delete m_user_chewing_table;
+            m_user_chewing_table = NULL;
+        }
+    }
 public:
     /**
      * FacadeChewingTable::FacadeChewingTable:
@@ -49,6 +60,16 @@ public:
     FacadeChewingTable() {
         m_system_chewing_table = NULL;
         m_user_chewing_table = NULL;
+    }
+
+    /**
+     * FacadeChewingTable::~FacadeChewingTable:
+     *
+     * The destructor of the FacadeChewingTable.
+     *
+     */
+    ~FacadeChewingTable() {
+        reset();
     }
 
     /**
@@ -80,6 +101,8 @@ public:
      */
     bool load(pinyin_option_t options, MemoryChunk * system,
               MemoryChunk * user){
+        reset();
+
         bool result = false;
         if (system) {
             m_system_chewing_table = new ChewingLargeTable(options);
