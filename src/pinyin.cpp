@@ -534,6 +534,8 @@ void pinyin_fini(pinyin_context_t * context){
     g_free(context->m_system_dir);
     g_free(context->m_user_dir);
     context->m_modified = false;
+
+    delete context;
 }
 
 /* copy from options to context->m_options. */
