@@ -87,6 +87,7 @@ int main(int argc, char * argv[]){
         pinyin_save(context);
     }
 
+    pinyin_free_candidates(instance, candidates);
     g_array_free(candidates, TRUE);
     pinyin_free_instance(instance);
     pinyin_fini(context);
