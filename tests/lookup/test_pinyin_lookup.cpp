@@ -48,10 +48,18 @@ int main( int argc, char * argv[]){
     
     PinyinLookup2 pinyin_lookup(options, &largetable, &phrase_index,
                                &system_bigram, &user_bigram);
+
+    /* prepare the prefixes for get_best_match. */
+    TokenVector prefixes = g_array_new
+        (FALSE, FALSE, sizeof(phrase_token_t));
+    g_array_append_val(prefixes, sentence_start);
     
-    char* linebuf = NULL;
-    size_t size = 0;
-    ssize_t read;
+    CandidateConstraints constraints = g_array_new
+        (FALSE, FALSE, sizeof(lookup_constraint_t));
+
+    MatchResults results = g_array_new(FALSE, FALSE, sizeof(phrase_token_t));
+
+    char* linebuf = NULL; size_t size = 0; ssize_t read;
     while( (read = getline(&linebuf, &size, stdin)) != -1 ){
         if ( '\n' == linebuf[strlen(linebuf) - 1] ) {
             linebuf[strlen(linebuf) - 1] = '\0';
@@ -69,22 +77,13 @@ int main( int argc, char * argv[]){
 	if ( 0 == keys->len ) /* invalid pinyin */
 	    continue;
 
-        /* prepare the prefixes for get_best_match. */
-        TokenVector prefixes = g_array_new
-            (FALSE, FALSE, sizeof(phrase_token_t));
-        g_array_append_val(prefixes, sentence_start);
-
         /* initialize constraints. */
-	CandidateConstraints constraints = g_array_new(FALSE, FALSE, sizeof(lookup_constraint_t));
-
 	g_array_set_size(constraints, keys->len);
 	for ( size_t i = 0; i < constraints->len; ++i){
 	    lookup_constraint_t * constraint = &g_array_index(constraints, lookup_constraint_t, i);
 	    constraint->m_type = NO_CONSTRAINT;
 	}
 
-	MatchResults results = g_array_new(FALSE, FALSE, sizeof(phrase_token_t));
-	
 	guint32 start_time = record_time();
 	for ( size_t i = 0; i < bench_times; ++i)
 	    pinyin_lookup.get_best_match(prefixes, keys, constraints, results);
@@ -99,11 +98,16 @@ int main( int argc, char * argv[]){
 	char * sentence = NULL;
 	pinyin_lookup.convert_to_utf8(results, sentence);
 	printf("%s\n", sentence);
-	g_array_free(results, TRUE);
 
 	g_array_free(keys, TRUE);
 	g_array_free(key_rests, TRUE);
 	g_free(sentence);
     }
+
+    g_array_free(prefixes, TRUE);
+    g_array_free(constraints, TRUE);
+    g_array_free(results, TRUE);
+
     free(linebuf);
+    return 0;
 }
