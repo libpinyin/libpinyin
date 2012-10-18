@@ -44,7 +44,6 @@ bool end_data(FILE * output){
 int main(int argc, char * argv[]){
     FILE * output = stdout;
     const char * bigram_filename = "bigram.db";
-    MemoryChunk * chunk = NULL;
 
     FacadePhraseIndex phrase_index;
     if (!load_phrase_index(&phrase_index))
@@ -72,8 +71,9 @@ bool gen_unigram(FILE * output, FacadePhraseIndex * phrase_index) {
             continue;
 
         PhraseItem item;
-        for ( size_t j = range.m_range_begin; j < range.m_range_end; j++) {
-            int result = phrase_index->get_phrase_item(j, item);
+        for (phrase_token_t token = range.m_range_begin;
+              token < range.m_range_end; token++) {
+            int result = phrase_index->get_phrase_item(token, item);
 
             if ( result == ERROR_NO_ITEM )
                 continue;
@@ -82,9 +82,9 @@ bool gen_unigram(FILE * output, FacadePhraseIndex * phrase_index) {
             size_t freq = item.get_unigram_frequency();
             if ( 0 == freq )
                 continue;
-            char * phrase = taglib_token_to_string(phrase_index, j);
+            char * phrase = taglib_token_to_string(phrase_index, token);
             if ( phrase )
-                fprintf(output, "\\item %s count %ld\n", phrase, freq);
+                fprintf(output, "\\item %d %s count %ld\n", token, phrase, freq);
 
             g_free(phrase);
         }
@@ -117,7 +117,8 @@ bool gen_bigram(FILE * output, FacadePhraseIndex * phrase_index, Bigram * bigram
             guint32 freq = item->m_count;
 
             if ( word1 && word2)
-                fprintf(output, "\\item %s %s count %d\n", word1, word2, freq);
+                fprintf(output, "\\item %d %s %d %s count %d\n",
+                        token, word1, item->m_token, word2, freq);
 
             g_free(word1); g_free(word2);
         }
