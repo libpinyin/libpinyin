@@ -308,6 +308,8 @@ bool taglib_fini(){
     return true;
 }
 
+#if 0
+
 static phrase_token_t taglib_special_string_to_token(const char * string){
     struct token_pair{
         phrase_token_t token;
@@ -354,6 +356,8 @@ phrase_token_t taglib_string_to_token(PhraseLargeTable2 * phrase_table,
     g_free(phrase);
     return token;
 }
+
+#endif
 
 static const char * taglib_special_token_to_string(phrase_token_t token){
     struct token_pair{

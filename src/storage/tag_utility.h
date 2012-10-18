@@ -116,20 +116,6 @@ class FacadePhraseIndex;
 
 
 /**
- * taglib_string_to_token:
- * @phrase_table: the phrase table for token lookup.
- * @phrase_index: the phrase index to prepare PhraseTokens.
- * @string: the string of the phrase.
- * @returns: the phrase token found in phrase table.
- *
- * Translate one phrase into the token.
- *
- */
-phrase_token_t taglib_string_to_token(PhraseLargeTable2 * phrase_table,
-                                      FacadePhraseIndex * phrase_index,
-                                      const char * string);
-
-/**
  * taglib_token_to_string:
  * @phrase_index: the phrase index for phrase string lookup.
  * @token: the phrase token.
