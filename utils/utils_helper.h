@@ -23,13 +23,20 @@
 #ifndef UTILS_HELPER_H
 #define UTILS_HELPER_H
 
-#define TAGLIB_GET_VALUE(var, index)                                    \
+
+#define TAGLIB_GET_TOKEN(var, index)                                    \
     phrase_token_t var = null_token;                                    \
     {                                                                   \
         const char * string = (const char *) g_ptr_array_index          \
             (values, index);                                            \
-        var = taglib_string_to_token                                    \
-            (phrase_table, phrase_index, string);                       \
+        var = atoi(string);                                             \
+    }
+
+#define TAGLIB_GET_PHRASE_STRING(var, index)                            \
+    const char * var = NULL;                                            \
+    {                                                                   \
+        var = (const char *) g_ptr_array_index                          \
+            (values, index);                                            \
     }
 
 #define TAGLIB_GET_TAGVALUE(type, var, conv)                            \
