@@ -114,23 +114,25 @@ bool parse_body(FILE * input, FILE * output){
 bool parse_unigram(FILE * input, FILE * output){
     taglib_push_state();
 
-    assert(taglib_add_tag(GRAM_1_ITEM_LINE, "\\item", 1, "freq", "count"));
+    assert(taglib_add_tag(GRAM_1_ITEM_LINE, "\\item", 2, "freq", "count"));
 
     do {
         assert(taglib_read(linebuf, line_type, values, required));
         switch(line_type) {
         case GRAM_1_ITEM_LINE: {
             /* handle \item in \1-gram */
-            const char * string = (const char *) g_ptr_array_index(values, 0);
+            TAGLIB_GET_TOKEN(token, 0);
+            TAGLIB_GET_PHRASE_STRING(word, 1);
+
             /* remove the "<start>" in the uni-gram of interpolation model */
-            if ( strcmp("<start>", string) == 0 )
+            if ( sentence_start == token )
                 break;
 
             TAGLIB_GET_TAGVALUE(glong, freq, atol);
 
             /* ignore zero unigram freq item */
             if ( 0 != freq )
-                fprintf(output, "\\item %s count %ld\n", string, freq);
+                fprintf(output, "\\item %d %s count %ld\n", token, word, freq);
             break;
         }
         case END_LINE:
@@ -150,7 +152,7 @@ bool parse_unigram(FILE * input, FILE * output){
 bool parse_bigram(FILE * input, FILE * output){
     taglib_push_state();
 
-    assert(taglib_add_tag(GRAM_2_ITEM_LINE, "\\item", 2,
+    assert(taglib_add_tag(GRAM_2_ITEM_LINE, "\\item", 4,
                           "count", "T:N_n_0:n_1:Mr"));
 
     do {
@@ -159,11 +161,15 @@ bool parse_bigram(FILE * input, FILE * output){
         case GRAM_2_ITEM_LINE:{
             /* handle \item in \2-gram */
             /* two strings */
-            const char * string1 = (const char *) g_ptr_array_index(values, 0);
-            const char * string2 = (const char *) g_ptr_array_index(values, 1);
+            TAGLIB_GET_TOKEN(token1, 0);
+            TAGLIB_GET_PHRASE_STRING(word1, 1);
+
+            TAGLIB_GET_TOKEN(token2, 2);
+            TAGLIB_GET_PHRASE_STRING(word2, 3);
 
             TAGLIB_GET_TAGVALUE(glong, count, atol);
-            fprintf(output, "\\item %s %s count %ld\n", string1, string2, count);
+            fprintf(output, "\\item %d %s %d %s count %ld\n",
+                    token1, word1, token2, word2, count);
             break;
         }
         case END_LINE:
