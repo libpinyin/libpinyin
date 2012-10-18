@@ -48,13 +48,13 @@ bool print_k_mixture_model_array_headers(FILE * output,
     bigram->get_all_items(items);
 
     for (size_t i = 0; i < items->len; ++i) {
-        phrase_token_t * token = &g_array_index(items, phrase_token_t, i);
+        phrase_token_t token = g_array_index(items, phrase_token_t, i);
         KMixtureModelArrayHeader array_header;
-        assert(bigram->get_array_header(*token, array_header));
-        char * phrase = taglib_token_to_string(phrase_index, *token);
+        assert(bigram->get_array_header(token, array_header));
+        char * phrase = taglib_token_to_string(phrase_index, token);
         if ( phrase )
-            fprintf(output, "\\item %s count %d freq %d\n",
-                    phrase, array_header.m_WC, array_header.m_freq);
+            fprintf(output, "\\item %d %s count %d freq %d\n",
+                    token, phrase, array_header.m_WC, array_header.m_freq);
 
         g_free(phrase);
     }
@@ -69,21 +69,22 @@ bool print_k_mixture_model_array_items(FILE * output,
     bigram->get_all_items(items);
 
     for (size_t i = 0; i < items->len; ++i) {
-        phrase_token_t * token = &g_array_index(items, phrase_token_t, i);
+        phrase_token_t token = g_array_index(items, phrase_token_t, i);
         KMixtureModelSingleGram * single_gram = NULL;
-        assert(bigram->load(*token, single_gram));
+        assert(bigram->load(token, single_gram));
         FlexibleBigramPhraseArray array = g_array_new
             (FALSE, FALSE, sizeof(KMixtureModelArrayItemWithToken));
         single_gram->retrieve_all(array);
 
         for (size_t m = 0; m < array->len; ++m){
             KMixtureModelArrayItemWithToken * item = &g_array_index(array, KMixtureModelArrayItemWithToken, m);
-            char * word1 = taglib_token_to_string(phrase_index, *token);
+            char * word1 = taglib_token_to_string(phrase_index, token);
             char * word2 = taglib_token_to_string(phrase_index, item->m_token);
 
             if (word1 && word2)
-                fprintf(output, "\\item %s %s count %d T %d N_n_0 %d n_1 %d Mr %d\n",
-                        word1, word2, item->m_item.m_WC, item->m_item.m_WC,
+                fprintf(output, "\\item %d %s %d %s count %d T %d N_n_0 %d n_1 %d Mr %d\n",
+                        token, word1, item->m_token, word2,
+                        item->m_item.m_WC, item->m_item.m_WC,
                         item->m_item.m_N_n_0, item->m_item.m_n_1,
                         item->m_item.m_Mr);
 
