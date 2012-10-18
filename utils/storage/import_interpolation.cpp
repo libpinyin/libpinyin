@@ -117,14 +117,17 @@ bool parse_unigram(FILE * input, PhraseLargeTable2 * phrase_table,
                    FacadePhraseIndex * phrase_index){
     taglib_push_state();
 
-    assert(taglib_add_tag(GRAM_1_ITEM_LINE, "\\item", 1, "count", ""));
+    assert(taglib_add_tag(GRAM_1_ITEM_LINE, "\\item", 2, "count", ""));
 
     do {
         assert(taglib_read(linebuf, line_type, values, required));
         switch (line_type) {
         case GRAM_1_ITEM_LINE:{
             /* handle \item in \1-gram */
-            TAGLIB_GET_VALUE(token, 0);
+            TAGLIB_GET_TOKEN(token, 0);
+            TAGLIB_GET_PHRASE_STRING(word, 1);
+            assert(taglib_validate_token_with_string
+                   (phrase_index, token, word));
 
             TAGLIB_GET_TAGVALUE(glong, count, atol);
             phrase_index->add_unigram_frequency(token, count);
@@ -149,7 +152,7 @@ bool parse_bigram(FILE * input, PhraseLargeTable2 * phrase_table,
                   Bigram * bigram){
     taglib_push_state();
 
-    assert(taglib_add_tag(GRAM_2_ITEM_LINE, "\\item", 2, "count", ""));
+    assert(taglib_add_tag(GRAM_2_ITEM_LINE, "\\item", 4, "count", ""));
 
     phrase_token_t last_token = 0; SingleGram * last_single_gram = NULL;
     do {
@@ -158,8 +161,15 @@ bool parse_bigram(FILE * input, PhraseLargeTable2 * phrase_table,
         case GRAM_2_ITEM_LINE:{
             /* handle \item in \2-gram */
             /* two tokens */
-            TAGLIB_GET_VALUE(token1, 0);
-            TAGLIB_GET_VALUE(token2, 1);
+            TAGLIB_GET_TOKEN(token1, 0);
+            TAGLIB_GET_PHRASE_STRING(word1, 1);
+            assert(taglib_validate_token_with_string
+                   (phrase_index, token1, word1));
+
+            TAGLIB_GET_TOKEN(token2, 2);
+            TAGLIB_GET_PHRASE_STRING(word2, 3);
+            assert(taglib_validate_token_with_string
+                   (phrase_index, token2, word2));
 
             TAGLIB_GET_TAGVALUE(glong, count, atol);
 
