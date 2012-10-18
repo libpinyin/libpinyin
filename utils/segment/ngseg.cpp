@@ -55,7 +55,7 @@ bool deal_with_segmentable(PhraseLookup * phrase_lookup,
     phrase_lookup->get_best_match(current_ucs4->len,
                                   (ucs4_t *) current_ucs4->data, results);
 
-    phrase_lookup->convert_to_utf8(results, "\n", result_string);
+    phrase_lookup->convert_to_utf8(results, result_string);
 
     if (result_string) {
         printf("%s\n", result_string);
@@ -77,7 +77,7 @@ bool deal_with_unknown(GArray * current_ucs4){
     char * result_string = g_ucs4_to_utf8
         ( (ucs4_t *) current_ucs4->data, current_ucs4->len,
           NULL, NULL, NULL);
-    printf("%s\n", result_string);
+    printf("%d %s\n", null_token, result_string);
     g_free(result_string);
     return true;
 }

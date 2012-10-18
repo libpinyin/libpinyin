@@ -119,7 +119,6 @@ public:
     /**
      * PhraseLookup::convert_to_utf8:
      * @results: the guessed sentence in the form of phrase tokens.
-     * @delimiter: the delimiter between the phrases.
      * @result_string: the converted sentence in utf8 string.
      * @returns: whether the convert operation is successful.
      *
@@ -129,11 +128,10 @@ public:
      *
      */
     bool convert_to_utf8(MatchResults results,
-                         /* in */ const char * delimiter,
                          /* out */ char * & result_string)
     {
         return pinyin::convert_to_utf8(m_phrase_index, results,
-                                       delimiter, result_string);
+                                       "\n", true, result_string);
     }
 };
 

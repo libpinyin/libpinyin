@@ -43,7 +43,7 @@ bool try_phrase_lookup(PhraseLookup * phrase_lookup,
     }
     printf("\n");
 #endif
-    phrase_lookup->convert_to_utf8(results, "\n", result_string);
+    phrase_lookup->convert_to_utf8(results, result_string);
     if (result_string)
         printf("%s\n", result_string);
     else

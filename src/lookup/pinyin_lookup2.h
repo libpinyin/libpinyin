@@ -191,7 +191,7 @@ public:
                          /* out */ char * & result_string)
     {
         return pinyin::convert_to_utf8(m_phrase_index, results,
-                                       NULL, result_string);
+                                       NULL, false, result_string);
     }
 
 

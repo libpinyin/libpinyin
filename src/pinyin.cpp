@@ -681,7 +681,7 @@ bool pinyin_get_sentence(pinyin_instance_t * instance,
 
     bool retval = pinyin::convert_to_utf8
         (context->m_phrase_index, instance->m_match_results,
-         NULL, *sentence);
+         NULL, false, *sentence);
 
     return retval;
 }
