@@ -400,4 +400,17 @@ char * taglib_token_to_string(FacadePhraseIndex * phrase_index,
     return phrase;
 }
 
+bool taglib_validate_token_with_string(FacadePhraseIndex * phrase_index,
+                                       phrase_token_t token,
+                                       const char * string){
+    bool result = false;
+
+    char * str = taglib_token_to_string(phrase_index, token);
+    result = (0 == strcmp(str, string));
+    g_free(str);
+
+    return result;
+}
+
+
 };

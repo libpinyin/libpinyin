@@ -141,9 +141,22 @@ phrase_token_t taglib_string_to_token(PhraseLargeTable2 * phrase_table,
 char * taglib_token_to_string(FacadePhraseIndex * phrase_index,
                               phrase_token_t token);
 
-/* Note: the following function is only available when the optional tag exists.
- * bool taglib_report_status(int line_type);
+/**
+ * taglib_validate_token_with_string:
+ * @phrase_index: the phrase index.
+ * @token: the phrase token.
+ * @string: the phrase string.
+ * @returns: whether the token is validated with the phrase string.
+ *
+ * Validate the token with the phrase string.
+ *
  */
+bool taglib_validate_token_with_string(FacadePhraseIndex * phrase_index,
+                                       phrase_token_t token,
+                                       const char * string);
+
+/* Note: the following function is only available when the optional tag exists.
+   bool taglib_report_status(int line_type); */
 
 /* Note: taglib_write is omited, as printf is more suitable for this. */
 
