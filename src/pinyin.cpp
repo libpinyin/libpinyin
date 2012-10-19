@@ -1623,8 +1623,8 @@ bool pinyin_clear_constraints(pinyin_instance_t * instance){
     return retval;
 }
 
-bool pinyin_lookup_token(pinyin_instance_t * instance,
-                         const char * phrase, phrase_token_t * token){
+bool pinyin_lookup_tokens(pinyin_instance_t * instance,
+                          const char * phrase, GArray * tokenarray){
     pinyin_context_t * & context = instance->m_context;
     FacadePhraseIndex * & phrase_index = context->m_phrase_index;
 
@@ -1635,7 +1635,7 @@ bool pinyin_lookup_token(pinyin_instance_t * instance,
     memset(tokens, 0, sizeof(PhraseTokens));
     phrase_index->prepare_tokens(tokens);
     int retval = context->m_phrase_table->search(ucs4_len, ucs4_phrase, tokens);
-    int num = get_first_token(tokens, *token);
+    int num = reduce_tokens(tokens, tokenarray);
     phrase_index->destroy_tokens(tokens);
 
     return SEARCH_OK & retval;

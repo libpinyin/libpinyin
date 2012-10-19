@@ -438,17 +438,17 @@ bool pinyin_clear_constraint(pinyin_instance_t * instance,
 bool pinyin_clear_constraints(pinyin_instance_t * instance);
 
 /**
- * pinyin_lookup_token:
+ * pinyin_lookup_tokens:
  * @instance: the pinyin instance.
  * @phrase: the phrase to be looked up.
- * @token: the returned phrase token.
+ * @tokenarray: the returned GArray of tokens.
  * @returns: whether the lookup operation is successful.
  *
- * Lookup the token for the phrase utf8 string.
+ * Lookup the tokens for the phrase utf8 string.
  *
  */
-bool pinyin_lookup_token(pinyin_instance_t * instance,
-                         const char * phrase, phrase_token_t * token);
+bool pinyin_lookup_tokens(pinyin_instance_t * instance,
+                          const char * phrase, GArray * tokenarray);
 
 /**
  * pinyin_translate_token:
