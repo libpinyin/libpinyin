@@ -108,6 +108,30 @@ public:
     }
 };
 
+
+static inline int reduce_tokens(PhraseTokens tokens,
+                                GArray * tokenarray) {
+    int num = 0;
+
+    for (size_t i = 0; i < PHRASE_INDEX_LIBRARY_COUNT; ++i) {
+        GArray * array = tokens[i];
+        if (NULL == array)
+            continue;
+
+        num += array->len;
+
+        for (size_t j = 0; j < array->len; ++j) {
+            phrase_token_t token = g_array_index(array, phrase_token_t, j);
+            g_array_append_val(tokenarray, token);
+        }
+    }
+
+    /* the following line will be removed in future after code are verified. */
+    assert(0 == num || 1 == num);
+
+    return num;
+}
+
 /* for compatibility. */
 static inline int get_first_token(PhraseTokens tokens,
                                   /* out */ phrase_token_t & token){
