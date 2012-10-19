@@ -50,9 +50,13 @@
 
 #define TAGLIB_PARSE_SEGMENTED_LINE(phrase_index, var, line)            \
     phrase_token_t var = null_token;                                    \
-    {                                                                   \
+    do {                                                                \
+        if (0 == strlen(line))                                          \
+            break;                                                      \
+                                                                        \
         gchar ** strs = g_strsplit_set(line, " \t", 2);                 \
-        assert(2 == g_strv_length(strs));                               \
+        if (2 != g_strv_length(strs))                                   \
+            assert(false);                                              \
                                                                         \
         phrase_token_t token = atoi(strs[0]);                           \
         const char * phrase = strs[1];                                  \
@@ -63,7 +67,7 @@
         var = token;                                                    \
                                                                         \
         g_strfreev(strs);                                               \
-    }
+    } while(false);
 
 
 static bool load_phrase_index(FacadePhraseIndex * phrase_index) {

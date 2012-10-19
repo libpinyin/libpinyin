@@ -196,7 +196,7 @@ int main(int argc, char * argv[]){
         for ( glong i = 0; i < strings->len; ++i ) {
             SegmentStep * step = &g_array_index(strings, SegmentStep, i);
             char * string = g_ucs4_to_utf8( step->m_phrase, step->m_phrase_len, NULL, NULL, NULL);
-            printf("%s\n", string);
+            printf("%d %s\n", step->m_handle, string);
             g_free(string);
         }
 
