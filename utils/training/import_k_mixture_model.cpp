@@ -283,10 +283,6 @@ int main(int argc, char * argv[]){
     KMixtureModelBigram bigram(K_MIXTURE_MODEL_MAGIC_NUMBER);
     bigram.attach(k_mixture_model_filename, ATTACH_READWRITE|ATTACH_CREATE);
 
-    PhraseTokens tokens;
-    memset(tokens, 0, sizeof(PhraseTokens));
-    phrase_index.prepare_tokens(tokens);
-
     taglib_init();
 
     /* prepare to read n-gram model */
@@ -307,8 +303,6 @@ int main(int argc, char * argv[]){
         parse_body(input, &phrase_table, &phrase_index, &bigram);
 
     taglib_fini();
-
-    phrase_index.destroy_tokens(tokens);
 
     return 0;
 }

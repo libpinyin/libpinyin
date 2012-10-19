@@ -51,12 +51,8 @@ bool read_document(PhraseLargeTable2 * phrase_table,
                    FILE * document,
                    HashofDocument hash_of_document,
                    HashofUnigram hash_of_unigram){
-    PhraseTokens tokens;
-    memset(tokens, 0, sizeof(PhraseTokens));
-    phrase_index->prepare_tokens(tokens);
 
-    char * linebuf = NULL;
-    size_t size = 0;
+    char * linebuf = NULL;size_t size = 0;
     phrase_token_t last_token, cur_token = last_token = 0;
 
     while ( getline(&linebuf, &size, document) ){
@@ -67,7 +63,7 @@ bool read_document(PhraseLargeTable2 * phrase_table,
             linebuf[strlen(linebuf) - 1] = '\0';
         }
 
-        TAGLIB_PARSE_SEGMENTED_LINE(&phrase_index, token, linebuf);
+        TAGLIB_PARSE_SEGMENTED_LINE(phrase_index, token, linebuf);
 
         last_token = cur_token;
         cur_token = token;
@@ -127,8 +123,6 @@ bool read_document(PhraseLargeTable2 * phrase_table,
     }
 
     free(linebuf);
-
-    phrase_index->destroy_tokens(tokens);
 
     return true;
 }

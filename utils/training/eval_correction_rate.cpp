@@ -147,10 +147,6 @@ int main(int argc, char * argv[]){
         exit(ENOENT);
     }
 
-    PhraseTokens phrase_tokens;
-    memset(phrase_tokens, 0, sizeof(PhraseTokens));
-    phrase_index.prepare_tokens(phrase_tokens);
-
     /* Evaluates the correction rate of test text documents. */
     size_t tested_count = 0; size_t passed_count = 0;
     char* linebuf = NULL; size_t size = 0;
@@ -195,8 +191,6 @@ int main(int argc, char * argv[]){
     g_array_free(tokens, TRUE);
     fclose(evals_file);
     free(linebuf);
-
-    phrase_index.destroy_tokens(phrase_tokens);
 
     return 0;
 }

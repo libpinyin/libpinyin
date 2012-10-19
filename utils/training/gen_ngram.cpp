@@ -70,12 +70,7 @@ int main(int argc, char * argv[]){
     Bigram bigram;
     bigram.attach(bigram_filename, ATTACH_CREATE|ATTACH_READWRITE);
 
-    PhraseTokens tokens;
-    memset(tokens, 0, sizeof(PhraseTokens));
-    phrase_index.prepare_tokens(tokens);
-    
-    char* linebuf = NULL;
-    size_t size = 0;
+    char* linebuf = NULL; size_t size = 0;
     phrase_token_t last_token, cur_token = last_token = 0;
     while( getline(&linebuf, &size, stdin) ){
 	if ( feof(stdin) )
@@ -125,7 +120,6 @@ int main(int argc, char * argv[]){
         delete single_gram;
     }
 
-    phrase_index.destroy_tokens(tokens);
     free(linebuf);
     
     if (!save_phrase_index(&phrase_index))
