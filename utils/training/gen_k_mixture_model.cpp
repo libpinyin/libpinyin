@@ -62,25 +62,12 @@ bool read_document(PhraseLargeTable2 * phrase_table,
     while ( getline(&linebuf, &size, document) ){
         if ( feof(document) )
             break;
-        /* Note: check '\n' here? */
-        linebuf[strlen(linebuf) - 1] = '\0';
 
-        glong phrase_len = 0;
-        ucs4_t * phrase = g_utf8_to_ucs4(linebuf, -1, NULL, &phrase_len, NULL);
-
-        phrase_token_t token = null_token;
-        if ( 0 != phrase_len ) {
-            phrase_index->clear_tokens(tokens);
-            int search_result = phrase_table->search
-                (phrase_len, phrase, tokens);
-            int num = get_first_token(tokens, token);
-
-            if ( !(search_result & SEARCH_OK) )
-                token = null_token;
-
-            g_free(phrase);
-            phrase = NULL;
+        if ( '\n' == linebuf[strlen(linebuf) - 1] ) {
+            linebuf[strlen(linebuf) - 1] = '\0';
         }
+
+        TAGLIB_PARSE_SEGMENTED_LINE(&phrase_index, token, linebuf);
 
         last_token = cur_token;
         cur_token = token;
