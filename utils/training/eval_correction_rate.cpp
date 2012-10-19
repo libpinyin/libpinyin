@@ -160,23 +160,12 @@ int main(int argc, char * argv[]){
     while( getline(&linebuf, &size, evals_file) ) {
         if ( feof(evals_file) )
             break;
-        if ( '\n' == linebuf[strlen(linebuf)-1] )
-            linebuf[strlen(linebuf)-1] = '\0';
 
-        glong phrase_len = 0;
-        ucs4_t * phrase = g_utf8_to_ucs4(linebuf, -1, NULL, &phrase_len, NULL);
-
-        token = null_token;
-        if ( 0 != phrase_len ) {
-            int result = phrase_table.search(phrase_len, phrase, phrase_tokens);
-            int num = get_first_token(phrase_tokens, token);
-
-            if ( !(result & SEARCH_OK) )
-                token = null_token;
-
-            g_free(phrase);
-            phrase = NULL;
+        if ( '\n' == linebuf[strlen(linebuf) - 1] ) {
+            linebuf[strlen(linebuf) - 1] = '\0';
         }
+
+        TAGLIB_PARSE_SEGMENTED_LINE(&phrase_index, token, linebuf);
 
         if ( null_token == token ) {
             if ( tokens->len ) { /* one test. */
