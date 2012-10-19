@@ -26,7 +26,6 @@
 /* increase all unigram frequency by a constant. */
 
 int main(int argc, char * argv[]){
-    MemoryChunk * chunk = NULL;
 
     FacadePhraseIndex phrase_index;
     if (!load_phrase_index(&phrase_index))
@@ -40,8 +39,6 @@ int main(int argc, char * argv[]){
 
         if (SYSTEM_FILE != table_info->m_file_type)
             continue;
-
-        const char * binfile = table_info->m_system_filename;
 
         guint32 freq = 1; PhraseIndexRange range;
         int result = phrase_index.get_range(i, range);
