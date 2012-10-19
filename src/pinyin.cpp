@@ -296,7 +296,6 @@ bool pinyin_iterator_add_phrase(import_iterator_t * iter,
     /* check whether the phrase exists in phrase table */
     glong len_phrase = 0;
     ucs4_t * ucs4_phrase = g_utf8_to_ucs4(phrase, -1, NULL, &len_phrase, NULL);
-    phrase_token_t token = null_token;
 
     bool result = false;
 
@@ -307,16 +306,63 @@ bool pinyin_iterator_add_phrase(import_iterator_t * iter,
     ChewingKeyRestVector key_rests =
         g_array_new(FALSE, FALSE, sizeof(ChewingKeyRest));
 
+    phrase_token_t token = null_token;
+    GArray * tokenarray = g_array_new(FALSE, FALSE, sizeof(phrase_token_t));
+
+    /* do phrase table search. */
     PhraseTokens tokens;
     memset(tokens, 0, sizeof(PhraseTokens));
     phrase_index->prepare_tokens(tokens);
     int retval = phrase_table->search(len_phrase, ucs4_phrase, tokens);
-    int num = get_first_token(tokens, token);
+    int num = reduce_tokens(tokens, tokenarray);
     phrase_index->destroy_tokens(tokens);
 
+    /* find the best token candidate. */
+    for (size_t i = 0; i < tokenarray->len; ++i) {
+        phrase_token_t candidate = g_array_index(tokenarray, phrase_token_t, i);
+        if (null_token == token) {
+            token = candidate;
+            continue;
+        }
+
+        if (PHRASE_INDEX_LIBRARY_INDEX(candidate) == iter->m_phrase_index) {
+            /* only one phrase string per sub phrase index. */
+            assert(PHRASE_INDEX_LIBRARY_INDEX(token) != iter->m_phrase_index);
+            token = candidate;
+            continue;
+        }
+    }
+    g_array_free(tokenarray, TRUE);
+
     PhraseItem item;
-    if (!(retval & SEARCH_OK)) {
-        /* if not exists, get the maximum token,
+    /* check whether it exists in the same sub phrase; */
+    if (null_token != token &&
+        PHRASE_INDEX_LIBRARY_INDEX(token) == iter->m_phrase_index) {
+        /* if so, remove the phrase, add the pinyin for the phrase item,
+           then add it back;*/
+        phrase_index->get_phrase_item(token, item);
+        assert(len_phrase == item.get_phrase_length());
+        ucs4_t tmp_phrase[MAX_PHRASE_LENGTH];
+        item.get_phrase_string(tmp_phrase);
+        assert(0 == memcmp
+               (ucs4_phrase, tmp_phrase, sizeof(ucs4_t) * len_phrase));
+
+        /* parse the pinyin. */
+        parser.parse(options, keys, key_rests, pinyin, strlen(pinyin));
+
+        PhraseItem * removed_item = NULL;
+        retval = phrase_index->remove_phrase_item(token, removed_item);
+        if (ERROR_OK == retval) {
+            /* maybe check whether there are duplicated pronunciations here. */
+            removed_item->append_pronunciation((ChewingKey *)keys->data,
+                                               count);
+            phrase_index->add_phrase_item(token, removed_item);
+            delete removed_item;
+            result = true;
+        }
+    } else {
+        /* if not exists in the sub phrase index,
+           get the maximum token,
            then add it directly with maximum token + 1; */
         PhraseIndexRange range;
         retval = phrase_index->get_range(iter->m_phrase_index, range);
@@ -341,32 +387,6 @@ bool pinyin_iterator_add_phrase(import_iterator_t * iter,
                                                     count * unigram_factor);
                 result = true;
             }
-        }
-    } else {
-        /* if exists, check whether in the same sub phrase; */
-        if (PHRASE_INDEX_LIBRARY_INDEX(token) == iter->m_phrase_index) {
-            /* if so, remove the phrase, add the pinyin for the phrase item,
-               then add it back;*/
-            phrase_index->get_phrase_item(token, item);
-            assert(len_phrase == item.get_phrase_length());
-            ucs4_t tmp_phrase[MAX_PHRASE_LENGTH];
-            item.get_phrase_string(tmp_phrase);
-            assert(0 == memcmp
-                   (ucs4_phrase, tmp_phrase, sizeof(ucs4_t) * len_phrase));
-
-            /* parse the pinyin. */
-            parser.parse(options, keys, key_rests, pinyin, strlen(pinyin));
-
-            PhraseItem * removed_item = NULL;
-            retval = phrase_index->remove_phrase_item(token, removed_item);
-            if (ERROR_OK == retval) {
-                removed_item->append_pronunciation((ChewingKey *)keys->data,
-                                                   count);
-                phrase_index->add_phrase_item(token, removed_item);
-                delete removed_item;
-            }
-        } else {
-            /* if not, return false; */
         }
     }
 
