@@ -16,7 +16,7 @@
 ## Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 
-textual_model_data	= interpolation.text \
+textual_model_data	= interpolation2.text \
 				gb_char.table gbk_char.table
 
 binary_model_data	= gb_char.bin gbk_char.bin \
@@ -34,17 +34,17 @@ libpinyin_dbdir		= $(pkgdatadir)/data
 
 CLEANFILES		= $(binary_model_data)
 
-interpolation.text:
-	wget https://github.com/downloads/libpinyin/libpinyin/model.text.tar.gz
-	tar xvf model.text.tar.gz -C $(top_srcdir)/data
+interpolation2.text:
+	wget https://github.com/downloads/libpinyin/libpinyin/model2.text.tar.gz
+	tar xvf model2.text.tar.gz -C $(top_srcdir)/data
 
 
-gb_char.table gbk_char.table: interpolation.text
+gb_char.table gbk_char.table: interpolation2.text
 
 bigram.db: $(textual_model_data)
 	$(RM) $(binary_model_data)
 	../utils/storage/gen_binary_files --table-dir $(top_srcdir)/data
-	../utils/storage/import_interpolation < $(top_srcdir)/data/interpolation.text
+	../utils/storage/import_interpolation < $(top_srcdir)/data/interpolation2.text
 	../utils/training/gen_unigram
 
 gb_char.bin gbk_char.bin phrase_index.bin pinyin_index.bin: bigram.db
