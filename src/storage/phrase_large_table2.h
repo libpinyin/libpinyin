@@ -121,10 +121,7 @@ static inline int reduce_tokens(PhraseTokens tokens,
 
         num += array->len;
 
-        for (size_t j = 0; j < array->len; ++j) {
-            phrase_token_t token = g_array_index(array, phrase_token_t, j);
-            g_array_append_val(tokenarray, token);
-        }
+        g_array_append_vals(tokenarray, array->data, array->len);
     }
 
     /* the following line will be removed in future after code are verified. */
