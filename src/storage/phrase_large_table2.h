@@ -112,6 +112,7 @@ public:
 static inline int reduce_tokens(PhraseTokens tokens,
                                 GArray * tokenarray) {
     int num = 0;
+    g_array_set_size(tokenarray, 0);
 
     for (size_t i = 0; i < PHRASE_INDEX_LIBRARY_COUNT; ++i) {
         GArray * array = tokens[i];

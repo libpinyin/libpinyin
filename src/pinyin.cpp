@@ -625,6 +625,7 @@ bool pinyin_guess_sentence_with_prefix(pinyin_instance_t * instance,
 
     glong len_str = 0;
     ucs4_t * ucs4_str = g_utf8_to_ucs4(prefix, -1, NULL, &len_str, NULL);
+    GArray * tokenarray = g_array_new(FALSE, FALSE, sizeof(phrase_token_t));
 
     if (ucs4_str && len_str) {
         /* add prefixes. */
@@ -639,12 +640,15 @@ bool pinyin_guess_sentence_with_prefix(pinyin_instance_t * instance,
             memset(tokens, 0, sizeof(tokens));
             phrase_index->prepare_tokens(tokens);
             int result = context->m_phrase_table->search(i, start, tokens);
-            int num = get_first_token(tokens, token);
+            int num = reduce_tokens(tokens, tokenarray);
             phrase_index->destroy_tokens(tokens);
+
             if (result & SEARCH_OK)
-                g_array_append_val(instance->m_prefixes, token);
+                g_array_append_vals(instance->m_prefixes,
+                                    tokenarray->data, tokenarray->len);
         }
     }
+    g_array_free(tokenarray, TRUE);
     g_free(ucs4_str);
 
     pinyin_update_constraints(instance);
