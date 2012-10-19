@@ -48,6 +48,23 @@
         var = conv((const char *)value);                                \
     }
 
+#define TAGLIB_PARSE_SEGMENTED_LINE(phrase_index, var, line)            \
+    phrase_token_t var = null_token;                                    \
+    {                                                                   \
+        gchar ** strs = g_strsplit_set(line, " \t", 2);                 \
+        assert(2 == g_strv_length(strs));                               \
+                                                                        \
+        phrase_token_t token = atoi(strs[0]);                           \
+        const char * phrase = strs[1];                                  \
+        if (null_token != token)                                        \
+            assert(taglib_validate_token_with_string                    \
+                   (phrase_index, token, phrase));                      \
+                                                                        \
+        var = token;                                                    \
+                                                                        \
+        g_strfreev(strs);                                               \
+    }
+
 
 static bool load_phrase_index(FacadePhraseIndex * phrase_index) {
     MemoryChunk * chunk = NULL;
