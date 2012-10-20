@@ -130,29 +130,6 @@ static inline int reduce_tokens(PhraseTokens tokens,
     return num;
 }
 
-/* for compatibility. */
-static inline int get_first_token(PhraseTokens tokens,
-                                  /* out */ phrase_token_t & token){
-    int num = 0; token = null_token;
-
-    for (size_t i = 0; i < PHRASE_INDEX_LIBRARY_COUNT; ++i) {
-        GArray * array = tokens[i];
-        if (NULL == array || 0 == array->len)
-            continue;
-
-        num += array->len;
-
-        if (null_token == token) {
-            token = g_array_index(array, phrase_token_t, 0);
-        }
-    }
-
-    /* the following line will be removed in future after code are verified. */
-    assert(0 == num || 1 == num);
-
-    return num;
-}
-
 };
 
 #endif

@@ -26,6 +26,21 @@
 #include "pinyin_internal.h"
 #include "utils_helper.h"
 
+/* for compatibility. */
+int get_first_token(PhraseTokens tokens,
+                    /* out */ phrase_token_t & token){
+    token = null_token;
+
+    GArray * tokenarray = g_array_new(FALSE, FALSE, sizeof(phrase_token_t));
+    int num = reduce_tokens(tokens, tokenarray);
+    if (num)
+        token = g_array_index(tokenarray, phrase_token_t, 0);
+    g_array_free(tokenarray, TRUE);
+
+    return num;
+}
+
+
 /* graph shortest path sentence segment. */
 
 /* Note:
