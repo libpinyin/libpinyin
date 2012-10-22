@@ -114,7 +114,7 @@ bool do_one_test(PinyinLookup2 * pinyin_lookup,
 }
 
 int main(int argc, char * argv[]){
-    const char * evals_text = "evals.text";
+    const char * evals_text = "evals2.text";
 
     pinyin_option_t options = USE_TONE;
     FacadeChewingTable largetable;
@@ -140,7 +140,7 @@ int main(int argc, char * argv[]){
     PinyinLookup2 pinyin_lookup(options, &largetable, &phrase_index,
                                &system_bigram, &user_bigram);
 
-    /* open evals.text. */
+    /* open evals text. */
     FILE * evals_file = fopen(evals_text, "r");
     if ( NULL == evals_file ) {
         fprintf(stderr, "Can't open file:%s\n", evals_text);
