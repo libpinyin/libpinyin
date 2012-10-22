@@ -58,13 +58,13 @@
         if (2 != g_strv_length(strs))                                   \
             assert(false);                                              \
                                                                         \
-        phrase_token_t token = atoi(strs[0]);                           \
+        phrase_token_t _token = atoi(strs[0]);                          \
         const char * phrase = strs[1];                                  \
-        if (null_token != token)                                        \
+        if (null_token != _token)                                       \
             assert(taglib_validate_token_with_string                    \
-                   (phrase_index, token, phrase));                      \
+                   (phrase_index, _token, phrase));                     \
                                                                         \
-        var = token;                                                    \
+        var = _token;                                                   \
                                                                         \
         g_strfreev(strs);                                               \
     } while(false);
