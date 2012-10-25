@@ -589,4 +589,154 @@ const pinyin_table_info_t pinyin_phrase_files[PHRASE_INDEX_LIBRARY_COUNT] =
 
         {NULL, NULL, "user.bin", USER_FILE}
     };
+
+
+static bool _peek_header(PhraseIndexLogger * logger,
+                         guint32 & old_total_freq){
+    old_total_freq = 0;
+
+    size_t header_count = 0;
+    LOG_TYPE log_type; phrase_token_t token;
+    MemoryChunk oldchunk, newchunk;
+
+    while (logger->has_next_record()) {
+        bool retval = logger->next_record
+            (log_type, token, &oldchunk, &newchunk);
+
+        if (!retval)
+            break;
+
+        if (LOG_MODIFY_HEADER != log_type)
+            continue;
+
+        ++header_count;
+
+        oldchunk.get_content(0, &old_total_freq, sizeof(guint32));
+    }
+
+    /* 1 for normal case, 0 for corrupted file. */
+    assert(1 >= header_count);
+
+    return  1 == header_count? true : false;
+}
+
+bool _compute_new_header(PhraseIndexLogger * logger,
+                         phrase_token_t mask,
+                         phrase_token_t value,
+                         guint32 & new_total_freq) {
+
+    LOG_TYPE log_type; phrase_token_t token;
+    MemoryChunk oldchunk, newchunk;
+    PhraseItem olditem, newitem;
+
+    while(logger->has_next_record()) {
+        bool retval = logger->next_record
+            (log_type, token, &oldchunk, &newchunk);
+
+        if (!retval)
+            break;
+
+        if (LOG_MODIFY_HEADER == log_type)
+            continue;
+
+        if ((token & mask) == value)
+            continue;
+
+        switch(log_type) {
+        case LOG_ADD_RECORD:{
+            assert( 0 == oldchunk.size() );
+            newitem.m_chunk.set_chunk(newchunk.begin(), newchunk.size(),
+                                      NULL);
+            new_total_freq += newitem.get_unigram_frequency();
+            break;
+        }
+        case LOG_REMOVE_RECORD:{
+            assert( 0 == newchunk.size() );
+            olditem.m_chunk.set_chunk(oldchunk.begin(), oldchunk.size(),
+                                      NULL);
+            new_total_freq -= olditem.get_unigram_frequency();
+            break;
+        }
+        case LOG_MODIFY_RECORD:{
+            olditem.m_chunk.set_chunk(oldchunk.begin(), oldchunk.size(),
+                                      NULL);
+            new_total_freq -= olditem.get_unigram_frequency();
+
+            newitem.m_chunk.set_chunk(newchunk.begin(), newchunk.size(),
+                                      NULL);
+            new_total_freq += newitem.get_unigram_frequency();
+            break;
+        }
+        default:
+            assert(false);
+        }
+    }
+
+    return true;
+}
+
+static bool _write_header(PhraseIndexLogger * logger,
+                          guint32 & old_total_freq,
+                          guint32 & new_total_freq) {
+    MemoryChunk oldheader, newheader;
+    oldheader.set_content(0, &old_total_freq, sizeof(guint32));
+    newheader.set_content(0, &new_total_freq, sizeof(guint32));
+    logger->append_record(LOG_MODIFY_HEADER, null_token,
+                          &oldheader, &newheader);
+    return true;
+}
+
+static bool _mask_out_records(PhraseIndexLogger * oldlogger,
+                              phrase_token_t mask,
+                              phrase_token_t value,
+                              PhraseIndexLogger * newlogger) {
+    LOG_TYPE log_type; phrase_token_t token;
+    MemoryChunk oldchunk, newchunk;
+
+    while(oldlogger->has_next_record()) {
+        bool retval = oldlogger->next_record
+            (log_type, token, &oldchunk, &newchunk);
+
+        if (!retval)
+            break;
+
+        if (LOG_MODIFY_HEADER == log_type)
+            continue;
+
+        if ((token & mask) == value)
+            continue;
+
+        newlogger->append_record(log_type, token, &oldchunk, &newchunk);
+    }
+
+    return true;
+}
+
+PhraseIndexLogger * mask_out_phrase_index_logger
+(PhraseIndexLogger * oldlogger, phrase_token_t mask,
+ phrase_token_t value) {
+    PhraseIndexLogger * newlogger = new PhraseIndexLogger;
+    guint32 old_total_freq = 0, new_total_freq = 0;
+
+    /* peek the header value. */
+    if (!_peek_header(oldlogger, old_total_freq))
+        return newlogger;
+
+    new_total_freq = old_total_freq;
+
+    /* compute the new header based on add/modify/remove records. */
+    oldlogger->rewind();
+    if (!_compute_new_header(oldlogger, mask, value, new_total_freq))
+        return newlogger;
+
+    /* write out the modify header record. */
+    _write_header(newlogger, old_total_freq, new_total_freq);
+
+    /* mask out the matched records. */
+    oldlogger->rewind();
+    _mask_out_records(oldlogger, mask, value, newlogger);
+
+    return newlogger;
+}
+
 };

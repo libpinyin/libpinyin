@@ -61,6 +61,11 @@ const size_t phrase_item_header = sizeof(guint8) + sizeof(guint8) + sizeof(guint
  */
 class PhraseItem{
     friend class SubPhraseIndex;
+    friend bool _compute_new_header(PhraseIndexLogger * logger,
+                                    phrase_token_t mask,
+                                    phrase_token_t value,
+                                    guint32 & new_total_freq);
+
 private:
     MemoryChunk m_chunk;
     bool set_n_pronunciation(guint8 n_prouns);
@@ -799,6 +804,10 @@ typedef struct {
 } pinyin_table_info_t;
 
 extern const pinyin_table_info_t pinyin_phrase_files[PHRASE_INDEX_LIBRARY_COUNT];
+
+PhraseIndexLogger * mask_out_phrase_index_logger
+(const PhraseIndexLogger * oldlogger, phrase_token_t mask,
+ phrase_token_t value);
  
 };
 
