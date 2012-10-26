@@ -533,6 +533,22 @@ public:
     bool merge(guint8 phrase_index, MemoryChunk * log);
 
     /**
+     * FacadePhraseIndex::merge_with_mask:
+     * @phrase_index: the index of sub phrase index to be merged.
+     * @log: the logger of difference in user home directory.
+     * @mask: the mask.
+     * @value: the value.
+     * @returns: whether the merge operation is successful.
+     *
+     * Merge the user logger of difference with mask operation.
+     *
+     * Note: the ownership of log is transfered here.
+     *
+     */
+    bool merge_with_mask(guint8 phrase_index, MemoryChunk * log,
+                         phrase_token_t mask, phrase_token_t value);
+
+    /**
      * FacadePhraseIndex::compact:
      * @returns: whether the compact operation is successful.
      *
@@ -806,8 +822,7 @@ typedef struct {
 extern const pinyin_table_info_t pinyin_phrase_files[PHRASE_INDEX_LIBRARY_COUNT];
 
 PhraseIndexLogger * mask_out_phrase_index_logger
-(const PhraseIndexLogger * oldlogger, phrase_token_t mask,
- phrase_token_t value);
+(PhraseIndexLogger * oldlogger, phrase_token_t mask, phrase_token_t value);
  
 };
 

@@ -251,6 +251,40 @@ bool FacadePhraseIndex::merge(guint8 phrase_index, MemoryChunk * log){
     return retval;
 }
 
+bool FacadePhraseIndex::merge_with_mask(guint8 phrase_index,
+                                        MemoryChunk * log,
+                                        phrase_token_t mask,
+                                        phrase_token_t value){
+    SubPhraseIndex * & sub_phrases = m_sub_phrase_indices[phrase_index];
+    if ( !sub_phrases )
+        return false;
+
+    /* check mask and value. */
+    phrase_token_t index_mask = PHRASE_INDEX_LIBRARY_INDEX(mask);
+    phrase_token_t index_value = PHRASE_INDEX_LIBRARY_INDEX(value);
+    if (!((index_mask & phrase_index) == index_value))
+        return false;
+
+    /* unload old sub phrase index */
+    m_total_freq -= sub_phrases->get_phrase_index_total_freq();
+
+    /* calculate the sub phrase index mask and value. */
+    mask &= PHRASE_MASK; value &= PHRASE_MASK;
+
+    /* prepare the new logger. */
+    PhraseIndexLogger oldlogger;
+    oldlogger.load(log);
+    PhraseIndexLogger * newlogger = mask_out_phrase_index_logger
+        (&oldlogger, mask, value);
+
+    bool retval = sub_phrases->merge(newlogger);
+    m_total_freq += sub_phrases->get_phrase_index_total_freq();
+    delete newlogger;
+
+    return retval;
+}
+
+
 bool SubPhraseIndex::load(MemoryChunk * chunk, 
 			  table_offset_t offset, table_offset_t end){
     //save the memory chunk
