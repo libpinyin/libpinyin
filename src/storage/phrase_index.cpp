@@ -262,7 +262,7 @@ bool FacadePhraseIndex::merge_with_mask(guint8 phrase_index,
     /* check mask and value. */
     phrase_token_t index_mask = PHRASE_INDEX_LIBRARY_INDEX(mask);
     phrase_token_t index_value = PHRASE_INDEX_LIBRARY_INDEX(value);
-    if (!((index_mask & phrase_index) == index_value))
+    if ((phrase_index & index_mask) != index_value)
         return false;
 
     /* unload old sub phrase index */
@@ -604,6 +604,49 @@ bool FacadePhraseIndex::compact(){
         m_sub_phrase_indices[index] = new_sub_phrase;
     }
     return true;
+}
+
+bool SubPhraseIndex::mask_out(phrase_token_t mask, phrase_token_t value){
+    PhraseIndexRange range;
+    if (ERROR_OK != get_range(range))
+        return false;
+
+    /* calculate mask and value for sub phrase index. */
+    mask &= PHRASE_MASK; value &= PHRASE_MASK;
+
+    for (phrase_token_t token = range.m_range_begin;
+         token < range.m_range_end; ++token) {
+        if ((token & mask) != value)
+            continue;
+
+        PhraseItem * item = NULL;
+        remove_phrase_item(token, item);
+        if (item)
+            delete item;
+    }
+
+    return true;
+}
+
+bool FacadePhraseIndex::mask_out(guint8 phrase_index,
+                                 phrase_token_t mask,
+                                 phrase_token_t value){
+    SubPhraseIndex * & sub_phrases = m_sub_phrase_indices[phrase_index];
+    if (!sub_phrases)
+        return false;
+
+    /* check mask and value. */
+    phrase_token_t index_mask = PHRASE_INDEX_LIBRARY_INDEX(mask);
+    phrase_token_t index_value = PHRASE_INDEX_LIBRARY_INDEX(value);
+
+    if ((phrase_index & index_mask ) != index_value)
+        return false;
+
+    m_total_freq -= sub_phrases->get_phrase_index_total_freq();
+    bool retval = sub_phrases->mask_out(mask, value);
+    m_total_freq += sub_phrases->get_phrase_index_total_freq();
+
+    return retval;
 }
 
 namespace pinyin{
