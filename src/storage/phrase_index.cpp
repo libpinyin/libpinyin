@@ -530,8 +530,15 @@ int SubPhraseIndex::get_range(/* out */ PhraseIndexRange & range){
     const table_offset_t * begin = (const table_offset_t *)m_phrase_index.begin();
     const table_offset_t * end = (const table_offset_t *)m_phrase_index.end();
 
+    /* remove trailing zeros. */
+    const table_offset_t * poffset = 0;
+    for (poffset = end - 1; poffset >= begin + 1; --poffset) {
+        if (0 !=  *poffset)
+            break;
+    }
+
     range.m_range_begin = 1; /* token starts with 1 in gen_pinyin_table. */
-    range.m_range_end = end - begin;
+    range.m_range_end = poffset + 1 - begin; /* removed zeros. */
 
     return ERROR_OK;
 }
@@ -542,13 +549,12 @@ bool FacadePhraseIndex::compact(){
         if ( !sub_phrase )
             continue;
 
-        SubPhraseIndex * new_sub_phrase =  new SubPhraseIndex;
         PhraseIndexRange range;
         int result = sub_phrase->get_range(range);
-        if ( result != ERROR_OK ) {
-            delete new_sub_phrase;
+        if ( result != ERROR_OK )
             continue;
-        }
+
+        SubPhraseIndex * new_sub_phrase =  new SubPhraseIndex;
 
         PhraseItem item;
         for ( phrase_token_t token = range.m_range_begin;
