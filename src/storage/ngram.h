@@ -150,6 +150,10 @@ public:
      *
      */
     bool set_total_freq(guint32 total);
+
+    guint32 get_length();
+
+    guint32 mask_out(phrase_token_t mask, phrase_token_t value);
     
     /**
      * SingleGram::prune:

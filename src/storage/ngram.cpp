@@ -55,6 +55,53 @@ bool SingleGram::set_total_freq(guint32 total){
     return true;
 }
 
+guint32 SingleGram::get_length(){
+    /* get the number of items. */
+    const SingleGramItem * begin = (const SingleGramItem *)
+        ((const char *)(m_chunk.begin()) + sizeof(guint32));
+    const SingleGramItem * end = (const SingleGramItem *) m_chunk.end();
+
+    const guint32 length = end - begin;
+
+    if (0 == length) {
+        /* no items here, total freq should be zero. */
+        guint32 total_freq = 0;
+        assert(get_total_freq(total_freq));
+        assert(0 == total_freq);
+    }
+
+    return length;
+}
+
+guint32 SingleGram::mask_out(phrase_token_t mask, phrase_token_t value){
+    guint32 removed_items = 0;
+
+    guint32 total_freq = 0;
+    assert(get_total_freq(total_freq));
+
+    const SingleGramItem * begin = (const SingleGramItem *)
+        ((const char *)(m_chunk.begin()) + sizeof(guint32));
+    const SingleGramItem * end = (const SingleGramItem *) m_chunk.end();
+
+    for (const SingleGramItem * cur = begin; cur != end; ++cur) {
+        if ((mask & cur->m_token) != value)
+            continue;
+
+        total_freq -= cur->m_freq;
+        size_t offset = sizeof(guint32) +
+            sizeof(SingleGramItem) * (cur - begin);
+        m_chunk.remove_content(offset, sizeof(SingleGramItem));
+
+        /* update chunk end. */
+        end = (const SingleGramItem *) m_chunk.end();
+        ++removed_items;
+        --cur;
+    }
+
+    assert(set_total_freq(total_freq));
+    return removed_items;
+}
+
 bool SingleGram::prune(){
     assert(false);
 #if 0
