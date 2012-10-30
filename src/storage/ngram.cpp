@@ -84,7 +84,7 @@ guint32 SingleGram::mask_out(phrase_token_t mask, phrase_token_t value){
     const SingleGramItem * end = (const SingleGramItem *) m_chunk.end();
 
     for (const SingleGramItem * cur = begin; cur != end; ++cur) {
-        if ((mask & cur->m_token) != value)
+        if ((cur->m_token & mask) != value)
             continue;
 
         total_freq -= cur->m_freq;
@@ -421,6 +421,19 @@ bool Bigram::store(phrase_token_t index, SingleGram * single_gram){
     return ret == 0;
 }
 
+bool Bigram::remove(/* in */ phrase_token_t index){
+    if ( !m_db )
+        return false;
+
+    DBT db_key;
+    memset(&db_key, 0, sizeof(DBT));
+    db_key.data = &index;
+    db_key.size = sizeof(phrase_token_t);
+
+    int ret = m_db->del(m_db, NULL, &db_key, 0);
+    return 0 == ret;
+}
+
 bool Bigram::get_all_items(GArray * items){
     g_array_set_size(items, 0);
 
@@ -450,6 +463,44 @@ bool Bigram::get_all_items(GArray * items){
     if (cursorp != NULL) 
         cursorp->c_close(cursorp); 
 
+    return true;
+}
+
+bool Bigram::mask_out(phrase_token_t mask, phrase_token_t value){
+    GArray * items = g_array_new(FALSE, FALSE, sizeof(phrase_token_t));
+
+    if (!get_all_items(items)) {
+        g_array_free(items, TRUE);
+        return false;
+    }
+
+    for (size_t i = 0; i < items->len; ++i) {
+        phrase_token_t index = g_array_index(items, phrase_token_t, i);
+
+        if ((index & mask) == value) {
+            assert(remove(index));
+            continue;
+        }
+
+        SingleGram * gram = NULL;
+        assert(load(index, gram));
+
+        int num = gram->mask_out(mask, value);
+        if (0 == num) {
+            delete gram;
+            continue;
+        }
+
+        if (0 == gram->get_length()) {
+            assert(remove(index));
+        } else {
+            assert(store(index, gram));
+        }
+
+        delete gram;
+    }
+
+    g_array_free(items, TRUE);
     return true;
 }
 

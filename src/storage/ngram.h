@@ -260,6 +260,8 @@ public:
     bool store(/* in */ phrase_token_t index,
                /* in */ SingleGram * single_gram);
 
+    bool remove(/* in */ phrase_token_t index);
+
     /**
      * Bigram::get_all_items:
      * @items: the GArray to store all previous tokens.
@@ -269,6 +271,8 @@ public:
      *
      */
     bool get_all_items(/* out */ GArray * items);
+
+    bool mask_out(phrase_token_t mask, phrase_token_t value);
 };
 
 /**
