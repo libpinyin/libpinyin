@@ -151,8 +151,24 @@ public:
      */
     bool set_total_freq(guint32 total);
 
+    /**
+     * SingleGram::get_length:
+     * @returns: the number of items in this single gram.
+     *
+     * Get the number of items in this single gram.
+     *
+     */
     guint32 get_length();
 
+    /**
+     * SingleGram::mask_out:
+     * @mask: the mask.
+     * @value: the value.
+     * @returns: the number of removed items.
+     *
+     * Mask out the matched items in this single gram.
+     *
+     */
     guint32 mask_out(phrase_token_t mask, phrase_token_t value);
     
     /**
@@ -242,7 +258,7 @@ public:
      * @single_gram: the single gram of the previous token.
      * @returns: whether the load operation is successful.
      *
-     * Load the single gram of the previous token into the SingleGram class.
+     * Load the single gram of the previous token.
      *
      */
     bool load(/* in */ phrase_token_t index,
@@ -254,12 +270,20 @@ public:
      * @single_gram: the single gram of the previous token.
      * @returns: whether the store operation is successful.
      *
-     * Store the single gram of the previous token from the SingleGram class.
+     * Store the single gram of the previous token.
      *
      */
     bool store(/* in */ phrase_token_t index,
                /* in */ SingleGram * single_gram);
 
+    /**
+     * Bigram::remove:
+     * @index: the previous token in the bi-gram.
+     * @returns: whether the remove operation is successful.
+     *
+     * Remove the single gram of the previous token.
+     *
+     */
     bool remove(/* in */ phrase_token_t index);
 
     /**
@@ -272,6 +296,15 @@ public:
      */
     bool get_all_items(/* out */ GArray * items);
 
+    /**
+     * Bigram::mask_out:
+     * @mask: the mask.
+     * @value: the value.
+     * @returns: whether the mask out operation is successful.
+     *
+     * Mask out the matched items.
+     *
+     */
     bool mask_out(phrase_token_t mask, phrase_token_t value);
 };
 
