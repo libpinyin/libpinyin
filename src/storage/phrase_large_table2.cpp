@@ -678,7 +678,6 @@ int PhraseLengthIndexLevel2::get_length() const {
     return length;
 }
 
-
 template<size_t phrase_length>
 int PhraseArrayIndexLevel2<phrase_length>::get_length() const {
     IndexItem * chunk_begin = NULL, * chunk_end = NULL;
