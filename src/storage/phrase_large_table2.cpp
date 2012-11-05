@@ -48,6 +48,9 @@ public:
                   /* in */ phrase_token_t token);
     int remove_index(int phrase_length, /* in */ ucs4_t phrase[],
                      /* in */ phrase_token_t token);
+
+    /* get length method */
+    int get_length() const;
 };
 
 
@@ -80,6 +83,9 @@ public:
     /* add_index/remove_index method */
     int add_index(/* in */ ucs4_t phrase[], /* in */ phrase_token_t token);
     int remove_index(/* in */ ucs4_t phrase[], /* in */ phrase_token_t token);
+
+    /* get length method */
+    int get_length() const;
 };
 
 };
@@ -651,4 +657,33 @@ store(MemoryChunk * new_chunk, table_offset_t offset, table_offset_t & end) {
     new_chunk->set_content(offset, m_chunk.begin(), m_chunk.size());
     end = offset + m_chunk.size();
     return true;
+}
+
+
+/* get length method */
+
+int PhraseLengthIndexLevel2::get_length() const {
+    int length = m_phrase_array_indexes->len;
+
+    /* trim trailing zero. */
+    for (int i = length - 1; i >= 0; --i) {
+        void * array = g_array_index(m_phrase_array_indexes, void *, i);
+
+        if (NULL != array)
+            break;
+
+        --length;
+    }
+
+    return length;
+}
+
+
+template<size_t phrase_length>
+int PhraseArrayIndexLevel2<phrase_length>::get_length() const {
+    IndexItem * chunk_begin = NULL, * chunk_end = NULL;
+    chunk_begin = (IndexItem *) m_chunk.begin();
+    chunk_end = (IndexItem *) m_chunk.end();
+
+    return chunk_end - chunk_begin;
 }
