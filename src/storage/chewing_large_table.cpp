@@ -488,9 +488,18 @@ int ChewingBitmapIndexLevel::remove_index(int phrase_length,
         [first_key.m_initial][first_key.m_middle]
         [first_key.m_final][first_key.m_tone];
 
-    if (length_array)
-        return length_array->remove_index(phrase_length - 1, keys + 1, token);
-    return ERROR_REMOVE_ITEM_DONOT_EXISTS;
+    if (NULL == length_array)
+        return ERROR_REMOVE_ITEM_DONOT_EXISTS;
+
+    int retval = length_array->remove_index(phrase_length - 1, keys + 1, token);
+
+    /* remove empty array. */
+    if (0 == length_array->get_length()) {
+        delete length_array;
+        length_array = NULL;
+    }
+
+    return retval;
 }
 
 int ChewingLengthIndexLevel::add_index(int phrase_length,

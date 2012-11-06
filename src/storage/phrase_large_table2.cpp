@@ -292,10 +292,18 @@ int PhraseBitmapIndexLevel2::remove_index(int phrase_length,
     PhraseLengthIndexLevel2 * & length_array =
         m_phrase_length_indexes[first_key];
 
-    if ( length_array )
-        return length_array->remove_index(phrase_length, phrase, token);
+    if (NULL == length_array)
+        return ERROR_REMOVE_ITEM_DONOT_EXISTS;
 
-    return ERROR_REMOVE_ITEM_DONOT_EXISTS;
+    int retval = length_array->remove_index(phrase_length, phrase, token);
+
+    /* remove empty array. */
+    if (0 == length_array->get_length()) {
+        delete length_array;
+        length_array = NULL;
+    }
+
+    return retval;
 }
 
 int PhraseLengthIndexLevel2::add_index(int phrase_length,
