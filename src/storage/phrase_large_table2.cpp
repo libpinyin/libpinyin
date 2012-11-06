@@ -359,11 +359,23 @@ int PhraseLengthIndexLevel2::remove_index(int phrase_length,
 
 #define CASE(len) case len:                                             \
     {                                                                   \
-        PhraseArrayIndexLevel2<len> * & array =  g_array_index          \
-            (m_phrase_array_indexes, PhraseArrayIndexLevel2<len> *, len - 1); \
-        if ( !array )                                                   \
+        PhraseArrayIndexLevel2<len> * & array = g_array_index           \
+            (m_phrase_array_indexes,                                    \
+             PhraseArrayIndexLevel2<len> *, len - 1);                   \
+        if (NULL == array)                                              \
             return ERROR_REMOVE_ITEM_DONOT_EXISTS;                      \
-        return array->remove_index(phrase, token);                      \
+        int retval = array->remove_index(phrase, token);                \
+                                                                        \
+        /* remove empty array. */                                       \
+        if (0 == array->get_length()) {                                 \
+            delete array;                                               \
+            array = NULL;                                               \
+                                                                        \
+            /* shrink self array. */                                    \
+            g_array_set_size(m_phrase_array_indexes,                    \
+                             get_length());                             \
+        }                                                               \
+        return retval;                                                  \
     }
 
     switch(phrase_length){

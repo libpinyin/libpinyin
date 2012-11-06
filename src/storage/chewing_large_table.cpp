@@ -560,8 +560,19 @@ int ChewingLengthIndexLevel::remove_index(int phrase_length,
             (m_chewing_array_indexes,                           \
              ChewingArrayIndexLevel<len> *, len);               \
         if (NULL == array)                                      \
-            return ERROR_REMOVE_ITEM_DONOT_EXISTS;                    \
-        return array->remove_index(keys, token);                \
+            return ERROR_REMOVE_ITEM_DONOT_EXISTS;              \
+        int retval = array->remove_index(keys, token);          \
+                                                                \
+        /* remove empty array. */                               \
+        if (0 == array->get_length()) {                         \
+            delete array;                                       \
+            array = NULL;                                       \
+                                                                \
+            /* shrink self array. */                            \
+            g_array_set_size(m_chewing_array_indexes,           \
+                             get_length());                     \
+        }                                                       \
+        return retval;                                          \
     }
 
     switch (phrase_length) {
