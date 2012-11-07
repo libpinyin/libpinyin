@@ -55,6 +55,9 @@ public:
     int add_index(int phrase_length, /* in */ ucs4_t phrase[], /* in */ phrase_token_t token);
 
     int remove_index(int phrase_length, /* in */ ucs4_t phrase[], /* in */ phrase_token_t token);
+
+    /* mask out method */
+    bool mask_out(phrase_token_t mask, phrase_token_t value);
 };
 
 
@@ -105,6 +108,11 @@ public:
 
     int remove_index(int phrase_length, /* in */ ucs4_t phrase[], /* in */ phrase_token_t token) {
         return m_bitmap_table.remove_index(phrase_length, phrase, token);
+    }
+
+    /* mask out method */
+    bool mask_out(phrase_token_t mask, phrase_token_t value) {
+        return m_bitmap_table.mask_out(mask, value);
     }
 };
 

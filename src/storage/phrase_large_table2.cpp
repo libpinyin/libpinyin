@@ -51,6 +51,9 @@ public:
 
     /* get length method */
     int get_length() const;
+
+    /* mask out method */
+    bool mask_out(phrase_token_t mask, phrase_token_t value);
 };
 
 
@@ -86,6 +89,9 @@ public:
 
     /* get length method */
     int get_length() const;
+
+    /* mask out method */
+    bool mask_out(phrase_token_t mask, phrase_token_t value);
 };
 
 };
@@ -150,8 +156,9 @@ PhraseLengthIndexLevel2::PhraseLengthIndexLevel2(){
 PhraseLengthIndexLevel2::~PhraseLengthIndexLevel2(){
 #define CASE(len) case len:                                             \
     {                                                                   \
-        PhraseArrayIndexLevel2<len> * & array =  g_array_index          \
-            (m_phrase_array_indexes, PhraseArrayIndexLevel2<len> *, len - 1); \
+        PhraseArrayIndexLevel2<len> * & array = g_array_index           \
+            (m_phrase_array_indexes,                                    \
+             PhraseArrayIndexLevel2<len> *, len - 1);                   \
         if ( array ) {                                                  \
             delete array;                                               \
             array = NULL;                                               \
@@ -705,4 +712,97 @@ int PhraseArrayIndexLevel2<phrase_length>::get_length() const {
     chunk_end = (IndexItem *) m_chunk.end();
 
     return chunk_end - chunk_begin;
+}
+
+
+/* mask out method */
+
+bool PhraseBitmapIndexLevel2::mask_out(phrase_token_t mask,
+                                       phrase_token_t value){
+    for (size_t i = 0; i < PHRASE_NUMBER_OF_BITMAP_INDEX; ++i) {
+        PhraseLengthIndexLevel2 * & length_array =
+            m_phrase_length_indexes[i];
+
+        if (NULL == length_array)
+            continue;
+
+        length_array->mask_out(mask, value);
+
+        if (0 == length_array->get_length()) {
+            delete length_array;
+            length_array = NULL;
+        }
+    }
+
+    return true;
+}
+
+bool PhraseLengthIndexLevel2::mask_out(phrase_token_t mask,
+                                       phrase_token_t value){
+#define CASE(len) case len:                                     \
+    {                                                           \
+        PhraseArrayIndexLevel2<len> * & array = g_array_index   \
+            (m_phrase_array_indexes,                            \
+             PhraseArrayIndexLevel2<len> *, len - 1);           \
+                                                                \
+        if (NULL == array)                                      \
+            continue;                                           \
+                                                                \
+        array->mask_out(mask, value);                           \
+                                                                \
+        if (0 == array->get_length()) {                         \
+            delete array;                                       \
+            array = NULL;                                       \
+        }                                                       \
+        break;                                                  \
+    }
+
+    for (size_t i = 1; i <= m_phrase_array_indexes->len; ++i) {
+        switch (i) {
+	    CASE(1);
+	    CASE(2);
+	    CASE(3);
+	    CASE(4);
+	    CASE(5);
+	    CASE(6);
+	    CASE(7);
+	    CASE(8);
+	    CASE(9);
+	    CASE(10);
+	    CASE(11);
+	    CASE(12);
+	    CASE(13);
+	    CASE(14);
+	    CASE(15);
+	    CASE(16);
+	default:
+	    assert(false);
+        }
+    }
+    /* shrink self array. */
+    g_array_set_size(m_phrase_array_indexes, get_length());
+#undef CASE
+    return true;
+}
+
+template<size_t phrase_length>
+bool PhraseArrayIndexLevel2<phrase_length>::mask_out
+(phrase_token_t mask, phrase_token_t value) {
+    IndexItem * begin = NULL, * end = NULL;
+    begin = (IndexItem *) m_chunk.begin();
+    end = (IndexItem *) m_chunk.end();
+
+    for (IndexItem * cur = begin; cur != end; ++cur) {
+        if ((cur->m_token & mask) != value)
+            continue;
+
+        int offset = (cur - begin) * sizeof(IndexItem);
+        m_chunk.remove_content(offset, sizeof(IndexItem));
+
+        /* update chunk end. */
+        end = (IndexItem *) m_chunk.end();
+        --cur;
+    }
+
+    return true;
 }
