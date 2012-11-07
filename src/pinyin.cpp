@@ -206,6 +206,13 @@ bool pinyin_load_phrase_library(pinyin_context_t * context,
                                 guint8 index){
     if (!(index < PHRASE_INDEX_LIBRARY_COUNT))
         return false;
+
+    /* check whether the sub phrase index is already loaded. */
+    PhraseIndexRange range;
+    int retval = context->m_phrase_index->get_range(index, range);
+    if (ERROR_OK == retval)
+        return false;
+
     const pinyin_table_info_t * table_info = pinyin_phrase_files + index;
 
     if (SYSTEM_FILE == table_info->m_file_type) {
