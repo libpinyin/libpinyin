@@ -75,12 +75,15 @@ public:
     /* search method */
     int search(int phrase_length, /* in */ ChewingKey keys[],
                /* out */ PhraseIndexRanges ranges) const;
+
     /* add/remove index method */
     int add_index(int phrase_length, /* in */ ChewingKey keys[],
                   /* in */ phrase_token_t token);
     int remove_index(int phrase_length, /* in */ ChewingKey keys[],
                      /* in */ phrase_token_t token);
 
+    /* mask out method */
+    bool mask_out(phrase_token_t mask, phrase_token_t value);
 };
 
 
@@ -138,6 +141,10 @@ public:
         return m_bitmap_table.remove_index(phrase_length, keys, token);
     }
 
+    /* mask out method */
+    bool mask_out(phrase_token_t mask, phrase_token_t value) {
+        return m_bitmap_table.mask_out(mask, value);
+    }
 };
 
 };

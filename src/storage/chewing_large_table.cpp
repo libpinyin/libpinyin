@@ -56,6 +56,9 @@ public:
 
     /* get length method */
     int get_length() const;
+
+    /* mask out method */
+    bool mask_out(phrase_token_t mask, phrase_token_t value);
 };
 
 
@@ -91,6 +94,9 @@ public:
 
     /* get length method */
     int get_length() const;
+
+    /* mask out method */
+    bool mask_out(phrase_token_t mask, phrase_token_t value);
 };
 
 };
@@ -342,7 +348,6 @@ ChewingLengthIndexLevel::~ChewingLengthIndexLevel() {
     }
 #undef CASE
     g_array_free(m_chewing_array_indexes, TRUE);
-    m_chewing_array_indexes = NULL;
 }
 
 
@@ -943,4 +948,99 @@ int ChewingArrayIndexLevel<phrase_length>::get_length() const {
     chunk_end = (IndexItem *) m_chunk.end();
 
     return chunk_end - chunk_begin;
+}
+
+
+/* mask out method */
+
+bool ChewingBitmapIndexLevel::mask_out(phrase_token_t mask,
+                                       phrase_token_t value) {
+    for (int k = CHEWING_ZERO_INITIAL; k < CHEWING_NUMBER_OF_INITIALS; ++k)
+        for (int l = CHEWING_ZERO_MIDDLE; l < CHEWING_NUMBER_OF_MIDDLES; ++l)
+            for (int m = CHEWING_ZERO_FINAL; m < CHEWING_NUMBER_OF_FINALS; ++m)
+                for (int n = CHEWING_ZERO_TONE; n < CHEWING_NUMBER_OF_TONES;
+                     ++n) {
+                    ChewingLengthIndexLevel * & length_array =
+                        m_chewing_length_indexes[k][l][m][n];
+
+                    if (NULL == length_array)
+                        continue;
+
+                    length_array->mask_out(mask, value);
+
+                    if (0 == length_array->get_length()) {
+                        delete length_array;
+                        length_array = NULL;
+                    }
+                }
+    return true;
+}
+
+bool ChewingLengthIndexLevel::mask_out(phrase_token_t mask,
+                                       phrase_token_t value) {
+#define CASE(len) case len:                                     \
+    {                                                           \
+        ChewingArrayIndexLevel<len> * & array = g_array_index   \
+            (m_chewing_array_indexes,                           \
+             ChewingArrayIndexLevel<len> *, len);               \
+                                                                \
+        if (NULL == array)                                      \
+            continue;                                           \
+                                                                \
+        array->mask_out(mask, value);                           \
+                                                                \
+        if (0 == array->get_length()) {                         \
+            delete array;                                       \
+            array = NULL;                                       \
+        }                                                       \
+        break;                                                  \
+    }
+
+    for (guint i = 0; i < m_chewing_array_indexes->len; ++i) {
+        switch (i){
+	    CASE(0);
+	    CASE(1);
+	    CASE(2);
+	    CASE(3);
+	    CASE(4);
+	    CASE(5);
+	    CASE(6);
+	    CASE(7);
+	    CASE(8);
+	    CASE(9);
+	    CASE(10);
+	    CASE(11);
+	    CASE(12);
+	    CASE(13);
+	    CASE(14);
+	    CASE(15);
+	default:
+	    assert(false);
+        }
+    }
+#undef CASE
+    g_array_set_size(m_chewing_array_indexes, get_length());
+    return true;
+}
+
+template<size_t phrase_length>
+bool ChewingArrayIndexLevel<phrase_length>::mask_out
+(phrase_token_t mask, phrase_token_t value) {
+    IndexItem * begin = NULL, * end = NULL;
+    begin = (IndexItem *) m_chunk.begin();
+    end   = (IndexItem *) m_chunk.end();
+
+    for (IndexItem * cur = begin; cur != end; ++cur) {
+        if ((cur->m_token & mask) != value)
+            continue;
+
+        int offset = (cur - begin) * sizeof(IndexItem);
+        m_chunk.remove_content(offset, sizeof(IndexItem));
+
+        /* update chunk end. */
+        end = (IndexItem *) m_chunk.end();
+        --cur;
+    }
+
+    return true;
 }
