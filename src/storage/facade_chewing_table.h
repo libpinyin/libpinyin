@@ -174,7 +174,7 @@ public:
     int add_index(int phrase_length, /* in */ ChewingKey keys[],
                   /* in */ phrase_token_t token) {
         if (NULL == m_user_chewing_table)
-            return false;
+            return ERROR_NO_USER_TABLE;
         return m_user_chewing_table->add_index(phrase_length, keys, token);
     }
 
@@ -191,8 +191,23 @@ public:
     int remove_index(int phrase_length, /* in */ ChewingKey keys[],
                      /* in */ phrase_token_t token) {
         if (NULL == m_user_chewing_table)
-            return false;
+            return ERROR_NO_USER_TABLE;
         return m_user_chewing_table->remove_index(phrase_length, keys, token);
+    }
+
+    /**
+     * FacadeChewingTable::mask_out:
+     * @mask: the mask.
+     * @value: the value.
+     * @returns: whether the mask out operation is successful.
+     *
+     * Mask out the matched chewing index.
+     *
+     */
+    bool mask_out(phrase_token_t mask, phrase_token_t value) {
+        if (NULL == m_user_chewing_table)
+            return false;
+        return m_user_chewing_table->mask_out(mask, value);
     }
 };
 

@@ -86,7 +86,8 @@ enum ErrorResult{
     ERROR_OUT_OF_RANGE,          /* beyond the end of the sub phrase index */
     ERROR_FILE_CORRUPTION,       /* file is corrupted */
     ERROR_INTEGER_OVERFLOW,      /* integer is overflowed */
-    ERROR_ALREADY_EXISTS         /* the sub phrase already exists. */
+    ERROR_ALREADY_EXISTS,        /* the sub phrase already exists. */
+    ERROR_NO_USER_TABLE          /* the user table is not loaded. */
 };
 
 /* For N-gram */
