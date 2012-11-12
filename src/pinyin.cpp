@@ -545,7 +545,6 @@ bool pinyin_set_chewing_scheme(pinyin_context_t * context,
     return true;
 }
 
-
 void pinyin_fini(pinyin_context_t * context){
     delete context->m_full_pinyin_parser;
     delete context->m_double_pinyin_parser;
@@ -563,6 +562,68 @@ void pinyin_fini(pinyin_context_t * context){
     context->m_modified = false;
 
     delete context;
+}
+
+bool pinyin_mask_out(pinyin_context_t * context,
+                     phrase_token_t mask,
+                     phrase_token_t value) {
+
+    context->m_pinyin_table->mask_out(mask, value);
+    context->m_phrase_table->mask_out(mask, value);
+    context->m_user_bigram->mask_out(mask, value);
+
+    /* mask out the phrase index. */
+    for (size_t index = 1; index < PHRASE_INDEX_LIBRARY_COUNT; ++index) {
+        PhraseIndexRange range;
+        int retval = context->m_phrase_index->get_range(index, range);
+
+        if (ERROR_NO_SUB_PHRASE_INDEX == retval)
+            continue;
+
+        const pinyin_table_info_t * table_info = pinyin_phrase_files + index;
+
+        if (NOT_USED == table_info->m_file_type)
+            continue;
+
+        const char * userfilename = table_info->m_user_filename;
+
+        if (NULL == userfilename)
+            continue;
+
+        if (SYSTEM_FILE == table_info->m_file_type) {
+            /* system phrase library */
+            MemoryChunk * chunk = new MemoryChunk;
+
+            const char * systemfilename = table_info->m_system_filename;
+            /* check bin file in system dir. */
+            gchar * chunkfilename = g_build_filename(context->m_system_dir,
+                                                     systemfilename, NULL);
+            chunk->load(chunkfilename);
+            g_free(chunkfilename);
+
+            context->m_phrase_index->load(index, chunk);
+
+            const char * userfilename = table_info->m_user_filename;
+
+            chunkfilename = g_build_filename(context->m_user_dir,
+                                             userfilename, NULL);
+
+            MemoryChunk * log = new MemoryChunk;
+            log->load(chunkfilename);
+            g_free(chunkfilename);
+
+            /* merge the chunk log with mask. */
+            context->m_phrase_index->merge_with_mask(index, log, mask, value);
+        }
+
+        if (USER_FILE == table_info->m_file_type) {
+            /* user phrase library */
+            context->m_phrase_index->mask_out(index, mask, value);
+        }
+    }
+
+    context->m_phrase_index->compact();
+    return true;
 }
 
 /* copy from options to context->m_options. */

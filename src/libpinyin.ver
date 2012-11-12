@@ -10,6 +10,7 @@ LIBPINYIN {
         pinyin_iterator_add_phrase;
         pinyin_end_add_phrases;
         pinyin_fini;
+        pinyin_mask_out;
         pinyin_set_options;
         pinyin_alloc_instance;
         pinyin_free_instance;

@@ -192,6 +192,21 @@ void pinyin_fini(pinyin_context_t * context);
 
 
 /**
+ * pinyin_mask_out:
+ * @context: the pinyin context.
+ * @mask: the mask.
+ * @value: the value.
+ * @returns: whether the mask out operation is successful.
+ *
+ * Mask out the matched phrase tokens.
+ *
+ */
+bool pinyin_mask_out(pinyin_context_t * context,
+                     phrase_token_t mask,
+                     phrase_token_t value);
+
+
+/**
  * pinyin_set_options:
  * @context: the pinyin context.
  * @options: the pinyin options of the pinyin context.
