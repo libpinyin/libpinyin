@@ -521,7 +521,7 @@ typedef ChewingKeyVector PinyinKeyVector;
 typedef ChewingKeyRestVector PinyinKeyPosVector;
 
 
-#define LIBPINYIN_FORMAT_VERSION  "0.8.91"
+#define LIBPINYIN_FORMAT_VERSION  "0.8.0"
 
 };
 
