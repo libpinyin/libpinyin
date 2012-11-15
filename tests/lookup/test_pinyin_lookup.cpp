@@ -55,7 +55,7 @@ int main( int argc, char * argv[]){
     g_array_append_val(prefixes, sentence_start);
     
     CandidateConstraints constraints = g_array_new
-        (FALSE, FALSE, sizeof(lookup_constraint_t));
+        (TRUE, FALSE, sizeof(lookup_constraint_t));
 
     MatchResults results = g_array_new(FALSE, FALSE, sizeof(phrase_token_t));
 

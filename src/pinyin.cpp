@@ -559,7 +559,7 @@ pinyin_instance_t * pinyin_alloc_instance(pinyin_context_t * context){
     instance->m_pinyin_key_rests =
         g_array_new(FALSE, FALSE, sizeof(ChewingKeyRest));
     instance->m_constraints = g_array_new
-        (FALSE, FALSE, sizeof(lookup_constraint_t));
+        (TRUE, FALSE, sizeof(lookup_constraint_t));
     instance->m_match_results =
         g_array_new(FALSE, FALSE, sizeof(phrase_token_t));
 

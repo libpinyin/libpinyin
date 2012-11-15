@@ -66,7 +66,7 @@ bool get_best_match(PinyinLookup2 * pinyin_lookup,
 
     /* initialize constraints. */
     CandidateConstraints constraints = g_array_new
-        (FALSE, FALSE, sizeof(lookup_constraint_t));
+        (TRUE, FALSE, sizeof(lookup_constraint_t));
     g_array_set_size(constraints, keys->len);
     for ( size_t i = 0; i < constraints->len; ++i ) {
         lookup_constraint_t * constraint = &g_array_index
