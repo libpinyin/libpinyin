@@ -70,8 +70,8 @@ bool PhraseItem::set_phrase_string(guint8 phrase_length, ucs4_t * phrase){
 }
 
 void PhraseItem::increase_pronunciation_possibility(pinyin_option_t options,
-					     ChewingKey * keys,
-					     gint32 delta){
+                                                    ChewingKey * keys,
+                                                    gint32 delta){
     guint8 phrase_length = get_phrase_length();
     guint8 npron = get_n_pronunciation();
     size_t offset = phrase_item_header + phrase_length * sizeof ( ucs4_t );
@@ -111,13 +111,13 @@ int SubPhraseIndex::add_unigram_frequency(phrase_token_t token, guint32 delta){
 	return ERROR_OUT_OF_RANGE;
 
     if ( 0 == offset )
-    return ERROR_NO_ITEM;
+        return ERROR_NO_ITEM;
 
     result = m_phrase_content.get_content
 	(offset + sizeof(guint8) + sizeof(guint8), &freq, sizeof(guint32));
 
     if ( !result )
-    return ERROR_FILE_CORRUPTION;
+        return ERROR_FILE_CORRUPTION;
 
     //protect total_freq overflow
     if ( delta > 0 && m_total_freq > m_total_freq + delta )
@@ -143,11 +143,11 @@ int SubPhraseIndex::get_phrase_item(phrase_token_t token, PhraseItem & item){
 	return ERROR_OUT_OF_RANGE;
 
     if ( 0 == offset )
-    return ERROR_NO_ITEM;
+        return ERROR_NO_ITEM;
 
     result = m_phrase_content.get_content(offset, &phrase_length, sizeof(guint8));
     if ( !result ) 
-    return ERROR_FILE_CORRUPTION;
+        return ERROR_FILE_CORRUPTION;
     
     result = m_phrase_content.get_content(offset+sizeof(guint8), &n_prons, sizeof(guint8));
     if ( !result ) 
@@ -174,7 +174,7 @@ int SubPhraseIndex::remove_phrase_item(phrase_token_t token, PhraseItem * & item
 
     int result = get_phrase_item(token, old_item);
     if (result != ERROR_OK)
-    return result;
+        return result;
 
     item = new PhraseItem;
     //implictly copy data from m_chunk_content.
@@ -310,7 +310,7 @@ bool SubPhraseIndex::load(MemoryChunk * chunk,
     m_phrase_index.set_chunk(buf_begin + index_one, 
 			     index_two - 1 - index_one, NULL);
     m_phrase_content.set_chunk(buf_begin + index_two, 
-				 index_three - 1 - index_two, NULL);
+                               index_three - 1 - index_two, NULL);
     g_return_val_if_fail( index_three <= end, FALSE);
     return true;
 }
@@ -358,7 +358,7 @@ bool SubPhraseIndex::diff(SubPhraseIndex * oldone, PhraseIndexLogger * logger){
     range.m_range_begin = std_lite::min(oldrange.m_range_begin,
                                         currange.m_range_begin);
     range.m_range_end = std_lite::max(oldrange.m_range_end,
-                                     currange.m_range_end);
+                                      currange.m_range_end);
     PhraseItem olditem, newitem;
 
     for (phrase_token_t token = range.m_range_begin;
@@ -381,7 +381,7 @@ bool SubPhraseIndex::diff(SubPhraseIndex * oldone, PhraseIndexLogger * logger){
                 logger->append_record(LOG_ADD_RECORD, token,
                                       NULL, &(newitem.m_chunk));
             } else { /* both empty. */
-                    /* do nothing. */
+                /* do nothing. */
             }
         }
     }
@@ -415,7 +415,7 @@ bool SubPhraseIndex::merge(PhraseIndexLogger * logger){
             remove_phrase_item(token, tmpitem);
 
             olditem.m_chunk.set_chunk(oldchunk.begin(), oldchunk.size(),
-                                   NULL);
+                                      NULL);
             if (olditem != *tmpitem)
                 return false;
             delete tmpitem;
