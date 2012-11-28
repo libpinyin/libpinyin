@@ -117,7 +117,7 @@ public:
 };
 
 
-static inline int reduce_tokens(PhraseTokens tokens,
+static inline int reduce_tokens(const PhraseTokens tokens,
                                 GArray * tokenarray) {
     int num = 0;
     g_array_set_size(tokenarray, 0);
@@ -139,7 +139,7 @@ static inline int reduce_tokens(PhraseTokens tokens,
 }
 
 /* for compatibility. */
-static inline int get_first_token(PhraseTokens tokens,
+static inline int get_first_token(const PhraseTokens tokens,
                                   /* out */ phrase_token_t & token){
     token = null_token;
 
