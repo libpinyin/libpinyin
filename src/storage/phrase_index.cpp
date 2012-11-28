@@ -53,8 +53,8 @@ void PhraseItem::append_pronunciation(ChewingKey * keys, guint32 freq){
 void PhraseItem::remove_nth_pronunciation(size_t index){
     guint8 phrase_length = get_phrase_length();
     set_n_pronunciation(get_n_pronunciation() - 1);
-    size_t offset = phrase_item_header + phrase_length * sizeof ( ucs4_t ) +
-        index * (phrase_length * sizeof (ChewingKey) + sizeof(guint32));
+    size_t offset = phrase_item_header + phrase_length * sizeof(ucs4_t) +
+        index * (phrase_length * sizeof(ChewingKey) + sizeof(guint32));
     m_chunk.remove_content(offset, phrase_length * sizeof(ChewingKey) + sizeof(guint32));
 }
 

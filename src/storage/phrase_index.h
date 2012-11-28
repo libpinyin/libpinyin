@@ -42,7 +42,7 @@
  * ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
  * + Phrase Length + number of  Pronunciations  + Uni-gram Frequency+
  * ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- * + Phrase String(UCS2) + n Pronunciations with Frequency +
+ * + Phrase String(UCS4) + n Pronunciations with Frequency +
  * +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
  */
 
