@@ -67,5 +67,9 @@ int main(int argc, char * argv[]){
 
     if ( linebuf )
         free(linebuf);
+
+    /* mask out all index items. */
+    largetable.mask_out(0x0, 0x0);
+
     return 0;
 }
