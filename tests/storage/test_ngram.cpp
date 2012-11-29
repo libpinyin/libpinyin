@@ -80,5 +80,8 @@ int main(int argc, char * argv[]){
 
     g_array_free(items, TRUE);
 
+    /* mask out all index items. */
+    bigram.mask_out(0x0, 0x0);
+
     return 0;
 }
