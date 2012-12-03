@@ -62,7 +62,11 @@ int main(int argc, char * argv[]){
     }
 
     pinyin_free_instance(instance);
+
+    pinyin_mask_out(context, 0x0, 0x0);
+    pinyin_save(context);
     pinyin_fini(context);
+
     free(linebuf);
     return 0;
 }
