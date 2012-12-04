@@ -541,24 +541,76 @@ bool pinyin_get_pinyin_string(pinyin_instance_t * instance,
                               ChewingKey * key,
                               gchar ** utf8_str);
 
+/**
+ * pinyin_token_get_phrase:
+ * @instance: the pinyin instance.
+ * @token: the phrase token.
+ * @len: the phrase length.
+ * @utf8_str: the phrase string.
+ * @returns: whether the get operation is successful.
+ *
+ * Get the phrase length and utf8 string.
+ *
+ */
 bool pinyin_token_get_phrase(pinyin_instance_t * instance,
                              phrase_token_t token,
                              guint * len,
                              gchar ** utf8_str);
 
+/**
+ * pinyin_token_get_n_pronunciation:
+ * @instance: the pinyin instance.
+ * @token: the phrase token.
+ * @num: the number of pinyins.
+ * @returns: whether the get operation is successful.
+ *
+ * Get the number of the pinyins.
+ *
+ */
 bool pinyin_token_get_n_pronunciation(pinyin_instance_t * instance,
                                       phrase_token_t token,
                                       guint * num);
 
+/**
+ * pinyin_token_get_nth_pronunciation:
+ * @instance: the pinyin instance.
+ * @token: the phrase token.
+ * @nth: the index of the pinyin.
+ * @keys: the GArray of chewing key.
+ * @returns: whether the get operation is successful.
+ *
+ * Get the nth pinyin from the phrase.
+ *
+ */
 bool pinyin_token_get_nth_pronunciation(pinyin_instance_t * instance,
                                         phrase_token_t token,
                                         guint nth,
                                         ChewingKeyVector keys);
 
+/**
+ * pinyin_token_get_unigram_frequency:
+ * @instance: the pinyin instance.
+ * @token: the phrase token.
+ * @freq: the unigram frequency of the phrase.
+ * @returns: whether the get operation is successful.
+ *
+ * Get the unigram frequency of the phrase.
+ *
+ */
 bool pinyin_token_get_unigram_frequency(pinyin_instance_t * instance,
                                         phrase_token_t token,
                                         guint * freq);
 
+/**
+ * pinyin_token_add_unigram_frequency:
+ * @instance: the pinyin instance.
+ * @token: the phrase token.
+ * @delta: the delta of the unigram frequency.
+ * @returns: whether the add operation is successful.
+ *
+ * Add delta to the unigram frequency of the phrase token.
+ *
+ */
 bool pinyin_token_add_unigram_frequency(pinyin_instance_t * instance,
                                         phrase_token_t token,
                                         guint delta);
