@@ -721,7 +721,6 @@ bool pinyin_guess_sentence_with_prefix(pinyin_instance_t * instance,
             if (i > MAX_PHRASE_LENGTH)
                 break;
 
-            phrase_token_t token = null_token;
             ucs4_t * start = ucs4_str + len_str - i;
 
             PhraseTokens tokens;
@@ -1816,6 +1815,85 @@ bool pinyin_get_pinyin_string(pinyin_instance_t * instance,
     *utf8_str = key->get_pinyin_string();
     return true;
 }
+
+bool pinyin_token_get_phrase(pinyin_instance_t * instance,
+                             phrase_token_t token,
+                             guint * len,
+                             gchar ** utf8_str) {
+    *len = 0; *utf8_str = NULL;
+    pinyin_context_t * & context = instance->m_context;
+    PhraseItem item;
+    ucs4_t buffer[MAX_PHRASE_LENGTH];
+
+    int retval = context->m_phrase_index->get_phrase_item(token, item);
+    if (ERROR_OK != retval)
+        return false;
+
+    item.get_phrase_string(buffer);
+    *len = item.get_phrase_length();
+    *utf8_str = g_ucs4_to_utf8(buffer, *len, NULL, NULL, NULL);
+    return true;
+}
+
+bool pinyin_token_get_n_pronunciation(pinyin_instance_t * instance,
+                                      phrase_token_t token,
+                                      guint * num){
+    *num = 0;
+    pinyin_context_t * & context = instance->m_context;
+    PhraseItem item;
+
+    int retval = context->m_phrase_index->get_phrase_item(token, item);
+    if (ERROR_OK != retval)
+        return false;
+
+    *num = item.get_n_pronunciation();
+    return true;
+}
+
+bool pinyin_token_get_nth_pronunciation(pinyin_instance_t * instance,
+                                        phrase_token_t token,
+                                        guint nth,
+                                        ChewingKeyVector keys){
+    g_array_set_size(keys, 0);
+    pinyin_context_t * & context = instance->m_context;
+    PhraseItem item;
+    ChewingKey buffer[MAX_PHRASE_LENGTH];
+    guint32 freq = 0;
+
+    int retval = context->m_phrase_index->get_phrase_item(token, item);
+    if (ERROR_OK != retval)
+        return false;
+
+    item.get_nth_pronunciation(nth, buffer, freq);
+    guint8 len = item.get_phrase_length();
+    g_array_append_vals(keys, buffer, len);
+    return true;
+}
+
+bool pinyin_token_get_unigram_frequency(pinyin_instance_t * instance,
+                                        phrase_token_t token,
+                                        guint * freq) {
+    *freq = 0;
+    pinyin_context_t * & context = instance->m_context;
+    PhraseItem item;
+
+    int retval = context->m_phrase_index->get_phrase_item(token, item);
+    if (ERROR_OK != retval)
+        return false;
+
+    *freq = item.get_unigram_frequency();
+    return true;
+}
+
+bool pinyin_token_add_unigram_frequency(pinyin_instance_t * instance,
+                                        phrase_token_t token,
+                                        guint delta){
+    pinyin_context_t * & context = instance->m_context;
+    int retval = context->m_phrase_index->add_unigram_frequency
+        (token, delta);
+    return ERROR_OK == retval;
+}
+
 
 
 /**

@@ -541,6 +541,30 @@ bool pinyin_get_pinyin_string(pinyin_instance_t * instance,
                               ChewingKey * key,
                               gchar ** utf8_str);
 
+bool pinyin_token_get_phrase(pinyin_instance_t * instance,
+                             phrase_token_t token,
+                             guint * len,
+                             gchar ** utf8_str);
+
+bool pinyin_token_get_n_pronunciation(pinyin_instance_t * instance,
+                                      phrase_token_t token,
+                                      guint * num);
+
+bool pinyin_token_get_nth_pronunciation(pinyin_instance_t * instance,
+                                        phrase_token_t token,
+                                        guint nth,
+                                        ChewingKeyVector keys);
+
+bool pinyin_token_get_unigram_frequency(pinyin_instance_t * instance,
+                                        phrase_token_t token,
+                                        guint * freq);
+
+bool pinyin_token_add_unigram_frequency(pinyin_instance_t * instance,
+                                        phrase_token_t token,
+                                        guint delta);
+
+
+
 /* hack here. */
 typedef ChewingKey PinyinKey;
 typedef ChewingKeyRest PinyinKeyPos;
