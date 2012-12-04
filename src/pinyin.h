@@ -514,6 +514,14 @@ bool pinyin_train(pinyin_instance_t * instance);
 bool pinyin_reset(pinyin_instance_t * instance);
 
 
+bool pinyin_get_chewing_string(pinyin_instance_t * instance,
+                               ChewingKey * key,
+                               gchar ** utf8_str);
+
+bool pinyin_get_pinyin_string(pinyin_instance_t * instance,
+                              ChewingKey * key,
+                              gchar ** utf8_str);
+
 /* hack here. */
 typedef ChewingKey PinyinKey;
 typedef ChewingKeyRest PinyinKeyPos;
