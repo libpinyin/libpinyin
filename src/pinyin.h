@@ -513,11 +513,30 @@ bool pinyin_train(pinyin_instance_t * instance);
  */
 bool pinyin_reset(pinyin_instance_t * instance);
 
-
+/**
+ * pinyin_get_chewing_string:
+ * @instance: the pinyin instance.
+ * @key: the chewing key.
+ * @utf8_str: the chewing string.
+ * @returns: whether the get operation is successful.
+ *
+ * Get the chewing string of the key.
+ *
+ */
 bool pinyin_get_chewing_string(pinyin_instance_t * instance,
                                ChewingKey * key,
                                gchar ** utf8_str);
 
+/**
+ * pinyin_get_pinyin_string:
+ * @instance: the pinyin instance.
+ * @key: the pinyin key.
+ * @utf8_str: the pinyin string.
+ * @returns: whether the get operation is successful.
+ *
+ * Get the pinyin string of the key.
+ *
+ */
 bool pinyin_get_pinyin_string(pinyin_instance_t * instance,
                               ChewingKey * key,
                               gchar ** utf8_str);
