@@ -1691,29 +1691,6 @@ bool pinyin_free_candidates(pinyin_instance_t * instance,
     return true;
 }
 
-
-bool pinyin_clear_constraint(pinyin_instance_t * instance,
-                             size_t offset){
-    pinyin_context_t * & context = instance->m_context;
-
-    bool retval = context->m_pinyin_lookup->clear_constraint
-        (instance->m_constraints, offset);
-
-    return retval;
-}
-
-bool pinyin_clear_constraints(pinyin_instance_t * instance){
-    pinyin_context_t * & context = instance->m_context;
-    bool retval = true;
-
-    for ( size_t i = 0; i < instance->m_constraints->len; ++i ) {
-        retval = context->m_pinyin_lookup->clear_constraint
-            (instance->m_constraints, i) && retval;
-    }
-
-    return retval;
-}
-
 bool pinyin_lookup_tokens(pinyin_instance_t * instance,
                           const char * phrase, GArray * tokenarray){
     pinyin_context_t * & context = instance->m_context;

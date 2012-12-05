@@ -29,8 +29,6 @@ LIBPINYIN {
         pinyin_get_full_pinyin_candidates;
         pinyin_choose_candidate;
         pinyin_free_candidates;
-        pinyin_clear_constraint;
-        pinyin_clear_constraints;
         pinyin_lookup_tokens;
         pinyin_translate_token;
         pinyin_get_pinyins_from_token;
