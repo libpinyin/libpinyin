@@ -444,21 +444,6 @@ bool pinyin_lookup_tokens(pinyin_instance_t * instance,
                           const char * phrase, GArray * tokenarray);
 
 /**
- * pinyin_translate_token:
- * @instance: the pinyin instance.
- * @token: the phrase token.
- * @word: the phrase in utf-8.
- * @returns: whether the token is valid.
- *
- * Translate the token to utf-8 phrase.
- *
- * Note: the returned word should be freed by g_free().
- *
- */
-bool pinyin_translate_token(pinyin_instance_t * instance,
-                            phrase_token_t token, char ** word);
-
-/**
  * pinyin_get_pinyins_from_token:
  * @instance: the pinyin instance.
  * @token: the character token.

@@ -1709,20 +1709,6 @@ bool pinyin_lookup_tokens(pinyin_instance_t * instance,
     return SEARCH_OK & retval;
 }
 
-/* the returned word should be freed by g_free. */
-bool pinyin_translate_token(pinyin_instance_t * instance,
-                            phrase_token_t token, char ** word){
-    pinyin_context_t * & context = instance->m_context;
-    PhraseItem item;
-    ucs4_t buffer[MAX_PHRASE_LENGTH];
-
-    int retval = context->m_phrase_index->get_phrase_item(token, item);
-    item.get_phrase_string(buffer);
-    guint8 length = item.get_phrase_length();
-    *word = g_ucs4_to_utf8(buffer, length, NULL, NULL, NULL);
-    return ERROR_OK == retval;
-}
-
 bool pinyin_get_pinyins_from_token(pinyin_instance_t * instance,
                                    phrase_token_t token, GArray * pinyinkeys){
     pinyin_context_t * & context = instance->m_context;
