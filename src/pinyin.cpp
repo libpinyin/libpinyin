@@ -1052,8 +1052,9 @@ static bool _compute_phrase_strings_of_items(pinyin_instance_t * instance,
         case NORMAL_CANDIDATE:
         case DIVIDED_CANDIDATE:
         case RESPLIT_CANDIDATE:
-            pinyin_translate_token
-                (instance, candidate->m_token, &(candidate->m_phrase_string));
+            pinyin_token_get_phrase
+                (instance, candidate->m_token, NULL,
+                 &(candidate->m_phrase_string));
             break;
         case ZOMBIE_CANDIDATE:
             break;
@@ -1762,7 +1763,6 @@ bool pinyin_token_get_phrase(pinyin_instance_t * instance,
                              phrase_token_t token,
                              guint * len,
                              gchar ** utf8_str) {
-    *len = 0; *utf8_str = NULL;
     pinyin_context_t * & context = instance->m_context;
     PhraseItem item;
     ucs4_t buffer[MAX_PHRASE_LENGTH];
@@ -1772,8 +1772,11 @@ bool pinyin_token_get_phrase(pinyin_instance_t * instance,
         return false;
 
     item.get_phrase_string(buffer);
-    *len = item.get_phrase_length();
-    *utf8_str = g_ucs4_to_utf8(buffer, *len, NULL, NULL, NULL);
+    guint length = item.get_phrase_length();
+    if (len)
+        *len = length;
+    if (utf8_str)
+        *utf8_str = g_ucs4_to_utf8(buffer, length, NULL, NULL, NULL);
     return true;
 }
 

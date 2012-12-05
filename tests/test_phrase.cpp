@@ -52,7 +52,7 @@ int main(int argc, char * argv[]){
                 continue;
 
             char * word = NULL;
-            pinyin_translate_token(instance, token, &word);
+            pinyin_token_get_phrase(instance, token, NULL, &word);
             printf("%s\t", word);
             g_free(word);
         }
