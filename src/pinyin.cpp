@@ -1709,27 +1709,6 @@ bool pinyin_lookup_tokens(pinyin_instance_t * instance,
     return SEARCH_OK & retval;
 }
 
-bool pinyin_get_pinyins_from_token(pinyin_instance_t * instance,
-                                   phrase_token_t token, GArray * pinyinkeys){
-    pinyin_context_t * & context = instance->m_context;
-    FacadePhraseIndex * & phrase_index = context->m_phrase_index;
-    PhraseItem item;
-
-    int retval = phrase_index->get_phrase_item(token, item);
-    if (1 != item.get_phrase_length())
-        return false;
-
-    guint8 npinyin = item.get_n_pronunciation();
-    size_t i;
-    ChewingKey onekey; guint32 freq;
-    for (i = 0; i < npinyin; ++i){
-        item.get_nth_pronunciation(i, &onekey, freq);
-        g_array_append_val(pinyinkeys, onekey);
-    }
-    return true;
-}
-
-
 bool pinyin_train(pinyin_instance_t * instance){
     if (!instance->m_context->m_user_dir)
         return false;

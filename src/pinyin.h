@@ -444,19 +444,6 @@ bool pinyin_lookup_tokens(pinyin_instance_t * instance,
                           const char * phrase, GArray * tokenarray);
 
 /**
- * pinyin_get_pinyins_from_token:
- * @instance: the pinyin instance.
- * @token: the character token.
- * @pinyinkeys: the pinyin keys from the character token.
- * @returns: whether the pinyin keys is retrieved.
- *
- * Get the pinyin keys for the character token.
- *
- */
-bool pinyin_get_pinyins_from_token(pinyin_instance_t * instance,
-                                   phrase_token_t token, GArray * pinyinkeys);
-
-/**
  * pinyin_train:
  * @instance: the pinyin instance.
  * @returns: whether the sentence is trained.
