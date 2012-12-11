@@ -147,16 +147,15 @@ public:
 		matched += *freq;
 	    }
 	}
-	// use preprocessor to avoid zero freq, in gen_pinyin_table.
-	/*
+
+#if 1
+        /* an additional safe guard for chewing. */
 	if ( 0 == total_freq )
-	    return 0.1;
-	*/
+	    return 0;
+#endif
+
+	/* used preprocessor to avoid zero freq, in gen_chewing_table. */
 	gfloat retval = matched / (gfloat) total_freq;
-	/*
-	if ( 0 == retval )
-	    return 0.03;
-	*/
 	return retval;
     }
 
