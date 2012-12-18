@@ -27,4 +27,4 @@ CFLAGS=${CFLAGS-"-Wall -Werror"}
 ACLOCAL_FLAGS="$ACLOCAL_FLAGS"
 REQUIRED_AUTOMAKE_VERSION=1.8
 
-. gnome-autogen.sh $@
+. gnome-autogen.sh "$@"
