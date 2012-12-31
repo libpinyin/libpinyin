@@ -40,10 +40,7 @@ AC_PROG_MAKE_SET
 AC_GNU_SOURCE
 
 # Init libtool
-AC_LIBTOOL_WIN32_DLL
-AC_LIBTOOL_DLOPEN
 AC_PROG_LIBTOOL
-AC_LIB_LTDL
 AC_SUBST(LIBTOOL_DEPS)
 
 # libtool option to control which symbols are exported
