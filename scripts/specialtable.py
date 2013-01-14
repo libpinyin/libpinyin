@@ -36,7 +36,7 @@ def load_phrase(filename):
     phrasefile = open(filename, "r")
     for line in phrasefile.readlines():
         line = line.rstrip(os.linesep)
-        (pinyin_str, freq) = line.split(' ', 1)
+        (pinyin_str, freq) = line.split(None, 1)
         freq = int(math.floor(float(freq)))
         if 0 == freq:
             #print(pinyin_str)
