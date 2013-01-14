@@ -2,9 +2,7 @@ all: pinyins.txt
 
 
 pinyins.txt:
-	awk -f genpinyins.awk -vlen=1 ../data/gb_char.table \
-	../data/gbk_char.table > $@
-	awk -f genpinyins.awk -vlen=2 ../data/gb_char.table >> $@
+	python3 genpinyins.py
 
 
 update-header:

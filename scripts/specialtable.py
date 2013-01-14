@@ -37,28 +37,17 @@ def load_phrase(filename):
     for line in phrasefile.readlines():
         line = line.rstrip(os.linesep)
         (pinyin_str, freq) = line.split(None, 1)
-        freq = int(math.floor(float(freq)))
+        freq = int(freq)
         if 0 == freq:
             #print(pinyin_str)
             continue
 
+        # no duplicate here
         if "'" in pinyin_str:
             (first_key, second_key) = pinyin_str.split("'")
-            if first_key[-1].isdigit():
-                first_key = first_key[:-1]
-            if second_key[-1].isdigit():
-                second_key = second_key[:-1]
-            if (first_key, second_key) in phrase_dict:
-                phrase_dict[(first_key, second_key)] += freq
-            else:
-                phrase_dict[(first_key, second_key)] = freq
+            phrase_dict[(first_key, second_key)] = freq
         else:
-            if pinyin_str[-1].isdigit():
-                pinyin_str = pinyin_str[:-1]
-            if pinyin_str in phrase_dict:
-                phrase_dict[pinyin_str] += freq
-            else:
-                phrase_dict[pinyin_str] = freq
+            phrase_dict[pinyin_str] = freq
     phrasefile.close()
 
 
