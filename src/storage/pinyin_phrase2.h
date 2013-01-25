@@ -132,6 +132,10 @@ inline void compute_lower_value2(pinyin_option_t options,
          * to check lower bound.
          */
 
+        /* as chewing zero middle is the first item, and its value is zero,
+         * no need to adjust it for incomplete pinyin.
+         */
+
         /* compute lower final */
         sel = aKey.m_final;
         for (k = aKey.m_final - 1; k >= CHEWING_ZERO_FINAL; --k) {
@@ -183,10 +187,20 @@ inline void compute_upper_value2(pinyin_option_t options,
         }
         aKey.m_initial = (ChewingInitial)sel;
 
-        /* compute upper middle, skipped as no fuzzy pinyin here.
-         * if needed in future, still use pinyin_compare_middle_and_final2
-         * to check upper bound.
-         */
+        /* adjust it for incomplete pinyin. */
+
+        /* compute upper middle */
+        sel = aKey.m_middle;
+        for (k = aKey.m_middle + 1; k <= CHEWING_LAST_MIDDLE; ++k) {
+            if (0 != pinyin_compare_middle_and_final2
+                (options,
+                 (ChewingMiddle)aKey.m_middle, (ChewingMiddle)k,
+                 (ChewingFinal)aKey.m_final, (ChewingFinal)aKey.m_final))
+                break;
+            else
+                sel = k;
+        }
+        aKey.m_middle = (ChewingMiddle)sel;
 
         /* compute upper final */
         sel = aKey.m_final;
