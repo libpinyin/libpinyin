@@ -200,7 +200,7 @@ int main(int argc, char * argv[]){
         ucs4_t * sentence = g_utf8_to_ucs4(linebuf, -1, NULL, &len, NULL);
         if ( len != num_of_chars ) {
             fprintf(stderr, "non-ucs4 characters encountered:%s.\n", linebuf);
-            fprintf(output, "\n");
+            fprintf(output, "%d \n", null_token);
             continue;
         }
 
@@ -218,14 +218,14 @@ int main(int argc, char * argv[]){
 
         /* print extra enter */
         if ( gen_extra_enter )
-            fprintf(output, "\n");
+            fprintf(output, "%d \n", null_token);
 
         g_array_free(strings, TRUE);
         g_free(sentence);
     }
 
     /* print enter at file tail */
-    fprintf(output, "\n");
+    fprintf(output, "%d \n", null_token);
     fclose(input);
     fclose(output);
     return 0;
