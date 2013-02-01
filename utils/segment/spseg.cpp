@@ -138,12 +138,14 @@ bool backtrace(GArray * steps, glong phrase_len, GArray * strings){
 }
 
 void print_help(){
-    printf("Usage: spseg [--generate-extra-enter]\n");
+    printf("Usage: spseg [--generate-extra-enter] [-o outputfile] [inputfile]\n");
 }
 
 int main(int argc, char * argv[]){
     int i = 1;
     bool gen_extra_enter = false;
+    FILE * input = stdin;
+    FILE * output = stdout;
 
     setlocale(LC_ALL, "");
     //deal with options.
@@ -153,9 +155,22 @@ int main(int argc, char * argv[]){
             exit(0);
         } else if (strcmp("--generate-extra-enter", argv[i]) == 0) {
             gen_extra_enter = true;
+        } else if (strcmp("-o", argv[i]) == 0) {
+            if ( ++i >= argc ){
+                print_help();
+                exit(EINVAL);
+            }
+            output = fopen(argv[i], "w");
+            if (NULL == output) {
+                print_help();
+                exit(EINVAL);
+            }
         } else {
-            print_help();
-            exit(EINVAL);
+            input = fopen(argv[i], "r");
+            if (NULL == input) {
+                print_help();
+                exit(EINVAL);
+            }
         }
         ++i;
     }
@@ -174,7 +189,7 @@ int main(int argc, char * argv[]){
     char * linebuf = NULL;
     size_t size = 0;
     ssize_t read;
-    while( (read = getline(&linebuf, &size, stdin)) != -1 ){
+    while( (read = getline(&linebuf, &size, input)) != -1 ){
         if ( '\n' ==  linebuf[strlen(linebuf) - 1] ) {
             linebuf[strlen(linebuf) - 1] = '\0';
         }
@@ -185,7 +200,7 @@ int main(int argc, char * argv[]){
         ucs4_t * sentence = g_utf8_to_ucs4(linebuf, -1, NULL, &len, NULL);
         if ( len != num_of_chars ) {
             fprintf(stderr, "non-ucs4 characters encountered:%s.\n", linebuf);
-            printf("\n");
+            fprintf(output, "\n");
             continue;
         }
 
@@ -197,19 +212,21 @@ int main(int argc, char * argv[]){
         for ( glong i = 0; i < strings->len; ++i ) {
             SegmentStep * step = &g_array_index(strings, SegmentStep, i);
             char * string = g_ucs4_to_utf8( step->m_phrase, step->m_phrase_len, NULL, NULL, NULL);
-            printf("%d %s\n", step->m_handle, string);
+            fprintf(output, "%d %s\n", step->m_handle, string);
             g_free(string);
         }
 
         /* print extra enter */
         if ( gen_extra_enter )
-            printf("\n");
+            fprintf(output, "\n");
 
         g_array_free(strings, TRUE);
         g_free(sentence);
     }
 
     /* print enter at file tail */
-    printf("\n");
+    fprintf(output, "\n");
+    fclose(input);
+    fclose(output);
     return 0;
 }
