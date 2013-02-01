@@ -45,11 +45,12 @@ enum CONTEXT_STATE{
 };
 
 void print_help(){
-    printf("Usage: ngseg [--generate-extra-enter]\n");
+    printf("Usage: ngseg [--generate-extra-enter]  [-o outputfile] [inputfile]\n");
 }
 
 bool deal_with_segmentable(PhraseLookup * phrase_lookup,
-                           GArray * current_ucs4){
+                           GArray * current_ucs4,
+                           FILE * output){
     char * result_string = NULL;
     MatchResults results = g_array_new(FALSE, FALSE, sizeof(phrase_token_t));
     phrase_lookup->get_best_match(current_ucs4->len,
@@ -58,7 +59,7 @@ bool deal_with_segmentable(PhraseLookup * phrase_lookup,
     phrase_lookup->convert_to_utf8(results, result_string);
 
     if (result_string) {
-        printf("%s\n", result_string);
+        fprintf(output, "%s\n", result_string);
     } else {
         char * tmp_string = g_ucs4_to_utf8
             ( (ucs4_t *) current_ucs4->data, current_ucs4->len,
@@ -73,11 +74,11 @@ bool deal_with_segmentable(PhraseLookup * phrase_lookup,
     return true;
 }
 
-bool deal_with_unknown(GArray * current_ucs4){
+bool deal_with_unknown(GArray * current_ucs4, FILE * output){
     char * result_string = g_ucs4_to_utf8
         ( (ucs4_t *) current_ucs4->data, current_ucs4->len,
           NULL, NULL, NULL);
-    printf("%d %s\n", null_token, result_string);
+    fprintf(output, "%d %s\n", null_token, result_string);
     g_free(result_string);
     return true;
 }
@@ -86,6 +87,8 @@ bool deal_with_unknown(GArray * current_ucs4){
 int main(int argc, char * argv[]){
     int i = 1;
     bool gen_extra_enter = false;
+    FILE * input = stdin;
+    FILE * output = stdout;
 
     setlocale(LC_ALL, "");
     /* deal with options */
@@ -95,9 +98,22 @@ int main(int argc, char * argv[]){
             exit(0);
         } else if ( strcmp("--generate-extra-enter", argv[i]) == 0 ){
             gen_extra_enter = true;
+        } else if (strcmp("-o", argv[i]) == 0) {
+            if ( ++i >= argc ){
+                print_help();
+                exit(EINVAL);
+            }
+            output = fopen(argv[i], "w");
+            if (NULL == output) {
+                print_help();
+                exit(EINVAL);
+            }
         } else {
-            print_help();
-            exit(EINVAL);
+            input = fopen(argv[i], "r");
+            if (NULL == input) {
+                print_help();
+                exit(EINVAL);
+            }
         }
         ++i;
     }
@@ -132,7 +148,7 @@ int main(int argc, char * argv[]){
 
     /* split the sentence */
     char * linebuf = NULL; size_t size = 0; ssize_t read;
-    while( (read = getline(&linebuf, &size, stdin)) != -1 ){
+    while( (read = getline(&linebuf, &size, input)) != -1 ){
         if ( '\n' ==  linebuf[strlen(linebuf) - 1] ) {
             linebuf[strlen(linebuf) - 1] = '\0';
         }
@@ -143,13 +159,13 @@ int main(int argc, char * argv[]){
         ucs4_t * sentence = g_utf8_to_ucs4(linebuf, -1, NULL, &len, NULL);
         if ( len != num_of_chars ) {
             fprintf(stderr, "non-ucs4 characters encountered:%s.\n", linebuf);
-            printf("\n");
+            fprintf(output, "\n");
             continue;
         }
 
         /* only new-line persists. */
         if ( 0  == num_of_chars ) {
-            printf("\n");
+            fprintf(output, "\n");
             continue;
         }
 
@@ -175,10 +191,10 @@ int main(int argc, char * argv[]){
 
             assert ( state != next_state );
             if ( state == CONTEXT_SEGMENTABLE )
-                deal_with_segmentable(&phrase_lookup, current_ucs4);
+                deal_with_segmentable(&phrase_lookup, current_ucs4, output);
 
             if ( state == CONTEXT_UNKNOWN )
-                deal_with_unknown(current_ucs4);
+                deal_with_unknown(current_ucs4, output);
 
             /* save the current character */
             g_array_set_size(current_ucs4, 0);
@@ -189,22 +205,24 @@ int main(int argc, char * argv[]){
         if ( current_ucs4->len ) {
             /* this seems always true. */
             if ( state == CONTEXT_SEGMENTABLE )
-                deal_with_segmentable(&phrase_lookup, current_ucs4);
+                deal_with_segmentable(&phrase_lookup, current_ucs4, output);
 
             if ( state == CONTEXT_UNKNOWN )
-                deal_with_unknown(current_ucs4);
+                deal_with_unknown(current_ucs4, output);
             g_array_set_size(current_ucs4, 0);
         }
 
         /* print extra enter */
         if ( gen_extra_enter )
-            printf("\n");
+            fprintf(output, "\n");
     }
     phrase_index.destroy_tokens(tokens);
 
     /* print enter at file tail */
-    printf("\n");
+    fprintf(output, "\n");
     g_array_free(current_ucs4, TRUE);
     free(linebuf);
+    fclose(input);
+    fclose(output);
     return 0;
 }
