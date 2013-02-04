@@ -24,7 +24,10 @@
 
 #include <config.h>
 #include <assert.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 #include <unistd.h>
+#include <fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>
 #ifdef HAVE_MMAP
@@ -347,25 +350,21 @@ public:
 	/* free old data */
 	reset();
 
-        size_t file_size;
-	
-	FILE* file = fopen(filename, "r");
-	if ( !file )
+	int fd = open(filename, O_RDONLY);
+	if (-1 == fd)
 	    return false;
 
-        fseek(file, 0, SEEK_END);
-        file_size = ftell(file);
-        fseek(file, 0, SEEK_SET);
+        off_t file_size = lseek(fd, 0, SEEK_END);
+        lseek(fd, 0, SEEK_SET);
 
 	int data_len = file_size;
 
 #ifdef HAVE_MMAP
-        int fd = fileno(file);
         void* data = mmap(NULL, data_len, PROT_READ|PROT_WRITE, MAP_PRIVATE,
                           fd, 0);
 
         if (MAP_FAILED == data) {
-            fclose(file);
+            close(fd);
             return false;
         }
 
@@ -373,15 +372,15 @@ public:
 #else
 	void* data = malloc(data_len);
 	if ( !data ){
-	    fclose(file);
-	    return false;      
+	    close(fd);
+	    return false;
 	}
-	
-	data_len = fread(data, 1, data_len, file);
+
+	data_len = read(fd, data, data_len);
 	set_chunk(data, data_len, (free_func_t)free);
 #endif
 
-	fclose(file);
+	close(fd);
 	return true;
     }
 
@@ -394,18 +393,18 @@ public:
      *
      */
     bool save(const char * filename){
-	FILE* file = fopen(filename, "w");
-	if ( !file )
+	int fd = open(filename, O_WRONLY|O_CREAT, 0644);
+	if ( -1 == fd )
 	    return false;
 
-	size_t data_len = fwrite(begin(), 1, size(), file);
+	size_t data_len = write(fd, begin(), size());
 	if ( data_len != size()){
-	    fclose(file);
+	    close(fd);
 	    return false;
 	}
 
-	fsync(fileno(file));
-	fclose(file);
+	fsync(fd);
+	close(fd);
 	return true;
     }
 };
