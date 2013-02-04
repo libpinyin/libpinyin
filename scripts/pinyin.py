@@ -73,7 +73,7 @@ PINYIN_DICT = {
     "nan" : 211, "nang" : 212, "nao" : 213, "ne" : 214, "nei" : 215,
     "nen" : 216, "neng" : 217, "ni" : 218, "nian" : 219, "niang" : 220,
     "niao" : 221, "nie" : 222, "nin" : 223, "ning" : 224, "niu" : 225,
-    # "ng" : 226,
+    "ng" : 226,
     "nong" : 227, "nou" : 228, "nu" : 229, "nuan" : 230,
     # "nue" : 231,
     "nuo" : 232, "nv" : 233, "nve" : 234,

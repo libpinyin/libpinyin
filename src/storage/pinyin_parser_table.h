@@ -350,6 +350,7 @@ const pinyin_index_item_t pinyin_index[] = {
 {"nemg", IS_PINYIN|PINYIN_CORRECT_MG_NG, 233},
 {"nen", IS_CHEWING|IS_PINYIN, 232},
 {"neng", IS_CHEWING|IS_PINYIN, 233},
+{"ng", IS_CHEWING|IS_PINYIN, 234},
 {"ni", IS_CHEWING|IS_PINYIN, 235},
 {"niagn", IS_PINYIN|PINYIN_CORRECT_GN_NG, 238},
 {"niamg", IS_PINYIN|PINYIN_CORRECT_MG_NG, 238},
@@ -1099,7 +1100,7 @@ const chewing_index_item_t chewing_index[] = {
 {"ㄩㄢ", IS_CHEWING|IS_PINYIN, 399},
 {"ㄩㄣ", IS_CHEWING|IS_PINYIN, 401},
 {"ㄩㄥ", IS_CHEWING|IS_PINYIN, 396},
-{"ㄫ", IS_CHEWING, 234}
+{"ㄫ", IS_CHEWING|IS_PINYIN, 234}
 };
 
 const content_table_item_t content_table[] = {
