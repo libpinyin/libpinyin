@@ -75,6 +75,7 @@ AC_FUNC_MALLOC
 AC_FUNC_MEMCMP
 AC_FUNC_REALLOC
 AC_FUNC_STAT
+AC_FUNC_MMAP
 AC_CHECK_FUNCS([gettimeofday memmove memset setlocale])
 
 AC_CHECK_HEADERS([libintl.h string.h])
