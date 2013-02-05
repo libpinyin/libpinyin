@@ -23,6 +23,7 @@
 #define CHEWING_LARGE_TABLE_H
 
 
+#include <stdio.h>
 #include "novel_types.h"
 #include "memory_chunk.h"
 #include "chewing_key.h"
