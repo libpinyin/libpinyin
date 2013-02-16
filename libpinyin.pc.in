@@ -2,8 +2,7 @@ prefix=@prefix@
 exec_prefix=@exec_prefix@
 libdir=@libdir@
 includedir=@includedir@
-datadir=@datadir@
-pkgdatadir=@datadir@/libpinyin
+pkgdatadir=@libdir@/libpinyin
 
 libpinyinincludedir=${includedir}/libpinyin-@VERSION@
 libpinyin_binary_version=@LIBPINYIN_BINARY_VERSION@

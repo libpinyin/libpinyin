@@ -30,7 +30,7 @@ EXTRA_DIST		= $(textual_model_data)
 
 libpinyin_db_DATA 	= $(binary_model_data)
 
-libpinyin_dbdir		= $(pkgdatadir)/data
+libpinyin_dbdir		= $(libdir)/libpinyin/data
 
 CLEANFILES		= $(binary_model_data)
 
