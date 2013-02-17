@@ -19,7 +19,7 @@ MAINTAINERCLEANFILES    = Makefile.in
 
 INCLUDES		= -I$(top_srcdir)/src/include \
 			  -I$(top_srcdir)/src/storage \
-			  @GLIB2_CPPFLAGS@
+			  @GLIB2_CFLAGS@
 
 noinst_HEADERS		= lookup.h \
 			  pinyin_lookup2.h \

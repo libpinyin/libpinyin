@@ -20,7 +20,7 @@ INCLUDES                = -I$(top_srcdir)/src \
                           -I$(top_srcdir)/src/storage \
                           -I$(top_srcdir)/src/lookup \
                           -I$(top_srcdir)/tests \
-                          @GLIB2_CPPFLAGS@
+                          @GLIB2_CFLAGS@
 
 TESTS			 = test_phrase_index_logger \
 			   test_ngram \
@@ -37,30 +37,30 @@ noinst_PROGRAMS          = test_phrase_index \
 
 test_phrase_index_SOURCES = test_phrase_index.cpp
 
-test_phrase_index_LDADD = ../../src/libpinyin_internal.la @GLIB2_LDFLAGS@
+test_phrase_index_LDADD = ../../src/libpinyin_internal.la @GLIB2_LIBS@
 
 test_phrase_index_logger_SOURCES = test_phrase_index_logger.cpp
 
 test_phrase_index_logger_LDADD = ../../src/libpinyin_internal.la \
-					@GLIB2_LDFLAGS@
+					@GLIB2_LIBS@
 
 test_phrase_table_SOURCES = test_phrase_table.cpp
 
-test_phrase_table_LDADD = ../../src/libpinyin_internal.la @GLIB2_LDFLAGS@
+test_phrase_table_LDADD = ../../src/libpinyin_internal.la @GLIB2_LIBS@
 
 test_ngram_SOURCES	= test_ngram.cpp
 
-test_ngram_LDADD	= ../../src/libpinyin_internal.la @GLIB2_LDFLAGS@
+test_ngram_LDADD	= ../../src/libpinyin_internal.la @GLIB2_LIBS@
 
 test_flexible_ngram_SOURCES	= test_flexible_ngram.cpp
 
 test_flexible_ngram_LDADD	= ../../src/libpinyin_internal.la \
-					@GLIB2_LDFLAGS@
+					@GLIB2_LIBS@
 
 test_parser2_SOURCES    = test_parser2.cpp
 
-test_parser2_LDADD      = ../../src/libpinyin_internal.la @GLIB2_LDFLAGS@
+test_parser2_LDADD      = ../../src/libpinyin_internal.la @GLIB2_LIBS@
 
 test_chewing_table_SOURCES    = test_chewing_table.cpp
 
-test_chewing_table_LDADD      = ../../src/libpinyin_internal.la @GLIB2_LDFLAGS@
+test_chewing_table_LDADD      = ../../src/libpinyin_internal.la @GLIB2_LIBS@

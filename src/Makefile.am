@@ -30,7 +30,7 @@ INCLUDES                = -I$(top_srcdir)/src \
 			  -I$(top_srcdir)/src/include \
 			  -I$(top_srcdir)/src/storage \
 			  -I$(top_srcdir)/src/lookup \
-                          @GLIB2_CPPFLAGS@
+                          @GLIB2_CFLAGS@
 
 libpinyinincludedir	= $(includedir)/libpinyin-@VERSION@
 
@@ -44,7 +44,7 @@ noinst_LTLIBRARIES	= libpinyin_internal.la
 
 libpinyin_la_SOURCES	= pinyin.cpp
 
-libpinyin_la_LIBADD	= storage/libstorage.la lookup/liblookup.la
+libpinyin_la_LIBADD	= storage/libstorage.la lookup/liblookup.la @GLIB2_LIBS@
 
 libpinyin_la_LDFLAGS	= -Wl,--version-script=$(srcdir)/libpinyin.ver \
 			  -version-info @LT_VERSION_INFO@

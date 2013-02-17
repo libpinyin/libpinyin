@@ -19,7 +19,7 @@ INCLUDES                = -I$(top_srcdir)/src \
                           -I$(top_srcdir)/src/include \
                           -I$(top_srcdir)/src/storage \
                           -I$(top_srcdir)/src/lookup \
-                          @GLIB2_CPPFLAGS@
+                          @GLIB2_CFLAGS@
 
 TESTS			 = test_memory_chunk
 

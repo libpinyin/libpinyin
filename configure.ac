@@ -51,14 +51,6 @@ AC_SUBST(LIBTOOL_EXPORT_OPTIONS)
 # Checks for libraries.
 PKG_CHECK_MODULES(GLIB2, [glib-2.0 >= 2.4.0])
 
-GLIB2_CPPFLAGS=`$PKG_CONFIG --cflags glib-2.0`
-
-AC_SUBST(GLIB2_CPPFLAGS)
-
-GLIB2_LDFLAGS=`$PKG_CONFIG --libs glib-2.0`
-
-AC_SUBST(GLIB2_LDFLAGS)
-
 # Checks for header files.
 AC_HEADER_STDC
 AC_CHECK_HEADERS([locale.h stdlib.h string.h sys/time.h unistd.h])
