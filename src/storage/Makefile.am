@@ -17,7 +17,7 @@
 
 INCLUDES                = -I$(top_srcdir)/src/include \
 			  -I$(top_srcdir)/src/storage \
-			  @GLIB2_CPPFLAGS@
+			  @GLIB2_CFLAGS@
 
 libpinyinincludedir	= $(includedir)/libpinyin-@VERSION@
 

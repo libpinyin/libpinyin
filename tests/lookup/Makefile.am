@@ -20,15 +20,15 @@ INCLUDES                = -I$(top_srcdir)/src \
                           -I$(top_srcdir)/src/storage \
                           -I$(top_srcdir)/src/lookup \
                           -I$(top_srcdir)/tests \
-                          @GLIB2_CPPFLAGS@
+                          @GLIB2_CFLAGS@
 
 noinst_PROGRAMS          = test_pinyin_lookup \
 			   test_phrase_lookup
 
 test_pinyin_lookup_SOURCES = test_pinyin_lookup.cpp
 
-test_pinyin_lookup_LDADD   = ../../src/libpinyin_internal.la @GLIB2_LDFLAGS@
+test_pinyin_lookup_LDADD   = ../../src/libpinyin_internal.la @GLIB2_LIBS@
 
 test_phrase_lookup_SOURCES = test_phrase_lookup.cpp
 
-test_phrase_lookup_LDADD   = ../../src/libpinyin_internal.la @GLIB2_LDFLAGS@
+test_phrase_lookup_LDADD   = ../../src/libpinyin_internal.la @GLIB2_LIBS@

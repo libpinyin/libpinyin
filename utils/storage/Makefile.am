@@ -20,7 +20,7 @@ INCLUDES                = -I$(top_srcdir)/src \
                           -I$(top_srcdir)/src/storage \
                           -I$(top_srcdir)/src/lookup \
 			  -I$(top_srcdir)/utils \
-                          @GLIB2_CPPFLAGS@
+                          @GLIB2_CFLAGS@
 
 bin_PROGRAMS		 = gen_binary_files \
 			   import_interpolation
@@ -30,16 +30,16 @@ noinst_PROGRAMS          = export_interpolation \
 
 gen_binary_files_SOURCES    = gen_binary_files.cpp
 
-gen_binary_files_LDADD      = ../../src/libpinyin_internal.la @GLIB2_LDFLAGS@
+gen_binary_files_LDADD      = ../../src/libpinyin_internal.la @GLIB2_LIBS@
 
 import_interpolation_SOURCES = import_interpolation.cpp
 
-import_interpolation_LDADD = ../../src/libpinyin_internal.la @GLIB2_LDFLAGS@
+import_interpolation_LDADD = ../../src/libpinyin_internal.la @GLIB2_LIBS@
 
 export_interpolation_SOURCES = export_interpolation.cpp
 
-export_interpolation_LDADD = ../../src/libpinyin_internal.la @GLIB2_LDFLAGS@
+export_interpolation_LDADD = ../../src/libpinyin_internal.la @GLIB2_LIBS@
 
 gen_chewing_table_SOURCES    = gen_chewing_table.cpp
 
-gen_chewing_table_LDADD      = ../../src/libpinyin_internal.la @GLIB2_LDFLAGS@
+gen_chewing_table_LDADD      = ../../src/libpinyin_internal.la @GLIB2_LIBS@

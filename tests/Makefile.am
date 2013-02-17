@@ -28,7 +28,7 @@ INCLUDES                = -I$(top_srcdir)/src \
                           -I$(top_srcdir)/src/include \
                           -I$(top_srcdir)/src/storage \
                           -I$(top_srcdir)/src/lookup \
-                          @GLIB2_CPPFLAGS@
+                          @GLIB2_CFLAGS@
 
 noinst_HEADERS          = timer.h \
 			  tests_helper.h
@@ -39,12 +39,12 @@ noinst_PROGRAMS         = test_pinyin \
 
 test_pinyin_SOURCES	= test_pinyin.cpp
 
-test_pinyin_LDADD	= ../src/libpinyin.la @GLIB2_LDFLAGS@
+test_pinyin_LDADD	= ../src/libpinyin.la @GLIB2_LIBS@
 
 test_phrase_SOURCES	= test_phrase.cpp
 
-test_phrase_LDADD	= ../src/libpinyin.la @GLIB2_LDFLAGS@
+test_phrase_LDADD	= ../src/libpinyin.la @GLIB2_LIBS@
 
 test_chewing_SOURCES	= test_chewing.cpp
 
-test_chewing_LDADD	= ../src/libpinyin.la @GLIB2_LDFLAGS@
+test_chewing_LDADD	= ../src/libpinyin.la @GLIB2_LIBS@
