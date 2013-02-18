@@ -564,6 +564,13 @@ int SubPhraseIndex::get_range(/* out */ PhraseIndexRange & range){
     const table_offset_t * begin = (const table_offset_t *)m_phrase_index.begin();
     const table_offset_t * end = (const table_offset_t *)m_phrase_index.end();
 
+    if (begin == end) {
+        /* skip empty sub phrase index. */
+        range.m_range_begin = 1;
+        range.m_range_end = 1;
+        return ERROR_OK;
+    }
+
     /* remove trailing zeros. */
     const table_offset_t * poffset = 0;
     for (poffset = end - 1; poffset >= begin + 1; --poffset) {
