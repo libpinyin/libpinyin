@@ -838,6 +838,7 @@ typedef enum {
 } PHRASE_FILE_TYPE;
 
 typedef struct {
+    const PHRASE_INDEX_LIBRARIES m_dict_index; /* for assert purpose. */
     const char * m_table_filename;
     const char * m_system_filename;
     const char * m_user_filename;
