@@ -178,7 +178,8 @@ pinyin_context_t * pinyin_init(const char * systemdir, const char * userdir){
     context->m_phrase_index = new FacadePhraseIndex;
 
     /* hack here: directly call load phrase library. */
-    pinyin_load_phrase_library(context, 1);
+    pinyin_load_phrase_library(context, GB_DICTIONARY);
+    pinyin_load_phrase_library(context, MERGED_DICTIONARY);
 
     context->m_system_bigram = new Bigram;
     filename = g_build_filename(context->m_system_dir, "bigram.db", NULL);
@@ -215,7 +216,8 @@ bool pinyin_load_phrase_library(pinyin_context_t * context,
 
     const pinyin_table_info_t * table_info = pinyin_phrase_files + index;
 
-    if (SYSTEM_FILE == table_info->m_file_type) {
+    if (SYSTEM_FILE == table_info->m_file_type ||
+        DICTIONARY == table_info->m_file_type) {
         /* system phrase library */
         MemoryChunk * chunk = new MemoryChunk;
 
@@ -267,8 +269,8 @@ bool pinyin_load_phrase_library(pinyin_context_t * context,
 
 bool pinyin_unload_phrase_library(pinyin_context_t * context,
                                   guint8 index){
-    /* gb_char.bin can't be unloaded. */
-    if (1 == index)
+    /* gb_char.bin and merged.bin can't be unloaded. */
+    if (GB_DICTIONARY == index || MERGED_DICTIONARY == index)
         return false;
 
     assert(index < PHRASE_INDEX_LIBRARY_COUNT);
@@ -436,7 +438,8 @@ bool pinyin_save(pinyin_context_t * context){
         if (NULL == userfilename)
             continue;
 
-        if (SYSTEM_FILE == table_info->m_file_type) {
+        if (SYSTEM_FILE == table_info->m_file_type ||
+            DICTIONARY == table_info->m_file_type) {
             /* system phrase library */
             MemoryChunk * chunk = new MemoryChunk;
             MemoryChunk * log = new MemoryChunk;
@@ -590,7 +593,8 @@ bool pinyin_mask_out(pinyin_context_t * context,
         if (NULL == userfilename)
             continue;
 
-        if (SYSTEM_FILE == table_info->m_file_type) {
+        if (SYSTEM_FILE == table_info->m_file_type ||
+            DICTIONARY == table_info->m_file_type) {
             /* system phrase library */
             MemoryChunk * chunk = new MemoryChunk;
 
