@@ -56,6 +56,7 @@ int main(int argc, char * argv[]){
     FacadePhraseIndex phrase_index;
     for (size_t i = 0; i < PHRASE_INDEX_LIBRARY_COUNT; ++i) {
         const pinyin_table_info_t * table_info = pinyin_phrase_files + i;
+        assert(table_info->m_dict_index == i);
 
         if (SYSTEM_FILE != table_info->m_file_type &&
             DICTIONARY != table_info->m_file_type)
