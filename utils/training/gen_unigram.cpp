@@ -46,7 +46,7 @@ int main(int argc, char * argv[]){
         bool retval = chunk->load(binfile);
         if (!retval) {
             fprintf(stderr, "load %s failed!\n", binfile);
-            return false;
+            exit(ENOENT);
         }
 
         phrase_index.load(i, chunk);

@@ -16,23 +16,23 @@
 ## Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 
-textual_model_data	= interpolation2.text \
-				gb_char.table gbk_char.table \
+tablefiles		= gb_char.table gbk_char.table \
 				merged.table \
 				art.table culture.table economy.table \
 				geology.table history.table life.table \
 				nature.table scitech.table \
 				society.table sport.table
 
+binfiles		= ${tablefiles:.table=.bin}
 
-binary_model_data	= gb_char.bin gbk_char.bin \
-				phrase_index.bin pinyin_index.bin \
+
+textual_model_data	= interpolation2.text \
+				$(tablefiles)
+
+
+binary_model_data	= phrase_index.bin pinyin_index.bin \
 				bigram.db \
-				merged.bin \
-				art.bin culture.bin economy.bin \
-				geology.bin history.bin life.bin \
-				nature.bin scitech.bin \
-				society.bin sport.bin
+				$(binfiles)
 
 
 MAINTAINERCLEANFILES	= Makefile.in
@@ -50,7 +50,7 @@ interpolation2.text:
 	tar xvf model2.text.tar.gz -C $(top_srcdir)/data
 
 
-gb_char.table gbk_char.table: interpolation2.text
+$(tablefiles): interpolation2.text
 
 bigram.db: $(textual_model_data)
 	$(RM) $(binary_model_data)
@@ -58,7 +58,7 @@ bigram.db: $(textual_model_data)
 	../utils/storage/import_interpolation < $(top_srcdir)/data/interpolation2.text
 	../utils/training/gen_unigram
 
-gb_char.bin gbk_char.bin phrase_index.bin pinyin_index.bin: bigram.db
+phrase_index.bin pinyin_index.bin $(binfiles): bigram.db
 
 rebuild:
 	git reset --hard
