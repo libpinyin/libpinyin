@@ -96,5 +96,8 @@ int main(int argc, char * argv[]){
     if (!save_phrase_index(&phrase_index))
         exit(ENOENT);
 
+    if (!save_dictionary(&phrase_index))
+        exit(ENOENT);
+
     return 0;
 }

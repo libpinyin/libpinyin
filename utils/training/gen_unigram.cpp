@@ -28,8 +28,6 @@
 int main(int argc, char * argv[]){
 
     FacadePhraseIndex phrase_index;
-    if (!load_phrase_index(&phrase_index))
-        exit(ENOENT);
 
     /* Note: please increase the value when corpus size becomes larger.
      *  To avoid zero value when computing unigram frequency in float format.
@@ -42,6 +40,17 @@ int main(int argc, char * argv[]){
             DICTIONARY != table_info->m_file_type)
             continue;
 
+        const char * binfile = table_info->m_system_filename;
+
+        MemoryChunk * chunk = new MemoryChunk;
+        bool retval = chunk->load(binfile);
+        if (!retval) {
+            fprintf(stderr, "load %s failed!\n", binfile);
+            return false;
+        }
+
+        phrase_index.load(i, chunk);
+
         guint32 freq = 1; PhraseIndexRange range;
         int result = phrase_index.get_range(i, range);
         if ( result == ERROR_OK ) {
@@ -53,6 +62,9 @@ int main(int argc, char * argv[]){
     }
 
     if (!save_phrase_index(&phrase_index))
+        exit(ENOENT);
+
+    if (!save_dictionary(&phrase_index))
         exit(ENOENT);
 
     return 0;
