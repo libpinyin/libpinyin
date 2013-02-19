@@ -17,11 +17,22 @@
 
 
 textual_model_data	= interpolation2.text \
-				gb_char.table gbk_char.table
+				gb_char.table gbk_char.table \
+				merged.table \
+				art.table culture.table economy.table \
+				geology.table history.table life.table \
+				nature.table scitech.table \
+				society.table sport.table
+
 
 binary_model_data	= gb_char.bin gbk_char.bin \
 				phrase_index.bin pinyin_index.bin \
-				bigram.db
+				bigram.db \
+				merged.bin \
+				art.bin culture.bin economy.bin \
+				geology.bin history.bin life.bin \
+				nature.bin scitech.bin \
+				society.bin sport.bin
 
 
 MAINTAINERCLEANFILES	= Makefile.in
@@ -35,7 +46,7 @@ libpinyin_dbdir		= $(libdir)/libpinyin/data
 CLEANFILES		= $(binary_model_data)
 
 interpolation2.text:
-	wget http://downloads.sourceforge.net/libpinyin/model2.text.tar.gz
+	wget http://downloads.sourceforge.net/libpinyin/model3.text.tar.gz
 	tar xvf model2.text.tar.gz -C $(top_srcdir)/data
 
 
