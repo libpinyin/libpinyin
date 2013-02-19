@@ -662,19 +662,21 @@ const pinyin_table_info_t pinyin_phrase_files[PHRASE_INDEX_LIBRARY_COUNT] =
         {NULL, NULL, NULL, NOT_USED},
         {"gb_char.table", "gb_char.bin", "gb_char.dbin", SYSTEM_FILE},
         {"gbk_char.table", "gbk_char.bin", "gbk_char.dbin", SYSTEM_FILE},
-        {NULL, NULL, NULL, NOT_USED},
-        {NULL, NULL, NULL, NOT_USED},
 
-        {NULL, NULL, NULL, NOT_USED},
-        {NULL, NULL, NULL, NOT_USED},
-        {NULL, NULL, NULL, NOT_USED},
-        {NULL, NULL, NULL, NOT_USED},
-        {NULL, NULL, NULL, NOT_USED},
+        {"merged.table", "merged.bin", "merged.dbin", SYSTEM_FILE},
 
-        {NULL, NULL, NULL, NOT_USED},
-        {NULL, NULL, NULL, NOT_USED},
-        {NULL, NULL, NULL, NOT_USED},
-        {NULL, NULL, NULL, NOT_USED},
+        {"art.table", "art.bin", "art.dbin", DICTIONARY},
+        {"culture.table", "culture.bin", "culture.dbin", DICTIONARY},
+        {"economy.table", "economy.bin", "economy.dbin", DICTIONARY},
+        {"geology.table", "geology.bin", "geology.dbin", DICTIONARY},
+        {"history.table", "history.bin", "history.dbin", DICTIONARY},
+
+        {"life.table", "life.bin", "life.dbin", DICTIONARY},
+        {"nature.table", "nature.bin", "nature.dbin", DICTIONARY},
+        {"scitech.table", "scitech.bin", "scitech.dbin", DICTIONARY},
+        {"society.table", "society.bin", "society.dbin", DICTIONARY},
+        {"sport.table", "sport.bin", "sport.dbin", DICTIONARY},
+
         {NULL, NULL, NULL, NOT_USED},
 
         {NULL, NULL, "user.bin", USER_FILE}
