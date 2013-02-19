@@ -833,6 +833,7 @@ public:
 typedef enum {
     NOT_USED,                /* not used. */
     SYSTEM_FILE,             /* system phrase file. */
+    DICTIONARY,              /* professional dictionary. */
     USER_FILE,               /* user only phrase file. */
 } PHRASE_FILE_TYPE;
 
