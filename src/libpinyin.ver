@@ -34,6 +34,7 @@ LIBPINYIN {
         pinyin_reset;
         pinyin_get_chewing_string;
         pinyin_get_pinyin_string;
+        pinyin_get_pinyin_strings;
         pinyin_token_get_phrase;
         pinyin_token_get_n_pronunciation;
         pinyin_token_get_nth_pronunciation;

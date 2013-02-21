@@ -492,6 +492,22 @@ bool pinyin_get_pinyin_string(pinyin_instance_t * instance,
                               gchar ** utf8_str);
 
 /**
+ * pinyin_get_pinyin_strings:
+ * @instance: the pinyin instance.
+ * @key: the pinyin key.
+ * @shengmu: the shengmu string.
+ * @yunmu: the yunmu string.
+ * @returns: whether the get operation is successful.
+ *
+ * Get the shengmu and yunmu strings of the key.
+ *
+ */
+bool pinyin_get_pinyin_strings(pinyin_instance_t * instance,
+                               ChewingKey * key,
+                               gchar ** shengmu,
+                               gchar ** yunmu);
+
+/**
  * pinyin_token_get_phrase:
  * @instance: the pinyin instance.
  * @token: the phrase token.

@@ -1763,6 +1763,19 @@ bool pinyin_get_pinyin_string(pinyin_instance_t * instance,
     return true;
 }
 
+bool pinyin_get_pinyin_strings(pinyin_instance_t * instance,
+                               ChewingKey * key,
+                               gchar ** shengmu,
+                               gchar ** yunmu) {
+    *shengmu = NULL; *yunmu = NULL;
+    if (0 == key->get_table_index())
+        return false;
+
+    *shengmu = key->get_shengmu_string();
+    *yunmu = key->get_yunmu_string();
+    return true;
+}
+
 bool pinyin_token_get_phrase(pinyin_instance_t * instance,
                              phrase_token_t token,
                              guint * len,
