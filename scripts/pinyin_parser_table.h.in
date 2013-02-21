@@ -29,15 +29,6 @@ const gint chewing_key_table[CHEWING_NUMBER_OF_INITIALS *
 @TABLE_INDEX@
 };
 
-const char * chewing_tone_table[CHEWING_NUMBER_OF_TONES] = {
-"",
-"ˉ",
-"ˊ",
-"ˇ",
-"ˋ",
-"˙"
-};
-
 };
 
 #endif

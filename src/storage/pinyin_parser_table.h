@@ -3388,15 +3388,6 @@ const gint chewing_key_table[CHEWING_NUMBER_OF_INITIALS *
 -1      /* ChewingKey(CHEWING_ZH, CHEWING_V, PINYIN_ING) */
 };
 
-const char * chewing_tone_table[CHEWING_NUMBER_OF_TONES] = {
-"",
-"ˉ",
-"ˊ",
-"ˇ",
-"ˋ",
-"˙"
-};
-
 };
 
 #endif

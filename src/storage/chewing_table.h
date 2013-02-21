@@ -207,6 +207,15 @@ const chewing_tone_item_t chewing_ibm_tones[] = {
 {'\0', 0}
 };
 
+const char * chewing_tone_table[CHEWING_NUMBER_OF_TONES] = {
+"",
+"ˉ",
+"ˊ",
+"ˇ",
+"ˋ",
+"˙"
+};
+
 };
 
 #endif
