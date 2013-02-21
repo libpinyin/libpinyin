@@ -58,11 +58,24 @@ def sort_all():
     pinyin_index = sorted(pinyin_index, key=sortfunc)
     bopomofo_index = sorted(bopomofo_index, key=sortfunc)
 
+def get_sheng_yun(pinyin):
+    if pinyin == None:
+        return None, None
+    if pinyin == "":
+        return "", ""
+    if pinyin == "ng":
+        return "", "ng"
+    for i in range(2, 0, -1):
+        s = pinyin[:i]
+        if s in shengmu_list:
+            return s, pinyin[i:]
+    return "", pinyin
 
 def gen_content_table():
     entries = []
     for ((correct, bopomofo, chewing)) in content_table:
-        entry = '{{"{0}", "{1}", {2}}}'.format(correct, bopomofo, chewing)
+        (shengmu, yunmu) = get_sheng_yun(correct)
+        entry = '{{"{0}", "{1}", "{2}", "{3}", {4}}}'.format(correct, shengmu, yunmu, bopomofo, chewing)
         entries.append(entry)
     return ',\n'.join(entries)
 

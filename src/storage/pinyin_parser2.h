@@ -31,6 +31,8 @@ namespace pinyin{
 
 typedef struct {
     const char * m_pinyin_str;
+    const char * m_shengmu_str;
+    const char * m_yunmu_str;
     const char * m_chewing_str;
     ChewingKey   m_chewing_key;
 } content_table_item_t;
