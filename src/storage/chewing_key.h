@@ -92,6 +92,8 @@ public:
 
     /* Note: the return value should be freed by g_free. */
     gchar * get_pinyin_string();
+    gchar * get_shengmu_string();
+    gchar * get_yunmu_string();
     gchar * get_chewing_string();
 };
 
