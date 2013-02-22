@@ -40,6 +40,14 @@ int main(int argc, char * argv[]){
             DICTIONARY != table_info->m_file_type)
             continue;
 
+        gint count = 100;
+        /* skip GBK_DICTIONARY. */
+        if (GBK_DICTIONARY == table_info->m_dict_index)
+            count = 1;
+
+        const guint32 unigram_factor = 7;
+        guint32 freq = count * unigram_factor;
+
         const char * binfile = table_info->m_system_filename;
 
         MemoryChunk * chunk = new MemoryChunk;
@@ -51,7 +59,7 @@ int main(int argc, char * argv[]){
 
         phrase_index.load(i, chunk);
 
-        guint32 freq = 1; PhraseIndexRange range;
+        PhraseIndexRange range;
         int result = phrase_index.get_range(i, range);
         if ( result == ERROR_OK ) {
             for (size_t token = range.m_range_begin;
