@@ -344,7 +344,7 @@ bool pinyin_iterator_add_phrase(import_iterator_t * iter,
     g_array_free(tokenarray, TRUE);
 
     PhraseItem item;
-    /* check whether it exists in the same sub phrase; */
+    /* check whether it exists in the same sub phrase index; */
     if (null_token != token &&
         PHRASE_INDEX_LIBRARY_INDEX(token) == iter->m_phrase_index) {
         /* if so, remove the phrase, add the pinyin for the phrase item,
@@ -370,7 +370,7 @@ bool pinyin_iterator_add_phrase(import_iterator_t * iter,
             result = true;
         }
     } else {
-        /* if not exists in the sub phrase index,
+        /* if not exists in the same sub phrase index,
            get the maximum token,
            then add it directly with maximum token + 1; */
         PhraseIndexRange range;
