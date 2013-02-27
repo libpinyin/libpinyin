@@ -530,7 +530,7 @@ bool PinyinLookup2::final_step(MatchResults & results){
 bool PinyinLookup2::train_result2(ChewingKeyVector keys,
                                   CandidateConstraints constraints,
                                   MatchResults results) {
-    const guint32 initial_seed = 23 * 15;
+    const guint32 initial_seed = 23 * 3;
     const guint32 expand_factor = 2;
     const guint32 unigram_factor = 7;
     const guint32 pinyin_factor = 1;

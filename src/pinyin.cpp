@@ -292,8 +292,8 @@ bool pinyin_iterator_add_phrase(import_iterator_t * iter,
                                 const char * pinyin,
                                 gint count){
     /* if -1 == count, use the default value. */
-    const gint default_count = 100;
-    const guint32 unigram_factor = 7;
+    const gint default_count = 5;
+    const guint32 unigram_factor = 3;
     if (-1 == count)
         count = default_count;
 
