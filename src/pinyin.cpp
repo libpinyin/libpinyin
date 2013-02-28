@@ -90,6 +90,16 @@ static bool check_format(const char * userdir){
     }
 
     filename = g_build_filename
+        (userdir, "user_pinyin_index.bin", NULL);
+    unlink(filename);
+    g_free(filename);
+
+    filename = g_build_filename
+        (userdir, "user_phrase_index.bin", NULL);
+    unlink(filename);
+    g_free(filename);
+
+    filename = g_build_filename
         (userdir, "user.db", NULL);
     unlink(filename);
     g_free(filename);
