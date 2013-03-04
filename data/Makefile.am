@@ -62,5 +62,5 @@ phrase_index.bin pinyin_index.bin $(binfiles): bigram.db
 
 rebuild:
 	git reset --hard
-	sed -i -e "s/#define LAMBDA_PARAMETER 0.332769/#define LAMBDA_PARAMETER $(LAMBDA_PARAMETER)/" ../src/include/novel_types.h
+	sed -i -e "s/#define LAMBDA_PARAMETER 0.351972/#define LAMBDA_PARAMETER $(LAMBDA_PARAMETER)/" ../src/include/novel_types.h
 	make -C .. >/dev/null 2>/dev/null
