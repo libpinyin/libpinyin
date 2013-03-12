@@ -24,6 +24,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+using namespace pinyin;
+
 int main(int argc, char * argv[]){
     pinyin_context_t * context =
         pinyin_init("../data", "../data");

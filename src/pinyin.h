@@ -28,7 +28,22 @@
 #include "pinyin_custom2.h"
 #include "chewing_key.h"
 
-using namespace pinyin;
+using pinyin::pinyin_option_t;
+using pinyin::DoublePinyinScheme;
+using pinyin::ChewingScheme;
+
+using pinyin::phrase_token_t;
+using pinyin::null_token;
+
+using pinyin::ChewingKey;
+using pinyin::ChewingKeyRest;
+
+using pinyin::TokenVector;
+using pinyin::ChewingKeyVector;
+using pinyin::ChewingKeyRestVector;
+using pinyin::CandidateConstraints;
+using pinyin::MatchResults;
+
 
 extern "C" {
 

@@ -26,6 +26,8 @@
 #include <glib/gstdio.h>
 #include "pinyin_internal.h"
 
+using namespace pinyin;
+
 /* a glue layer for input method integration. */
 
 struct _pinyin_context_t{
