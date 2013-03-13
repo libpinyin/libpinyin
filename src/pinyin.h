@@ -446,6 +446,18 @@ bool pinyin_free_candidates(pinyin_instance_t * instance,
                             CandidateVector candidates);
 
 /**
+* pinyin_clear_constraint:
+* @instance: the pinyin instance.
+* @offset: the offset in the pinyin keys.
+* @returns: whether the constraint is cleared.
+*
+* Clear the previous chosen candidate.
+*
+*/
+bool pinyin_clear_constraint(pinyin_instance_t * instance,
+                             size_t offset);
+
+/**
  * pinyin_lookup_tokens:
  * @instance: the pinyin instance.
  * @phrase: the phrase to be looked up.
