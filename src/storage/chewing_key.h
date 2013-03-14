@@ -32,34 +32,6 @@
 namespace pinyin{
 
 
-/**
- * @brief enums of Double Pinyin Schemes.
- */
-enum DoublePinyinScheme
-{
-    DOUBLE_PINYIN_ZRM        = 1,
-    DOUBLE_PINYIN_MS         = 2,
-    DOUBLE_PINYIN_ZIGUANG    = 3,
-    DOUBLE_PINYIN_ABC        = 4,
-    DOUBLE_PINYIN_PYJJ       = 6,
-    DOUBLE_PINYIN_XHE        = 7,
-    DOUBLE_PINYIN_CUSTOMIZED = 30,        /* for user's keyboard */
-    DOUBLE_PINYIN_DEFAULT    = DOUBLE_PINYIN_MS
-};
-
-/**
- * @brief enums of Chewing Schemes.
- */
-enum ChewingScheme
-{
-    CHEWING_STANDARD = 1,
-    CHEWING_IBM      = 2,
-    CHEWING_GINYIEH  = 3,
-    CHEWING_ETEN     = 4,
-    CHEWING_DEFAULT  = CHEWING_STANDARD
-};
-
-
 /** Note: The parsed pinyins are stored in the following two
  *          GArrays to speed up chewing table lookup.
  *    As the chewing large table only contains information of struct ChewingKey.
