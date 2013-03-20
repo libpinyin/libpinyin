@@ -28,6 +28,7 @@
  */
 
 #include "novel_types.h"
+#include <limits.h>
 
 namespace pinyin{
 

@@ -27,7 +27,6 @@
 #ifndef NOVEL_TYPES_H
 #define NOVEL_TYPES_H
 
-#include <limits.h>
 #include <glib.h>
 
 namespace pinyin{
@@ -130,8 +129,6 @@ typedef guint32 table_offset_t;
 
 typedef double parameter_t;
 
-#define LAMBDA_PARAMETER 0.347121
-
 /* Array of ChewingKey/ChewingKeyRest */
 typedef GArray * ChewingKeyVector;
 typedef GArray * ChewingKeyRestVector;
@@ -163,6 +160,8 @@ typedef enum {
     RESERVED1,
     USER_DICTIONARY
 } PHRASE_INDEX_LIBRARIES;
+
+#define LAMBDA_PARAMETER 0.347121
 
 };
 
