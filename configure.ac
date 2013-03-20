@@ -5,7 +5,7 @@
 m4_define([libpinyin_major_version], [0])
 m4_define([libpinyin_minor_version], [9])
 m4_define([libpinyin_micro_version], [91])
-m4_define([libpinyin_abi_current], [3])
+m4_define([libpinyin_abi_current], [4])
 m4_define([libpinyin_abi_revision], [0])
 
 m4_define([libpinyin_version],
