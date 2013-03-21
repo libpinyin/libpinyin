@@ -36,8 +36,6 @@ int main(int argc, char * argv[]){
     pinyin_set_options(context, options);
 
     pinyin_instance_t * instance = pinyin_alloc_instance(context);
-    CandidateVector candidates = g_array_new
-        (FALSE, FALSE, sizeof(lookup_candidate_t));
 
     char * prefixbuf = NULL; size_t prefixsize = 0;
     char * linebuf = NULL; size_t linesize = 0;
@@ -69,18 +67,18 @@ int main(int argc, char * argv[]){
 
         pinyin_parse_more_full_pinyins(instance, linebuf);
         pinyin_guess_sentence_with_prefix(instance, prefixbuf);
+        pinyin_guess_full_pinyin_candidates(instance, 0);
 
-        pinyin_get_full_pinyin_candidates(instance, 0, candidates);
-        for (size_t i = 0; i < candidates->len; ++i) {
-            lookup_candidate_t * candidate = &g_array_index
-                (candidates, lookup_candidate_t, i);
-            const char * pinyins = candidate->m_new_pinyins;
-            const char * word = candidate->m_phrase_string;
+        guint len = 0;
+        pinyin_get_n_candidate(instance, &len);
+        for (size_t i = 0; i < len; ++i) {
+            lookup_candidate_t * candidate = NULL;
+            pinyin_get_candidate(instance, i, &candidate);
 
-            if (pinyins)
-                printf("%s %s\t", pinyins, word);
-            else
-                printf("%s\t", word);
+            const char * word = NULL;
+            pinyin_get_candidate_string(instance, candidate, &word);
+
+            printf("%s\t", word);
         }
         printf("\n");
 
@@ -89,8 +87,6 @@ int main(int argc, char * argv[]){
         pinyin_save(context);
     }
 
-    pinyin_free_candidates(instance, candidates);
-    g_array_free(candidates, TRUE);
     pinyin_free_instance(instance);
 
     pinyin_mask_out(context, 0x0, 0x0);
