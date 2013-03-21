@@ -836,9 +836,9 @@ bool pinyin_parse_full_pinyin(pinyin_instance_t * instance,
     pinyin_context_t * & context = instance->m_context;
 
     int pinyin_len = strlen(onepinyin);
-    int parse_len = context->m_full_pinyin_parser->parse_one_key
+    bool retval = context->m_full_pinyin_parser->parse_one_key
         ( context->m_options, *onekey, onepinyin, pinyin_len);
-    return pinyin_len == parse_len;
+    return retval;
 }
 
 size_t pinyin_parse_more_full_pinyins(pinyin_instance_t * instance,
@@ -862,9 +862,9 @@ bool pinyin_parse_double_pinyin(pinyin_instance_t * instance,
     pinyin_context_t * & context = instance->m_context;
 
     int pinyin_len = strlen(onepinyin);
-    int parse_len = context->m_double_pinyin_parser->parse_one_key
+    bool retval = context->m_double_pinyin_parser->parse_one_key
         ( context->m_options, *onekey, onepinyin, pinyin_len);
-    return pinyin_len == parse_len;
+    return retval;
 }
 
 size_t pinyin_parse_more_double_pinyins(pinyin_instance_t * instance,
@@ -885,9 +885,9 @@ bool pinyin_parse_chewing(pinyin_instance_t * instance,
     pinyin_context_t * & context = instance->m_context;
 
     int chewing_len = strlen(onechewing);
-    int parse_len = context->m_chewing_parser->parse_one_key
+    bool retval = context->m_chewing_parser->parse_one_key
         ( context->m_options, *onekey, onechewing, chewing_len );
-    return chewing_len == parse_len;
+    return retval;
 }
 
 size_t pinyin_parse_more_chewings(pinyin_instance_t * instance,
@@ -1907,6 +1907,15 @@ bool pinyin_token_add_unigram_frequency(pinyin_instance_t * instance,
     return ERROR_OK == retval;
 }
 
+size_t pinyin_get_n_candidate(pinyin_instance_t * instance){
+    return instance->m_candidates->len;
+}
+
+size_t pinyin_get_n_pinyin(pinyin_instance_t * instance){
+    assert (instance->m_pinyin_keys->len ==
+            instance->m_pinyin_key_rests->len);
+    return instance->m_pinyin_keys->len;
+}
 
 
 /**

@@ -563,6 +563,10 @@ bool pinyin_token_add_unigram_frequency(pinyin_instance_t * instance,
                                         guint delta);
 
 
+size_t pinyin_get_n_candidate(pinyin_instance_t * instance);
+
+size_t pinyin_get_n_pinyin(pinyin_instance_t * instance);
+
 
 /* hack here. */
 typedef ChewingKey PinyinKey;
