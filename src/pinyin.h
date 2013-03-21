@@ -41,12 +41,7 @@ using pinyin::null_token;
 
 using pinyin::ChewingKey;
 using pinyin::ChewingKeyRest;
-
-using pinyin::TokenVector;
 using pinyin::ChewingKeyVector;
-using pinyin::ChewingKeyRestVector;
-using pinyin::CandidateConstraints;
-using pinyin::MatchResults;
 
 
 extern "C" {
