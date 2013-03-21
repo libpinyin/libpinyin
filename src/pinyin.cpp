@@ -1734,13 +1734,6 @@ int pinyin_choose_candidate(pinyin_instance_t * instance,
     return offset + len;
 }
 
-
-bool pinyin_free_candidates(pinyin_instance_t * instance,
-                            CandidateVector candidates) {
-    _free_candidates(candidates);
-    return true;
-}
-
 bool pinyin_clear_constraint(pinyin_instance_t * instance,
                              size_t offset){
     pinyin_context_t * & context = instance->m_context;

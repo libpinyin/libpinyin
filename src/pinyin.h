@@ -403,18 +403,6 @@ int pinyin_choose_candidate(pinyin_instance_t * instance,
                             lookup_candidate_t * candidate);
 
 /**
- * pinyin_free_candidates:
- * @instance: the pinyin instance.
- * @candidates: the GArray of lookup_candidate_t candidates.
- * @returns: whether the free operation succeeded.
- *
- * Free the candidates.
- *
- */
-bool pinyin_free_candidates(pinyin_instance_t * instance,
-                            CandidateVector candidates);
-
-/**
 * pinyin_clear_constraint:
 * @instance: the pinyin instance.
 * @offset: the offset in the pinyin keys.
