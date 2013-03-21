@@ -2009,6 +2009,27 @@ bool pinyin_get_raw_full_pinyin(pinyin_instance_t * instance,
     return true;
 }
 
+bool pinyin_get_n_phrase(pinyin_instance_t * instance,
+                         guint * num) {
+    *num = instance->m_match_results->len;
+    return true;
+}
+
+bool pinyin_get_phrase_token(pinyin_instance_t * instance,
+                             guint index,
+                             phrase_token_t * token){
+    MatchResults & match_results = instance->m_match_results;
+
+    *token = null_token;
+
+    if (index >= match_results->len)
+        return false;
+
+    *token = g_array_index(match_results, phrase_token_t, index);
+
+    return true;
+}
+
 
 /**
  *  Note: prefix is the text before the pre-edit string.

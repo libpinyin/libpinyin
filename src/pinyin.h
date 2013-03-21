@@ -600,7 +600,12 @@ bool pinyin_get_key_rest_length(pinyin_instance_t * instance,
 bool pinyin_get_raw_full_pinyin(pinyin_instance_t * instance,
                                 const gchar ** utf8_str);
 
+bool pinyin_get_n_phrase(pinyin_instance_t * instance,
+                         guint * num);
 
+bool pinyin_get_phrase_token(pinyin_instance_t * instance,
+                             guint index,
+                             phrase_token_t * token);
 
 /* hack here. */
 typedef ChewingKey PinyinKey;
