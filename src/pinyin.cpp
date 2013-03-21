@@ -51,10 +51,39 @@ struct _pinyin_context_t{
     bool m_modified;
 };
 
+struct _pinyin_instance_t{
+    pinyin_context_t * m_context;
+    gchar * m_raw_full_pinyin;
+    TokenVector m_prefixes;
+    ChewingKeyVector m_pinyin_keys;
+    ChewingKeyRestVector m_pinyin_key_rests;
+    CandidateConstraints m_constraints;
+    MatchResults m_match_results;
+    CandidateVector m_candidates;
+};
+
+struct _lookup_candidate_t{
+    enum lookup_candidate_type_t m_candidate_type;
+    gchar * m_phrase_string;
+    phrase_token_t m_token;
+    ChewingKeyRest m_orig_rest;
+    gchar * m_new_pinyins;
+    guint32 m_freq; /* the amplifed gfloat numerical value. */
+public:
+    _lookup_candidate_t() {
+        m_candidate_type = NORMAL_CANDIDATE;
+        m_phrase_string = NULL;
+        m_token = null_token;
+        m_new_pinyins = NULL;
+        m_freq = 0;
+    }
+};
+
 struct _import_iterator_t{
     pinyin_context_t * m_context;
     guint8 m_phrase_index;
 };
+
 
 static bool check_format(const char * userdir){
     gchar * filename = g_build_filename
