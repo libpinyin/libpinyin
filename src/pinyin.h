@@ -26,7 +26,11 @@
 #include <stdio.h>
 #include "novel_types.h"
 #include "pinyin_custom2.h"
-#include "chewing_key.h"
+
+namespace pinyin{
+typedef struct _ChewingKey ChewingKey;
+typedef struct _ChewingKeyRest ChewingKeyRest;
+};
 
 using pinyin::pinyin_option_t;
 using pinyin::DoublePinyinScheme;
@@ -52,8 +56,6 @@ typedef struct _pinyin_instance_t pinyin_instance_t;
 typedef struct _lookup_candidate_t lookup_candidate_t;
 
 typedef struct _import_iterator_t import_iterator_t;
-
-typedef GArray * CandidateVector; /* GArray of lookup_candidate_t */
 
 enum lookup_candidate_type_t{
     BEST_MATCH_CANDIDATE = 1,
@@ -570,8 +572,6 @@ bool pinyin_token_add_unigram_frequency(pinyin_instance_t * instance,
 /* hack here. */
 typedef ChewingKey PinyinKey;
 typedef ChewingKeyRest PinyinKeyPos;
-typedef ChewingKeyVector PinyinKeyVector;
-typedef ChewingKeyRestVector PinyinKeyPosVector;
 
 
 #define LIBPINYIN_FORMAT_VERSION  "0.8.92"

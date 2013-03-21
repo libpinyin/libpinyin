@@ -30,6 +30,8 @@ using namespace pinyin;
 
 /* a glue layer for input method integration. */
 
+typedef GArray * CandidateVector; /* GArray of lookup_candidate_t */
+
 struct _pinyin_context_t{
     pinyin_option_t m_options;
 
