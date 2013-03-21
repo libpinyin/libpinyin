@@ -365,32 +365,28 @@ size_t pinyin_parse_more_chewings(pinyin_instance_t * instance,
 bool pinyin_in_chewing_keyboard(pinyin_instance_t * instance,
                                 const char key, const char ** symbol);
 /**
- * pinyin_get_candidates:
+ * pinyin_guess_candidates:
  * @instance: the pinyin instance.
  * @offset: the offset in the pinyin keys.
- * @candidates: The GArray of lookup_candidate_t candidates.
  * @returns: whether a list of tokens are gotten.
  *
- * Get the candidates at the offset.
+ * Guess the candidates at the offset.
  *
  */
-bool pinyin_get_candidates(pinyin_instance_t * instance,
-                           size_t offset,
-                           CandidateVector candidates);
+bool pinyin_guess_candidates(pinyin_instance_t * instance,
+                             size_t offset);
 
 /**
- * pinyin_get_full_pinyin_candidates:
+ * pinyin_guess_full_pinyin_candidates:
  * @instance: the pinyin instance.
  * @offset: the offset in the pinyin keys.
- * @candidates: the GArray of lookup_candidate_t candidates.
  * @returns: whether a list of lookup_candidate_t candidates are gotten.
  *
- * Get the full pinyin candidates at the offset.
+ * Guess the full pinyin candidates at the offset.
  *
  */
-bool pinyin_get_full_pinyin_candidates(pinyin_instance_t * instance,
-                                       size_t offset,
-                                       CandidateVector candidates);
+bool pinyin_guess_full_pinyin_candidates(pinyin_instance_t * instance,
+                                       size_t offset);
 
 /**
  * pinyin_choose_candidate:
