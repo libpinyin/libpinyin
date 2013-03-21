@@ -1221,15 +1221,14 @@ static bool _free_candidates(CandidateVector candidates) {
     return true;
 }
 
-bool pinyin_get_candidates(pinyin_instance_t * instance,
-                           size_t offset,
-                           CandidateVector candidates) {
+bool pinyin_guess_candidates(pinyin_instance_t * instance,
+                             size_t offset) {
 
     pinyin_context_t * & context = instance->m_context;
     pinyin_option_t & options = context->m_options;
     ChewingKeyVector & pinyin_keys = instance->m_pinyin_keys;
 
-    _free_candidates(candidates);
+    _free_candidates(instance->m_candidates);
 
     size_t pinyin_len = pinyin_keys->len - offset;
     ssize_t i;
@@ -1289,7 +1288,7 @@ bool pinyin_get_candidates(pinyin_instance_t * instance,
         for (size_t k = 0; k < items->len; ++k) {
             lookup_candidate_t * item = &g_array_index
                 (items, lookup_candidate_t, k);
-            g_array_append_val(candidates, *item);
+            g_array_append_val(instance->m_candidates, *item);
         }
 
 #if 0
@@ -1307,11 +1306,11 @@ bool pinyin_get_candidates(pinyin_instance_t * instance,
 
     /* post process to remove duplicated candidates */
 
-    _prepend_sentence_candidate(instance, candidates);
+    _prepend_sentence_candidate(instance, instance->m_candidates);
 
-    _compute_phrase_strings_of_items(instance, offset, candidates);
+    _compute_phrase_strings_of_items(instance, offset, instance->m_candidates);
 
-    _remove_duplicated_items_by_phrase_string(instance, candidates);
+    _remove_duplicated_items_by_phrase_string(instance, instance->m_candidates);
 
     return true;
 }
@@ -1549,15 +1548,14 @@ static bool _try_resplit_table(pinyin_instance_t * instance,
     return found;
 }
 
-bool pinyin_get_full_pinyin_candidates(pinyin_instance_t * instance,
-                                       size_t offset,
-                                       CandidateVector candidates){
+bool pinyin_guess_full_pinyin_candidates(pinyin_instance_t * instance,
+                                         size_t offset){
 
     pinyin_context_t * & context = instance->m_context;
     pinyin_option_t & options = context->m_options;
     ChewingKeyVector & pinyin_keys = instance->m_pinyin_keys;
 
-    _free_candidates(candidates);
+    _free_candidates(instance->m_candidates);
 
     size_t pinyin_len = pinyin_keys->len - offset;
     pinyin_len = std_lite::min((size_t)MAX_PHRASE_LENGTH, pinyin_len);
@@ -1615,7 +1613,7 @@ bool pinyin_get_full_pinyin_candidates(pinyin_instance_t * instance,
                 for (i = 0; i < items->len; ++i) {
                     lookup_candidate_t * item = &g_array_index
                         (items, lookup_candidate_t, i);
-                    g_array_append_val(candidates, *item);
+                    g_array_append_val(instance->m_candidates, *item);
                 }
             }
         }
@@ -1665,7 +1663,7 @@ bool pinyin_get_full_pinyin_candidates(pinyin_instance_t * instance,
         for (size_t k = 0; k < items->len; ++k) {
             lookup_candidate_t * item = &g_array_index
                 (items, lookup_candidate_t, k);
-            g_array_append_val(candidates, *item);
+            g_array_append_val(instance->m_candidates, *item);
         }
 
 #if 0
@@ -1683,11 +1681,11 @@ bool pinyin_get_full_pinyin_candidates(pinyin_instance_t * instance,
 
     /* post process to remove duplicated candidates */
 
-    _prepend_sentence_candidate(instance, candidates);
+    _prepend_sentence_candidate(instance, instance->m_candidates);
 
-    _compute_phrase_strings_of_items(instance, offset, candidates);
+    _compute_phrase_strings_of_items(instance, offset, instance->m_candidates);
 
-    _remove_duplicated_items_by_phrase_string(instance, candidates);
+    _remove_duplicated_items_by_phrase_string(instance, instance->m_candidates);
 
     return true;
 }
