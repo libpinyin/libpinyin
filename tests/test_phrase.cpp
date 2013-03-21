@@ -42,11 +42,12 @@ int main(int argc, char * argv[]){
             break;
 
         pinyin_phrase_segment(instance, linebuf);
-        MatchResults & tokens = instance->m_match_results;
+        guint len = 0;
+        pinyin_get_n_phrase(instance, &len);
 
-        for ( size_t i = 0; i < tokens->len; ++i ){
-            phrase_token_t token = g_array_index
-                (tokens, phrase_token_t, i);
+        for ( size_t i = 0; i < len; ++i ){
+            phrase_token_t token = null_token;
+            pinyin_get_phrase_token(instance, i, &token);
 
             if ( null_token == token )
                 continue;
