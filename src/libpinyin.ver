@@ -40,6 +40,16 @@ LIBPINYIN {
         pinyin_token_get_nth_pronunciation;
         pinyin_token_get_unigram_frequency;
         pinyin_token_add_unigram_frequency;
+        pinyin_get_n_candidate;
+        pinyin_get_candidate;
+        pinyin_get_candidate_type;
+        pinyin_get_candidate_string;
+        pinyin_get_n_pinyin;
+        pinyin_get_pinyin_key;
+        pinyin_get_pinyin_key_rest;
+        pinyin_get_key_rest_positions;
+        pinyin_get_key_rest_length;
+        pinyin_get_raw_full_pinyin;
 
     local:
 	*;
