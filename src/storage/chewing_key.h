@@ -37,21 +37,21 @@ namespace pinyin{
  *    As the chewing large table only contains information of struct ChewingKey.
  */
 
-struct ChewingKey
+struct _ChewingKey
 {
     guint16 m_initial : 5;
     guint16 m_middle  : 2;
     guint16 m_final   : 5;
     guint16 m_tone    : 3;
 
-    ChewingKey() {
+    _ChewingKey() {
         m_initial = CHEWING_ZERO_INITIAL;
         m_middle  = CHEWING_ZERO_MIDDLE;
         m_final   = CHEWING_ZERO_FINAL;
         m_tone    = CHEWING_ZERO_TONE;
     }
 
-    ChewingKey(ChewingInitial initial, ChewingMiddle middle,
+    _ChewingKey(ChewingInitial initial, ChewingMiddle middle,
                ChewingFinal final) {
         m_initial = initial;
         m_middle = middle;
@@ -69,6 +69,8 @@ public:
     gchar * get_chewing_string();
 };
 
+typedef struct _ChewingKey ChewingKey;
+
 static inline bool operator == (ChewingKey lhs, ChewingKey rhs) {
     if (lhs.m_initial != rhs.m_initial)
         return false;
@@ -81,7 +83,7 @@ static inline bool operator == (ChewingKey lhs, ChewingKey rhs) {
     return true;
 }
 
-struct ChewingKeyRest
+struct _ChewingKeyRest
 {
     /* Note: the table index is removed,
      *   Please use get_table_index in ChewingKey.
@@ -89,7 +91,7 @@ struct ChewingKeyRest
     guint16 m_raw_begin;           /* the begin of the raw input. */
     guint16 m_raw_end;             /* the end of the raw input. */
 
-    ChewingKeyRest() {
+    _ChewingKeyRest() {
         /* the 0th item in pinyin parser table is reserved for invalid. */
         m_raw_begin = 0;
         m_raw_end = 0;
@@ -99,6 +101,8 @@ struct ChewingKeyRest
         return m_raw_end - m_raw_begin;
     }
 };
+
+typedef struct _ChewingKeyRest ChewingKeyRest;
 
 };
 

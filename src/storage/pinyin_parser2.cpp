@@ -72,7 +72,7 @@ static bool check_chewing_options(pinyin_option_t options, const chewing_index_i
 }
 
 
-gint ChewingKey::get_table_index() {
+gint _ChewingKey::get_table_index() {
     assert(m_initial <  CHEWING_NUMBER_OF_INITIALS);
     assert(m_middle < CHEWING_NUMBER_OF_MIDDLES);
     assert(m_final < CHEWING_NUMBER_OF_FINALS);
@@ -81,7 +81,7 @@ gint ChewingKey::get_table_index() {
     return index == -1 ? 0 : index;
 }
 
-gchar * ChewingKey::get_pinyin_string() {
+gchar * _ChewingKey::get_pinyin_string() {
     assert(m_tone < CHEWING_NUMBER_OF_TONES);
     gint index = get_table_index();
     assert(index < G_N_ELEMENTS(content_table));
@@ -94,21 +94,21 @@ gchar * ChewingKey::get_pinyin_string() {
     }
 }
 
-gchar * ChewingKey::get_shengmu_string() {
+gchar * _ChewingKey::get_shengmu_string() {
     gint index = get_table_index();
     assert(index < G_N_ELEMENTS(content_table));
     const content_table_item_t & item = content_table[index];
     return g_strdup(item.m_shengmu_str);
 }
 
-gchar * ChewingKey::get_yunmu_string() {
+gchar * _ChewingKey::get_yunmu_string() {
     gint index = get_table_index();
     assert(index < G_N_ELEMENTS(content_table));
     const content_table_item_t & item = content_table[index];
     return g_strdup(item.m_yunmu_str);
 }
 
-gchar * ChewingKey::get_chewing_string() {
+gchar * _ChewingKey::get_chewing_string() {
     assert(m_tone < CHEWING_NUMBER_OF_TONES);
     gint index = get_table_index();
     assert(index < G_N_ELEMENTS(content_table));
