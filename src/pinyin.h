@@ -52,13 +52,13 @@ typedef struct _lookup_candidate_t lookup_candidate_t;
 
 typedef struct _import_iterator_t import_iterator_t;
 
-enum lookup_candidate_type_t{
+typedef enum _lookup_candidate_type_t{
     BEST_MATCH_CANDIDATE = 1,
     NORMAL_CANDIDATE,
     DIVIDED_CANDIDATE,
     RESPLIT_CANDIDATE,
     ZOMBIE_CANDIDATE
-};
+} lookup_candidate_type_t;
 
 /**
  * pinyin_init:
@@ -563,10 +563,23 @@ bool pinyin_token_add_unigram_frequency(pinyin_instance_t * instance,
                                         guint delta);
 
 
-size_t pinyin_get_n_candidate(pinyin_instance_t * instance);
+bool pinyin_get_n_candidate(pinyin_instance_t * instance,
+                            guint * num);
 
-size_t pinyin_get_n_pinyin(pinyin_instance_t * instance);
+bool pinyin_get_candidate(pinyin_instance_t * instance,
+                          guint index,
+                          lookup_candidate_t ** candidate);
 
+bool pinyin_get_candidate_type(pinyin_instance_t * instance,
+                               lookup_candidate_t * candidate,
+                               lookup_candidate_type_t * type);
+
+bool pinyin_get_candidate_string(pinyin_instance_t * instance,
+                                 lookup_candidate_t * candidate,
+                                 const gchar ** utf8_str);
+
+bool pinyin_get_n_pinyin(pinyin_instance_t * instance,
+                         guint * num);
 
 /* hack here. */
 typedef ChewingKey PinyinKey;

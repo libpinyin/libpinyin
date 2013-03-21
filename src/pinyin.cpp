@@ -65,7 +65,7 @@ struct _pinyin_instance_t{
 };
 
 struct _lookup_candidate_t{
-    enum lookup_candidate_type_t m_candidate_type;
+    lookup_candidate_type_t m_candidate_type;
     gchar * m_phrase_string;
     phrase_token_t m_token;
     ChewingKeyRest m_orig_rest;
@@ -1907,16 +1907,52 @@ bool pinyin_token_add_unigram_frequency(pinyin_instance_t * instance,
     return ERROR_OK == retval;
 }
 
-size_t pinyin_get_n_candidate(pinyin_instance_t * instance){
-    return instance->m_candidates->len;
+bool pinyin_get_n_candidate(pinyin_instance_t * instance,
+                            guint * num) {
+    *num = instance->m_candidates->len;
+    return true;
 }
 
-size_t pinyin_get_n_pinyin(pinyin_instance_t * instance){
-    assert (instance->m_pinyin_keys->len ==
-            instance->m_pinyin_key_rests->len);
-    return instance->m_pinyin_keys->len;
+bool pinyin_get_candidate(pinyin_instance_t * instance,
+                          guint index,
+                          lookup_candidate_t ** candidate) {
+    CandidateVector & candidates = instance->m_candidates;
+
+    *candidate = NULL;
+
+    if (index >= candidates->len)
+        return false;
+
+    *candidate = &g_array_index(candidates, lookup_candidate_t, index);
+
+    return true;
 }
 
+bool pinyin_get_candidate_type(pinyin_instance_t * instance,
+                               lookup_candidate_t * candidate,
+                               lookup_candidate_type_t * type) {
+    *type = candidate->m_candidate_type;
+    return true;
+}
+
+bool pinyin_get_candidate_string(pinyin_instance_t * instance,
+                                 lookup_candidate_t * candidate,
+                                 const gchar ** utf8_str) {
+    *utf8_str = candidate->m_phrase_string;
+    return true;
+}
+
+bool pinyin_get_n_pinyin(pinyin_instance_t * instance,
+                         guint * num) {
+    *num = 0;
+
+    if (instance->m_pinyin_keys->len !=
+        instance->m_pinyin_key_rests->len)
+        return false;
+
+    *num = instance->m_pinyin_keys->len;
+    return true;
+}
 
 /**
  *  Note: prefix is the text before the pre-edit string.
