@@ -1954,6 +1954,36 @@ bool pinyin_get_n_pinyin(pinyin_instance_t * instance,
     return true;
 }
 
+bool pinyin_get_pinyin_key(pinyin_instance_t * instance,
+                           guint index,
+                           ChewingKey ** key) {
+    ChewingKeyVector & pinyin_keys = instance->m_pinyin_keys;
+
+    *key = NULL;
+
+    if (index >= pinyin_keys->len)
+        return false;
+
+    *key = &g_array_index(pinyin_keys, ChewingKey, index);
+
+    return true;
+}
+
+bool pinyin_get_pinyin_key_rest(pinyin_instance_t * instance,
+                                guint index,
+                                ChewingKeyRest ** key_rest) {
+    ChewingKeyRestVector & pinyin_key_rests = instance->m_pinyin_key_rests;
+
+    *key_rest = NULL;
+
+    if (index >= pinyin_key_rests->len)
+        return false;
+
+    *key_rest = &g_array_index(pinyin_key_rests, ChewingKeyRest, index);
+
+    return true;
+}
+
 /**
  *  Note: prefix is the text before the pre-edit string.
  */

@@ -581,6 +581,27 @@ bool pinyin_get_candidate_string(pinyin_instance_t * instance,
 bool pinyin_get_n_pinyin(pinyin_instance_t * instance,
                          guint * num);
 
+bool pinyin_get_pinyin_key(pinyin_instance_t * instance,
+                           guint index,
+                           ChewingKey ** key);
+
+bool pinyin_get_pinyin_key_rest(pinyin_instance_t * instance,
+                                guint index,
+                                ChewingKeyRest ** key_rest);
+
+bool pinyin_get_key_rest_positions(pinyin_instance_t * instance,
+                                   ChewingKeyRest * key_rest,
+                                   guint16 * begin, guint16 * end);
+
+bool pinyin_get_key_rest_length(pinyin_instance_t * instance,
+                                ChewingKeyRest * key_rest,
+                                guint16 * len);
+
+bool pinyin_get_raw_pinyin_input(pinyin_instance_t * instance,
+                                 const gchar ** utf8_str);
+
+
+
 /* hack here. */
 typedef ChewingKey PinyinKey;
 typedef ChewingKeyRest PinyinKeyPos;
