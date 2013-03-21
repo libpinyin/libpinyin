@@ -698,6 +698,8 @@ pinyin_instance_t * pinyin_alloc_instance(pinyin_context_t * context){
         (TRUE, FALSE, sizeof(lookup_constraint_t));
     instance->m_match_results =
         g_array_new(FALSE, FALSE, sizeof(phrase_token_t));
+    instance->m_candidates =
+        g_array_new(FALSE, FALSE, sizeof(lookup_candidate_t));
 
     return instance;
 }
@@ -709,6 +711,7 @@ void pinyin_free_instance(pinyin_instance_t * instance){
     g_array_free(instance->m_pinyin_key_rests, TRUE);
     g_array_free(instance->m_constraints, TRUE);
     g_array_free(instance->m_match_results, TRUE);
+    g_array_free(instance->m_candidates, TRUE);
 
     delete instance;
 }
@@ -1791,6 +1794,7 @@ bool pinyin_reset(pinyin_instance_t * instance){
     g_array_set_size(instance->m_pinyin_key_rests, 0);
     g_array_set_size(instance->m_constraints, 0);
     g_array_set_size(instance->m_match_results, 0);
+    g_array_set_size(instance->m_candidates, 0);
 
     return true;
 }
