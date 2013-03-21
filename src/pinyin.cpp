@@ -1984,6 +1984,32 @@ bool pinyin_get_pinyin_key_rest(pinyin_instance_t * instance,
     return true;
 }
 
+bool pinyin_get_key_rest_positions(pinyin_instance_t * instance,
+                                   ChewingKeyRest * key_rest,
+                                   guint16 * begin, guint16 * end) {
+    if (begin)
+        *begin = key_rest->m_raw_begin;
+
+    if (end)
+        *end = key_rest->m_raw_end;
+
+    return true;
+}
+
+bool pinyin_get_key_rest_length(pinyin_instance_t * instance,
+                                ChewingKeyRest * key_rest,
+                                guint16 * len) {
+    *len = key_rest->length();
+    return true;
+}
+
+bool pinyin_get_raw_full_pinyin(pinyin_instance_t * instance,
+                                const gchar ** utf8_str) {
+    *utf8_str = instance->m_raw_full_pinyin;
+    return true;
+}
+
+
 /**
  *  Note: prefix is the text before the pre-edit string.
  */

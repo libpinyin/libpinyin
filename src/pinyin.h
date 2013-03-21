@@ -597,8 +597,8 @@ bool pinyin_get_key_rest_length(pinyin_instance_t * instance,
                                 ChewingKeyRest * key_rest,
                                 guint16 * len);
 
-bool pinyin_get_raw_pinyin_input(pinyin_instance_t * instance,
-                                 const gchar ** utf8_str);
+bool pinyin_get_raw_full_pinyin(pinyin_instance_t * instance,
+                                const gchar ** utf8_str);
 
 
 
