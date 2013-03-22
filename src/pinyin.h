@@ -23,9 +23,10 @@
 #ifndef PINYIN_H
 #define PINYIN_H
 
-#include <stdio.h>
+
 #include "novel_types.h"
 #include "pinyin_custom2.h"
+
 
 G_BEGIN_DECLS
 
