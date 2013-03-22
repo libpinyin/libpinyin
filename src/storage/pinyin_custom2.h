@@ -22,7 +22,9 @@
 #ifndef PINYIN_CUSTOM2_H
 #define PINYIN_CUSTOM2_H
 
-namespace pinyin{
+#include <glib.h>
+
+G_BEGIN_DECLS
 
 /**
  * PinyinTableFlag:
@@ -104,6 +106,6 @@ enum ChewingScheme
     CHEWING_DEFAULT  = CHEWING_STANDARD
 };
 
-};
+G_END_DECLS
 
 #endif

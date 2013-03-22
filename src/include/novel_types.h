@@ -29,7 +29,7 @@
 
 #include <glib.h>
 
-namespace pinyin{
+G_BEGIN_DECLS
 
 typedef guint32 phrase_token_t;
 typedef gunichar ucs4_t;
@@ -61,10 +61,10 @@ typedef GArray * PhraseIndexRanges[PHRASE_INDEX_LIBRARY_COUNT];
 /* Array of Token */
 typedef GArray * PhraseTokens[PHRASE_INDEX_LIBRARY_COUNT];
 
+
 /* 
  *  PinYin Table Definition
  */
-class MemoryChunk;
 
 
 /* For both PinYin Table and Phrase Table */
@@ -163,6 +163,6 @@ typedef enum {
 
 #define LAMBDA_PARAMETER 0.347121
 
-};
+G_END_DECLS
 
 #endif

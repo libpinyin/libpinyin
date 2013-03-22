@@ -25,11 +25,13 @@
 #include <glib.h>
 #include "chewing_enum.h"
 
+using namespace pinyin;
+
+G_BEGIN_DECLS
+
 /** @file chewing_key.h
  *  @brief the definitions of chewing key related classes and structs.
  */
-
-namespace pinyin{
 
 
 /** Note: The parsed pinyins are stored in the following two
@@ -104,6 +106,6 @@ struct _ChewingKeyRest
 
 typedef struct _ChewingKeyRest ChewingKeyRest;
 
-};
+G_END_DECLS
 
 #endif

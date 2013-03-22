@@ -27,24 +27,10 @@
 #include "novel_types.h"
 #include "pinyin_custom2.h"
 
-namespace pinyin{
+G_BEGIN_DECLS
+
 typedef struct _ChewingKey ChewingKey;
 typedef struct _ChewingKeyRest ChewingKeyRest;
-};
-
-using pinyin::pinyin_option_t;
-using pinyin::DoublePinyinScheme;
-using pinyin::ChewingScheme;
-
-using pinyin::phrase_token_t;
-using pinyin::null_token;
-
-using pinyin::ChewingKey;
-using pinyin::ChewingKeyRest;
-using pinyin::ChewingKeyVector;
-
-
-extern "C" {
 
 typedef struct _pinyin_context_t pinyin_context_t;
 typedef struct _pinyin_instance_t pinyin_instance_t;
@@ -614,6 +600,6 @@ typedef ChewingKeyRest PinyinKeyPos;
 
 #define LIBPINYIN_FORMAT_VERSION  "0.8.92"
 
-};
+G_END_DECLS
 
 #endif
