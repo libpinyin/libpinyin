@@ -21,12 +21,12 @@ INCLUDES                = -I$(top_srcdir)/src/include \
 
 libpinyinincludedir	= $(includedir)/libpinyin-@VERSION@
 
-libpinyininclude_HEADERS= chewing_enum.h \
+libpinyininclude_HEADERS= pinyin_custom2.h
+
+
+noinst_HEADERS		= chewing_enum.h \
 			  chewing_key.h \
-			  pinyin_custom2.h
-
-
-noinst_HEADERS		= pinyin_parser2.h \
+			  pinyin_parser2.h \
 			  phrase_index.h \
 			  phrase_index_logger.h \
 			  phrase_large_table2.h \
