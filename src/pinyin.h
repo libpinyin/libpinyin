@@ -576,13 +576,13 @@ bool pinyin_get_pinyin_key_rest(pinyin_instance_t * instance,
                                 guint index,
                                 ChewingKeyRest ** key_rest);
 
-bool pinyin_get_key_rest_positions(pinyin_instance_t * instance,
-                                   ChewingKeyRest * key_rest,
-                                   guint16 * begin, guint16 * end);
+bool pinyin_get_pinyin_key_rest_positions(pinyin_instance_t * instance,
+                                          ChewingKeyRest * key_rest,
+                                          guint16 * begin, guint16 * end);
 
-bool pinyin_get_key_rest_length(pinyin_instance_t * instance,
-                                ChewingKeyRest * key_rest,
-                                guint16 * len);
+bool pinyin_get_pinyin_key_rest_length(pinyin_instance_t * instance,
+                                       ChewingKeyRest * key_rest,
+                                       guint16 * length);
 
 bool pinyin_get_raw_full_pinyin(pinyin_instance_t * instance,
                                 const gchar ** utf8_str);

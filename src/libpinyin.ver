@@ -47,8 +47,8 @@ LIBPINYIN {
         pinyin_get_n_pinyin;
         pinyin_get_pinyin_key;
         pinyin_get_pinyin_key_rest;
-        pinyin_get_key_rest_positions;
-        pinyin_get_key_rest_length;
+        pinyin_get_pinyin_key_rest_positions;
+        pinyin_get_pinyin_key_rest_length;
         pinyin_get_raw_full_pinyin;
         pinyin_get_n_phrase;
         pinyin_get_phrase_token;

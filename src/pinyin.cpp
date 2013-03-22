@@ -1984,9 +1984,9 @@ bool pinyin_get_pinyin_key_rest(pinyin_instance_t * instance,
     return true;
 }
 
-bool pinyin_get_key_rest_positions(pinyin_instance_t * instance,
-                                   ChewingKeyRest * key_rest,
-                                   guint16 * begin, guint16 * end) {
+bool pinyin_get_pinyin_key_rest_positions(pinyin_instance_t * instance,
+                                          ChewingKeyRest * key_rest,
+                                          guint16 * begin, guint16 * end) {
     if (begin)
         *begin = key_rest->m_raw_begin;
 
@@ -1996,10 +1996,10 @@ bool pinyin_get_key_rest_positions(pinyin_instance_t * instance,
     return true;
 }
 
-bool pinyin_get_key_rest_length(pinyin_instance_t * instance,
-                                ChewingKeyRest * key_rest,
-                                guint16 * len) {
-    *len = key_rest->length();
+bool pinyin_get_pinyin_key_rest_length(pinyin_instance_t * instance,
+                                       ChewingKeyRest * key_rest,
+                                       guint16 * length) {
+    *length = key_rest->length();
     return true;
 }
 
