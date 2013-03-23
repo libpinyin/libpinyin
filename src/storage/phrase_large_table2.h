@@ -133,7 +133,7 @@ static inline int reduce_tokens(const PhraseTokens tokens,
     }
 
     /* the following line will be removed in future after code are verified. */
-    assert(0 == num || 1 == num);
+    assert(0 <= num && num <= 3);
 
     return num;
 }
