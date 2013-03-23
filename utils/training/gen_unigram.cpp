@@ -40,10 +40,12 @@ int main(int argc, char * argv[]){
             DICTIONARY != table_info->m_file_type)
             continue;
 
-        guint32 freq = 2;
+        guint32 freq = 1;
+#if 0
         /* skip GBK_DICTIONARY. */
         if (GBK_DICTIONARY == table_info->m_dict_index)
             freq = 1;
+#endif
 
         const char * binfile = table_info->m_system_filename;
 
