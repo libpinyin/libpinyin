@@ -1818,12 +1818,13 @@ bool pinyin_get_pinyin_strings(pinyin_instance_t * instance,
                                ChewingKey * key,
                                gchar ** shengmu,
                                gchar ** yunmu) {
-    *shengmu = NULL; *yunmu = NULL;
     if (0 == key->get_table_index())
         return false;
 
-    *shengmu = key->get_shengmu_string();
-    *yunmu = key->get_yunmu_string();
+    if (shengmu)
+        *shengmu = key->get_shengmu_string();
+    if (yunmu)
+        *yunmu = key->get_yunmu_string();
     return true;
 }
 
