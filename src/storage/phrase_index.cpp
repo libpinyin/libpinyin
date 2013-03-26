@@ -677,7 +677,7 @@ const pinyin_table_info_t pinyin_phrase_files[PHRASE_INDEX_LIBRARY_COUNT] =
         {SOCIETY_DICTIONARY, "society.table", "society.bin", "society.dbin", DICTIONARY},
         {SPORT_DICTIONARY, "sport.table", "sport.bin", "sport.dbin", DICTIONARY},
 
-        {RESERVED1, NULL, NULL, NULL, NOT_USED},
+        {IMPORT_DICTIONARY, NULL, NULL, "import.bin", USER_FILE},
 
         {USER_DICTIONARY, NULL, NULL, "user.bin", USER_FILE}
     };
