@@ -345,11 +345,14 @@ bool pinyin_iterator_add_phrase(import_iterator_t * iter,
     FacadeChewingTable * & pinyin_table = context->m_pinyin_table;
     FacadePhraseIndex * & phrase_index = context->m_phrase_index;
 
+    bool result = false;
+
+    if (NULL == pinyin)
+        return result;
+
     /* check whether the phrase exists in phrase table */
     glong len_phrase = 0;
     ucs4_t * ucs4_phrase = g_utf8_to_ucs4(phrase, -1, NULL, &len_phrase, NULL);
-
-    bool result = false;
 
     pinyin_option_t options = PINYIN_CORRECT_ALL | USE_TONE;
     FullPinyinParser2 parser;
@@ -364,7 +367,7 @@ bool pinyin_iterator_add_phrase(import_iterator_t * iter,
     if (len_phrase != keys->len)
         return result;
 
-    if (len_phrase >= MAX_PHRASE_LENGTH)
+    if (0 == len_phrase || len_phrase >= MAX_PHRASE_LENGTH)
         return result;
 
     phrase_token_t token = null_token;
