@@ -14,8 +14,8 @@ int main(int argc, char * argv[]){
 
 
     phrase_item.set_phrase_string(1, &string1);
-    phrase_item.append_pronunciation(&key1, 100);
-    phrase_item.append_pronunciation(&key2, 300);
+    phrase_item.add_pronunciation(&key1, 100);
+    phrase_item.add_pronunciation(&key2, 300);
 
     assert(phrase_item.get_phrase_length() == 1);
 
@@ -104,7 +104,7 @@ int main(int argc, char * argv[]){
 
     phrase_index.get_phrase_item(16777222, item2);
     assert(item2.get_phrase_length() == 1);
-    assert(item2.get_n_pronunciation() == 6);
+    assert(item2.get_n_pronunciation() == 2);
 
     return 0;
 }

@@ -415,8 +415,8 @@ bool pinyin_iterator_add_phrase(import_iterator_t * iter,
         retval = phrase_index->remove_phrase_item(token, removed_item);
         if (ERROR_OK == retval) {
             /* maybe check whether there are duplicated pronunciations here. */
-            removed_item->append_pronunciation((ChewingKey *)keys->data,
-                                               count);
+            removed_item->add_pronunciation((ChewingKey *)keys->data,
+                                            count);
             phrase_index->add_phrase_item(token, removed_item);
             delete removed_item;
             result = true;
@@ -439,7 +439,7 @@ bool pinyin_iterator_add_phrase(import_iterator_t * iter,
                     (keys->len, (ChewingKey *)(keys->data), token);
 
                 item.set_phrase_string(len_phrase, ucs4_phrase);
-                item.append_pronunciation((ChewingKey *)(keys->data), count);
+                item.add_pronunciation((ChewingKey *)(keys->data), count);
                 phrase_index->add_phrase_item(token, &item);
                 phrase_index->add_unigram_frequency(token,
                                                     count * unigram_factor);

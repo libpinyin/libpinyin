@@ -42,12 +42,50 @@ bool PhraseItem::get_nth_pronunciation(size_t index, ChewingKey * keys,
         (offset + phrase_length * sizeof(ChewingKey), &freq , sizeof(guint32));
 }
 
+#if 0
 void PhraseItem::append_pronunciation(ChewingKey * keys, guint32 freq){
     guint8 phrase_length = get_phrase_length();
     set_n_pronunciation(get_n_pronunciation() + 1);
     m_chunk.set_content(m_chunk.size(), keys,
                         phrase_length * sizeof(ChewingKey));
     m_chunk.set_content(m_chunk.size(), &freq, sizeof(guint32));
+}
+#endif
+
+bool PhraseItem::add_pronunciation(ChewingKey * keys, guint32 delta){
+    guint8 phrase_length = get_phrase_length();
+    guint8 npron = get_n_pronunciation();
+    size_t offset = phrase_item_header + phrase_length * sizeof(ucs4_t);
+    char * buf_begin = (char *) m_chunk.begin();
+    guint32 total_freq = 0;
+
+    for (int i = 0; i < npron; ++i) {
+        char * chewing_begin = buf_begin + offset +
+            i * (phrase_length * sizeof(ChewingKey) + sizeof(guint32));
+        guint32 * freq = (guint32 *)(chewing_begin +
+                                     phrase_length * sizeof(ChewingKey));
+
+        total_freq += *freq;
+
+        if (0 == pinyin_exact_compare2
+            (keys, (ChewingKey *)chewing_begin, phrase_length)) {
+            /* found the exact match pinyin keys. */
+
+	    /* protect against total_freq overflow. */
+            if (delta > 0 && total_freq > total_freq + delta)
+                return false;
+
+            *freq += delta;
+            total_freq += delta;
+            return true;
+        }
+    }
+
+    set_n_pronunciation(npron + 1);
+    m_chunk.set_content(m_chunk.size(), keys,
+                        phrase_length * sizeof(ChewingKey));
+    m_chunk.set_content(m_chunk.size(), &delta, sizeof(guint32));
+    return true;
 }
 
 void PhraseItem::remove_nth_pronunciation(size_t index){
@@ -74,21 +112,25 @@ void PhraseItem::increase_pronunciation_possibility(pinyin_option_t options,
                                                     gint32 delta){
     guint8 phrase_length = get_phrase_length();
     guint8 npron = get_n_pronunciation();
-    size_t offset = phrase_item_header + phrase_length * sizeof ( ucs4_t );
+    size_t offset = phrase_item_header + phrase_length * sizeof(ucs4_t);
     char * buf_begin = (char *) m_chunk.begin();
     guint32 total_freq = 0;
-    for ( int i = 0 ; i < npron ; ++i){
+
+    for (int i = 0; i < npron; ++i) {
 	char * chewing_begin = buf_begin + offset +
-	    i * ( phrase_length * sizeof(ChewingKey) + sizeof(guint32) );
+	    i * (phrase_length * sizeof(ChewingKey) + sizeof(guint32));
 	guint32 * freq = (guint32 *)(chewing_begin +
                                      phrase_length * sizeof(ChewingKey));
 	total_freq += *freq;
-	if ( 0 == pinyin_compare_with_ambiguities2
-             (options, keys,
-              (ChewingKey *)chewing_begin, phrase_length) ){
-	    //protect against total_freq overflow.
-	    if ( delta > 0 && total_freq > total_freq + delta )
+
+	if (0 == pinyin_compare_with_ambiguities2
+            (options, keys,
+             (ChewingKey *)chewing_begin, phrase_length)) {
+
+	    /* protect against total_freq overflow. */
+	    if (delta > 0 && total_freq > total_freq + delta)
 		return;
+
 	    *freq += delta;
 	    total_freq += delta;
 	}
@@ -515,7 +557,7 @@ bool FacadePhraseIndex::load_text(guint8 phrase_index, FILE * infile){
 	parser.parse(options, keys, key_rests, pinyin, strlen(pinyin));
 	
 	if (item_ptr->get_phrase_length() == keys->len) {
-            item_ptr->append_pronunciation((ChewingKey *)keys->data, freq);
+            item_ptr->add_pronunciation((ChewingKey *)keys->data, freq);
         } else {
             fprintf(stderr, "FacadePhraseIndex::load_text:%s\t%s\n",
                     pinyin, phrase);

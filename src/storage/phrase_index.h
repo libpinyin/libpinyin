@@ -213,14 +213,15 @@ public:
 			       /* out */ guint32 & freq);
 
     /**
-     * PhraseItem::append_pronunciation:
+     * PhraseItem::add_pronunciation:
      * @keys: the pronunciation keys.
-     * @freq: the frequency of the pronunciation.
+     * @delta: the delta of the frequency of the pronunciation.
+     * @returns: whether the add operation is successful.
      *
-     * Append one pronunciation.
+     * Add one pronunciation.
      *
      */
-    void append_pronunciation(ChewingKey * keys, guint32 freq);
+    bool add_pronunciation(ChewingKey * keys, guint32 delta);
 
     /**
      * PhraseItem::remove_nth_pronunciation:
