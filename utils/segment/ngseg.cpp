@@ -25,6 +25,17 @@
 #include "pinyin_internal.h"
 #include "utils_helper.h"
 
+static gboolean gen_extra_enter = FALSE;
+static gchar * outputfile = NULL;
+
+static GOptionEntry entries[] =
+{
+    {"outputfile", 'o', 0, G_OPTION_ARG_FILENAME, &outputfile, "output", "filename"},
+    {"generate-extra-enter", 0, 0, G_OPTION_ARG_NONE, &gen_extra_enter, "generate ", NULL},
+    {NULL}
+};
+
+
 /* n-gram based sentence segment. */
 
 /* Note:
@@ -43,10 +54,6 @@ enum CONTEXT_STATE{
     CONTEXT_SEGMENTABLE,
     CONTEXT_UNKNOWN
 };
-
-void print_help(){
-    printf("Usage: ngseg [--generate-extra-enter]  [-o outputfile] [inputfile]\n");
-}
 
 bool deal_with_segmentable(PhraseLookup * phrase_lookup,
                            GArray * current_ucs4,
@@ -85,37 +92,40 @@ bool deal_with_unknown(GArray * current_ucs4, FILE * output){
 
 
 int main(int argc, char * argv[]){
-    int i = 1;
-    bool gen_extra_enter = false;
     FILE * input = stdin;
     FILE * output = stdout;
 
     setlocale(LC_ALL, "");
-    /* deal with options */
-    while ( i < argc ){
-        if ( strcmp ("--help", argv[i]) == 0 ){
-            print_help();
-            exit(0);
-        } else if ( strcmp("--generate-extra-enter", argv[i]) == 0 ){
-            gen_extra_enter = true;
-        } else if (strcmp("-o", argv[i]) == 0) {
-            if ( ++i >= argc ){
-                print_help();
-                exit(EINVAL);
-            }
-            output = fopen(argv[i], "w");
-            if (NULL == output) {
-                print_help();
-                exit(EINVAL);
-            }
-        } else {
-            input = fopen(argv[i], "r");
-            if (NULL == input) {
-                print_help();
-                exit(EINVAL);
-            }
+
+    GError * error = NULL;
+    GOptionContext * context;
+
+    context = g_option_context_new("- n-gram segment");
+    g_option_context_add_main_entries(context, entries, NULL);
+    if (!g_option_context_parse(context, &argc, &argv, &error)) {
+        g_print("option parsing failed:%s\n", error->message);
+        exit(EINVAL);
+    }
+
+    if (outputfile) {
+        output = fopen(outputfile, "w");
+        if (NULL == output) {
+            perror("open file failed");
+            exit(EINVAL);
         }
-        ++i;
+    }
+
+    if (argc > 2) {
+        fprintf(stderr, "too many arguments.\n");
+        exit(EINVAL);
+    }
+
+    if (2 == argc) {
+        input = fopen(argv[1], "r");
+        if (NULL == input) {
+            perror("open file failed");
+            exit(EINVAL);
+        }
     }
 
     /* init phrase table */
