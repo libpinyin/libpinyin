@@ -26,7 +26,7 @@ bin_PROGRAMS		 = gen_binary_files \
 			   import_interpolation
 
 noinst_PROGRAMS          = export_interpolation \
-			   gen_chewing_table
+			   gen_pinyin_table
 
 gen_binary_files_SOURCES    = gen_binary_files.cpp
 
@@ -40,6 +40,6 @@ export_interpolation_SOURCES = export_interpolation.cpp
 
 export_interpolation_LDADD = ../../src/libpinyin_internal.la @GLIB2_LIBS@
 
-gen_chewing_table_SOURCES    = gen_chewing_table.cpp
+gen_pinyin_table_SOURCES    = gen_pinyin_table.cpp
 
-gen_chewing_table_LDADD      = ../../src/libpinyin_internal.la @GLIB2_LIBS@
+gen_pinyin_table_LDADD      = ../../src/libpinyin_internal.la @GLIB2_LIBS@
