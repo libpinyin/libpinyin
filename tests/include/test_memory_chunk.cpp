@@ -69,6 +69,9 @@ int main(int argc, char * argv[]){
         printf("match\n");
     }
 
+    delete chunk;
+    chunk = new MemoryChunk;
+
     chunk->set_content(0, version, strlen(version) + 1);
     chunk->save(filename);
 
