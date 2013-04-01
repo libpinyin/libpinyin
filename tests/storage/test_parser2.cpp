@@ -29,27 +29,27 @@
 #include "pinyin_parser2.h"
 
 
-size_t bench_times = 1000;
+static gchar * parsername = "";
+static gboolean incomplete = FALSE;
 
-using namespace pinyin;
+static GOptionEntry entries[] =
+{
+    {"parser", 'p', 0, G_OPTION_ARG_STRING, &parsername, "parser", "fullpinyin doublepinyin chewing"},
+    {"incomplete", 'i', 0, G_OPTION_ARG_NONE, &incomplete, "incomplete pinyin", NULL},
+    {NULL}
+};
 
-static const char * help_msg =
-    "Usage:\n"
-    "  test-parser -p <parser> [-s <scheme>] [options].\n\n"
-    "  -p <parser> fullpinyin/doublepinyin/chewing.\n"
 #if 0
     "  -s <scheme> specify scheme for doublepinyin/chewing.\n"
     "     schemes for doublepinyin: zrm, ms, ziguang, abc, pyjj, xhe.\n"
     "     schemes for chewing: standard, ibm, ginyieh, eten.\n"
 #endif
-    "  -i          Use incomplete pinyin.\n"
-    "  -h          print this help msg.\n"
-    ;
 
 
-void print_help(){
-    printf("%s", help_msg);
-}
+size_t bench_times = 1000;
+
+using namespace pinyin;
+
 
 int main(int argc, char * argv[]) {
     PinyinParser2 * parser = NULL;
@@ -59,34 +59,26 @@ int main(int argc, char * argv[]) {
 
     pinyin_option_t options = PINYIN_CORRECT_ALL | USE_TONE | USE_RESPLIT_TABLE;
 
-    int i = 1;
-    while(i < argc) {
-        if (strcmp("-h", argv[i]) == 0) {
-            print_help();
-            exit(0);
-        } else if (strcmp("-i", argv[i]) == 0) {
-            options |= PINYIN_INCOMPLETE | CHEWING_INCOMPLETE;
-        } else if (strcmp("-p", argv[i]) == 0) {
-            if ( ++i >= argc ) {
-                print_help();
-                exit(EINVAL);
-            }
-            const char * name = argv[i];
-            if (strcmp("fullpinyin", name) == 0) {
-                parser = new FullPinyinParser2();
-            } else if (strcmp("doublepinyin", name) == 0) {
-                parser = new DoublePinyinParser2();
-            } else if (strcmp("chewing", name) == 0) {
-                parser = new ChewingParser2();
-            } else {
-                print_help();
-                exit(EINVAL);
-            }
-        } else {
-            print_help();
-            exit(EINVAL);
-        }
-        ++i;
+    GError * error = NULL;
+    GOptionContext * context;
+
+    context = g_option_context_new("- test pinyin parser");
+    g_option_context_add_main_entries(context, entries, NULL);
+    if (!g_option_context_parse(context, &argc, &argv, &error)) {
+        g_print("option parsing failed:%s\n", error->message);
+        exit(1);
+    }
+
+    if (incomplete)
+        options |= PINYIN_INCOMPLETE | CHEWING_INCOMPLETE;
+
+    /* create the parser */
+    if (strcmp("fullpinyin", parsername) == 0) {
+        parser = new FullPinyinParser2();
+    } else if (strcmp("doublepinyin", parsername) == 0) {
+        parser = new DoublePinyinParser2();
+    } else if (strcmp("chewing", parsername) == 0) {
+        parser = new ChewingParser2();
     }
 
     if (!parser)
