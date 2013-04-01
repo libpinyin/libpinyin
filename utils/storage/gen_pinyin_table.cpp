@@ -24,8 +24,8 @@
 #include <glib.h>
 #include "pinyin_internal.h"
 
-static const gchar * outputfile = "temp.out";
 static gint phrase_index = 0;
+static const gchar * outputfile = "temp.out";
 
 static GOptionEntry entries[] =
 {

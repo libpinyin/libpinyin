@@ -52,13 +52,6 @@ using namespace pinyin;
 
 
 int main(int argc, char * argv[]) {
-    PinyinParser2 * parser = NULL;
-    ChewingKeyVector keys = g_array_new(FALSE, FALSE, sizeof(ChewingKey));
-    ChewingKeyRestVector key_rests =
-        g_array_new(FALSE, FALSE, sizeof(ChewingKeyRest));
-
-    pinyin_option_t options = PINYIN_CORRECT_ALL | USE_TONE | USE_RESPLIT_TABLE;
-
     GError * error = NULL;
     GOptionContext * context;
 
@@ -69,8 +62,14 @@ int main(int argc, char * argv[]) {
         exit(EINVAL);
     }
 
+    pinyin_option_t options = PINYIN_CORRECT_ALL | USE_TONE | USE_RESPLIT_TABLE;
     if (incomplete)
         options |= PINYIN_INCOMPLETE | CHEWING_INCOMPLETE;
+
+    PinyinParser2 * parser = NULL;
+    ChewingKeyVector keys = g_array_new(FALSE, FALSE, sizeof(ChewingKey));
+    ChewingKeyRestVector key_rests =
+        g_array_new(FALSE, FALSE, sizeof(ChewingKeyRest));
 
     /* create the parser */
     if (strcmp("fullpinyin", parsername) == 0) {
