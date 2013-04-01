@@ -29,7 +29,7 @@
 #include "pinyin_parser2.h"
 
 
-static gchar * parsername = "";
+static const gchar * parsername = "";
 static gboolean incomplete = FALSE;
 
 static GOptionEntry entries[] =

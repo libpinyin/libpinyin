@@ -24,27 +24,25 @@
 #include "pinyin_internal.h"
 #include "utils_helper.h"
 
-void print_help(){
-    printf("Usage: gen_binary_files --table-dir <DIRNAME>\n");
-}
+static const gchar * table_dir = ".";
+
+static GOptionEntry entries[] =
+{
+    {"table-dir", 0, 0, G_OPTION_ARG_FILENAME, &table_dir, "table directory", NULL},
+    {NULL}
+};
 
 int main(int argc, char * argv[]){
-    int i = 1;
-    const char * table_dir = ".";
-
     setlocale(LC_ALL, "");
-    while ( i < argc ){
-        if ( strcmp("--help", argv[i]) == 0 ){
-            print_help();
-            exit(0);
-        } else if ( strcmp("--table-dir", argv[i]) == 0){
-            if ( ++i >= argc ){
-                print_help();
-                exit(EINVAL);
-            }
-            table_dir = argv[i];
-        }
-        ++i;
+
+    GError * error = NULL;
+    GOptionContext * context;
+
+    context = g_option_context_new("- generate binary files");
+    g_option_context_add_main_entries(context, entries, NULL);
+    if (!g_option_context_parse(context, &argc, &argv, &error)) {
+        g_print("option parsing failed:%s\n", error->message);
+        exit(EINVAL);
     }
 
     /* generate pinyin index*/
