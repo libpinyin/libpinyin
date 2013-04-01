@@ -24,6 +24,17 @@
 #include <glib.h>
 #include "pinyin_internal.h"
 
+static const gchar * outputfile = "temp.out";
+static gint phrase_index = 0;
+
+static GOptionEntry entries[] =
+{
+    {"phraseindex", 't', 0, G_OPTION_ARG_INT, &phrase_index, "phrase index", NULL},
+    {"outputfile", 'o', 0, G_OPTION_ARG_FILENAME, &outputfile, "output filename", NULL},
+    {NULL}
+};
+
+
 using namespace pinyin;
 
 /* map from phrase_item to GArray of chewing_and_freq_item */
@@ -58,15 +69,7 @@ gboolean store_one_item(gpointer key, gpointer value, gpointer data);
 int phrase_array_compare(gconstpointer lhs, gconstpointer rhs,
                          gpointer userdata);
 
-void gen_phrase_file(const char * outfilename, int phrase_index);
-
-void print_help(){
-    printf("Usage: gen_chewing_table -t <PHRASE_INDEX> "
-	   "-o <OUTPUTFILE> <FILE1> <FILE2> .. <FILEn>\n");
-    printf("<OUTPUTFILE> the result output file\n");
-    printf("<FILEi> input pinyin files\n");
-    printf("<PHRASE_INDEX> phrase index identifier\n");
-}
+void gen_phrase_file(const char * outputfile, int phrase_index);
 
 
 gint phrase_item_compare(gconstpointer a, gconstpointer b){
@@ -81,39 +84,29 @@ gint phrase_item_compare(gconstpointer a, gconstpointer b){
 
 
 int main(int argc, char * argv[]){
-    const char * outfilename = "temp.out";
-    int phrase_index = 0;
-    int i = 1;
+    int i;
 
     g_chewing_tree = g_tree_new(phrase_item_compare);
 
-    while (  i < argc ){
-	if ( strcmp("--help", argv[i] ) == 0) {
-            print_help();
-            exit(0);
-	}else if ( strcmp("-t", argv[i] ) == 0){
-	    if ( ++i >= argc ) {
-		print_help();
-                exit(EINVAL);
-            }
-	    phrase_index = atoi(argv[i]);
-	}else if ( strcmp("-o", argv[i] ) == 0 ){
-	    if ( ++i >= argc ) {
-		print_help();
-                exit(EINVAL);
-            }
-	    outfilename = g_strdup(argv[i]);
-	} else {
-	    feed_file(argv[i]);
-	}
-	++i;
+    GError * error = NULL;
+    GOptionContext * context;
+
+    context = g_option_context_new("- generate pinyin table");
+    g_option_context_add_main_entries(context, entries, NULL);
+    if (!g_option_context_parse(context, &argc, &argv, &error)) {
+        g_print("option parsing failed:%s\n", error->message);
+        exit(EINVAL);
+    }
+
+    for (i = 1; i < argc; ++i) {
+        feed_file(argv[i]);
     }
 
     printf("nnodes: %d\n", g_tree_nnodes(g_chewing_tree));
 
     /* store in item array */
     g_item_array[0] = NULL;
-    for ( int i = 1; i < MAX_PHRASE_LENGTH + 1; ++i){
+    for (i = 1; i < MAX_PHRASE_LENGTH + 1; ++i){
 	g_item_array[i] = g_array_new
             (FALSE, TRUE, sizeof(phrase_and_array_item));
     }
@@ -124,7 +117,7 @@ int main(int argc, char * argv[]){
 	g_array_sort_with_data(g_item_array[i], phrase_array_compare , &i);
     }
 
-    gen_phrase_file(outfilename, phrase_index);
+    gen_phrase_file(outputfile, phrase_index);
 
     return 0;
 }
@@ -251,10 +244,10 @@ int phrase_array_compare(gconstpointer lhs, gconstpointer rhs,
 }
 
 
-void gen_phrase_file(const char * outfilename, int phrase_index){
-    FILE * outfile = fopen(outfilename, "w");
+void gen_phrase_file(const char * outputfile, int phrase_index){
+    FILE * outfile = fopen(outputfile, "w");
     if (NULL == outfile ) {
-        fprintf(stderr, "Can't write file %s.\n", outfilename);
+        fprintf(stderr, "Can't write file %s.\n", outputfile);
         exit(ENOENT);
     }
 
