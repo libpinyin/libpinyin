@@ -19,13 +19,19 @@
  *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
+#include <locale.h>
 #include "pinyin_internal.h"
 #include "k_mixture_model.h"
 #include "utils_helper.h"
 
-void print_help(){
-    printf("Usage: export_k_mixture_model [--k-mixture-model-file <FILENAME>]\n");
-}
+static const gchar * k_mixture_model_filename = NULL;
+
+static GOptionEntry entries[] =
+{
+    {"k-mixture-model-file", 0, 0, G_OPTION_ARG_FILENAME, &k_mixture_model_filename, "k mixture model file", NULL},
+    {NULL}
+};
+
 
 bool print_k_mixture_model_magic_header(FILE * output,
                                         KMixtureModelBigram * bigram){
@@ -105,25 +111,17 @@ bool end_data(FILE * output){
 }
 
 int main(int argc, char * argv[]){
-    int i = 1;
-    const char * k_mixture_model_filename = NULL;
     FILE * output = stdout;
+    setlocale(LC_ALL, "");
 
-    while ( i < argc ){
-        if ( strcmp ("--help", argv[i]) == 0 ){
-            print_help();
-            exit(0);
-        } else if ( strcmp ("--k-mixture-model-file", argv[i]) == 0 ){
-            if ( ++i > argc ){
-                print_help();
-                exit(EINVAL);
-            }
-            k_mixture_model_filename = argv[i];
-        } else {
-            print_help();
-            exit(EINVAL);
-        }
-        ++i;
+    GError * error = NULL;
+    GOptionContext * context;
+
+    context = g_option_context_new("- export k mixture model");
+    g_option_context_add_main_entries(context, entries, NULL);
+    if (!g_option_context_parse(context, &argc, &argv, &error)) {
+        g_print("option parsing failed:%s\n", error->message);
+        exit(EINVAL);
     }
 
     FacadePhraseIndex phrase_index;
