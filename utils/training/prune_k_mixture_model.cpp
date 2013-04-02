@@ -27,12 +27,21 @@
 #include "pinyin_internal.h"
 #include "k_mixture_model.h"
 
-static guint32 g_prune_k = 3;
-static parameter_t g_prune_poss = 0.99;
 
 void print_help(){
-    printf("Usage: prune_k_mixture_model -k <INT> --CDF <FLOAT>  <FILENAME>\n");
+    printf("Usage: prune_k_mixture_model -k <INT> --CDF <DOUBLE>  <FILENAME>\n");
 }
+
+static gint g_prune_k = 3;
+static parameter_t g_prune_poss = 0.99;
+
+static GOptionEntry entries[] =
+{
+    {"pruneK", 'k', 0, G_OPTION_ARG_INT, &g_prune_k, "k parameter", NULL},
+    {"CDF", 0, 0, G_OPTION_ARG_DOUBLE, &g_prune_poss, "CDF parameter", NULL},
+    {NULL}
+};
+
 
 bool prune_k_mixture_model(KMixtureModelMagicHeader * magic_header,
                            KMixtureModelSingleGram * & bigram,
@@ -97,31 +106,24 @@ bool prune_k_mixture_model(KMixtureModelMagicHeader * magic_header,
 }
 
 int main(int argc, char * argv[]){
-    int i = 1;
-    const char * bigram_filename = NULL;
-
     setlocale(LC_ALL, "");
-    while ( i < argc ){
-        if ( strcmp("--help", argv[i]) == 0 ){
-            print_help();
-            exit(0);
-        } else if ( strcmp("-k", argv[i]) == 0 ){
-            if ( ++i >= argc ){
-                print_help();
-                exit(EINVAL);
-            }
-            g_prune_k = atoi(argv[i]);
-        } else if ( strcmp("--CDF", argv[i]) == 0 ){
-            if ( ++i >= argc ){
-                print_help();
-                exit(EINVAL);
-            }
-            g_prune_poss = atof(argv[i]);
-        } else {
-            bigram_filename = argv[i];
-        }
-        ++i;
+
+    GError * error = NULL;
+    GOptionContext * context;
+
+    context = g_option_context_new("- prune k mixture model");
+    g_option_context_add_main_entries(context, entries, NULL);
+    if (!g_option_context_parse(context, &argc, &argv, &error)) {
+        g_print("option parsing failed:%s\n", error->message);
+        exit(EINVAL);
     }
+
+    if (2 != argc) {
+        fprintf(stderr, "wrong arguments.\n");
+        exit(EINVAL);
+    }
+
+    const gchar * bigram_filename = argv[1];
 
     /* TODO: magic header signature check here. */
     KMixtureModelBigram bigram(K_MIXTURE_MODEL_MAGIC_NUMBER);
