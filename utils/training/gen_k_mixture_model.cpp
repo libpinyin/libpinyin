@@ -32,6 +32,16 @@ typedef GHashTable * HashofSecondWord;
 
 typedef GHashTable * HashofUnigram;
 
+
+void print_help(){
+    printf("Usage: gen_k_mixture_model [--skip-pi-gram-training]\n"
+           "                           [--maximum-occurs-allowed <INT>]\n"
+           "                           [--maximum-increase-rates-allowed <FLOAT>]\n"
+           "                           [--k-mixture-model-file <FILENAME>]\n"
+           "                           {<FILENAME>}+\n");
+}
+
+
 static gint g_maximum_occurs = 20;
 static parameter_t g_maximum_increase_rates = 3.;
 static gboolean g_train_pi_gram = TRUE;

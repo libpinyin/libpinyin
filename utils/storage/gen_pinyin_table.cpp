@@ -24,6 +24,16 @@
 #include <glib.h>
 #include "pinyin_internal.h"
 
+
+void print_help(){
+    printf("Usage: gen_pinyin_table -t <PHRASE_INDEX> \n"
+           "-o <OUTPUTFILE> <FILE1> <FILE2> .. <FILEn>\n"
+           "<OUTPUTFILE> the result output file\n"
+           "<FILEi> input pinyin files\n"
+           "<PHRASE_INDEX> phrase index identifier\n");
+}
+
+
 static gint phrase_index = 0;
 static const gchar * outputfile = "temp.out";
 

@@ -25,9 +25,6 @@
 #include "pinyin_internal.h"
 #include "tests_helper.h"
 
-void print_help(){
-    printf("Usage: test_phrase_lookup\n");
-}
 
 bool try_phrase_lookup(PhraseLookup * phrase_lookup,
                        ucs4_t * ucs4_str, glong ucs4_len){

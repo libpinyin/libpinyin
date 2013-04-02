@@ -25,6 +25,12 @@
 #include "pinyin_internal.h"
 #include "utils_helper.h"
 
+
+void print_help(){
+    printf("Usage: ngseg [--generate-extra-enter]  [-o outputfile] [inputfile]\n");
+}
+
+
 static gboolean gen_extra_enter = FALSE;
 static gchar * outputfile = NULL;
 
