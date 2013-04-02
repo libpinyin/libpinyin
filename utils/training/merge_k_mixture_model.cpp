@@ -28,6 +28,13 @@ void print_help(){
     printf("                             {<SOURCE_FILENAME>}+\n");
 }
 
+static const gchar * result_filename = NULL;
+
+static GOptionEntry entries[] =
+{
+    {"result-file", 0, 0, G_OPTION_ARG_FILENAME, &result_filename, "merged result file", NULL},
+    {NULL}
+};
 
 static bool merge_two_phrase_array( /* in */  FlexibleBigramPhraseArray first,
                              /* in */  FlexibleBigramPhraseArray second,
@@ -203,29 +210,23 @@ bool merge_two_k_mixture_model( /* in & out */ KMixtureModelBigram * target,
 
 int main(int argc, char * argv[]){
     int i = 1;
-    const char * result_filename = NULL;
 
     setlocale(LC_ALL, "");
-    while (i < argc) {
-        if ( strcmp("--help", argv[i]) == 0 ){
-            print_help();
-            exit(0);
-        } else if ( strcmp("--result-file", argv[i]) == 0 ){
-            if ( ++i >= argc ){
-                print_help();
-                exit(EINVAL);
-            }
-            result_filename = argv[i];
-        } else {
-            break;
-        }
-        ++i;
+
+    GError * error = NULL;
+    GOptionContext * context;
+
+    context = g_option_context_new("- merge k mixture model");
+    g_option_context_add_main_entries(context, entries, NULL);
+    if (!g_option_context_parse(context, &argc, &argv, &error)) {
+        g_print("option parsing failed:%s\n", error->message);
+        exit(EINVAL);
     }
 
     KMixtureModelBigram target(K_MIXTURE_MODEL_MAGIC_NUMBER);
     target.attach(result_filename, ATTACH_READWRITE|ATTACH_CREATE);
 
-    while ( i < argc ){
+    while (i < argc){
         const char * new_filename = argv[i];
         KMixtureModelBigram new_one(K_MIXTURE_MODEL_MAGIC_NUMBER);
         new_one.attach(new_filename, ATTACH_READONLY);
