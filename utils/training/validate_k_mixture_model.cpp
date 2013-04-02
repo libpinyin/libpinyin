@@ -137,18 +137,22 @@ bool validate_bigram(KMixtureModelBigram * bigram){
 }
 
 int main(int argc, char * argv[]){
-    int i = 1;
-    const char * k_mixture_model_filename = NULL;
 
-    while ( i < argc ){
-        if ( strcmp ("--help", argv[i]) == 0 ){
-            print_help();
-            exit(0);
-        } else {
-            k_mixture_model_filename = argv[i];
-        }
-        ++i;
+    GError * error = NULL;
+    GOptionContext * context;
+
+    context = g_option_context_new("- validate k mixture model");
+    if (!g_option_context_parse(context, &argc, &argv, &error)) {
+        g_print("option parsing failed:%s\n", error->message);
+        exit(EINVAL);
     }
+
+    if (2 != argc) {
+        fprintf(stderr, "wrong arguments.\n");
+        exit(EINVAL);
+    }
+
+    const char * k_mixture_model_filename = argv[1];
 
     KMixtureModelBigram bigram(K_MIXTURE_MODEL_MAGIC_NUMBER);
     bigram.attach(k_mixture_model_filename, ATTACH_READONLY);
