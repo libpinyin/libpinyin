@@ -23,10 +23,16 @@
 #include "pinyin_internal.h"
 #include "k_mixture_model.h"
 
-void print_help(){
-    printf("Usage: estimate_k_mixture_model [--bigram-file <FILENAME>]\n");
-    printf("                                [--deleted-bigram-file <FILENAME]\n");
-}
+static const gchar * bigram_filename = "k_mixture_model_ngram.db";
+static const gchar * deleted_bigram_filename = "k_mixture_model_deleted_ngram.db";
+
+static GOptionEntry entries[] =
+{
+    {"bigram-file", 0, 0, G_OPTION_ARG_FILENAME, &bigram_filename, "the bigram file", NULL},
+    {"deleted-bigram-file", 0, 0, G_OPTION_ARG_FILENAME, &deleted_bigram_filename, "the deleted bigram file", NULL},
+    {NULL}
+};
+
 
 parameter_t compute_interpolation(KMixtureModelSingleGram * deleted_bigram,
                                   KMixtureModelBigram * unigram,
@@ -91,32 +97,16 @@ parameter_t compute_interpolation(KMixtureModelSingleGram * deleted_bigram,
 }
 
 int main(int argc, char * argv[]){
-    int i = 1;
-    const char * bigram_filename = "k_mixture_model_ngram.db";
-    const char * deleted_bigram_filename = "k_mixture_model_deleted_ngram.db";
-
     setlocale(LC_ALL, "");
-    while ( i < argc ){
-        if ( strcmp("--help", argv[i] ) == 0 ){
-            print_help();
-            exit(0);
-        } else if ( strcmp("--bigram-file", argv[i]) == 0 ){
-            if ( ++i >= argc ) {
-                print_help();
-                exit(EINVAL);
-            }
-            bigram_filename = argv[i];
-        } else if ( strcmp("--deleted-bigram-file", argv[i]) == 0){
-            if ( ++i >= argc ) {
-                print_help();
-                exit(EINVAL);
-            }
-            deleted_bigram_filename = argv[i];
-        } else{
-            print_help();
-            exit(EINVAL);
-        }
-        ++i;
+
+    GError * error = NULL;
+    GOptionContext * context;
+
+    context = g_option_context_new("- estimate k mixture model");
+    g_option_context_add_main_entries(context, entries, NULL);
+    if (!g_option_context_parse(context, &argc, &argv, &error)) {
+        g_print("option parsing failed:%s\n", error->message);
+        exit(EINVAL);
     }
 
     /* TODO: magic header signature check here. */
