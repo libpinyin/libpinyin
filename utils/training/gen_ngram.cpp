@@ -27,34 +27,29 @@
 #include "pinyin_internal.h"
 #include "utils_helper.h"
 
-void print_help(){
-    printf("Usage: gen_ngram [--skip-pi-gram-training]\n");
-    printf("                 [--bigram-file <FILENAME>]\n");
-}
+static gboolean train_pi_gram = TRUE;
+static const gchar * bigram_filename = "bigram.db";
+
+static GOptionEntry entries[] =
+{
+    {"skip-pi-gram-training", 0, G_OPTION_FLAG_REVERSE, G_OPTION_ARG_NONE, &train_pi_gram, "skip pi-gram training", NULL},
+    {"bigram-file", 0, 0, G_OPTION_ARG_FILENAME, &bigram_filename, "bi-gram file", NULL},
+    {NULL}
+};
 
 int main(int argc, char * argv[]){
-    int i = 1;
-    bool train_pi_gram = true;
-    const char * bigram_filename = "bigram.db";
+    FILE * input = stdin;
 
     setlocale(LC_ALL, "");
-    while ( i < argc ){
-	if ( strcmp("--help", argv[i]) == 0){
-	    print_help();
-            exit(0);
-	}else if ( strcmp("--skip-pi-gram-training", argv[i]) == 0 ){
-	    train_pi_gram = false;
-	}else if ( strcmp("--bigram-file", argv[i]) == 0){
-            if ( ++i >= argc ) {
-                print_help();
-                exit(EINVAL);
-            }
-            bigram_filename = argv[i];
-	}else{
-            print_help();
-            exit(EINVAL);
-        }
-	++i;
+
+    GError * error = NULL;
+    GOptionContext * context;
+
+    context = g_option_context_new("- generate n-gram");
+    g_option_context_add_main_entries(context, entries, NULL);
+    if (!g_option_context_parse(context, &argc, &argv, &error)) {
+        g_print("option parsing failed:%s\n", error->message);
+        exit(EINVAL);
     }
     
     PhraseLargeTable2 phrase_table;
@@ -72,8 +67,8 @@ int main(int argc, char * argv[]){
 
     char* linebuf = NULL; size_t size = 0;
     phrase_token_t last_token, cur_token = last_token = 0;
-    while( getline(&linebuf, &size, stdin) ){
-	if ( feof(stdin) )
+    while( getline(&linebuf, &size, input) ){
+	if ( feof(input) )
 	    break;
 
         if ( '\n' == linebuf[strlen(linebuf) - 1] ) {
