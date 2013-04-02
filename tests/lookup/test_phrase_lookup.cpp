@@ -54,21 +54,8 @@ bool try_phrase_lookup(PhraseLookup * phrase_lookup,
 }
 
 int main(int argc, char * argv[]){
-    int i = 1;
 
     setlocale(LC_ALL, "");
-    /* deal with options. */
-    while ( i < argc ){
-        if ( strcmp ("--help", argv[i]) == 0 ){
-            print_help();
-            exit(0);
-        } else {
-            print_help();
-            exit(EINVAL);
-        }
-        ++i;
-    }
-
 
     /* init phrase table */
     FacadePhraseTable2 phrase_table;
