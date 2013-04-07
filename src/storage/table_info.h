@@ -35,8 +35,15 @@ private:
 
     pinyin_table_info_t m_table_info[PHRASE_INDEX_LIBRARY_COUNT];
 
+private:
+    void reset();
+
+    void postfix_tables();
+
 public:
     SystemTableInfo();
+
+    ~SystemTableInfo();
 
     bool load(const char * filename);
 
