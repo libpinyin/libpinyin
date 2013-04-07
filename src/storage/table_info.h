@@ -55,7 +55,11 @@ public:
 
     bool load(const char * filename);
 
-    bool conform(const SystemTableInfo * sysinfo);
+    bool save(const char * filename);
+
+    bool is_conform(const SystemTableInfo * sysinfo);
+
+    bool make_conform(const SystemTableInfo * sysinfo);
 };
 
 };

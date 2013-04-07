@@ -144,9 +144,9 @@ typedef guint32 pinyin_option_t;
 
 typedef enum {
     RESERVED = 0,
-    GB_DICTIONARY,
-    GBK_DICTIONARY,
-    MERGED_DICTIONARY,
+    GB_DICTIONARY = 1,
+    GBK_DICTIONARY = 2,
+    MERGED_DICTIONARY = 3,
     ART_DICTIONARY,
     CULTURE_DICTIONARY,
     ECONOMY_DICTIONARY,
