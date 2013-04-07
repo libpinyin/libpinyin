@@ -141,7 +141,7 @@ bool SystemTableInfo::load(const char * filename) {
         return false;
 
 #if 0
-    printf("binver:%d modelver:%d lambda:%f", binver, modelver, lambda);
+    printf("binver:%d modelver:%d lambda:%f\n", binver, modelver, lambda);
 #endif
 
     m_binary_format_version = binver;
@@ -171,6 +171,90 @@ bool SystemTableInfo::load(const char * filename) {
         table_info->m_file_type = to_file_type(filetype);
     }
 
+    fclose(input);
+
+    /* postfix reserved tables. */
     postfix_tables();
+    return true;
+}
+
+const pinyin_table_info_t * SystemTableInfo::get_table_info() {
+    return m_table_info;
+}
+
+gfloat SystemTableInfo::get_lambda() {
+    return m_lambda;
+}
+
+
+UserTableInfo::UserTableInfo() {
+    m_binary_format_version = 0;
+    m_model_data_version = 0;
+}
+
+void UserTableInfo::reset() {
+    m_binary_format_version = 0;
+    m_model_data_version = 0;
+}
+
+bool UserTableInfo::load(cosnt char * filename) {
+    reset();
+
+    FILE * input = fopen(filename, "r");
+    if (NULL == input) {
+        fprintf(stderr, "open %s failed.", filename);
+        return false;
+    }
+
+    int binver = 0, modelver = 0;
+
+    int num = fscanf(input, "binary format version:%d", &binver);
+    if (1 != num)
+        return false;
+
+    num = fscanf(input, "model data version:%d", &modelver);
+    if (1 != num)
+        return false;
+
+#if 0
+    printf("binver:%d modelver:%d\n", binver, modelver);
+#endif
+
+    m_binary_format_version = binver;
+    m_model_data_version = modelver;
+
+    fclose(input);
+
+    return true;
+}
+
+bool UserTableInfo::save(const char * filename) {
+    FILE * output = fopen(filename, "w");
+    if (NULL == output) {
+        fprintf(stderr, "write %s failed.\n", output);
+        return false;
+    }
+
+    fprintf(output, "binary format version:%d\n", m_binary_format_version);
+    fprintf(output, "model data version:%d\n", m_model_data_version);
+
+    fclose(output);
+
+    return true;
+}
+
+bool UserTableInfo::is_conform(const SystemTableInfo * sysinfo) {
+    if (sysinfo->m_binary_format_version != m_binary_format_version)
+        return false;
+
+    if (sysinfo->m_model_data_version != m_model_data_version)
+        return false;
+
+    return true;
+}
+
+bool UserTableInfo::make_conform(const SystemTableInfo * sysinfo) {
+    m_binary_format_version = sysinfo->m_binary_format_version;
+    m_model_data_version = sysinfo->m_model_data_version;
     return true;
 }

@@ -47,7 +47,7 @@ public:
 
     bool load(const char * filename);
 
-    pinyin_table_info_t * get_table_info();
+    const pinyin_table_info_t * get_table_info();
 
     gfloat get_lambda();
 };
@@ -56,6 +56,9 @@ class UserTableInfo{
 private:
     int m_binary_format_version;
     int m_model_data_version;
+
+private:
+    void reset();
 
 public:
     UserTableInfo();
