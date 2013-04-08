@@ -26,6 +26,7 @@
 #include <glib/gstdio.h>
 #include "pinyin_internal.h"
 
+
 using namespace pinyin;
 
 /* a glue layer for input method integration. */
@@ -94,7 +95,7 @@ static bool check_format(pinyin_context_t * context){
 
     UserTableInfo user_table_info;
     gchar * filename = g_build_filename
-        (userdir, "user.conf", NULL);
+        (userdir, USER_TABLE_INFO, NULL);
     user_table_info.load(filename);
     g_free(filename);
 
@@ -124,17 +125,17 @@ static bool check_format(pinyin_context_t * context){
     }
 
     filename = g_build_filename
-        (userdir, "user_pinyin_index.bin", NULL);
+        (userdir, USER_PINYIN_INDEX, NULL);
     unlink(filename);
     g_free(filename);
 
     filename = g_build_filename
-        (userdir, "user_phrase_index.bin", NULL);
+        (userdir, USER_PHRASE_INDEX, NULL);
     unlink(filename);
     g_free(filename);
 
     filename = g_build_filename
-        (userdir, "user.db", NULL);
+        (userdir, USER_BIGRAM, NULL);
     unlink(filename);
     g_free(filename);
 
@@ -148,7 +149,7 @@ static bool mark_version(pinyin_context_t * context){
     user_table_info.make_conform(&context->m_system_table_info);
 
     gchar * filename = g_build_filename
-        (userdir, "user.conf", NULL);
+        (userdir, USER_TABLE_INFO, NULL);
     bool retval = user_table_info.save(filename);
     g_free(filename);
 
@@ -165,7 +166,7 @@ pinyin_context_t * pinyin_init(const char * systemdir, const char * userdir){
     context->m_modified = false;
 
     gchar * filename = g_build_filename
-        (context->m_system_dir, "table.conf", NULL);
+        (context->m_system_dir, SYSTEM_TABLE_INFO, NULL);
     if (!context->m_system_table_info.load(filename)) {
         fprintf(stderr, "open %s failed!\n", filename);
         return NULL;
@@ -185,7 +186,7 @@ pinyin_context_t * pinyin_init(const char * systemdir, const char * userdir){
     /* load system chewing table. */
     MemoryChunk * chunk = new MemoryChunk;
     filename = g_build_filename
-        (context->m_system_dir, "pinyin_index.bin", NULL);
+        (context->m_system_dir, SYSTEM_PINYIN_INDEX, NULL);
     if (!chunk->load(filename)) {
         fprintf(stderr, "open %s failed!\n", filename);
         return NULL;
@@ -195,7 +196,7 @@ pinyin_context_t * pinyin_init(const char * systemdir, const char * userdir){
     /* load user chewing table */
     MemoryChunk * userchunk = new MemoryChunk;
     filename = g_build_filename
-        (context->m_user_dir, "user_pinyin_index.bin", NULL);
+        (context->m_user_dir, USER_PINYIN_INDEX, NULL);
     if (!userchunk->load(filename)) {
         /* hack here: use local Chewing Table to create empty memory chunk. */
         ChewingLargeTable table(context->m_options);
@@ -211,7 +212,7 @@ pinyin_context_t * pinyin_init(const char * systemdir, const char * userdir){
     /* load system phrase table */
     chunk = new MemoryChunk;
     filename = g_build_filename
-        (context->m_system_dir, "phrase_index.bin", NULL);
+        (context->m_system_dir, SYSTEM_PHRASE_INDEX, NULL);
     if (!chunk->load(filename)) {
         fprintf(stderr, "open %s failed!\n", filename);
         return NULL;
@@ -221,7 +222,7 @@ pinyin_context_t * pinyin_init(const char * systemdir, const char * userdir){
     /* load user phrase table */
     userchunk = new MemoryChunk;
     filename = g_build_filename
-        (context->m_user_dir, "user_phrase_index.bin", NULL);
+        (context->m_user_dir, USER_PHRASE_INDEX, NULL);
     if (!userchunk->load(filename)) {
         /* hack here: use local Phrase Table to create empty memory chunk. */
         PhraseLargeTable2 table;
@@ -238,12 +239,12 @@ pinyin_context_t * pinyin_init(const char * systemdir, const char * userdir){
     pinyin_load_phrase_library(context, MERGED_DICTIONARY);
 
     context->m_system_bigram = new Bigram;
-    filename = g_build_filename(context->m_system_dir, "bigram.db", NULL);
+    filename = g_build_filename(context->m_system_dir, SYSTEM_BIGRAM, NULL);
     context->m_system_bigram->attach(filename, ATTACH_READONLY);
     g_free(filename);
 
     context->m_user_bigram = new Bigram;
-    filename = g_build_filename(context->m_user_dir, "user.db", NULL);
+    filename = g_build_filename(context->m_user_dir, USER_BIGRAM, NULL);
     context->m_user_bigram->load_db(filename);
     g_free(filename);
 
@@ -554,12 +555,12 @@ bool pinyin_save(pinyin_context_t * context){
         }
     }
 
-    /* save user chewing table */
+    /* save user pinyin table */
     gchar * tmpfilename = g_build_filename
-        (context->m_user_dir, "user_pinyin_index.bin.tmp", NULL);
+        (context->m_user_dir, USER_PINYIN_INDEX ".tmp", NULL);
     unlink(tmpfilename);
     gchar * filename = g_build_filename
-        (context->m_user_dir, "user_pinyin_index.bin", NULL);
+        (context->m_user_dir, USER_PINYIN_INDEX, NULL);
 
     MemoryChunk * chunk = new MemoryChunk;
     context->m_pinyin_table->store(chunk);
@@ -571,10 +572,10 @@ bool pinyin_save(pinyin_context_t * context){
 
     /* save user phrase table */
     tmpfilename = g_build_filename
-        (context->m_user_dir, "user_phrase_index.bin.tmp", NULL);
+        (context->m_user_dir, USER_PHRASE_INDEX ".tmp", NULL);
     unlink(tmpfilename);
     filename = g_build_filename
-        (context->m_user_dir, "user_phrase_index.bin", NULL);
+        (context->m_user_dir, USER_PHRASE_INDEX, NULL);
 
     chunk = new MemoryChunk;
     context->m_phrase_table->store(chunk);
@@ -586,9 +587,9 @@ bool pinyin_save(pinyin_context_t * context){
 
     /* save user bi-gram */
     tmpfilename = g_build_filename
-        (context->m_user_dir, "user.db.tmp", NULL);
+        (context->m_user_dir, USER_BIGRAM ".tmp", NULL);
     unlink(tmpfilename);
-    filename = g_build_filename(context->m_user_dir, "user.db", NULL);
+    filename = g_build_filename(context->m_user_dir, USER_BIGRAM, NULL);
     context->m_user_bigram->save_db(tmpfilename);
     rename(tmpfilename, filename);
     g_free(tmpfilename);

@@ -47,6 +47,18 @@
 /* training module */
 #include "flexible_ngram.h"
 
+
+/* define filenames */
+#define SYSTEM_TABLE_INFO "table.conf"
+#define USER_TABLE_INFO "user.conf"
+#define SYSTEM_BIGRAM "bigram.db"
+#define USER_BIGRAM "user_bigram.db"
+#define SYSTEM_PINYIN_INDEX "pinyin_index.bin"
+#define USER_PINYIN_INDEX "user_pinyin_index.bin"
+#define SYSTEM_PHRASE_INDEX "phrase_index.bin"
+#define USER_PHRASE_INDEX "user_phrase_index.bin"
+
+
 using namespace pinyin;
 
 
