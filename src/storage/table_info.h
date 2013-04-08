@@ -22,7 +22,26 @@
 #ifndef TABLE_INFO_H
 #define TABLE_INFO_H
 
+#include "novel_types.h"
+
+
 namespace pinyin{
+
+typedef enum {
+    NOT_USED,                /* not used. */
+    SYSTEM_FILE,             /* system phrase file. */
+    DICTIONARY,              /* professional dictionary. */
+    USER_FILE,               /* user only phrase file. */
+} PHRASE_FILE_TYPE;
+
+typedef struct {
+    guint8 m_dict_index; /* for assert purpose. */
+    const gchar * m_table_filename;
+    const gchar * m_system_filename;
+    const gchar * m_user_filename;
+    PHRASE_FILE_TYPE m_file_type;
+} pinyin_table_info_t;
+
 
 class UserTableInfo;
 

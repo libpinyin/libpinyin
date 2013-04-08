@@ -22,6 +22,7 @@
 #include "table_info.h"
 #include <stdio.h>
 #include <assert.h>
+#include <string.h>
 
 using namespace pinyin;
 
@@ -67,12 +68,13 @@ void SystemTableInfo::reset() {
     for (i = 0; i < PHRASE_INDEX_LIBRARY_COUNT; ++i) {
         pinyin_table_info_t * tableinfo = &m_table_info[i];
 
-        g_free(tableinfo->m_table_filename);
+        g_free((gchar *)tableinfo->m_table_filename);
         tableinfo->m_table_filename = NULL;
-        g_free(tableinfo->m_system_filename);
+        g_free((gchar *)tableinfo->m_system_filename);
         tableinfo->m_system_filename = NULL;
-        g_free(tableinfo->m_user_filename);
+        g_free((gchar *)tableinfo->m_user_filename);
         tableinfo->m_user_filename = NULL;
+
         tableinfo->m_file_type = NOT_USED;
     }
 }
@@ -80,7 +82,7 @@ void SystemTableInfo::reset() {
 void SystemTableInfo::postfix_tables() {
     size_t i;
     for (i = 0; i < G_N_ELEMENTS(reserved_tables); ++i) {
-        pinyin_table_info_t * postfix = &reserved_tables[i];
+        const pinyin_table_info_t * postfix = &reserved_tables[i];
 
         guint8 index = postfix->m_dict_index;
         pinyin_table_info_t * tableinfo = &m_table_info[index];
@@ -150,8 +152,8 @@ bool SystemTableInfo::load(const char * filename) {
 
     int index = 0;
     char tablefile[256], sysfile[256], userfile[256], filetype[256];
-    while (!feof(infile)){
-        num = fscanf("%d %s %s %s %s",
+    while (!feof(input)) {
+        num = fscanf(input, "%d %s %s %s %s",
                      &index, tablefile, sysfile, userfile, filetype);
 
         if (5 != num)
@@ -164,11 +166,11 @@ bool SystemTableInfo::load(const char * filename) {
         pinyin_table_info_t * tableinfo = &m_table_info[index];
         assert(index == tableinfo->m_dict_index);
 
-        table_info->m_table_filename = to_string(tablefile);
-        table_info->m_system_filename = to_string(sysfile);
-        table_info->m_user_filename = to_string(userfile);
+        tableinfo->m_table_filename = to_string(tablefile);
+        tableinfo->m_system_filename = to_string(sysfile);
+        tableinfo->m_user_filename = to_string(userfile);
 
-        table_info->m_file_type = to_file_type(filetype);
+        tableinfo->m_file_type = to_file_type(filetype);
     }
 
     fclose(input);
@@ -197,7 +199,7 @@ void UserTableInfo::reset() {
     m_model_data_version = 0;
 }
 
-bool UserTableInfo::load(cosnt char * filename) {
+bool UserTableInfo::load(const char * filename) {
     reset();
 
     FILE * input = fopen(filename, "r");
@@ -231,7 +233,7 @@ bool UserTableInfo::load(cosnt char * filename) {
 bool UserTableInfo::save(const char * filename) {
     FILE * output = fopen(filename, "w");
     if (NULL == output) {
-        fprintf(stderr, "write %s failed.\n", output);
+        fprintf(stderr, "write %s failed.\n", filename);
         return false;
     }
 

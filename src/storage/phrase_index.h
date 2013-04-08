@@ -831,23 +831,6 @@ public:
     }
 };
 
-typedef enum {
-    NOT_USED,                /* not used. */
-    SYSTEM_FILE,             /* system phrase file. */
-    DICTIONARY,              /* professional dictionary. */
-    USER_FILE,               /* user only phrase file. */
-} PHRASE_FILE_TYPE;
-
-typedef struct {
-    const guint8 m_dict_index; /* for assert purpose. */
-    const char * m_table_filename;
-    const char * m_system_filename;
-    const char * m_user_filename;
-    PHRASE_FILE_TYPE m_file_type;
-} pinyin_table_info_t;
-
-extern const pinyin_table_info_t pinyin_phrase_files[PHRASE_INDEX_LIBRARY_COUNT];
-
 PhraseIndexLogger * mask_out_phrase_index_logger
 (PhraseIndexLogger * oldlogger, phrase_token_t mask, phrase_token_t value);
 
