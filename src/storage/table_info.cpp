@@ -130,15 +130,15 @@ bool SystemTableInfo::load(const char * filename) {
     int binver = 0, modelver = 0;
     gfloat lambda = 0.;
 
-    int num = fscanf(input, "binary format version:%d", &binver);
+    int num = fscanf(input, "binary format version:%d\n", &binver);
     if (1 != num)
         return false;
 
-    num = fscanf(input, "model data version:%d", &modelver);
+    num = fscanf(input, "model data version:%d\n", &modelver);
     if (1 != num)
         return false;
 
-    num = fscanf(input, "lambda parameter:%f", &lambda);
+    num = fscanf(input, "lambda parameter:%f\n", &lambda);
     if (1 != num)
         return false;
 
@@ -153,7 +153,7 @@ bool SystemTableInfo::load(const char * filename) {
     int index = 0;
     char tablefile[256], sysfile[256], userfile[256], filetype[256];
     while (!feof(input)) {
-        num = fscanf(input, "%d %s %s %s %s",
+        num = fscanf(input, "%d %s %s %s %s\n",
                      &index, tablefile, sysfile, userfile, filetype);
 
         if (5 != num)
@@ -210,11 +210,11 @@ bool UserTableInfo::load(const char * filename) {
 
     int binver = 0, modelver = 0;
 
-    int num = fscanf(input, "binary format version:%d", &binver);
+    int num = fscanf(input, "binary format version:%d\n", &binver);
     if (1 != num)
         return false;
 
-    num = fscanf(input, "model data version:%d", &modelver);
+    num = fscanf(input, "model data version:%d\n", &modelver);
     if (1 != num)
         return false;
 
