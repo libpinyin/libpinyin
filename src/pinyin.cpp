@@ -51,6 +51,8 @@ struct _pinyin_context_t{
     char * m_system_dir;
     char * m_user_dir;
     bool m_modified;
+
+    SystemTableInfo m_system_table_info;
 };
 
 struct _pinyin_instance_t{
@@ -87,26 +89,25 @@ struct _import_iterator_t{
 };
 
 
-static bool check_format(const char * userdir){
+static bool check_format(pinyin_context_t * context){
+    const char * userdir = context->m_user_dir;
+
+    UserTableInfo user_table_info;
     gchar * filename = g_build_filename
-        (userdir, "version", NULL);
-
-    MemoryChunk chunk;
-    bool exists = chunk.load(filename);
-
-    if (exists) {
-        exists = (0 == memcmp
-                  (LIBPINYIN_FORMAT_VERSION, chunk.begin(),
-                   strlen(LIBPINYIN_FORMAT_VERSION) + 1));
-    }
+        (userdir, "user.conf", NULL);
+    user_table_info.load(filename);
     g_free(filename);
+
+    bool exists = user_table_info.is_conform
+        (&context->m_system_table_info);
 
     if (exists)
         return exists;
 
     /* clean up files, if version mis-matches. */
     for (size_t i = 1; i < PHRASE_INDEX_LIBRARY_COUNT; ++i) {
-        const pinyin_table_info_t * table_info = pinyin_phrase_files + i;
+        const pinyin_table_info_t * table_info =
+            context->m_system_table_info.get_table_info() + i;
 
         if (NOT_USED == table_info->m_file_type)
             continue;
@@ -140,14 +141,17 @@ static bool check_format(const char * userdir){
     return exists;
 }
 
-static bool mark_version(const char * userdir){
+static bool mark_version(pinyin_context_t * context){
+    const char * userdir = context->m_user_dir;
+
+    UserTableInfo user_table_info;
+    user_table_info.make_conform(&context->m_system_table_info);
+
     gchar * filename = g_build_filename
-        (userdir, "version", NULL);
-    MemoryChunk chunk;
-    chunk.set_content(0, LIBPINYIN_FORMAT_VERSION,
-                      strlen(LIBPINYIN_FORMAT_VERSION) + 1);
-    bool retval = chunk.save(filename);
+        (userdir, "user.conf", NULL);
+    bool retval = user_table_info.save(filename);
     g_free(filename);
+
     return retval;
 }
 
@@ -160,7 +164,16 @@ pinyin_context_t * pinyin_init(const char * systemdir, const char * userdir){
     context->m_user_dir = g_strdup(userdir);
     context->m_modified = false;
 
-    check_format(context->m_user_dir);
+    gchar * filename = g_build_filename
+        (context->m_system_dir, "table.conf", NULL);
+    if (!context->m_system_table_info.load(filename)) {
+        fprintf(stderr, "open %s failed!\n", filename);
+        return NULL;
+    }
+    g_free(filename);
+
+
+    check_format(context);
 
     context->m_full_pinyin_parser = new FullPinyinParser2;
     context->m_double_pinyin_parser = new DoublePinyinParser2;
@@ -171,7 +184,7 @@ pinyin_context_t * pinyin_init(const char * systemdir, const char * userdir){
 
     /* load system chewing table. */
     MemoryChunk * chunk = new MemoryChunk;
-    gchar * filename = g_build_filename
+    filename = g_build_filename
         (context->m_system_dir, "pinyin_index.bin", NULL);
     if (!chunk->load(filename)) {
         fprintf(stderr, "open %s failed!\n", filename);
@@ -257,7 +270,8 @@ bool pinyin_load_phrase_library(pinyin_context_t * context,
     if (ERROR_OK == retval)
         return false;
 
-    const pinyin_table_info_t * table_info = pinyin_phrase_files + index;
+    const pinyin_table_info_t * table_info =
+        context->m_system_table_info.get_table_info() + index;
 
     if (SYSTEM_FILE == table_info->m_file_type ||
         DICTIONARY == table_info->m_file_type) {
@@ -477,7 +491,8 @@ bool pinyin_save(pinyin_context_t * context){
         if (ERROR_NO_SUB_PHRASE_INDEX == retval)
             continue;
 
-        const pinyin_table_info_t * table_info = pinyin_phrase_files + i;
+        const pinyin_table_info_t * table_info =
+            context->m_system_table_info.get_table_info() + i;
 
         if (NOT_USED == table_info->m_file_type)
             continue;
@@ -579,7 +594,7 @@ bool pinyin_save(pinyin_context_t * context){
     g_free(tmpfilename);
     g_free(filename);
 
-    mark_version(context->m_user_dir);
+    mark_version(context);
 
     context->m_modified = false;
     return true;
@@ -632,7 +647,8 @@ bool pinyin_mask_out(pinyin_context_t * context,
         if (ERROR_NO_SUB_PHRASE_INDEX == retval)
             continue;
 
-        const pinyin_table_info_t * table_info = pinyin_phrase_files + index;
+        const pinyin_table_info_t * table_info =
+            context->m_system_table_info.get_table_info() + index;
 
         if (NOT_USED == table_info->m_file_type)
             continue;

@@ -37,7 +37,8 @@ binary_model_data	= phrase_index.bin pinyin_index.bin \
 
 MAINTAINERCLEANFILES	= Makefile.in
 
-EXTRA_DIST		= $(textual_model_data)
+EXTRA_DIST		= $(textual_model_data) \
+			  table.conf
 
 libpinyin_db_DATA 	= $(binary_model_data)
 

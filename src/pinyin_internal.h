@@ -41,6 +41,7 @@
 #include "pinyin_lookup2.h"
 #include "phrase_lookup.h"
 #include "tag_utility.h"
+#include "table_info.h"
 
 
 /* training module */

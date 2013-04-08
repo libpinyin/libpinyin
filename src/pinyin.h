@@ -714,8 +714,6 @@ typedef ChewingKey PinyinKey;
 typedef ChewingKeyRest PinyinKeyPos;
 
 
-#define LIBPINYIN_FORMAT_VERSION  "0.8.92"
-
 G_END_DECLS
 
 #endif
