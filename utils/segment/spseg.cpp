@@ -189,6 +189,14 @@ int main(int argc, char * argv[]){
         }
     }
 
+    SystemTableInfo system_table_info;
+
+    bool retval = system_table_info.load("table.conf");
+    if (!retval) {
+        fprintf(stderr, "load table.conf failed.\n");
+        exit(ENOENT);
+    }
+
     /* init phrase table */
     FacadePhraseTable2 phrase_table;
     MemoryChunk * chunk = new MemoryChunk;
@@ -197,7 +205,11 @@ int main(int argc, char * argv[]){
 
     /* init phrase index */
     FacadePhraseIndex phrase_index;
-    if (!load_phrase_index(&phrase_index))
+
+    const pinyin_table_info_t * phrase_files =
+        system_table_info.get_table_info();
+
+    if (!load_phrase_index(phrase_files, &phrase_index))
         exit(ENOENT);
 
     char * linebuf = NULL; size_t size = 0; ssize_t read;
