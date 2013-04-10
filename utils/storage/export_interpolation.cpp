@@ -45,8 +45,20 @@ int main(int argc, char * argv[]){
     FILE * output = stdout;
     const char * bigram_filename = "bigram.db";
 
+    SystemTableInfo system_table_info;
+
+    bool retval = system_table_info.load("table.conf");
+    if (!retval) {
+        fprintf(stderr, "load table.conf failed.\n");
+        exit(ENOENT);
+    }
+
     FacadePhraseIndex phrase_index;
-    if (!load_phrase_index(&phrase_index))
+
+    const pinyin_table_info_t * phrase_files =
+        system_table_info.get_table_info();
+
+    if (!load_phrase_index(phrase_files, &phrase_index))
         exit(ENOENT);
 
     Bigram bigram;
