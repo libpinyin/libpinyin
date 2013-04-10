@@ -6,10 +6,21 @@
 size_t bench_times = 1000;
 
 int main(int argc, char * argv[]){
+    SystemTableInfo system_table_info;
+
+    bool retval = system_table_info.load("../../data/table.conf");
+    if (!retval) {
+        fprintf(stderr, "load table.conf failed.\n");
+        exit(ENOENT);
+    }
+
     PhraseLargeTable2 largetable;
     FacadePhraseIndex phrase_index;
 
-    if (!load_phrase_table(NULL, &largetable, &phrase_index))
+    const pinyin_table_info_t * phrase_files =
+        system_table_info.get_table_info();
+
+    if (!load_phrase_table(phrase_files, NULL, &largetable, &phrase_index))
         exit(ENOENT);
 
     MemoryChunk * chunk = new MemoryChunk;

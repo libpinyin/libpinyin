@@ -27,11 +27,22 @@
 size_t bench_times = 1000;
 
 int main(int argc, char * argv[]) {
+    SystemTableInfo system_table_info;
+
+    bool retval = system_table_info.load("../../data/table.conf");
+    if (!retval) {
+        fprintf(stderr, "load table.conf failed.\n");
+        exit(ENOENT);
+    }
+
     pinyin_option_t options = USE_TONE | PINYIN_INCOMPLETE;
     ChewingLargeTable largetable(options);
     FacadePhraseIndex phrase_index;
 
-    if (!load_phrase_table(&largetable, NULL, &phrase_index))
+    const pinyin_table_info_t * phrase_files =
+        system_table_info.get_table_info();
+
+    if (!load_phrase_table(phrase_files, &largetable, NULL, &phrase_index))
         exit(ENOENT);
 
     MemoryChunk * new_chunk = new MemoryChunk;

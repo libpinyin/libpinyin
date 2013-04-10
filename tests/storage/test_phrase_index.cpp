@@ -71,8 +71,20 @@ int main(int argc, char * argv[]){
         assert(poss == 0.5);
     }
 
+    SystemTableInfo system_table_info;
+
+    bool retval = system_table_info.load("../../data/table.conf");
+    if (!retval) {
+        fprintf(stderr, "load table.conf failed.\n");
+        exit(ENOENT);
+    }
+
     FacadePhraseIndex phrase_index;
-    if (!load_phrase_table(NULL, NULL, &phrase_index))
+
+    const pinyin_table_info_t * phrase_files =
+        system_table_info.get_table_info();
+
+    if (!load_phrase_table(phrase_files, NULL, NULL, &phrase_index))
         exit(ENOENT);
 
     phrase_index.compact();
