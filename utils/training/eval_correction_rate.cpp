@@ -116,6 +116,14 @@ bool do_one_test(PinyinLookup2 * pinyin_lookup,
 int main(int argc, char * argv[]){
     const char * evals_text = "evals2.text";
 
+    SystemTableInfo system_table_info;
+
+    bool retval = system_table_info.load("table.conf");
+    if (!retval) {
+        fprintf(stderr, "load table.conf failed.\n");
+        exit(ENOENT);
+    }
+
     pinyin_option_t options = USE_TONE;
     FacadeChewingTable largetable;
 
@@ -129,7 +137,11 @@ int main(int argc, char * argv[]){
     phrase_table.load(chunk, NULL);
 
     FacadePhraseIndex phrase_index;
-    if (!load_phrase_index(&phrase_index))
+
+    const pinyin_table_info_t * phrase_files =
+        system_table_info.get_table_info();
+
+    if (!load_phrase_index(phrase_files, &phrase_index))
         exit(ENOENT);
 
     Bigram system_bigram;
