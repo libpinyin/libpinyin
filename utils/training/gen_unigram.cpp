@@ -20,20 +20,42 @@
  */
 
 #include <stdio.h>
+#include <locale.h>
 #include "pinyin_internal.h"
 #include "utils_helper.h"
+
+static const gchar * table_dir = ".";
+
+static GOptionEntry entries[] =
+{
+    {"table-dir", 0, 0, G_OPTION_ARG_FILENAME, &table_dir, "table directory", NULL},
+    {NULL}
+};
 
 /* increase all unigram frequency by a constant. */
 
 int main(int argc, char * argv[]){
+    setlocale(LC_ALL, "");
+
+    GError * error = NULL;
+    GOptionContext * context;
+
+    context = g_option_context_new("- increase uni-gram");
+    g_option_context_add_main_entries(context, entries, NULL);
+    if (!g_option_context_parse(context, &argc, &argv, &error)) {
+        g_print("option parsing failed:%s\n", error->message);
+        exit(EINVAL);
+    }
 
     SystemTableInfo system_table_info;
 
-    bool retval = system_table_info.load("table.conf");
+    gchar * filename = g_build_filename(table_dir, "table.conf", NULL);
+    bool retval = system_table_info.load(filename);
     if (!retval) {
         fprintf(stderr, "load table.conf failed.\n");
         exit(ENOENT);
     }
+    g_free(filename);
 
     FacadePhraseIndex phrase_index;
 

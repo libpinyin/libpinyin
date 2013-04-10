@@ -57,8 +57,8 @@ $(tablefiles): interpolation2.text
 bigram.db: $(textual_model_data)
 	$(RM) $(binary_model_data)
 	../utils/storage/gen_binary_files --table-dir $(top_srcdir)/data
-	../utils/storage/import_interpolation < $(top_srcdir)/data/interpolation2.text
-	../utils/training/gen_unigram
+	../utils/storage/import_interpolation --table-dir $(top_srcdir)/data < $(top_srcdir)/data/interpolation2.text
+	../utils/training/gen_unigram --table-dir $(top_srcdir)/data
 
 phrase_index.bin pinyin_index.bin $(binfiles): bigram.db
 
