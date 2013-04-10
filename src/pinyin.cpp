@@ -105,10 +105,12 @@ static bool check_format(pinyin_context_t * context){
     if (exists)
         return exists;
 
+    const pinyin_table_info_t * phrase_files =
+        context->m_system_table_info.get_table_info();
+
     /* clean up files, if version mis-matches. */
     for (size_t i = 1; i < PHRASE_INDEX_LIBRARY_COUNT; ++i) {
-        const pinyin_table_info_t * table_info =
-            context->m_system_table_info.get_table_info() + i;
+        const pinyin_table_info_t * table_info = phrase_files + i;
 
         if (NOT_USED == table_info->m_file_type)
             continue;
@@ -168,7 +170,7 @@ pinyin_context_t * pinyin_init(const char * systemdir, const char * userdir){
     gchar * filename = g_build_filename
         (context->m_system_dir, SYSTEM_TABLE_INFO, NULL);
     if (!context->m_system_table_info.load(filename)) {
-        fprintf(stderr, "open %s failed!\n", filename);
+        fprintf(stderr, "load %s failed!\n", filename);
         return NULL;
     }
     g_free(filename);
@@ -271,8 +273,10 @@ bool pinyin_load_phrase_library(pinyin_context_t * context,
     if (ERROR_OK == retval)
         return false;
 
-    const pinyin_table_info_t * table_info =
-        context->m_system_table_info.get_table_info() + index;
+    const pinyin_table_info_t * phrase_files =
+        context->m_system_table_info.get_table_info();
+
+    const pinyin_table_info_t * table_info = phrase_files + index;
 
     if (SYSTEM_FILE == table_info->m_file_type ||
         DICTIONARY == table_info->m_file_type) {
@@ -484,6 +488,9 @@ bool pinyin_save(pinyin_context_t * context){
 
     context->m_phrase_index->compact();
 
+    const pinyin_table_info_t * phrase_files =
+        context->m_system_table_info.get_table_info();
+
     /* skip the reserved zero phrase library. */
     for (size_t i = 1; i < PHRASE_INDEX_LIBRARY_COUNT; ++i) {
         PhraseIndexRange range;
@@ -492,8 +499,7 @@ bool pinyin_save(pinyin_context_t * context){
         if (ERROR_NO_SUB_PHRASE_INDEX == retval)
             continue;
 
-        const pinyin_table_info_t * table_info =
-            context->m_system_table_info.get_table_info() + i;
+        const pinyin_table_info_t * table_info = phrase_files + i;
 
         if (NOT_USED == table_info->m_file_type)
             continue;
@@ -640,6 +646,9 @@ bool pinyin_mask_out(pinyin_context_t * context,
     context->m_phrase_table->mask_out(mask, value);
     context->m_user_bigram->mask_out(mask, value);
 
+    const pinyin_table_info_t * phrase_files =
+        context->m_system_table_info.get_table_info();
+
     /* mask out the phrase index. */
     for (size_t index = 1; index < PHRASE_INDEX_LIBRARY_COUNT; ++index) {
         PhraseIndexRange range;
@@ -648,8 +657,7 @@ bool pinyin_mask_out(pinyin_context_t * context,
         if (ERROR_NO_SUB_PHRASE_INDEX == retval)
             continue;
 
-        const pinyin_table_info_t * table_info =
-            context->m_system_table_info.get_table_info() + index;
+        const pinyin_table_info_t * table_info = phrase_files + index;
 
         if (NOT_USED == table_info->m_file_type)
             continue;
