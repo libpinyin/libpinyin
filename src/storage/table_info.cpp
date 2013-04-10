@@ -45,13 +45,13 @@ SystemTableInfo::SystemTableInfo() {
 
     size_t i;
     for (i = 0; i < PHRASE_INDEX_LIBRARY_COUNT; ++i) {
-        pinyin_table_info_t * tableinfo = &m_table_info[i];
+        pinyin_table_info_t * table_info = &m_table_info[i];
 
-        tableinfo->m_dict_index = i;
-        tableinfo->m_table_filename = NULL;
-        tableinfo->m_system_filename = NULL;
-        tableinfo->m_user_filename = NULL;
-        tableinfo->m_file_type = NOT_USED;
+        table_info->m_dict_index = i;
+        table_info->m_table_filename = NULL;
+        table_info->m_system_filename = NULL;
+        table_info->m_user_filename = NULL;
+        table_info->m_file_type = NOT_USED;
     }
 }
 
@@ -66,16 +66,16 @@ void SystemTableInfo::reset() {
 
     size_t i;
     for (i = 0; i < PHRASE_INDEX_LIBRARY_COUNT; ++i) {
-        pinyin_table_info_t * tableinfo = &m_table_info[i];
+        pinyin_table_info_t * table_info = &m_table_info[i];
 
-        g_free((gchar *)tableinfo->m_table_filename);
-        tableinfo->m_table_filename = NULL;
-        g_free((gchar *)tableinfo->m_system_filename);
-        tableinfo->m_system_filename = NULL;
-        g_free((gchar *)tableinfo->m_user_filename);
-        tableinfo->m_user_filename = NULL;
+        g_free((gchar *)table_info->m_table_filename);
+        table_info->m_table_filename = NULL;
+        g_free((gchar *)table_info->m_system_filename);
+        table_info->m_system_filename = NULL;
+        g_free((gchar *)table_info->m_user_filename);
+        table_info->m_user_filename = NULL;
 
-        tableinfo->m_file_type = NOT_USED;
+        table_info->m_file_type = NOT_USED;
     }
 }
 
@@ -85,13 +85,13 @@ void SystemTableInfo::postfix_tables() {
         const pinyin_table_info_t * postfix = &reserved_tables[i];
 
         guint8 index = postfix->m_dict_index;
-        pinyin_table_info_t * tableinfo = &m_table_info[index];
-        assert(tableinfo->m_dict_index == index);
+        pinyin_table_info_t * table_info = &m_table_info[index];
+        assert(table_info->m_dict_index == index);
 
-        tableinfo->m_table_filename = g_strdup(postfix->m_table_filename);
-        tableinfo->m_system_filename = g_strdup(postfix->m_system_filename);
-        tableinfo->m_user_filename = g_strdup(postfix->m_user_filename);
-        tableinfo->m_file_type = postfix->m_file_type;
+        table_info->m_table_filename = g_strdup(postfix->m_table_filename);
+        table_info->m_system_filename = g_strdup(postfix->m_system_filename);
+        table_info->m_user_filename = g_strdup(postfix->m_user_filename);
+        table_info->m_file_type = postfix->m_file_type;
     }
 }
 
@@ -163,14 +163,14 @@ bool SystemTableInfo::load(const char * filename) {
             continue;
 
         /* save into m_table_info. */
-        pinyin_table_info_t * tableinfo = &m_table_info[index];
-        assert(index == tableinfo->m_dict_index);
+        pinyin_table_info_t * table_info = &m_table_info[index];
+        assert(index == table_info->m_dict_index);
 
-        tableinfo->m_table_filename = to_string(tablefile);
-        tableinfo->m_system_filename = to_string(sysfile);
-        tableinfo->m_user_filename = to_string(userfile);
+        table_info->m_table_filename = to_string(tablefile);
+        table_info->m_system_filename = to_string(sysfile);
+        table_info->m_user_filename = to_string(userfile);
 
-        tableinfo->m_file_type = to_file_type(filetype);
+        table_info->m_file_type = to_file_type(filetype);
     }
 
     fclose(input);
