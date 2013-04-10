@@ -36,29 +36,29 @@ int main(int argc, char * argv[]) {
 
     size_t i;
     for (i = 0; i < PHRASE_INDEX_LIBRARY_COUNT; ++i) {
-        const pinyin_table_info_t * tableinfo =
+        const pinyin_table_info_t * table_info =
             system_table_info.get_table_info() + i;
 
-        assert(i == tableinfo->m_dict_index);
-        printf("table index:%d\n", tableinfo->m_dict_index);
+        assert(i == table_info->m_dict_index);
+        printf("table index:%d\n", table_info->m_dict_index);
 
-        switch(tableinfo->m_file_type) {
+        switch(table_info->m_file_type) {
         case NOT_USED:
             printf("not used.\n");
             break;
 
         case SYSTEM_FILE:
-            printf("system file:%s %s %s.\n", tableinfo->m_table_filename,
-                   tableinfo->m_system_filename, tableinfo->m_user_filename);
+            printf("system file:%s %s %s.\n", table_info->m_table_filename,
+                   table_info->m_system_filename, table_info->m_user_filename);
             break;
 
         case DICTIONARY:
-            printf("dictionary:%s %s %s.\n", tableinfo->m_table_filename,
-                   tableinfo->m_system_filename, tableinfo->m_user_filename);
+            printf("dictionary:%s %s %s.\n", table_info->m_table_filename,
+                   table_info->m_system_filename, table_info->m_user_filename);
             break;
 
         case USER_FILE:
-            printf("user file:%s.\n", tableinfo->m_user_filename);
+            printf("user file:%s.\n", table_info->m_user_filename);
             break;
 
         default:
