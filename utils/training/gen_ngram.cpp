@@ -51,7 +51,15 @@ int main(int argc, char * argv[]){
         g_print("option parsing failed:%s\n", error->message);
         exit(EINVAL);
     }
-    
+
+    SystemTableInfo system_table_info;
+
+    bool retval = system_table_info.load("table.conf");
+    if (!retval) {
+        fprintf(stderr, "load table.conf failed.\n");
+        exit(ENOENT);
+    }
+
     PhraseLargeTable2 phrase_table;
     /* init phrase table */
     MemoryChunk * chunk = new MemoryChunk;
@@ -59,7 +67,11 @@ int main(int argc, char * argv[]){
     phrase_table.load(chunk);
 
     FacadePhraseIndex phrase_index;
-    if (!load_phrase_index(&phrase_index))
+
+    const pinyin_table_info_t * phrase_files =
+        system_table_info.get_table_info();
+
+    if (!load_phrase_index(phrase_files, &phrase_index))
         exit(ENOENT);
     
     Bigram bigram;
@@ -117,7 +129,7 @@ int main(int argc, char * argv[]){
 
     free(linebuf);
     
-    if (!save_phrase_index(&phrase_index))
+    if (!save_phrase_index(phrase_files, &phrase_index))
         exit(ENOENT);
 
     return 0;
