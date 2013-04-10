@@ -28,6 +28,13 @@
 size_t bench_times = 100;
 
 int main( int argc, char * argv[]){
+    SystemTableInfo system_table_info;
+
+    bool retval = system_table_info.load("../../data/table.conf");
+    if (!retval) {
+        fprintf(stderr, "load table.conf failed.\n");
+        exit(ENOENT);
+    }
 
     pinyin_option_t options =
         USE_TONE | USE_RESPLIT_TABLE | PINYIN_CORRECT_ALL | PINYIN_AMB_ALL;
@@ -37,8 +44,11 @@ int main( int argc, char * argv[]){
     chunk->load("../../data/pinyin_index.bin");
     largetable.load(options, chunk, NULL);
 
+    const pinyin_table_info_t * phrase_files =
+        system_table_info.get_table_info();
+
     FacadePhraseIndex phrase_index;
-    if (!load_phrase_index(&phrase_index))
+    if (!load_phrase_index(phrase_files, &phrase_index))
         exit(ENOENT);
 
     Bigram system_bigram;
