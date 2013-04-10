@@ -45,6 +45,14 @@ int main(int argc, char * argv[]){
         exit(EINVAL);
     }
 
+    SystemTableInfo system_table_info;
+
+    bool retval = system_table_info.load("table.conf");
+    if (!retval) {
+        fprintf(stderr, "load table.conf failed.\n");
+        exit(ENOENT);
+    }
+
     /* generate pinyin index*/
     pinyin_option_t options = USE_TONE;
     ChewingLargeTable chewing_table(options);
@@ -52,8 +60,12 @@ int main(int argc, char * argv[]){
 
     /* generate phrase index */
     FacadePhraseIndex phrase_index;
+
+    const pinyin_table_info_t * phrase_files =
+        system_table_info.get_table_info();
+
     for (size_t i = 0; i < PHRASE_INDEX_LIBRARY_COUNT; ++i) {
-        const pinyin_table_info_t * table_info = pinyin_phrase_files + i;
+        const pinyin_table_info_t * table_info = phrase_files + i;
         assert(table_info->m_dict_index == i);
 
         if (SYSTEM_FILE != table_info->m_file_type &&
@@ -91,10 +103,10 @@ int main(int argc, char * argv[]){
 
     phrase_index.compact();
 
-    if (!save_phrase_index(&phrase_index))
+    if (!save_phrase_index(phrase_files, &phrase_index))
         exit(ENOENT);
 
-    if (!save_dictionary(&phrase_index))
+    if (!save_dictionary(phrase_files, &phrase_index))
         exit(ENOENT);
 
     return 0;
