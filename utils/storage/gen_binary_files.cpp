@@ -47,11 +47,13 @@ int main(int argc, char * argv[]){
 
     SystemTableInfo system_table_info;
 
-    bool retval = system_table_info.load("table.conf");
+    gchar * filename = g_build_filename(table_dir, "table.conf", NULL);
+    bool retval = system_table_info.load(filename);
     if (!retval) {
         fprintf(stderr, "load table.conf failed.\n");
         exit(ENOENT);
     }
+    g_free(filename);
 
     /* generate pinyin index*/
     pinyin_option_t options = USE_TONE;
@@ -74,7 +76,7 @@ int main(int argc, char * argv[]){
 
         const char * tablename = table_info->m_table_filename;
 
-        gchar * filename = g_build_filename(table_dir, tablename, NULL);
+        filename = g_build_filename(table_dir, tablename, NULL);
         FILE * tablefile = fopen(filename, "r");
 
         if (NULL == tablefile) {
