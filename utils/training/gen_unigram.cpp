@@ -27,13 +27,24 @@
 
 int main(int argc, char * argv[]){
 
+    SystemTableInfo system_table_info;
+
+    bool retval = system_table_info.load("table.conf");
+    if (!retval) {
+        fprintf(stderr, "load table.conf failed.\n");
+        exit(ENOENT);
+    }
+
     FacadePhraseIndex phrase_index;
+
+    const pinyin_table_info_t * phrase_files =
+        system_table_info.get_table_info();
 
     /* Note: please increase the value when corpus size becomes larger.
      *  To avoid zero value when computing unigram frequency in float format.
      */
     for (size_t i = 0; i < PHRASE_INDEX_LIBRARY_COUNT; ++i) {
-        const pinyin_table_info_t * table_info = pinyin_phrase_files + i;
+        const pinyin_table_info_t * table_info = phrase_files + i;
         assert(table_info->m_dict_index == i);
 
         if (SYSTEM_FILE != table_info->m_file_type &&
@@ -68,10 +79,10 @@ int main(int argc, char * argv[]){
         }
     }
 
-    if (!save_phrase_index(&phrase_index))
+    if (!save_phrase_index(phrase_files, &phrase_index))
         exit(ENOENT);
 
-    if (!save_dictionary(&phrase_index))
+    if (!save_dictionary(phrase_files, &phrase_index))
         exit(ENOENT);
 
     return 0;
