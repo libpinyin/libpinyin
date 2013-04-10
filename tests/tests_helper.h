@@ -22,10 +22,11 @@
 #ifndef TESTS_HELPER_H
 #define TESTS_HELPER_H
 
-static bool load_phrase_index(FacadePhraseIndex * phrase_index){
+static bool load_phrase_index(const pinyin_table_info_t * phrase_files,
+                              FacadePhraseIndex * phrase_index){
     MemoryChunk * chunk = NULL;
     for (size_t i = 0; i < PHRASE_INDEX_LIBRARY_COUNT; ++i) {
-        const pinyin_table_info_t * table_info = pinyin_phrase_files + i;
+        const pinyin_table_info_t * table_info = phrase_files + i;
 
         if (SYSTEM_FILE != table_info->m_file_type)
             continue;
@@ -47,11 +48,12 @@ static bool load_phrase_index(FacadePhraseIndex * phrase_index){
     return true;
 }
 
-static bool load_phrase_table(ChewingLargeTable * chewing_table,
+static bool load_phrase_table(const pinyin_table_info_t * phrase_files,
+                              ChewingLargeTable * chewing_table,
                               PhraseLargeTable2 * phrase_table,
                               FacadePhraseIndex * phrase_index){
     for (size_t i = 0; i < PHRASE_INDEX_LIBRARY_COUNT; ++i) {
-        const pinyin_table_info_t * table_info = pinyin_phrase_files + i;
+        const pinyin_table_info_t * table_info = phrase_files + i;
 
         if (SYSTEM_FILE != table_info->m_file_type)
             continue;

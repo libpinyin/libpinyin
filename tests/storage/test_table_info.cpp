@@ -28,6 +28,7 @@ int main(int argc, char * argv[]) {
 
     bool retval = system_table_info.load("../../data/table.conf");
     if (!retval) {
+        fprintf(stderr, "load table.conf failed.\n");
         exit(ENOENT);
     }
 
