@@ -26,9 +26,10 @@
 
 using namespace pinyin;
 
-const gfloat PinyinLookup2::bigram_lambda = LAMBDA_PARAMETER;
-const gfloat PinyinLookup2::unigram_lambda = 1 - LAMBDA_PARAMETER;
-
+/*
+const gfloat PinyinLookup2::bigram_lambda = lambda;
+const gfloat PinyinLookup2::unigram_lambda = 1 - lambda;
+*/
 
 /* internal definition */
 static const size_t nbeam = 32;
@@ -184,11 +185,15 @@ static void clear_steps(GPtrArray * steps_index, GPtrArray * steps_content){
 }
 
 
-PinyinLookup2::PinyinLookup2(pinyin_option_t options,
+PinyinLookup2::PinyinLookup2(const gfloat lambda,
+                             pinyin_option_t options,
                              FacadeChewingTable * pinyin_table,
                              FacadePhraseIndex * phrase_index,
                              Bigram * system_bigram,
-                             Bigram * user_bigram){
+                             Bigram * user_bigram)
+    : bigram_lambda(lambda),
+      unigram_lambda(1. - lambda)
+{
     m_options = options;
     m_pinyin_table = pinyin_table;
     m_phrase_index = phrase_index;

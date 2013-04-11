@@ -80,8 +80,8 @@ struct lookup_constraint_t{
  */
 class PinyinLookup2{
 private:
-    static const gfloat bigram_lambda;
-    static const gfloat unigram_lambda;
+    const gfloat bigram_lambda;
+    const gfloat unigram_lambda;
 
     PhraseItem m_cache_phrase_item;
     SingleGram m_merged_single_gram;
@@ -119,6 +119,7 @@ protected:
 public:
     /**
      * PinyinLookup2::PinyinLookup2:
+     * @lambda: the lambda parameter for interpolation model.
      * @options: the pinyin options.
      * @pinyin_table: the pinyin table.
      * @phrase_index: the phrase index.
@@ -128,8 +129,11 @@ public:
      * The constructor of the PinyinLookup2.
      *
      */
-    PinyinLookup2(pinyin_option_t options, FacadeChewingTable * pinyin_table,
-                  FacadePhraseIndex * phrase_index, Bigram * system_bigram,
+    PinyinLookup2(const gfloat lambda,
+                  pinyin_option_t options,
+                  FacadeChewingTable * pinyin_table,
+                  FacadePhraseIndex * phrase_index,
+                  Bigram * system_bigram,
                   Bigram * user_bigram);
 
     /**
