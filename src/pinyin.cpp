@@ -250,13 +250,16 @@ pinyin_context_t * pinyin_init(const char * systemdir, const char * userdir){
     context->m_user_bigram->load_db(filename);
     g_free(filename);
 
+    gfloat lambda = context->m_system_table_info.get_lambda();
+
     context->m_pinyin_lookup = new PinyinLookup2
-        ( context->m_options, context->m_pinyin_table,
-          context->m_phrase_index, context->m_system_bigram,
-          context->m_user_bigram);
+        ( lambda, context->m_options,
+          context->m_pinyin_table, context->m_phrase_index,
+          context->m_system_bigram, context->m_user_bigram);
 
     context->m_phrase_lookup = new PhraseLookup
-        (context->m_phrase_table, context->m_phrase_index,
+        (lambda,
+         context->m_phrase_table, context->m_phrase_index,
          context->m_system_bigram, context->m_user_bigram);
 
     return context;
