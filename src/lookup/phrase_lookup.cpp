@@ -30,9 +30,10 @@
 using namespace pinyin;
 
 
-const gfloat PhraseLookup::bigram_lambda = LAMBDA_PARAMETER;
-const gfloat PhraseLookup::unigram_lambda = 1 - LAMBDA_PARAMETER;
-
+/*
+const gfloat PhraseLookup::bigram_lambda = lambda;
+const gfloat PhraseLookup::unigram_lambda = 1 - lambda;
+*/
 
 static bool populate_prefixes(GPtrArray * steps_index,
                               GPtrArray * steps_content) {
@@ -90,10 +91,14 @@ static void clear_steps(GPtrArray * steps_index,
     }
 }
 
-PhraseLookup::PhraseLookup(FacadePhraseTable2 * phrase_table,
+PhraseLookup::PhraseLookup(const gfloat lambda,
+                           FacadePhraseTable2 * phrase_table,
                            FacadePhraseIndex * phrase_index,
                            Bigram * system_bigram,
-                           Bigram * user_bigram){
+                           Bigram * user_bigram)
+    : bigram_lambda(lambda),
+      unigram_lambda(1. - lambda)
+{
     m_phrase_table = phrase_table;
     m_phrase_index = phrase_index;
     m_system_bigram = system_bigram;
