@@ -149,8 +149,11 @@ int main(int argc, char * argv[]){
     Bigram user_bigram;
     user_bigram.attach(NULL, ATTACH_CREATE|ATTACH_READWRITE);
 
-    PinyinLookup2 pinyin_lookup(options, &largetable, &phrase_index,
-                               &system_bigram, &user_bigram);
+    gfloat lambda = system_table_info.get_lambda();
+
+    PinyinLookup2 pinyin_lookup(lambda, options,
+                                &largetable, &phrase_index,
+                                &system_bigram, &user_bigram);
 
     /* open evals text. */
     FILE * evals_file = fopen(evals_text, "r");

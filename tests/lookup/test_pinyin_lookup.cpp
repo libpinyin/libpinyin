@@ -55,9 +55,12 @@ int main( int argc, char * argv[]){
     system_bigram.attach("../../data/bigram.db", ATTACH_READONLY);
     Bigram user_bigram;
     user_bigram.attach(NULL, ATTACH_CREATE|ATTACH_READWRITE);
+
+    gfloat lambda = system_table_info.get_lambda();
     
-    PinyinLookup2 pinyin_lookup(options, &largetable, &phrase_index,
-                               &system_bigram, &user_bigram);
+    PinyinLookup2 pinyin_lookup(lambda, options,
+                                &largetable, &phrase_index,
+                                &system_bigram, &user_bigram);
 
     /* prepare the prefixes for get_best_match. */
     TokenVector prefixes = g_array_new

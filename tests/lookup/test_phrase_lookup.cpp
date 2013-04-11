@@ -80,8 +80,11 @@ int main(int argc, char * argv[]){
     system_bigram.attach("../../data/bigram.db", ATTACH_READONLY);
     Bigram user_bigram;
 
+    gfloat lambda = system_table_info.get_lambda();
+
     /* init phrase lookup */
-    PhraseLookup phrase_lookup(&phrase_table, &phrase_index,
+    PhraseLookup phrase_lookup(lambda,
+                               &phrase_table, &phrase_index,
                                &system_bigram, &user_bigram);
 
     /* try one sentence */
