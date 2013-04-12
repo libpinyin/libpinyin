@@ -150,8 +150,6 @@ typedef enum {
     USER_DICTIONARY = 15
 } PHRASE_INDEX_LIBRARIES;
 
-#define LAMBDA_PARAMETER 0.347121
-
 G_END_DECLS
 
 #endif

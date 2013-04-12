@@ -1089,9 +1089,11 @@ static void _compute_frequency_of_items(pinyin_context_t * context,
         total_freq = phrase_index->get_phrase_index_total_freq();
         assert (0 < total_freq);
 
+        gfloat lambda = context->m_system_table_info.get_lambda();
+
         /* Note: possibility value <= 1.0. */
-        guint32 freq = (LAMBDA_PARAMETER * bigram_poss +
-                        (1 - LAMBDA_PARAMETER) *
+        guint32 freq = (lambda * bigram_poss +
+                        (1 - lambda) *
                         cached_item.get_unigram_frequency() /
                         (gfloat) total_freq) * 256 * 256 * 256;
         item->m_freq = freq;
