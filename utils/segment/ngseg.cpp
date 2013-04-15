@@ -246,6 +246,8 @@ int main(int argc, char * argv[]){
         /* print extra enter */
         if ( gen_extra_enter )
             fprintf(output, "%d \n", null_token);
+
+        g_free(sentence);
     }
     phrase_index.destroy_tokens(tokens);
 

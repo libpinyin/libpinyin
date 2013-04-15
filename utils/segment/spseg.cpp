@@ -2,7 +2,7 @@
  *  libpinyin
  *  Library to deal with pinyin.
  *  
- *  Copyright (C) 2010 Peng Wu
+ *  Copyright (C) 2010,2013 Peng Wu
  *  
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -50,6 +50,12 @@ static GOptionEntry entries[] =
  * which contains non-ucs4 characters.
  */
 
+enum CONTEXT_STATE{
+    CONTEXT_INIT,
+    CONTEXT_SEGMENTABLE,
+    CONTEXT_UNKNOWN
+};
+
 struct SegmentStep{
     phrase_token_t m_handle;
     ucs4_t * m_phrase;
@@ -70,12 +76,14 @@ public:
 
 bool backtrace(GArray * steps, glong phrase_len, GArray * strings);
 
-//Note: do not free phrase, as it is used by strings (array of segment).
+/* Note: do not free phrase, as it is used by strings (array of segment). */
 bool segment(FacadePhraseTable2 * phrase_table,
              FacadePhraseIndex * phrase_index,
-             ucs4_t * phrase,
-             glong phrase_len,
-             GArray * strings /* Array of Segment *. */){
+             GArray * current_ucs4,
+             GArray * strings /* Array of SegmentStep. */){
+    ucs4_t * phrase = (ucs4_t *)current_ucs4->data;
+    guint phrase_len = current_ucs4->len;
+
     /* Prepare for shortest path segment dynamic programming. */
     GArray * steps = g_array_new(TRUE, TRUE, sizeof(SegmentStep));
     SegmentStep step;
@@ -126,18 +134,18 @@ bool segment(FacadePhraseTable2 * phrase_table,
 }
 
 bool backtrace(GArray * steps, glong phrase_len, GArray * strings){
-    //backtracing to get the result.
+    /* backtracing to get the result. */
     size_t cur_step = phrase_len;
     g_array_set_size(strings, 0);
     while ( cur_step ){
         SegmentStep * step = &g_array_index(steps, SegmentStep, cur_step);
         g_array_append_val(strings, *step);
         cur_step = cur_step + step->m_backward_nstep;
-        //intended to avoid leaking internal informations
+        /* intended to avoid leaking internal informations. */
         step->m_nword = 0; step->m_backward_nstep = 0;
     }
 
-    //reverse the strings
+    /* reverse the strings. */
     for ( size_t i = 0; i < strings->len / 2; ++i ) {
         SegmentStep * head, * tail;
         head = &g_array_index(strings, SegmentStep, i);
@@ -151,6 +159,35 @@ bool backtrace(GArray * steps, glong phrase_len, GArray * strings){
     g_array_free(steps, TRUE);
     return true;
 }
+
+bool deal_with_segmentable(FacadePhraseTable2 * phrase_table,
+                           FacadePhraseIndex * phrase_index,
+                           GArray * current_ucs4,
+                           FILE * output){
+
+    /* do segment stuff. */
+    GArray * strings = g_array_new(TRUE, TRUE, sizeof(SegmentStep));
+    segment(phrase_table, phrase_index, current_ucs4, strings);
+
+    /* print out the split phrase. */
+    for ( glong i = 0; i < strings->len; ++i ) {
+        SegmentStep * step = &g_array_index(strings, SegmentStep, i);
+        char * string = g_ucs4_to_utf8( step->m_phrase, step->m_phrase_len, NULL, NULL, NULL);
+        fprintf(output, "%d %s\n", step->m_handle, string);
+        g_free(string);
+    }
+    g_array_free(strings, TRUE);
+}
+
+bool deal_with_unknown(GArray * current_ucs4, FILE * output){
+    char * result_string = g_ucs4_to_utf8
+        ( (ucs4_t *) current_ucs4->data, current_ucs4->len,
+          NULL, NULL, NULL);
+    fprintf(output, "%d %s\n", null_token, result_string);
+    g_free(result_string);
+    return true;
+}
+
 
 int main(int argc, char * argv[]){
     FILE * input = stdin;
@@ -212,13 +249,20 @@ int main(int argc, char * argv[]){
     if (!load_phrase_index(phrase_files, &phrase_index))
         exit(ENOENT);
 
+    CONTEXT_STATE state, next_state;
+    GArray * current_ucs4 = g_array_new(TRUE, TRUE, sizeof(ucs4_t));
+
+    PhraseTokens tokens;
+    memset(tokens, 0, sizeof(PhraseTokens));
+    phrase_index.prepare_tokens(tokens);
+
     char * linebuf = NULL; size_t size = 0; ssize_t read;
     while( (read = getline(&linebuf, &size, input)) != -1 ){
         if ( '\n' ==  linebuf[strlen(linebuf) - 1] ) {
             linebuf[strlen(linebuf) - 1] = '\0';
         }
 
-        //check non-ucs4 characters
+        /* check non-ucs4 characters. */
         const glong num_of_chars = g_utf8_strlen(linebuf, -1);
         glong len = 0;
         ucs4_t * sentence = g_utf8_to_ucs4(linebuf, -1, NULL, &len, NULL);
@@ -228,28 +272,69 @@ int main(int argc, char * argv[]){
             continue;
         }
 
-        //do segment stuff
-        GArray * strings = g_array_new(TRUE, TRUE, sizeof(SegmentStep));
-        segment(&phrase_table, &phrase_index, sentence, len, strings);
+        /* only new-line persists. */
+        if ( 0  == num_of_chars ) {
+            fprintf(output, "%d \n", null_token);
+            continue;
+        }
 
-        //print out the split phrase
-        for ( glong i = 0; i < strings->len; ++i ) {
-            SegmentStep * step = &g_array_index(strings, SegmentStep, i);
-            char * string = g_ucs4_to_utf8( step->m_phrase, step->m_phrase_len, NULL, NULL, NULL);
-            fprintf(output, "%d %s\n", step->m_handle, string);
-            g_free(string);
+        state = CONTEXT_INIT;
+        int result = phrase_table.search( 1, sentence, tokens);
+        g_array_append_val( current_ucs4, sentence[0]);
+        if ( result & SEARCH_OK )
+            state = CONTEXT_SEGMENTABLE;
+        else
+            state = CONTEXT_UNKNOWN;
+
+        for ( int i = 1; i < num_of_chars; ++i) {
+            int result = phrase_table.search( 1, sentence + i, tokens);
+            if ( result & SEARCH_OK )
+                next_state = CONTEXT_SEGMENTABLE;
+            else
+                next_state = CONTEXT_UNKNOWN;
+
+            if ( state == next_state ){
+                g_array_append_val(current_ucs4, sentence[i]);
+                continue;
+            }
+
+            assert ( state != next_state );
+            if ( state == CONTEXT_SEGMENTABLE )
+                deal_with_segmentable(&phrase_table, &phrase_index,
+                                      current_ucs4, output);
+
+            if ( state == CONTEXT_UNKNOWN )
+                deal_with_unknown(current_ucs4, output);
+
+            /* save the current character */
+            g_array_set_size(current_ucs4, 0);
+            g_array_append_val(current_ucs4, sentence[i]);
+            state = next_state;
+        }
+
+        if ( current_ucs4->len ) {
+            /* this seems always true. */
+            if ( state == CONTEXT_SEGMENTABLE )
+                deal_with_segmentable(&phrase_table, &phrase_index,
+                                      current_ucs4, output);
+
+            if ( state == CONTEXT_UNKNOWN )
+                deal_with_unknown(current_ucs4, output);
+            g_array_set_size(current_ucs4, 0);
         }
 
         /* print extra enter */
         if ( gen_extra_enter )
             fprintf(output, "%d \n", null_token);
 
-        g_array_free(strings, TRUE);
         g_free(sentence);
     }
+    phrase_index.destroy_tokens(tokens);
 
     /* print enter at file tail */
     fprintf(output, "%d \n", null_token);
+    g_array_free(current_ucs4, TRUE);
+    free(linebuf);
     fclose(input);
     fclose(output);
     return 0;
