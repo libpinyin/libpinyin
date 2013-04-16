@@ -53,6 +53,7 @@
 #define USER_TABLE_INFO "user.conf"
 #define SYSTEM_BIGRAM "bigram.db"
 #define USER_BIGRAM "user_bigram.db"
+#define DELETED_BIGRAM "deleted_bigram.db"
 #define SYSTEM_PINYIN_INDEX "pinyin_index.bin"
 #define USER_PINYIN_INDEX "user_pinyin_index.bin"
 #define SYSTEM_PHRASE_INDEX "phrase_index.bin"

@@ -176,7 +176,9 @@ bool deal_with_segmentable(FacadePhraseTable2 * phrase_table,
         fprintf(output, "%d %s\n", step->m_handle, string);
         g_free(string);
     }
+
     g_array_free(strings, TRUE);
+    return true;
 }
 
 bool deal_with_unknown(GArray * current_ucs4, FILE * output){
@@ -228,7 +230,7 @@ int main(int argc, char * argv[]){
 
     SystemTableInfo system_table_info;
 
-    bool retval = system_table_info.load("table.conf");
+    bool retval = system_table_info.load(SYSTEM_TABLE_INFO);
     if (!retval) {
         fprintf(stderr, "load table.conf failed.\n");
         exit(ENOENT);
@@ -237,7 +239,7 @@ int main(int argc, char * argv[]){
     /* init phrase table */
     FacadePhraseTable2 phrase_table;
     MemoryChunk * chunk = new MemoryChunk;
-    chunk->load("phrase_index.bin");
+    chunk->load(SYSTEM_PHRASE_INDEX);
     phrase_table.load(chunk, NULL);
 
     /* init phrase index */
