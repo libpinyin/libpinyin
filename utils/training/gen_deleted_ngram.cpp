@@ -28,7 +28,7 @@
 #include "utils_helper.h"
 
 static gboolean train_pi_gram = TRUE;
-static const gchar * bigram_filename = "deleted_bigram.db";
+static const gchar * bigram_filename = DELETED_BIGRAM;
 
 static GOptionEntry entries[] =
 {
@@ -53,7 +53,7 @@ int main(int argc, char * argv[]){
 
     SystemTableInfo system_table_info;
 
-    bool retval = system_table_info.load("table.conf");
+    bool retval = system_table_info.load(SYSTEM_TABLE_INFO);
     if (!retval) {
         fprintf(stderr, "load table.conf failed.\n");
         exit(ENOENT);
@@ -62,7 +62,7 @@ int main(int argc, char * argv[]){
     /* load phrase table. */
     PhraseLargeTable2 phrase_table;
     MemoryChunk * new_chunk = new MemoryChunk;
-    new_chunk->load("phrase_index.bin");
+    new_chunk->load(SYSTEM_PHRASE_INDEX);
     phrase_table.load(new_chunk);
 
     FacadePhraseIndex phrase_index;

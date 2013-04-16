@@ -91,7 +91,7 @@ parameter_t compute_interpolation(SingleGram * deleted_bigram,
 int main(int argc, char * argv[]){
     SystemTableInfo system_table_info;
 
-    bool retval = system_table_info.load("table.conf");
+    bool retval = system_table_info.load(SYSTEM_TABLE_INFO);
     if (!retval) {
         fprintf(stderr, "load table.conf failed.\n");
         exit(ENOENT);
@@ -106,10 +106,10 @@ int main(int argc, char * argv[]){
         exit(ENOENT);
 
     Bigram bigram;
-    bigram.attach("bigram.db", ATTACH_READONLY);
+    bigram.attach(SYSTEM_BIGRAM, ATTACH_READONLY);
 
     Bigram deleted_bigram;
-    deleted_bigram.attach("deleted_bigram.db", ATTACH_READONLY);
+    deleted_bigram.attach(DELETED_BIGRAM, ATTACH_READONLY);
 
     GArray * deleted_items = g_array_new(FALSE, FALSE, sizeof(phrase_token_t));
     deleted_bigram.get_all_items(deleted_items);

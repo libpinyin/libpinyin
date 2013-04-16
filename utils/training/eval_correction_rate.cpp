@@ -118,7 +118,7 @@ int main(int argc, char * argv[]){
 
     SystemTableInfo system_table_info;
 
-    bool retval = system_table_info.load("table.conf");
+    bool retval = system_table_info.load(SYSTEM_TABLE_INFO);
     if (!retval) {
         fprintf(stderr, "load table.conf failed.\n");
         exit(ENOENT);
@@ -128,12 +128,12 @@ int main(int argc, char * argv[]){
     FacadeChewingTable largetable;
 
     MemoryChunk * chunk = new MemoryChunk;
-    chunk->load("pinyin_index.bin");
+    chunk->load(SYSTEM_PINYIN_INDEX);
     largetable.load(options, chunk, NULL);
 
     FacadePhraseTable2 phrase_table;
     chunk = new MemoryChunk;
-    chunk->load("phrase_index.bin");
+    chunk->load(SYSTEM_PHRASE_INDEX);
     phrase_table.load(chunk, NULL);
 
     FacadePhraseIndex phrase_index;
@@ -145,7 +145,7 @@ int main(int argc, char * argv[]){
         exit(ENOENT);
 
     Bigram system_bigram;
-    system_bigram.attach("bigram.db", ATTACH_READONLY);
+    system_bigram.attach(SYSTEM_BIGRAM, ATTACH_READONLY);
     Bigram user_bigram;
     user_bigram.attach(NULL, ATTACH_CREATE|ATTACH_READWRITE);
 

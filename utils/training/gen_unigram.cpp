@@ -49,7 +49,7 @@ int main(int argc, char * argv[]){
 
     SystemTableInfo system_table_info;
 
-    gchar * filename = g_build_filename(table_dir, "table.conf", NULL);
+    gchar * filename = g_build_filename(table_dir, SYSTEM_TABLE_INFO, NULL);
     bool retval = system_table_info.load(filename);
     if (!retval) {
         fprintf(stderr, "load table.conf failed.\n");
