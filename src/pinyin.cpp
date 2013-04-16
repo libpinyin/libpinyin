@@ -369,7 +369,7 @@ bool pinyin_iterator_add_phrase(import_iterator_t * iter,
 
     bool result = false;
 
-    if (NULL == pinyin)
+    if (NULL == phrase || NULL == pinyin)
         return result;
 
     /* check whether the phrase exists in phrase table */
