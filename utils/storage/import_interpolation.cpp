@@ -233,7 +233,7 @@ bool parse_bigram(FILE * input, PhraseLargeTable2 * phrase_table,
 
 int main(int argc, char * argv[]){
     FILE * input = stdin;
-    const char * bigram_filename = "bigram.db";
+    const char * bigram_filename = SYSTEM_BIGRAM;
 
     setlocale(LC_ALL, "");
 
@@ -249,7 +249,7 @@ int main(int argc, char * argv[]){
 
     SystemTableInfo system_table_info;
 
-    gchar * filename = g_build_filename(table_dir, "table.conf", NULL);
+    gchar * filename = g_build_filename(table_dir, SYSTEM_TABLE_INFO, NULL);
     bool retval = system_table_info.load(filename);
     if (!retval) {
         fprintf(stderr, "load table.conf failed.\n");
@@ -260,7 +260,7 @@ int main(int argc, char * argv[]){
     PhraseLargeTable2 phrase_table;
 
     MemoryChunk * chunk = new MemoryChunk;
-    retval = chunk->load("phrase_index.bin");
+    retval = chunk->load(SYSTEM_PHRASE_INDEX);
     if (!retval) {
         fprintf(stderr, "open phrase_index.bin failed!\n");
         exit(ENOENT);

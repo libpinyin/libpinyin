@@ -47,7 +47,7 @@ int main(int argc, char * argv[]){
 
     SystemTableInfo system_table_info;
 
-    gchar * filename = g_build_filename(table_dir, "table.conf", NULL);
+    gchar * filename = g_build_filename(table_dir, SYSTEM_TABLE_INFO, NULL);
     bool retval = system_table_info.load(filename);
     if (!retval) {
         fprintf(stderr, "load table.conf failed.\n");
@@ -95,12 +95,12 @@ int main(int argc, char * argv[]){
 
     MemoryChunk * new_chunk = new MemoryChunk;
     chewing_table.store(new_chunk);
-    new_chunk->save("pinyin_index.bin");
+    new_chunk->save(SYSTEM_PINYIN_INDEX);
     chewing_table.load(new_chunk);
     
     new_chunk = new MemoryChunk;
     phrase_table.store(new_chunk);
-    new_chunk->save("phrase_index.bin");
+    new_chunk->save(SYSTEM_PHRASE_INDEX);
     phrase_table.load(new_chunk);
 
     phrase_index.compact();

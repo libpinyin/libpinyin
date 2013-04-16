@@ -43,11 +43,11 @@ bool end_data(FILE * output){
 
 int main(int argc, char * argv[]){
     FILE * output = stdout;
-    const char * bigram_filename = "bigram.db";
+    const char * bigram_filename = SYSTEM_BIGRAM;
 
     SystemTableInfo system_table_info;
 
-    bool retval = system_table_info.load("table.conf");
+    bool retval = system_table_info.load(SYSTEM_TABLE_INFO);
     if (!retval) {
         fprintf(stderr, "load table.conf failed.\n");
         exit(ENOENT);
