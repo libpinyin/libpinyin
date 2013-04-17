@@ -479,6 +479,7 @@ bool pinyin_iterator_add_phrase(import_iterator_t * iter,
 void pinyin_end_add_phrases(import_iterator_t * iter){
     /* compact the content memory chunk of phrase index. */
     iter->m_context->m_phrase_index->compact();
+    iter->m_context->m_modified = true;
     delete iter;
 }
 
