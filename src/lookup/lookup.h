@@ -50,10 +50,7 @@ struct lookup_value_t{
 };
 
 
-class FacadeChewingTable;
-class FacadePhraseTable;
 class FacadePhraseIndex;
-class Bigram;
 
 
 /* Note:

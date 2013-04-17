@@ -21,13 +21,14 @@
 
 #include <stdio.h>
 #include <locale.h>
+#include <string.h>
 #include <glib.h>
 #include "pinyin_internal.h"
 #include "utils_helper.h"
 
 
 void print_help(){
-    printf("Usage: spseg [--generate-extra-enter] [-o outputfile] [inputfile]\n");
+    printf("Usage: mergeseq [-o outputfile] [inputfile]\n");
 }
 
 
@@ -37,7 +38,6 @@ static gchar * outputfile = NULL;
 static GOptionEntry entries[] =
 {
     {"outputfile", 'o', 0, G_OPTION_ARG_FILENAME, &outputfile, "output", "filename"},
-    {"generate-extra-enter", 0, 0, G_OPTION_ARG_NONE, &gen_extra_enter, "generate ", NULL},
     {NULL}
 };
 
@@ -54,13 +54,13 @@ typedef GArray * UnicodeCharVector;
 /* GArray of TokenInfo. */
 typedef GArray * TokenInfoVector;
 
-gint calculate_sequence_length(TokenInfoVector * tokeninfos) {
+gint calculate_sequence_length(TokenInfoVector tokeninfos) {
     gint len = 0;
 
     size_t i = 0;
     for (i = 0; i < tokeninfos->len; ++i) {
         TokenInfo * token_info = &g_array_index(tokeninfos, TokenInfo, i);
-        len += token_info->len;
+        len += token_info->m_token_len;
     }
 
     return len;
@@ -70,18 +70,17 @@ gint calculate_sequence_length(TokenInfoVector * tokeninfos) {
  *   if not, just output the first token;
  * pop the first token or sequence.
  */
-bool merge_sequence(PhraseLargeTable2 * phrase_table,
+bool merge_sequence(FacadePhraseTable2 * phrase_table,
                     FacadePhraseIndex * phrase_index,
-                    UnicodeCharVector * unichars,
-                    TokenInfoVector * tokeninfos) {
+                    UnicodeCharVector unichars,
+                    TokenInfoVector tokeninfos) {
     assert(tokeninfos->len > 0);
 
     bool found = false;
     TokenInfo * token_info = NULL;
-    gint token_len = 0;
     phrase_token_t token = null_token;
 
-    const gunichar * ucs4_str = (const gunichar *)unichars->data;
+    ucs4_t * ucs4_str = (ucs4_t *) unichars->data;
 
     PhraseTokens tokens;
     memset(tokens, 0, sizeof(PhraseTokens));
@@ -92,7 +91,6 @@ bool merge_sequence(PhraseLargeTable2 * phrase_table,
     gint seq_len = calculate_sequence_length(tokeninfos);
     while (seq_len > 0) {
         /* do phrase table search. */
-        phrase_index->clear_tokens(tokens);
         int retval = phrase_table->search(seq_len, ucs4_str, tokens);
 
         if (retval & SEARCH_OK) {
@@ -122,15 +120,15 @@ bool merge_sequence(PhraseLargeTable2 * phrase_table,
     return found;
 }
 
-bool pop_first_token(UnicodeCharVector * unichars,
-                     TokenInfoVector * tokeninfos,
+bool pop_first_token(UnicodeCharVector unichars,
+                     TokenInfoVector tokeninfos,
                      FILE * output) {
-    const gunichar * ucs4_str = (const gunichar *)unichars->data;
+    ucs4_t * ucs4_str = (ucs4_t *) unichars->data;
 
     /* pop it. */
-    token_info = &g_array_index(tokeninfos, TokenInfo, 0);
-    token = token_info->m_token;
-    token_len = token_info->m_token_len;
+    TokenInfo * token_info = &g_array_index(tokeninfos, TokenInfo, 0);
+    phrase_token_t token = token_info->m_token;
+    gint token_len = token_info->m_token_len;
 
     glong read = 0;
     gchar * utf8_str = g_ucs4_to_utf8(ucs4_str, token_len, &read, NULL, NULL);
@@ -144,10 +142,10 @@ bool pop_first_token(UnicodeCharVector * unichars,
     return true;
 }
 
-bool feed_line(PhraseLargeTable2 * phrase_table,
+bool feed_line(FacadePhraseTable2 * phrase_table,
                FacadePhraseIndex * phrase_index,
-               UnicodeCharVector * unichars,
-               TokenInfoVector * tokeninfos,
+               UnicodeCharVector unichars,
+               TokenInfoVector tokeninfos,
                const char * linebuf,
                FILE * output) {
 
@@ -167,7 +165,7 @@ bool feed_line(PhraseLargeTable2 * phrase_table,
 
     PhraseItem item;
     phrase_index->get_phrase_item(token, item);
-    guint8 len = item.get_phrase_length();
+    gint len = item.get_phrase_length();
 
     TokenInfo info;
     info.m_token = token;
@@ -179,7 +177,7 @@ bool feed_line(PhraseLargeTable2 * phrase_table,
     g_array_append_vals(unichars, buffer, len);
 
     /* probe merge sequence. */
-    gint len = calculate_sequence_length(tokeninfos);
+    len = calculate_sequence_length(tokeninfos);
     while (len >= MAX_PHRASE_LENGTH) {
         merge_sequence(phrase_table, phrase_index, unichars, tokeninfos);
         pop_first_token(unichars, tokeninfos, output);
@@ -199,7 +197,7 @@ int main(int argc, char * argv[]){
     GError * error = NULL;
     GOptionContext * context;
 
-    context = g_option_context_new("- shortest path segment");
+    context = g_option_context_new("- merge word sequence");
     g_option_context_add_main_entries(context, entries, NULL);
     if (!g_option_context_parse(context, &argc, &argv, &error)) {
         g_print("option parsing failed:%s\n", error->message);
@@ -259,7 +257,10 @@ int main(int argc, char * argv[]){
             linebuf[strlen(linebuf) - 1] = '\0';
         }
 
-        feed_line(phrase_table, phrase_index,
+        if (0 == strlen(linebuf))
+            continue;
+
+        feed_line(&phrase_table, &phrase_index,
                   unichars, tokeninfos,
                   linebuf, output);
     }
