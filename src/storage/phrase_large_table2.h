@@ -118,7 +118,7 @@ public:
 
 
 static inline int reduce_tokens(const PhraseTokens tokens,
-                                GArray * tokenarray) {
+                                TokenVector tokenarray) {
     int num = 0;
     g_array_set_size(tokenarray, 0);
 
@@ -143,7 +143,7 @@ static inline int get_first_token(const PhraseTokens tokens,
                                   /* out */ phrase_token_t & token){
     token = null_token;
 
-    GArray * tokenarray = g_array_new(FALSE, FALSE, sizeof(phrase_token_t));
+    TokenVector tokenarray = g_array_new(FALSE, FALSE, sizeof(phrase_token_t));
     int num = reduce_tokens(tokens, tokenarray);
     if (num)
         token = g_array_index(tokenarray, phrase_token_t, 0);
