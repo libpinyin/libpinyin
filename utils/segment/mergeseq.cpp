@@ -128,3 +128,48 @@ bool pop_first_token(UnicodeCharVector * unichars,
 
     return true;
 }
+
+bool feed_line(PhraseLargeTable2 * phrase_table,
+               FacadePhraseIndex * phrase_index,
+               UnicodeCharVector * unichars,
+               TokenInfoVector * tokens,
+               const char * line,
+               FILE * output) {
+
+    TAGLIB_PARSE_SEGMENTED_LINE(phrase_index, token, line);
+
+    if (null_token == token) {
+        /* empty the queue. */
+        while (0 != tokens->len) {
+            merge_sequence(phrase_table, phrase_index, unichars, tokens);
+            pop_first_token(unichars, tokens, output);
+        }
+
+        assert(0 == unichars->len);
+        assert(0 == tokens->len);
+        return false;
+    }
+
+    PhraseItem item;
+    phrase_index->get_phrase_item(token, item);
+    guint8 len = item.get_phrase_length();
+
+    TokenInfo info;
+    info.m_token = token;
+    info.m_token_len = len;
+    g_array_append_val(tokens, info);
+
+    ucs4_t buffer[MAX_PHRASE_LENGTH];
+    item.get_phrase_string(buffer);
+    g_array_append_vals(unichars, buffer, len);
+
+    /* probe merge sequence. */
+    gint len = calculate_sequence_length(tokens);
+    while (len >= MAX_PHRASE_LENGTH) {
+        merge_sequence(phrase_table, phrase_index, unichars, tokens);
+        pop_first_token(unichars, tokens, output);
+        len = calculate_sequence_length(tokens);
+    }
+
+    return true;
+}
