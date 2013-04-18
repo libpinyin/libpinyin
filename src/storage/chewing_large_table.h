@@ -43,16 +43,17 @@ protected:
     [CHEWING_NUMBER_OF_FINALS][CHEWING_NUMBER_OF_TONES];
 
     /* search functions */
-    int initial_level_search(int phrase_length, /* in */ ChewingKey keys[],
+    int initial_level_search(int phrase_length,
+                             /* in */ const ChewingKey keys[],
                              /* out */ PhraseIndexRanges ranges) const;
 
     int middle_and_final_level_search(ChewingInitial initial,
                                       int phrase_length,
-                                      /* in */ ChewingKey keys[],
+                                      /* in */ const ChewingKey keys[],
                                       /* out */ PhraseIndexRanges ranges) const;
     int tone_level_search(ChewingInitial initial, ChewingMiddle middle,
                           ChewingFinal final, int phrase_length,
-                          /* in */ ChewingKey keys[],
+                          /* in */ const ChewingKey keys[],
                           /* out */ PhraseIndexRanges ranges) const;
 
     void reset();
@@ -74,13 +75,13 @@ public:
                table_offset_t & end);
 
     /* search method */
-    int search(int phrase_length, /* in */ ChewingKey keys[],
+    int search(int phrase_length, /* in */ const ChewingKey keys[],
                /* out */ PhraseIndexRanges ranges) const;
 
     /* add/remove index method */
-    int add_index(int phrase_length, /* in */ ChewingKey keys[],
+    int add_index(int phrase_length, /* in */ const ChewingKey keys[],
                   /* in */ phrase_token_t token);
-    int remove_index(int phrase_length, /* in */ ChewingKey keys[],
+    int remove_index(int phrase_length, /* in */ const ChewingKey keys[],
                      /* in */ phrase_token_t token);
 
     /* mask out method */
@@ -126,18 +127,18 @@ public:
     bool load_text(FILE * file);
 
     /* search method */
-    int search(int phrase_length, /* in */ ChewingKey keys[],
+    int search(int phrase_length, /* in */ const ChewingKey keys[],
                /* out */ PhraseIndexRanges ranges) const {
         return m_bitmap_table.search(phrase_length, keys, ranges);
     }
 
     /* add/remove index method */
-    int add_index(int phrase_length, /* in */ ChewingKey keys[],
+    int add_index(int phrase_length, /* in */ const ChewingKey keys[],
                   /* in */ phrase_token_t token) {
         return m_bitmap_table.add_index(phrase_length, keys, token);
     }
 
-    int remove_index(int phrase_length, /* in */ ChewingKey keys[],
+    int remove_index(int phrase_length, /* in */ const ChewingKey keys[],
                      /* in */ phrase_token_t token) {
         return m_bitmap_table.remove_index(phrase_length, keys, token);
     }

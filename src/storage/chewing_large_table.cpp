@@ -45,13 +45,13 @@ public:
 
     /* search method */
     int search(pinyin_option_t options, int phrase_length,
-               /* in */ ChewingKey keys[],
+               /* in */ const ChewingKey keys[],
                /* out */ PhraseIndexRanges ranges) const;
 
     /* add/remove index method */
-    int add_index(int phrase_length, /* in */ ChewingKey keys[],
+    int add_index(int phrase_length, /* in */ const ChewingKey keys[],
                   /* in */ phrase_token_t token);
-    int remove_index(int phrase_length, /* in */ ChewingKey keys[],
+    int remove_index(int phrase_length, /* in */ const ChewingKey keys[],
                      /* in */ phrase_token_t token);
 
     /* get length method */
@@ -72,7 +72,7 @@ protected:
 
     /* compress consecutive tokens */
     int convert(pinyin_option_t options,
-                ChewingKey keys[],
+                const ChewingKey keys[],
                 IndexItem * begin,
                 IndexItem * end,
                 PhraseIndexRanges ranges) const;
@@ -84,12 +84,12 @@ public:
                table_offset_t & end);
 
     /* search method */
-    int search(pinyin_option_t options, /* in */ChewingKey keys[],
+    int search(pinyin_option_t options, /* in */const ChewingKey keys[],
                /* out */ PhraseIndexRanges ranges) const;
 
     /* add/remove index method */
-    int add_index(/* in */ ChewingKey keys[], /* in */ phrase_token_t token);
-    int remove_index(/* in */ ChewingKey keys[],
+    int add_index(/* in */ const ChewingKey keys[], /* in */ phrase_token_t token);
+    int remove_index(/* in */ const ChewingKey keys[],
                      /* in */ phrase_token_t token);
 
     /* get length method */
@@ -129,14 +129,14 @@ void ChewingBitmapIndexLevel::reset() {
 /* search method */
 
 int ChewingBitmapIndexLevel::search(int phrase_length,
-                                    /* in */ ChewingKey keys[],
+                                    /* in */ const ChewingKey keys[],
                                     /* out */ PhraseIndexRanges ranges) const {
     assert(phrase_length > 0);
     return initial_level_search(phrase_length, keys, ranges);
 }
 
 int ChewingBitmapIndexLevel::initial_level_search (int phrase_length,
-    /* in */ ChewingKey keys[], /* out */ PhraseIndexRanges ranges) const {
+    /* in */ const ChewingKey keys[], /* out */ PhraseIndexRanges ranges) const {
 
 /* macros */
 #define MATCH(AMBIGUITY, ORIGIN, ANOTHER) case ORIGIN:                  \
@@ -197,7 +197,7 @@ int ChewingBitmapIndexLevel::initial_level_search (int phrase_length,
 
 
 int ChewingBitmapIndexLevel::middle_and_final_level_search
-(ChewingInitial initial, int phrase_length, /* in */ ChewingKey keys[],
+(ChewingInitial initial, int phrase_length, /* in */ const ChewingKey keys[],
  /* out */ PhraseIndexRanges ranges) const {
 
 /* macros */
@@ -268,7 +268,7 @@ int ChewingBitmapIndexLevel::middle_and_final_level_search
 
 int ChewingBitmapIndexLevel::tone_level_search
 (ChewingInitial initial, ChewingMiddle middle, ChewingFinal final,
- int phrase_length, /* in */ ChewingKey keys[],
+ int phrase_length, /* in */ const ChewingKey keys[],
  /* out */ PhraseIndexRanges ranges) const {
 
     int result = SEARCH_NONE;
@@ -352,7 +352,7 @@ ChewingLengthIndexLevel::~ChewingLengthIndexLevel() {
 
 
 int ChewingLengthIndexLevel::search(pinyin_option_t options, int phrase_length,
-                                    /* in */ ChewingKey keys[],
+                                    /* in */ const ChewingKey keys[],
                                     /* out */ PhraseIndexRanges ranges) const {
     int result = SEARCH_NONE;
     if (m_chewing_array_indexes->len < phrase_length + 1)
@@ -397,7 +397,7 @@ int ChewingLengthIndexLevel::search(pinyin_option_t options, int phrase_length,
 
 template<size_t phrase_length>
 int ChewingArrayIndexLevel<phrase_length>::search
-(pinyin_option_t options, /* in */ChewingKey keys[],
+(pinyin_option_t options, /* in */ const ChewingKey keys[],
  /* out */ PhraseIndexRanges ranges) const {
     IndexItem * chunk_begin = NULL, * chunk_end = NULL;
     chunk_begin = (IndexItem *) m_chunk.begin();
@@ -423,7 +423,7 @@ int ChewingArrayIndexLevel<phrase_length>::search
 /* compress consecutive tokens */
 template<size_t phrase_length>
 int ChewingArrayIndexLevel<phrase_length>::convert
-(pinyin_option_t options, ChewingKey keys[],
+(pinyin_option_t options, const ChewingKey keys[],
  IndexItem * begin, IndexItem * end,
  PhraseIndexRanges ranges) const {
     IndexItem * iter = NULL;
@@ -471,7 +471,7 @@ int ChewingArrayIndexLevel<phrase_length>::convert
 /* add/remove index method */
 
 int ChewingBitmapIndexLevel::add_index(int phrase_length,
-                                       /* in */ ChewingKey keys[],
+                                       /* in */ const ChewingKey keys[],
                                        /* in */ phrase_token_t token) {
     const ChewingKey first_key = keys[0];
     ChewingLengthIndexLevel * & length_array = m_chewing_length_indexes
@@ -486,7 +486,7 @@ int ChewingBitmapIndexLevel::add_index(int phrase_length,
 }
 
 int ChewingBitmapIndexLevel::remove_index(int phrase_length,
-                                          /* in */ ChewingKey keys[],
+                                          /* in */ const ChewingKey keys[],
                                           /* in */ phrase_token_t token) {
     const ChewingKey first_key = keys[0];
     ChewingLengthIndexLevel * & length_array = m_chewing_length_indexes
@@ -508,7 +508,7 @@ int ChewingBitmapIndexLevel::remove_index(int phrase_length,
 }
 
 int ChewingLengthIndexLevel::add_index(int phrase_length,
-                                       /* in */ ChewingKey keys[],
+                                       /* in */ const ChewingKey keys[],
                                        /* in */ phrase_token_t token) {
     if (!(phrase_length + 1 < MAX_PHRASE_LENGTH))
         return ERROR_PHRASE_TOO_LONG;
@@ -551,7 +551,7 @@ int ChewingLengthIndexLevel::add_index(int phrase_length,
 }
 
 int ChewingLengthIndexLevel::remove_index(int phrase_length,
-                                          /* in */ ChewingKey keys[],
+                                          /* in */ const ChewingKey keys[],
                                           /* in */ phrase_token_t token) {
     if (!(phrase_length + 1 < MAX_PHRASE_LENGTH))
         return ERROR_PHRASE_TOO_LONG;
@@ -606,7 +606,7 @@ int ChewingLengthIndexLevel::remove_index(int phrase_length,
 
 template<size_t phrase_length>
 int ChewingArrayIndexLevel<phrase_length>::add_index
-(/* in */ ChewingKey keys[], /* in */ phrase_token_t token) {
+(/* in */ const ChewingKey keys[], /* in */ phrase_token_t token) {
     IndexItem * begin, * end;
 
     IndexItem add_elem(keys, token);
@@ -633,7 +633,7 @@ int ChewingArrayIndexLevel<phrase_length>::add_index
 
 template<size_t phrase_length>
 int ChewingArrayIndexLevel<phrase_length>::remove_index
-(/* in */ ChewingKey keys[], /* in */ phrase_token_t token) {
+(/* in */ const ChewingKey keys[], /* in */ phrase_token_t token) {
     IndexItem * begin, * end;
 
     IndexItem remove_elem(keys, token);

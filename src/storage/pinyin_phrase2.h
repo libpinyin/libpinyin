@@ -107,9 +107,9 @@ inline int pinyin_compare_with_ambiguities2(pinyin_option_t options,
 
 /* compute pinyin lower bound */
 inline void compute_lower_value2(pinyin_option_t options,
-                                  ChewingKey * in_keys,
-                                  ChewingKey * out_keys,
-                                  int phrase_length) {
+                                 const ChewingKey * in_keys,
+                                 ChewingKey * out_keys,
+                                 int phrase_length) {
     ChewingKey aKey;
 
     for (int i = 0; i < phrase_length; ++i) {
@@ -167,7 +167,7 @@ inline void compute_lower_value2(pinyin_option_t options,
 
 /* compute pinyin upper bound */
 inline void compute_upper_value2(pinyin_option_t options,
-                                 ChewingKey * in_keys,
+                                 const ChewingKey * in_keys,
                                  ChewingKey * out_keys,
                                  int phrase_length) {
     ChewingKey aKey;
@@ -237,7 +237,8 @@ struct PinyinIndexItem2{
     phrase_token_t m_token;
     ChewingKey m_keys[phrase_length];
 public:
-    PinyinIndexItem2<phrase_length> (ChewingKey * keys, phrase_token_t token) {
+    PinyinIndexItem2<phrase_length> (const ChewingKey * keys,
+                                     phrase_token_t token) {
         memmove(m_keys, keys, sizeof(ChewingKey) * phrase_length);
         m_token = token;
     }

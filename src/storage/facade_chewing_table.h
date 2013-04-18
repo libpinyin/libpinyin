@@ -139,7 +139,7 @@ public:
      * Search the phrase tokens according to the pinyin keys.
      *
      */
-    int search(int phrase_length, /* in */ ChewingKey keys[],
+    int search(int phrase_length, /* in */ const ChewingKey keys[],
                /* out */ PhraseIndexRanges ranges) const {
 
         /* clear ranges. */
@@ -171,7 +171,7 @@ public:
      * Add the phrase token to the user chewing table.
      *
      */
-    int add_index(int phrase_length, /* in */ ChewingKey keys[],
+    int add_index(int phrase_length, /* in */ const ChewingKey keys[],
                   /* in */ phrase_token_t token) {
         if (NULL == m_user_chewing_table)
             return ERROR_NO_USER_TABLE;
@@ -188,7 +188,7 @@ public:
      * Remove the phrase token from the user chewing table.
      *
      */
-    int remove_index(int phrase_length, /* in */ ChewingKey keys[],
+    int remove_index(int phrase_length, /* in */ const ChewingKey keys[],
                      /* in */ phrase_token_t token) {
         if (NULL == m_user_chewing_table)
             return ERROR_NO_USER_TABLE;
