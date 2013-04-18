@@ -160,6 +160,10 @@ bool feed_line(FacadePhraseTable2 * phrase_table,
 
         assert(0 == unichars->len);
         assert(0 == tokeninfos->len);
+
+        /* restore the null token line. */
+        fprintf(output, "%s\n", linebuf);
+
         return false;
     }
 
