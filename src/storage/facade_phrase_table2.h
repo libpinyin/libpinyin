@@ -120,7 +120,7 @@ public:
      * Search the phrase tokens according to the ucs4 characters.
      *
      */
-    int search(int phrase_length, /* in */ ucs4_t phrase[],
+    int search(int phrase_length, /* in */ const ucs4_t phrase[],
                /* out */ PhraseTokens tokens) const {
         /* clear tokens. */
         for (size_t i = 0; i < PHRASE_INDEX_LIBRARY_COUNT; ++i) {
@@ -151,7 +151,7 @@ public:
      * Add the phrase token to the user phrase table.
      *
      */
-    int add_index(int phrase_length, /* in */ ucs4_t phrase[],
+    int add_index(int phrase_length, /* in */ const ucs4_t phrase[],
                   /* in */ phrase_token_t token) {
         if (NULL == m_user_phrase_table)
             return ERROR_NO_USER_TABLE;
@@ -170,7 +170,7 @@ public:
      * Remove the phrase token from the user phrase table.
      *
      */
-    int remove_index(int phrase_length, /* in */ ucs4_t phrase[],
+    int remove_index(int phrase_length, /* in */ const ucs4_t phrase[],
                      /* in */ phrase_token_t token) {
         if (NULL == m_user_phrase_table)
             return ERROR_NO_USER_TABLE;

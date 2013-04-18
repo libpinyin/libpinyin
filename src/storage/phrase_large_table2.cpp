@@ -40,13 +40,13 @@ public:
     bool store(MemoryChunk * new_chunk, table_offset_t offset, table_offset_t & end);
 
     /* search method */
-    int search(int phrase_length, /* in */ ucs4_t phrase[],
+    int search(int phrase_length, /* in */ const ucs4_t phrase[],
                /* out */ PhraseTokens tokens) const;
 
     /* add_index/remove_index method */
-    int add_index(int phrase_length, /* in */ ucs4_t phrase[],
+    int add_index(int phrase_length, /* in */ const ucs4_t phrase[],
                   /* in */ phrase_token_t token);
-    int remove_index(int phrase_length, /* in */ ucs4_t phrase[],
+    int remove_index(int phrase_length, /* in */ const ucs4_t phrase[],
                      /* in */ phrase_token_t token);
 
     /* get length method */
@@ -62,7 +62,7 @@ struct PhraseIndexItem2{
     phrase_token_t m_token;
     ucs4_t m_phrase[phrase_length];
 public:
-    PhraseIndexItem2<phrase_length>(ucs4_t phrase[], phrase_token_t token){
+    PhraseIndexItem2<phrase_length>(const ucs4_t phrase[], phrase_token_t token){
         memmove(m_phrase, phrase, sizeof(ucs4_t) * phrase_length);
         m_token = token;
     }
@@ -81,11 +81,11 @@ public:
     bool store(MemoryChunk * new_chunk, table_offset_t offset, table_offset_t & end);
 
     /* search method */
-    int search(/* in */ ucs4_t phrase[], /* out */ PhraseTokens tokens) const;
+    int search(/* in */ const ucs4_t phrase[], /* out */ PhraseTokens tokens) const;
 
     /* add_index/remove_index method */
-    int add_index(/* in */ ucs4_t phrase[], /* in */ phrase_token_t token);
-    int remove_index(/* in */ ucs4_t phrase[], /* in */ phrase_token_t token);
+    int add_index(/* in */ const ucs4_t phrase[], /* in */ phrase_token_t token);
+    int remove_index(/* in */ const ucs4_t phrase[], /* in */ phrase_token_t token);
 
     /* get length method */
     int get_length() const;
@@ -133,7 +133,7 @@ void PhraseBitmapIndexLevel2::reset(){
 /* search method */
 
 int PhraseBitmapIndexLevel2::search(int phrase_length,
-                                    /* in */ ucs4_t phrase[],
+                                    /* in */ const ucs4_t phrase[],
                                     /* out */ PhraseTokens tokens) const {
     assert(phrase_length > 0);
 
@@ -193,7 +193,7 @@ PhraseLengthIndexLevel2::~PhraseLengthIndexLevel2(){
 }
 
 int PhraseLengthIndexLevel2::search(int phrase_length,
-                                    /* in */ ucs4_t phrase[],
+                                    /* in */ const ucs4_t phrase[],
                                     /* out */ PhraseTokens tokens) const {
     int result = SEARCH_NONE;
     if(m_phrase_array_indexes->len < phrase_length)
@@ -236,7 +236,7 @@ int PhraseLengthIndexLevel2::search(int phrase_length,
 
 template<size_t phrase_length>
 int PhraseArrayIndexLevel2<phrase_length>::search
-(/* in */ ucs4_t phrase[], /* out */ PhraseTokens tokens) const {
+(/* in */ const ucs4_t phrase[], /* out */ PhraseTokens tokens) const {
     int result = SEARCH_NONE;
 
     IndexItem * chunk_begin = NULL, * chunk_end = NULL;
@@ -278,7 +278,7 @@ int PhraseArrayIndexLevel2<phrase_length>::search
 /* add/remove index method */
 
 int PhraseBitmapIndexLevel2::add_index(int phrase_length,
-                                       /* in */ ucs4_t phrase[],
+                                       /* in */ const ucs4_t phrase[],
                                        /* in */ phrase_token_t token){
     guint8 first_key =  (phrase[0] & 0xFF00) >> 8;
 
@@ -292,7 +292,7 @@ int PhraseBitmapIndexLevel2::add_index(int phrase_length,
 }
 
 int PhraseBitmapIndexLevel2::remove_index(int phrase_length,
-                                         /* in */ ucs4_t phrase[],
+                                         /* in */ const ucs4_t phrase[],
                                          /* in */ phrase_token_t token){
     guint8 first_key = (phrase[0] & 0xFF00) >> 8;
 
@@ -314,7 +314,7 @@ int PhraseBitmapIndexLevel2::remove_index(int phrase_length,
 }
 
 int PhraseLengthIndexLevel2::add_index(int phrase_length,
-                                       /* in */ ucs4_t phrase[],
+                                       /* in */ const ucs4_t phrase[],
                                        /* in */ phrase_token_t token) {
     if (phrase_length >= MAX_PHRASE_LENGTH)
         return ERROR_PHRASE_TOO_LONG;
@@ -356,7 +356,7 @@ int PhraseLengthIndexLevel2::add_index(int phrase_length,
 }
 
 int PhraseLengthIndexLevel2::remove_index(int phrase_length,
-                                          /* in */ ucs4_t phrase[],
+                                          /* in */ const ucs4_t phrase[],
                                           /* in */ phrase_token_t token) {
     if (phrase_length >= MAX_PHRASE_LENGTH)
         return ERROR_PHRASE_TOO_LONG;
@@ -410,7 +410,7 @@ int PhraseLengthIndexLevel2::remove_index(int phrase_length,
 
 template<size_t phrase_length>
 int PhraseArrayIndexLevel2<phrase_length>::add_index
-(/* in */ ucs4_t phrase[], /* in */ phrase_token_t token){
+(/* in */ const ucs4_t phrase[], /* in */ phrase_token_t token){
     IndexItem * begin, * end;
 
     IndexItem add_elem(phrase, token);
@@ -437,7 +437,7 @@ int PhraseArrayIndexLevel2<phrase_length>::add_index
 
 template<size_t phrase_length>
 int PhraseArrayIndexLevel2<phrase_length>::remove_index
-(/* in */ ucs4_t phrase[], /* in */ phrase_token_t token) {
+(/* in */ const ucs4_t phrase[], /* in */ phrase_token_t token) {
     IndexItem * begin, * end;
 
     IndexItem remove_elem(phrase, token);

@@ -48,13 +48,13 @@ public:
     bool store(MemoryChunk * new_chunk, table_offset_t offset, table_offset_t & end);
 
     /* search method */
-    int search(int phrase_length, /* in */ ucs4_t phrase[],
+    int search(int phrase_length, /* in */ const ucs4_t phrase[],
                /* out */ PhraseTokens tokens) const;
 
     /* add_index/remove_index method */
-    int add_index(int phrase_length, /* in */ ucs4_t phrase[], /* in */ phrase_token_t token);
+    int add_index(int phrase_length, /* in */ const ucs4_t phrase[], /* in */ phrase_token_t token);
 
-    int remove_index(int phrase_length, /* in */ ucs4_t phrase[], /* in */ phrase_token_t token);
+    int remove_index(int phrase_length, /* in */ const ucs4_t phrase[], /* in */ phrase_token_t token);
 
     /* mask out method */
     bool mask_out(phrase_token_t mask, phrase_token_t value);
@@ -96,17 +96,17 @@ public:
     bool load_text(FILE * file);
 
     /* search method */
-    int search(int phrase_length, /* in */ ucs4_t phrase[],
+    int search(int phrase_length, /* in */ const ucs4_t phrase[],
                /* out */ PhraseTokens tokens) const {
         return m_bitmap_table.search(phrase_length, phrase, tokens);
     }
 
     /* add_index/remove_index method */
-    int add_index(int phrase_length, /* in */ ucs4_t phrase[], /* in */ phrase_token_t token) {
+    int add_index(int phrase_length, /* in */ const ucs4_t phrase[], /* in */ phrase_token_t token) {
         return m_bitmap_table.add_index(phrase_length, phrase, token);
     }
 
-    int remove_index(int phrase_length, /* in */ ucs4_t phrase[], /* in */ phrase_token_t token) {
+    int remove_index(int phrase_length, /* in */ const ucs4_t phrase[], /* in */ phrase_token_t token) {
         return m_bitmap_table.remove_index(phrase_length, phrase, token);
     }
 
