@@ -307,11 +307,11 @@ const double_pinyin_scheme_yunmu_item_t double_pinyin_pyjj_yun[] = {
 };
 
 const double_pinyin_scheme_shengmu_item_t double_pinyin_xhe_sheng[] = {
-{NULL } /* A */,
+{"'"  } /* A */,
 {"b"  } /* B */,
 {"c"  } /* C */,
 {"d"  } /* D */,
-{NULL } /* E */,
+{"'"  } /* E */,
 {"f"  } /* F */,
 {"g"  } /* G */,
 {"h"  } /* H */,
