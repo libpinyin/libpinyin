@@ -62,6 +62,6 @@ bigram.db: $(textual_model_data)
 
 phrase_index.bin pinyin_index.bin $(binfiles): bigram.db
 
-rebuild:
+modify:
 	git reset --hard
 	sed -i -r -e "s'lambda parameter:0\\.[0-9]{3,6}'lambda parameter:$(LAMBDA_PARAMETER)'" table.conf
