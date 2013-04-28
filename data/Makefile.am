@@ -48,8 +48,8 @@ libpinyin_dbdir		= $(libdir)/libpinyin/data
 CLEANFILES		= $(binary_model_data)
 
 interpolation2.text:
-	wget http://downloads.sourceforge.net/libpinyin/models/model5.text.tar.gz
-	tar xvf model5.text.tar.gz -C $(top_srcdir)/data
+	wget http://downloads.sourceforge.net/libpinyin/models/model6.text.tar.gz
+	tar xvf model6.text.tar.gz -C $(top_srcdir)/data
 
 
 $(tablefiles): interpolation2.text
@@ -64,5 +64,5 @@ phrase_index.bin pinyin_index.bin $(binfiles): bigram.db
 
 rebuild:
 	git reset --hard
-	sed -i -e "s/lambda parameter:0.347121/lambda parameter:$(LAMBDA_PARAMETER)/" table.conf
+	sed -i -e "s/lambda parameter:0.276514/lambda parameter:$(LAMBDA_PARAMETER)/" table.conf
 	make -C .. >/dev/null 2>/dev/null
