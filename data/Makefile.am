@@ -64,5 +64,4 @@ phrase_index.bin pinyin_index.bin $(binfiles): bigram.db
 
 rebuild:
 	git reset --hard
-	sed -i -e "s/lambda parameter:0.276514/lambda parameter:$(LAMBDA_PARAMETER)/" table.conf
-	make -C .. >/dev/null 2>/dev/null
+	sed -i -r -e "s'lambda parameter:0\\.[0-9]{3,6}'lambda parameter:$(LAMBDA_PARAMETER)'" table.conf
