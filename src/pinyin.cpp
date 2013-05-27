@@ -1821,7 +1821,7 @@ bool pinyin_reset(pinyin_instance_t * instance){
     g_array_set_size(instance->m_pinyin_key_rests, 0);
     g_array_set_size(instance->m_constraints, 0);
     g_array_set_size(instance->m_match_results, 0);
-    g_array_set_size(instance->m_candidates, 0);
+    _free_candidates(instance->m_candidates);
 
     return true;
 }
