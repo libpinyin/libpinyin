@@ -131,16 +131,22 @@ bool SystemTableInfo::load(const char * filename) {
     gfloat lambda = 0.;
 
     int num = fscanf(input, "binary format version:%d\n", &binver);
-    if (1 != num)
+    if (1 != num) {
+        fclose(input);
         return false;
+    }
 
     num = fscanf(input, "model data version:%d\n", &modelver);
-    if (1 != num)
+    if (1 != num) {
+        fclose(input);
         return false;
+    }
 
     num = fscanf(input, "lambda parameter:%f\n", &lambda);
-    if (1 != num)
+    if (1 != num) {
+        fclose(input);
         return false;
+    }
 
 #if 0
     printf("binver:%d modelver:%d lambda:%f\n", binver, modelver, lambda);
@@ -211,12 +217,16 @@ bool UserTableInfo::load(const char * filename) {
     int binver = 0, modelver = 0;
 
     int num = fscanf(input, "binary format version:%d\n", &binver);
-    if (1 != num)
+    if (1 != num) {
+        fclose(input);
         return false;
+    }
 
     num = fscanf(input, "model data version:%d\n", &modelver);
-    if (1 != num)
+    if (1 != num) {
+        fclose(input);
         return false;
+    }
 
 #if 0
     printf("binver:%d modelver:%d\n", binver, modelver);
