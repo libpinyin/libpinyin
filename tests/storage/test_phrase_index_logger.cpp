@@ -31,7 +31,7 @@ int main(int argc, char * argv[]){
     phrase_index.load(1, chunk);
 
     PhraseIndexRange range;
-    phrase_index.get_range(1, range);
+    assert(ERROR_OK == phrase_index.get_range(1, range));
     for (size_t i = range.m_range_begin; i < range.m_range_end; ++i ) {
         phrase_index.add_unigram_frequency(i, 1);
     }

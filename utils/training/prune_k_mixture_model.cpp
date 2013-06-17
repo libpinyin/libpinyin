@@ -130,7 +130,11 @@ int main(int argc, char * argv[]){
     bigram.attach(bigram_filename, ATTACH_READWRITE);
 
     KMixtureModelMagicHeader magic_header;
-    bigram.get_magic_header(magic_header);
+    if (!bigram.get_magic_header(magic_header)) {
+        fprintf(stderr, "no magic header in k mixture model.\n");
+        exit(ENODATA);
+    }
+
     GArray * items = g_array_new(FALSE, FALSE, sizeof(phrase_token_t));
     bigram.get_all_items(items);
 
