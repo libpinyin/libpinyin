@@ -90,6 +90,7 @@ bool validate_bigram(KMixtureModelBigram * bigram){
         phrase_token_t * token = &g_array_index(items, phrase_token_t, i);
         KMixtureModelSingleGram * single_gram = NULL;
         assert(bigram->load(*token, single_gram));
+
         FlexibleBigramPhraseArray array = g_array_new
             (FALSE, FALSE, sizeof(KMixtureModelArrayItemWithToken));
         single_gram->retrieve_all(array);
@@ -106,6 +107,7 @@ bool validate_bigram(KMixtureModelBigram * bigram){
                 result = false;
             }
             if ( 0 != freq ){
+                delete single_gram;
                 continue;
             } else {
                 fprintf(stderr, "in the array header of token %d:\n", *token);
@@ -130,6 +132,7 @@ bool validate_bigram(KMixtureModelBigram * bigram){
         }
 
         g_array_free(array, TRUE);
+        delete single_gram;
     }
 
     g_array_free(items, TRUE);
