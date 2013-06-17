@@ -143,11 +143,15 @@ void feed_file ( const char * filename){
     }
 
     while ( !feof(infile)){
-	fscanf(infile, "%s", phrase);
-	fscanf(infile, "%s", pinyin);
-	fscanf(infile, "%u", &freq);
+	int num = fscanf(infile, "%s %s %u",
+                         phrase, pinyin, &freq);
+
+        if (3 != num)
+            continue;
+
 	if (feof(infile))
             break;
+
 	feed_line(phrase, pinyin, freq);
     }
 
