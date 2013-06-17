@@ -188,20 +188,23 @@ bool parse_bigram(FILE * input, PhraseLargeTable2 * phrase_table,
                 if ( last_token && last_single_gram ) {
                     bigram->store(last_token, last_single_gram);
                     delete last_single_gram;
-                    //safe guard
-                    last_token = 0;
+
+                    /* safe guard */
+                    last_token = null_token;
                     last_single_gram = NULL;
                 }
                 SingleGram * single_gram = NULL;
                 bigram->load(token1, single_gram);
 
-                //create the new single gram
+                /* create the new single gram */
                 if ( single_gram == NULL )
                     single_gram = new SingleGram;
                 last_token = token1;
                 last_single_gram = single_gram;
             }
-            //save the freq
+
+            /* save the freq */
+            assert(NULL != last_single_gram);
             guint32 total_freq = 0;
             assert(last_single_gram->get_total_freq(total_freq));
             assert(last_single_gram->insert_freq(token2, count));

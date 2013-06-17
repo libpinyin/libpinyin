@@ -231,6 +231,8 @@ bool parse_bigram(FILE * input, PhraseLargeTable2 * phrase_table,
                 last_token = token1;
                 last_single_gram = single_gram;
             }
+
+            assert(NULL != last_single_gram);
             assert(last_single_gram->insert_array_item(token2, array_item));
             break;
         }
