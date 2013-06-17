@@ -136,6 +136,7 @@ bool gen_bigram(FILE * output, FacadePhraseIndex * phrase_index, Bigram * bigram
         }
 
         g_array_free(array, TRUE);
+        delete single_gram;
     }
 
     g_array_free(items, TRUE);

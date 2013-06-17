@@ -85,6 +85,7 @@ static bool load_phrase_index(const pinyin_table_info_t * phrase_files,
         bool retval = chunk->load(binfile);
         if (!retval) {
             fprintf(stderr, "load %s failed!\n", binfile);
+            delete chunk;
             return false;
         }
 

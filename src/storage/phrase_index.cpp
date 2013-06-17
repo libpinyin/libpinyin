@@ -458,8 +458,12 @@ bool SubPhraseIndex::merge(PhraseIndexLogger * logger){
 
             olditem.m_chunk.set_chunk(oldchunk.begin(), oldchunk.size(),
                                       NULL);
-            if (olditem != *tmpitem)
+
+            if (olditem != *tmpitem) {
+                delete tmpitem;
                 return false;
+            }
+
             delete tmpitem;
 
             break;
