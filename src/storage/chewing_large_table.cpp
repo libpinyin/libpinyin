@@ -668,10 +668,11 @@ bool ChewingLargeTable::load_text(FILE * infile) {
     size_t freq;
 
     while (!feof(infile)) {
-        fscanf(infile, "%s", pinyin);
-        fscanf(infile, "%s", phrase);
-        fscanf(infile, "%u", &token);
-        fscanf(infile, "%ld", &freq);
+        int num = fscanf(infile, "%s %s %u %ld",
+                         pinyin, phrase, &token, &freq);
+
+        if (4 != num)
+            continue;
 
         if(feof(infile))
             break;

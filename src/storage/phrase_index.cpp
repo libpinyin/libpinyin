@@ -519,14 +519,18 @@ bool FacadePhraseIndex::load_text(guint8 phrase_index, FILE * infile){
     char phrase[256];
     phrase_token_t token;
     size_t freq;
+
     PhraseItem * item_ptr = new PhraseItem;
     phrase_token_t cur_token = 0;
-    while ( !feof(infile)){
-        fscanf(infile, "%s", pinyin);
-        fscanf(infile, "%s", phrase);
-        fscanf(infile, "%u", &token);
-	fscanf(infile, "%ld", &freq);
-	if ( feof(infile) )
+
+    while (!feof(infile)){
+        int num = fscanf(infile, "%s %s %u %ld",
+                         pinyin, phrase, &token, &freq);
+
+        if (4 != num)
+            continue;
+
+	if (feof(infile))
 	    break;
 
         assert(PHRASE_INDEX_LIBRARY_INDEX(token) == phrase_index );
