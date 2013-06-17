@@ -109,6 +109,7 @@ static bool save_phrase_index(const pinyin_table_info_t * phrase_files,
         bool retval = new_chunk->save(binfile);
         if (!retval) {
             fprintf(stderr, "save %s failed.", binfile);
+            delete new_chunk;
             return false;
         }
 
@@ -133,6 +134,7 @@ static bool save_dictionary(const pinyin_table_info_t * phrase_files,
         bool retval = new_chunk->save(binfile);
         if (!retval) {
             fprintf(stderr, "save %s failed.", binfile);
+            delete new_chunk;
             return false;
         }
 
