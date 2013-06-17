@@ -537,7 +537,12 @@ bool pinyin_save(pinyin_context_t * context){
             gchar * chunkpathname = g_build_filename(context->m_user_dir,
                                                      userfilename, NULL);
             log->save(tmppathname);
-            rename(tmppathname, chunkpathname);
+
+            int result = rename(tmppathname, chunkpathname);
+            if (0 != result)
+                fprintf(stderr, "rename %s to %s failed.\n",
+                        tmppathname, chunkpathname);
+
             g_free(chunkpathname);
             g_free(tmppathname);
             delete log;
@@ -558,7 +563,12 @@ bool pinyin_save(pinyin_context_t * context){
                                                      userfilename, NULL);
 
             chunk->save(tmppathname);
-            rename(tmppathname, chunkpathname);
+
+            int result = rename(tmppathname, chunkpathname);
+            if (0 != result)
+                fprintf(stderr, "rename %s to %s failed.\n",
+                        tmppathname, chunkpathname);
+
             g_free(chunkpathname);
             g_free(tmppathname);
             delete chunk;
@@ -576,7 +586,12 @@ bool pinyin_save(pinyin_context_t * context){
     context->m_pinyin_table->store(chunk);
     chunk->save(tmpfilename);
     delete chunk;
-    rename(tmpfilename, filename);
+
+    int result = rename(tmpfilename, filename);
+    if (0 != result)
+        fprintf(stderr, "rename %s to %s failed.\n",
+                tmpfilename, filename);
+
     g_free(tmpfilename);
     g_free(filename);
 
@@ -591,7 +606,12 @@ bool pinyin_save(pinyin_context_t * context){
     context->m_phrase_table->store(chunk);
     chunk->save(tmpfilename);
     delete chunk;
-    rename(tmpfilename, filename);
+
+    result = rename(tmpfilename, filename);
+    if (0 != result)
+        fprintf(stderr, "rename %s to %s failed.\n",
+                tmpfilename, filename);
+
     g_free(tmpfilename);
     g_free(filename);
 
@@ -601,7 +621,12 @@ bool pinyin_save(pinyin_context_t * context){
     unlink(tmpfilename);
     filename = g_build_filename(context->m_user_dir, USER_BIGRAM, NULL);
     context->m_user_bigram->save_db(tmpfilename);
-    rename(tmpfilename, filename);
+
+    result = rename(tmpfilename, filename);
+    if (0 != result)
+        fprintf(stderr, "rename %s to %s failed.\n",
+                tmpfilename, filename);
+
     g_free(tmpfilename);
     g_free(filename);
 
