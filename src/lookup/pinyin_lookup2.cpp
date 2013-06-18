@@ -202,6 +202,10 @@ PinyinLookup2::PinyinLookup2(const gfloat lambda,
 
     m_steps_index = g_ptr_array_new();
     m_steps_content = g_ptr_array_new();
+
+    /* the member variables below are saved in get_best_match call. */
+    m_keys = NULL;
+    m_constraints = NULL;
 }
 
 PinyinLookup2::~PinyinLookup2(){
@@ -594,6 +598,7 @@ bool PinyinLookup2::train_result2(ChewingKeyVector keys,
                 assert(user->set_freq(*token, freq + seed));
                 assert(m_user_bigram->store(last_token, user));
             next:
+                assert(NULL != user);
                 if (user)
                     delete user;
             }

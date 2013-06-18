@@ -106,6 +106,10 @@ PhraseLookup::PhraseLookup(const gfloat lambda,
 
     m_steps_index = g_ptr_array_new();
     m_steps_content = g_ptr_array_new();
+
+    /* the member variables below are saved in get_best_match call. */
+    m_sentence = NULL;
+    m_sentence_length = 0;
 }
 
 PhraseLookup::~PhraseLookup(){
