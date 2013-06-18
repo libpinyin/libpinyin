@@ -541,6 +541,7 @@ public:
      */
     bool get_all_items(GArray * items){
         g_array_set_size(items, 0);
+
         if ( !m_db )
             return false;
 
@@ -550,6 +551,9 @@ public:
 
         /* Get a cursor */
         m_db->cursor(m_db, NULL, &cursorp, 0);
+
+        if (NULL == cursorp)
+            return false;
 
         /* Initialize our DBTs. */
         memset(&key, 0, sizeof(DBT));
@@ -567,6 +571,10 @@ public:
 
         if ( ret != DB_NOTFOUND ){
             fprintf(stderr, "training db error, exit!");
+
+            if (cursorp != NULL)
+                cursorp->c_close(cursorp);
+
             exit(EIO);
         }
 

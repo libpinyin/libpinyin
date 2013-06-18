@@ -287,6 +287,9 @@ bool Bigram::load_db(const char * dbfile){
     ret = db_create(&tmp_db, NULL, 0);
     assert(ret == 0);
 
+    if (NULL == tmp_db)
+        return false;
+
     ret = tmp_db->open(tmp_db, NULL, dbfile, NULL,
                        DB_HASH, DB_RDONLY, 0600);
     if ( ret != 0 )
@@ -294,8 +297,12 @@ bool Bigram::load_db(const char * dbfile){
 
     DBC * cursorp = NULL;
     DBT key, data;
+
     /* Get a cursor */
     tmp_db->cursor(tmp_db, NULL, &cursorp, 0);
+
+    if (NULL == cursorp)
+        return false;
 
     /* Initialize our DBTs. */
     memset(&key, 0, sizeof(DBT));
@@ -328,6 +335,9 @@ bool Bigram::save_db(const char * dbfile){
     ret = db_create(&tmp_db, NULL, 0);
     assert(ret == 0);
 
+    if (NULL == tmp_db)
+        return false;
+
     ret = tmp_db->open(tmp_db, NULL, dbfile, NULL,
                        DB_HASH, DB_CREATE, 0600);
     if ( ret != 0 )
@@ -337,6 +347,9 @@ bool Bigram::save_db(const char * dbfile){
     DBT key, data;
     /* Get a cursor */
     m_db->cursor(m_db, NULL, &cursorp, 0);
+
+    if (NULL == cursorp)
+        return false;
 
     /* Initialize our DBTs. */
     memset(&key, 0, sizeof(DBT));
@@ -444,7 +457,10 @@ bool Bigram::get_all_items(GArray * items){
     DBT key, data;
     int ret;
     /* Get a cursor */
-    m_db->cursor(m_db, NULL, &cursorp, 0); 
+    m_db->cursor(m_db, NULL, &cursorp, 0);
+
+    if (NULL == cursorp)
+        return false;
 
     /* Initialize our DBTs. */
     memset(&key, 0, sizeof(DBT));
