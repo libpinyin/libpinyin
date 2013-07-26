@@ -23,6 +23,7 @@
 #include <stdio.h>
 #include <assert.h>
 #include <string.h>
+#include <locale.h>
 
 using namespace pinyin;
 
@@ -121,6 +122,8 @@ static PHRASE_FILE_TYPE to_file_type(const char * str) {
 bool SystemTableInfo::load(const char * filename) {
     reset();
 
+    char * locale = setlocale(LC_NUMERIC, "C");
+
     FILE * input = fopen(filename, "r");
     if (NULL == input) {
         fprintf(stderr, "open %s failed.\n", filename);
@@ -183,6 +186,9 @@ bool SystemTableInfo::load(const char * filename) {
 
     /* postfix reserved tables. */
     postfix_tables();
+
+    setlocale(LC_NUMERIC, locale);
+
     return true;
 }
 
@@ -207,6 +213,8 @@ void UserTableInfo::reset() {
 
 bool UserTableInfo::load(const char * filename) {
     reset();
+
+    char * locale = setlocale(LC_NUMERIC, "C");
 
     FILE * input = fopen(filename, "r");
     if (NULL == input) {
@@ -237,10 +245,14 @@ bool UserTableInfo::load(const char * filename) {
 
     fclose(input);
 
+    setlocale(LC_NUMERIC, locale);
+
     return true;
 }
 
 bool UserTableInfo::save(const char * filename) {
+    char * locale = setlocale(LC_NUMERIC, "C");
+
     FILE * output = fopen(filename, "w");
     if (NULL == output) {
         fprintf(stderr, "write %s failed.\n", filename);
@@ -251,6 +263,8 @@ bool UserTableInfo::save(const char * filename) {
     fprintf(output, "model data version:%d\n", m_model_data_version);
 
     fclose(output);
+
+    setlocale(LC_NUMERIC, locale);
 
     return true;
 }

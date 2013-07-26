@@ -20,10 +20,13 @@
  */
 
 #include <stdio.h>
+#include <locale.h>
 #include "pinyin_internal.h"
 
 
 int main(int argc, char * argv[]) {
+    setlocale(LC_ALL, "");
+
     SystemTableInfo system_table_info;
 
     bool retval = system_table_info.load("../../data/table.conf");
