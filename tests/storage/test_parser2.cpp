@@ -66,7 +66,7 @@ int main(int argc, char * argv[]) {
     if (incomplete)
         options |= PINYIN_INCOMPLETE | CHEWING_INCOMPLETE;
 
-    PinyinParser2 * parser = NULL;
+    PhoneticParser2 * parser = NULL;
     ChewingKeyVector keys = g_array_new(FALSE, FALSE, sizeof(ChewingKey));
     ChewingKeyRestVector key_rests =
         g_array_new(FALSE, FALSE, sizeof(ChewingKeyRest));
