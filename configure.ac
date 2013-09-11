@@ -2,9 +2,9 @@
 # Process this file with autoconf to produce a configure script.
 
 
-m4_define([libpinyin_major_version], [0])
-m4_define([libpinyin_minor_version], [9])
-m4_define([libpinyin_micro_version], [93])
+m4_define([libpinyin_major_version], [1])
+m4_define([libpinyin_minor_version], [0])
+m4_define([libpinyin_micro_version], [0])
 m4_define([libpinyin_abi_current], [4])
 m4_define([libpinyin_abi_revision], [0])
 
