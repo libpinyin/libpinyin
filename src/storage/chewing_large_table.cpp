@@ -355,9 +355,9 @@ int ChewingLengthIndexLevel::search(pinyin_option_t options, int phrase_length,
                                     /* in */ const ChewingKey keys[],
                                     /* out */ PhraseIndexRanges ranges) const {
     int result = SEARCH_NONE;
-    if (m_chewing_array_indexes->len < phrase_length + 1)
+    if ((int) m_chewing_array_indexes->len < phrase_length + 1)
         return result;
-    if (m_chewing_array_indexes->len > phrase_length + 1)
+    if ((int) m_chewing_array_indexes->len > phrase_length + 1)
         result |= SEARCH_CONTINUED;
 
 #define CASE(len) case len:                                             \
@@ -513,7 +513,7 @@ int ChewingLengthIndexLevel::add_index(int phrase_length,
     if (!(phrase_length + 1 < MAX_PHRASE_LENGTH))
         return ERROR_PHRASE_TOO_LONG;
 
-    if (m_chewing_array_indexes->len <= phrase_length)
+    if ((int) m_chewing_array_indexes->len <= phrase_length)
         g_array_set_size(m_chewing_array_indexes, phrase_length + 1);
 
 #define CASE(len) case len:                                     \
@@ -556,7 +556,7 @@ int ChewingLengthIndexLevel::remove_index(int phrase_length,
     if (!(phrase_length + 1 < MAX_PHRASE_LENGTH))
         return ERROR_PHRASE_TOO_LONG;
 
-    if (m_chewing_array_indexes->len <= phrase_length)
+    if ((int) m_chewing_array_indexes->len <= phrase_length)
         return ERROR_REMOVE_ITEM_DONOT_EXISTS;
 
 #define CASE(len) case len:                                     \
