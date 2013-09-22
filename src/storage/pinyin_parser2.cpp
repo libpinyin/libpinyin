@@ -84,7 +84,7 @@ gint _ChewingKey::get_table_index() {
 gchar * _ChewingKey::get_pinyin_string() {
     assert(m_tone < CHEWING_NUMBER_OF_TONES);
     gint index = get_table_index();
-    assert(index < G_N_ELEMENTS(content_table));
+    assert(index < (int) G_N_ELEMENTS(content_table));
     const content_table_item_t & item = content_table[index];
 
     if (CHEWING_ZERO_TONE == m_tone) {
@@ -96,14 +96,14 @@ gchar * _ChewingKey::get_pinyin_string() {
 
 gchar * _ChewingKey::get_shengmu_string() {
     gint index = get_table_index();
-    assert(index < G_N_ELEMENTS(content_table));
+    assert(index < (int) G_N_ELEMENTS(content_table));
     const content_table_item_t & item = content_table[index];
     return g_strdup(item.m_shengmu_str);
 }
 
 gchar * _ChewingKey::get_yunmu_string() {
     gint index = get_table_index();
-    assert(index < G_N_ELEMENTS(content_table));
+    assert(index < (int) G_N_ELEMENTS(content_table));
     const content_table_item_t & item = content_table[index];
     return g_strdup(item.m_yunmu_str);
 }
@@ -111,7 +111,7 @@ gchar * _ChewingKey::get_yunmu_string() {
 gchar * _ChewingKey::get_chewing_string() {
     assert(m_tone < CHEWING_NUMBER_OF_TONES);
     gint index = get_table_index();
-    assert(index < G_N_ELEMENTS(content_table));
+    assert(index < (int) G_N_ELEMENTS(content_table));
     const content_table_item_t & item = content_table[index];
 
     if (CHEWING_ZERO_TONE == m_tone) {
@@ -835,7 +835,7 @@ static bool search_chewing_symbols(const chewing_symbol_item_t * symbol_table,
 }
 
 static bool search_chewing_tones(const chewing_tone_item_t * tone_table,
-                                 const char key, char * tone) {
+                                 const char key, unsigned char * tone) {
     *tone = CHEWING_ZERO_TONE;
     /* just iterate the table, as we only have < 10 items. */
     while (tone_table->m_input != '\0') {
@@ -853,7 +853,7 @@ bool ChewingParser2::parse_one_key(pinyin_option_t options,
                                    ChewingKey & key,
                                    const char *str, int len) const {
     options &= ~(PINYIN_CORRECT_ALL|PINYIN_AMB_ALL);
-    char tone = CHEWING_ZERO_TONE;
+    unsigned char tone = CHEWING_ZERO_TONE;
 
     int symbols_len = len;
     /* probe whether the last key is tone key in str. */
@@ -965,10 +965,10 @@ bool ChewingParser2::set_scheme(ChewingScheme scheme) {
 
 
 bool ChewingParser2::in_chewing_scheme(pinyin_option_t options,
-                                       const char key, const char ** symbol)
- const {
+                                       const char key,
+                                       const char ** symbol) const {
     const gchar * chewing = NULL;
-    char tone = CHEWING_ZERO_TONE;
+    unsigned char tone = CHEWING_ZERO_TONE;
 
     if (search_chewing_symbols(m_symbol_table, key, &chewing)) {
         if (symbol)
