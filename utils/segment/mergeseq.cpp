@@ -32,7 +32,6 @@ void print_help(){
 }
 
 
-static gboolean gen_extra_enter = FALSE;
 static gchar * outputfile = NULL;
 
 static GOptionEntry entries[] =
@@ -268,6 +267,11 @@ int main(int argc, char * argv[]){
                   unichars, tokeninfos,
                   linebuf, output);
     }
+
+    /* append one null token for EOF. */
+    feed_line(&phrase_table, &phrase_index,
+              unichars, tokeninfos,
+              "0 ", output);
 
     g_array_free(unichars, TRUE);
     g_array_free(tokeninfos, TRUE);
