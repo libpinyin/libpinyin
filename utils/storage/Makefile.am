@@ -22,24 +22,18 @@ INCLUDES                = -I$(top_srcdir)/src \
 			  -I$(top_srcdir)/utils \
                           @GLIB2_CFLAGS@
 
-bin_PROGRAMS		 = gen_binary_files \
-			   import_interpolation
+LDADD			= ../../src/libpinyin_internal.la @GLIB2_LIBS@
 
-noinst_PROGRAMS          = export_interpolation \
-			   gen_pinyin_table
+bin_PROGRAMS		= gen_binary_files \
+			  import_interpolation
+
+noinst_PROGRAMS		= export_interpolation \
+			  gen_pinyin_table
 
 gen_binary_files_SOURCES    = gen_binary_files.cpp
 
-gen_binary_files_LDADD      = ../../src/libpinyin_internal.la @GLIB2_LIBS@
-
 import_interpolation_SOURCES = import_interpolation.cpp
-
-import_interpolation_LDADD = ../../src/libpinyin_internal.la @GLIB2_LIBS@
 
 export_interpolation_SOURCES = export_interpolation.cpp
 
-export_interpolation_LDADD = ../../src/libpinyin_internal.la @GLIB2_LIBS@
-
 gen_pinyin_table_SOURCES    = gen_pinyin_table.cpp
-
-gen_pinyin_table_LDADD      = ../../src/libpinyin_internal.la @GLIB2_LIBS@

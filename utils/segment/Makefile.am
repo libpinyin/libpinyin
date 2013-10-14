@@ -24,16 +24,12 @@ INCLUDES		= -I$(top_srcdir)/src \
 			  -I$(top_srcdir)/utils \
 			  @GLIB2_CFLAGS@
 
+LDADD			= ../../src/libpinyin_internal.la @GLIB2_LIBS@
+
 noinst_PROGRAMS		= spseg ngseg mergeseq
 
 spseg_SOURCES		= spseg.cpp
 
-spseg_LDADD		= ../../src/libpinyin_internal.la @GLIB2_LIBS@
-
 ngseg_SOURCES		= ngseg.cpp
 
-ngseg_LDADD		= ../../src/libpinyin_internal.la @GLIB2_LIBS@
-
 mergeseq_SOURCES	= mergeseq.cpp
-
-mergeseq_LDADD		= ../../src/libpinyin_internal.la @GLIB2_LIBS@

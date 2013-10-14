@@ -21,11 +21,10 @@ INCLUDES                = -I$(top_srcdir)/src \
                           -I$(top_srcdir)/src/lookup \
                           @GLIB2_CFLAGS@
 
-TESTS			 = test_memory_chunk
+LDADD			= @GLIB2_LIBS@
 
-noinst_PROGRAMS          = test_memory_chunk
+TESTS			= test_memory_chunk
 
-test_memory_chunk_SOURCES    = test_memory_chunk.cpp
+noinst_PROGRAMS		= test_memory_chunk
 
-test_memory_chunk_LDADD      = @GLIB2_LIBS@
-
+test_memory_chunk_SOURCES = test_memory_chunk.cpp
