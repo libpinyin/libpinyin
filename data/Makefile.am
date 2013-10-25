@@ -48,8 +48,8 @@ libpinyin_dbdir		= $(libdir)/libpinyin/data
 CLEANFILES		= $(binary_model_data)
 
 interpolation2.text:
-	wget http://downloads.sourceforge.net/libpinyin/models/model6.text.tar.gz
-	tar xvf model6.text.tar.gz -C $(top_srcdir)/data
+	wget http://downloads.sourceforge.net/libpinyin/models/model7.text.tar.gz
+	tar xvf model7.text.tar.gz -C $(top_srcdir)/data
 
 
 $(tablefiles): interpolation2.text
