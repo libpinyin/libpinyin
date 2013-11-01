@@ -39,3 +39,4 @@ def expand_file(filename, get_table_content):
             print(get_table_content(tablename))
         else:
             print(line)
+    infile.close()

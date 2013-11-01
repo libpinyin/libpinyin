@@ -5,7 +5,7 @@ pinyins.txt:
 	python3 genpinyins.py
 
 
-update-header:
+update-header: pinyins.txt
 	python3 genpinyinheader.py > ../src/storage/pinyin_parser_table.h
 	python3 gendoublepinyinheader.py > ../src/storage/double_pinyin_table.h
 	python3 genbopomofoheader.py > ../src/storage/chewing_table.h
