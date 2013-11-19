@@ -44,7 +44,8 @@ typedef enum _lookup_candidate_type_t{
     NORMAL_CANDIDATE,
     DIVIDED_CANDIDATE,
     RESPLIT_CANDIDATE,
-    ZOMBIE_CANDIDATE
+    ZOMBIE_CANDIDATE,
+    PREDICTED_CANDIDATE
 } lookup_candidate_type_t;
 
 /**

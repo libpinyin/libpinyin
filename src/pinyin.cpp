@@ -1171,6 +1171,7 @@ static bool _compute_phrase_strings_of_items(pinyin_instance_t * instance,
         case NORMAL_CANDIDATE:
         case DIVIDED_CANDIDATE:
         case RESPLIT_CANDIDATE:
+        case PREDICTED_CANDIDATE:
             pinyin_token_get_phrase
                 (instance, candidate->m_token, NULL,
                  &(candidate->m_phrase_string));
@@ -1758,6 +1759,75 @@ bool pinyin_guess_full_pinyin_candidates(pinyin_instance_t * instance,
     return true;
 }
 
+bool pinyin_guess_predicted_candidates(pinyin_instance_t * instance,
+                                       const char * prefix) {
+    pinyin_context_t * & context = instance->m_context;
+    FacadePhraseIndex * & phrase_index = context->m_phrase_index;
+    GArray * & prefixes = instance->m_prefixes;
+
+    _free_candidates(instance->m_candidates);
+
+    _compute_prefixes(instance, prefix);
+
+    phrase_token_t prev_token = _get_previous_token(instance, 0);
+
+    SingleGram merged_gram;
+    SingleGram * system_gram = NULL, * user_gram = NULL;
+    if (null_token != prev_token) {
+        context->m_system_bigram->load(prev_token, system_gram);
+        context->m_user_bigram->load(prev_token, user_gram);
+        merge_single_gram(&merged_gram, system_gram, user_gram);
+    }
+
+    GArray * items = g_array_new(FALSE, FALSE, sizeof(lookup_candidate_t));
+
+    /* retrieve all items. */
+    BigramPhraseWithCountArray tokens = g_array_new
+        (FALSE, FALSE, sizeof(BigramPhraseItemWithCount));
+    merged_gram.retrieve_all(tokens);
+
+    /* sort the longer word first. */
+    PhraseItem cached_item;
+    for (size_t len = MAX_PHRASE_LENGTH; len > 0; --len) {
+        /* append items. */
+        for (size_t k = 0; k < tokens->len; ++k){
+            phrase_token_t token = g_array_index(tokens, phrase_token_t, k);
+            phrase_index->get_phrase_item(token, cached_item);
+            if (len != cached_item.get_phrase_length())
+                continue;
+
+            lookup_candidate_t item;
+            item.m_candidate_type = PREDICTED_CANDIDATE;
+            item.m_token = token;
+            g_array_append_val(items, item);
+        }
+
+        _compute_frequency_of_items(context, prev_token, &merged_gram, items);
+
+        /* sort the candidates of the same length by frequency. */
+        g_array_sort(items, compare_item_with_frequency);
+
+        /* transfer back items to tokens, and save it into candidates */
+        for (size_t k = 0; k < items->len; ++k) {
+            lookup_candidate_t * item = &g_array_index
+                (items, lookup_candidate_t, k);
+            g_array_append_val(instance->m_candidates, *item);
+        }
+    }
+
+    g_array_free(items, TRUE);
+    if (system_gram)
+        delete system_gram;
+    if (user_gram)
+        delete user_gram;
+
+    /* post process to remove duplicated candidates */
+    _compute_phrase_strings_of_items(instance, 0, instance->m_candidates);
+
+    _remove_duplicated_items_by_phrase_string(instance, instance->m_candidates);
+
+    return true;
+}
 
 int pinyin_choose_candidate(pinyin_instance_t * instance,
                             size_t offset,
