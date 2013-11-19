@@ -1770,14 +1770,15 @@ bool pinyin_guess_predicted_candidates(pinyin_instance_t * instance,
     _compute_prefixes(instance, prefix);
 
     phrase_token_t prev_token = _get_previous_token(instance, 0);
+    if (null_token == prev_token)
+        return false;
 
+    /* merge single gram. */
     SingleGram merged_gram;
     SingleGram * system_gram = NULL, * user_gram = NULL;
-    if (null_token != prev_token) {
-        context->m_system_bigram->load(prev_token, system_gram);
-        context->m_user_bigram->load(prev_token, user_gram);
-        merge_single_gram(&merged_gram, system_gram, user_gram);
-    }
+    context->m_system_bigram->load(prev_token, system_gram);
+    context->m_user_bigram->load(prev_token, user_gram);
+    merge_single_gram(&merged_gram, system_gram, user_gram);
 
     GArray * items = g_array_new(FALSE, FALSE, sizeof(lookup_candidate_t));
 
@@ -1870,6 +1871,47 @@ int pinyin_choose_candidate(pinyin_instance_t * instance,
         (instance->m_constraints, instance->m_pinyin_keys) && len;
 
     return offset + len;
+}
+
+bool pinyin_choose_predicted_candidate(pinyin_instance_t * instance,
+                                      lookup_candidate_t * candidate){
+    const guint32 initial_seed = 23 * 3;
+    const guint32 unigram_factor = 7;
+
+    pinyin_context_t * & context = instance->m_context;
+    FacadePhraseIndex * & phrase_index = context->m_phrase_index;
+    GArray * & prefixes = instance->m_prefixes;
+
+    /* train uni-gram */
+    phrase_token_t token = candidate->m_token;
+    int error = phrase_index->add_unigram_frequency
+        (token, initial_seed * unigram_factor);
+    if (ERROR_INTEGER_OVERFLOW == error)
+        return false;
+
+    phrase_token_t prev_token = _get_previous_token(instance, 0);
+    if (null_token == prev_token)
+        return false;
+
+    SingleGram * user_gram = NULL;
+    context->m_user_bigram->load(prev_token, user_gram);
+
+    if (NULL == user_gram)
+        user_gram = new SingleGram;
+
+    /* train bi-gram */
+    guint32 total_freq = 0;
+    assert(user_gram->get_total_freq(total_freq));
+    guint32 freq = 0;
+    if (!user_gram->get_freq(token, freq)) {
+        assert(user_gram->insert_freq(token, initial_seed));
+    } else {
+        assert(user_gram->set_freq(token, freq + initial_seed));
+    }
+    assert(user_gram->set_total_freq(total_freq + initial_seed));
+    context->m_user_bigram->store(prev_token, user_gram);
+    delete user_gram;
+    return true;
 }
 
 bool pinyin_clear_constraint(pinyin_instance_t * instance,
