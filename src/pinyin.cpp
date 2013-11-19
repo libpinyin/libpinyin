@@ -812,14 +812,11 @@ bool pinyin_guess_sentence(pinyin_instance_t * instance){
     return retval;
 }
 
-bool pinyin_guess_sentence_with_prefix(pinyin_instance_t * instance,
-                                       const char * prefix){
+static void _compute_prefixes(pinyin_instance_t * instance,
+                            const char * prefix){
     pinyin_context_t * & context = instance->m_context;
 
     FacadePhraseIndex * & phrase_index = context->m_phrase_index;
-
-    g_array_set_size(instance->m_prefixes, 0);
-    g_array_append_val(instance->m_prefixes, sentence_start);
 
     glong len_str = 0;
     ucs4_t * ucs4_str = g_utf8_to_ucs4(prefix, -1, NULL, &len_str, NULL);
@@ -847,6 +844,16 @@ bool pinyin_guess_sentence_with_prefix(pinyin_instance_t * instance,
     }
     g_array_free(tokenarray, TRUE);
     g_free(ucs4_str);
+}
+
+bool pinyin_guess_sentence_with_prefix(pinyin_instance_t * instance,
+                                       const char * prefix){
+    pinyin_context_t * & context = instance->m_context;
+
+    g_array_set_size(instance->m_prefixes, 0);
+    g_array_append_val(instance->m_prefixes, sentence_start);
+
+    _compute_prefixes(instance, prefix);
 
     pinyin_update_constraints(instance);
     bool retval = context->m_pinyin_lookup->get_best_match
