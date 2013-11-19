@@ -234,6 +234,18 @@ bool pinyin_guess_sentence_with_prefix(pinyin_instance_t * instance,
                                        const char * prefix);
 
 /**
+ * pinyin_guess_predicted_candidates:
+ * @instance: the pinyin instance.
+ * @prefix: the prefix before the predicted candidates.
+ * @returns: whether the predicted candidates are guessed successfully.
+ *
+ * Guess the predicted candidates after the prefix word.
+ *
+ */
+bool pinyin_guess_predicted_candidates(pinyin_instance_t * instance,
+                                       const char * prefix);
+
+/**
  * pinyin_phrase_segment:
  * @instance: the pinyin instance.
  * @sentence: the utf-8 sentence to be segmented.
@@ -386,6 +398,18 @@ bool pinyin_guess_full_pinyin_candidates(pinyin_instance_t * instance,
 int pinyin_choose_candidate(pinyin_instance_t * instance,
                             size_t offset,
                             lookup_candidate_t * candidate);
+
+/**
+ * pinyin_choose_predicted_candidate:
+ * @instance: the pinyin instance.
+ * @candidate: the selected candidate.
+ * @returns: whether the self-learning is successful.
+ *
+ * Choose a predicted candidate.
+ *
+ */
+bool pinyin_choose_predicted_candidate(pinyin_instance_t * instance,
+                                       lookup_candidate_t * candidate);
 
 /**
 * pinyin_clear_constraint:

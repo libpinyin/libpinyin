@@ -1874,7 +1874,7 @@ int pinyin_choose_candidate(pinyin_instance_t * instance,
 }
 
 bool pinyin_choose_predicted_candidate(pinyin_instance_t * instance,
-                                      lookup_candidate_t * candidate){
+                                       lookup_candidate_t * candidate){
     const guint32 initial_seed = 23 * 3;
     const guint32 unigram_factor = 7;
 

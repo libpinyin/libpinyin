@@ -16,6 +16,7 @@ LIBPINYIN {
         pinyin_free_instance;
         pinyin_guess_sentence;
         pinyin_guess_sentence_with_prefix;
+        pinyin_guess_predicted_candidates;
         pinyin_phrase_segment;
         pinyin_get_sentence;
         pinyin_parse_full_pinyin;
@@ -28,6 +29,7 @@ LIBPINYIN {
         pinyin_guess_candidates;
         pinyin_guess_full_pinyin_candidates;
         pinyin_choose_candidate;
+        pinyin_choose_predicted_candidate;
         pinyin_clear_constraint;
         pinyin_lookup_tokens;
         pinyin_train;
