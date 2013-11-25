@@ -1792,14 +1792,19 @@ bool pinyin_guess_predicted_candidates(pinyin_instance_t * instance,
     for (size_t len = MAX_PHRASE_LENGTH; len > 0; --len) {
         /* append items. */
         for (size_t k = 0; k < tokens->len; ++k){
-            phrase_token_t token = g_array_index(tokens, phrase_token_t, k);
-            phrase_index->get_phrase_item(token, cached_item);
+            BigramPhraseItemWithCount * phrase_item = &g_array_index
+                (tokens, BigramPhraseItemWithCount, k);
+
+            int result = phrase_index->get_phrase_item
+                (phrase_item->m_token, cached_item);
+            if (ERROR_NO_SUB_PHRASE_INDEX == result)
+                continue;
             if (len != cached_item.get_phrase_length())
                 continue;
 
             lookup_candidate_t item;
             item.m_candidate_type = PREDICTED_CANDIDATE;
-            item.m_token = token;
+            item.m_token = phrase_item->m_token;
             g_array_append_val(items, item);
         }
 
