@@ -1761,6 +1761,8 @@ bool pinyin_guess_full_pinyin_candidates(pinyin_instance_t * instance,
 
 bool pinyin_guess_predicted_candidates(pinyin_instance_t * instance,
                                        const char * prefix) {
+    const guint32 filter = 256;
+
     pinyin_context_t * & context = instance->m_context;
     FacadePhraseIndex * & phrase_index = context->m_phrase_index;
     GArray * & prefixes = instance->m_prefixes;
@@ -1795,10 +1797,14 @@ bool pinyin_guess_predicted_candidates(pinyin_instance_t * instance,
             BigramPhraseItemWithCount * phrase_item = &g_array_index
                 (tokens, BigramPhraseItemWithCount, k);
 
+            if (phrase_item->m_count < filter)
+                continue;
+
             int result = phrase_index->get_phrase_item
                 (phrase_item->m_token, cached_item);
             if (ERROR_NO_SUB_PHRASE_INDEX == result)
                 continue;
+
             if (len != cached_item.get_phrase_length())
                 continue;
 
