@@ -75,7 +75,7 @@ version 0.4.92
 
 version 0.4.91
 * New parsers for full pinyin/double pinyin/chewing.
-  * libpinyin now fully supports all pinyin auto corrections in
+  * libpinyin now fully supports all pinyin auto corrections of
 ibus-pinyin.
   * libpinyin now better supports an/ang, en/eng, in/ing fuzzy
 pinyin match.
