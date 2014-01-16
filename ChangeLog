@@ -1,17 +1,67 @@
+version 1.0.0
+* the first official release of 1.0.x.
+
+version 0.9.94
+* bug fixes.
+
+version 0.9.93
+* fixes libpinyin issues from coverity scan report.
+
+version 0.9.92
+* bug fixes.
+
+version 0.9.91
+* code re-factor.
+
+version 0.9.0
+* the first official release of 0.9.x.
+* fixes import dictionary.
+
+version 0.8.93
+* add back pinyin_clear_constraint.
+
+version 0.8.92
+* fixes model data.
+
+version 0.8.91
+* multiple dictioniares and user dictionary support.
+
+version 0.8.1
+* bug fixes.
+
+version 0.8.0
+* the first official release of 0.8.x.
+
+version 0.7.92
+* re-factor PhraseLookup class.
+* all tests passed simple valgrind memory check.
+
+version 0.7.91
+* simplify PinyinLookup class.
+
+version 0.7.1
+* add API to lookup pinyin for characters.
+
+version 0.7.0
+* the first official release of 0.7.x.
+
+version 0.6.92
+* draft support for multiple professional phrase libraries.
+
 version 0.6.91
-* support ucs4 characters;
-* support guess sentence with prefix;
+* support ucs4 characters.
+* support guess sentence with prefix.
 * initially support fuzzy pinyin segment.
 
 version 0.6.0
 * the first official release of 0.6.x.
 
 version 0.5.92
-* fixes new parsers and chewing large table;
+* fixes new parsers and chewing large table.
 * improves pinyin_save.
 
 version 0.5.91
-* some code re-factor and simplify;
+* some code re-factor and simplify.
 * fixes the self-learning work around.
 
 version 0.5.0
@@ -26,7 +76,7 @@ version 0.4.92
 version 0.4.91
 * New parsers for full pinyin/double pinyin/chewing.
   * libpinyin now fully supports all pinyin auto corrections in
-ibus-pinyin;
+ibus-pinyin.
   * libpinyin now better supports an/ang, en/eng, in/ing fuzzy
 pinyin match.
 
