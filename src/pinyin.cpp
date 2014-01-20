@@ -1848,6 +1848,9 @@ int pinyin_choose_candidate(pinyin_instance_t * instance,
 
     pinyin_context_t * & context = instance->m_context;
 
+    if (BEST_MATCH_CANDIDATE == candidate->m_candidate_type)
+        return instance->m_pinyin_keys->len;
+
     if (DIVIDED_CANDIDATE == candidate->m_candidate_type ||
         RESPLIT_CANDIDATE == candidate->m_candidate_type) {
         /* update full pinyin. */
