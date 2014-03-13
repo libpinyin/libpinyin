@@ -162,7 +162,7 @@ bool SystemTableInfo::load(const char * filename) {
     int index = 0;
     char tablefile[256], sysfile[256], userfile[256], filetype[256];
     while (!feof(input)) {
-        num = fscanf(input, "%d %s %s %s %s\n",
+        num = fscanf(input, "%d %256s %256s %256s %256s\n",
                      &index, tablefile, sysfile, userfile, filetype);
 
         if (5 != num)

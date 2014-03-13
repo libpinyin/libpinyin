@@ -528,7 +528,7 @@ bool FacadePhraseIndex::load_text(guint8 phrase_index, FILE * infile){
     phrase_token_t cur_token = 0;
 
     while (!feof(infile)){
-        int num = fscanf(infile, "%s %s %u %ld",
+        int num = fscanf(infile, "%256s %256s %u %ld",
                          pinyin, phrase, &token, &freq);
 
         if (4 != num)
