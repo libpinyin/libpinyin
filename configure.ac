@@ -2,14 +2,20 @@
 # Process this file with autoconf to produce a configure script.
 
 
+# if not 1, append datestamp to the version number.
+m4_define([libpinyin_released], [1])
 m4_define([libpinyin_major_version], [1])
 m4_define([libpinyin_minor_version], [0])
 m4_define([libpinyin_micro_version], [0])
+m4_define(libpinyin_maybe_datestamp,
+    m4_esyscmd([if test x]libpinyin_released[ != x1; then date +.%Y%m%d | tr -d '\n\r'; fi]))
+
 m4_define([libpinyin_abi_current], [4])
 m4_define([libpinyin_abi_revision], [0])
 
 m4_define([libpinyin_version],
-          [libpinyin_major_version.libpinyin_minor_version.libpinyin_micro_version])
+          libpinyin_major_version.libpinyin_minor_version.libpinyin_micro_version[]libpinyin_maybe_datestamp)
+
 m4_define([libpinyin_binary_version],
           [libpinyin_abi_current.libpinyin_abi_revision])
 
