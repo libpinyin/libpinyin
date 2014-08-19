@@ -25,6 +25,7 @@ LIBPINYIN {
         pinyin_parse_more_double_pinyins;
         pinyin_parse_chewing;
         pinyin_parse_more_chewings;
+        pinyin_get_parsed_input_length;
         pinyin_in_chewing_keyboard;
         pinyin_guess_candidates;
         pinyin_guess_full_pinyin_candidates;
@@ -51,6 +52,7 @@ LIBPINYIN {
         pinyin_get_pinyin_key_rest;
         pinyin_get_pinyin_key_rest_positions;
         pinyin_get_pinyin_key_rest_length;
+        pinyin_get_pinyin_key_rest_offset;
         pinyin_get_raw_full_pinyin;
         pinyin_get_n_phrase;
         pinyin_get_phrase_token;

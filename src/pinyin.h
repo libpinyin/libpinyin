@@ -350,6 +350,17 @@ size_t pinyin_parse_more_chewings(pinyin_instance_t * instance,
                                   const char * chewings);
 
 /**
+ * pinyin_get_parsed_input_length:
+ * @instance: the pinyin instance.
+ * @returns: the parsed_length of the input.
+ *
+ * Get the parsed length of the input.
+ *
+ */
+size_t pinyin_get_parsed_input_length(pinyin_instance_t * instance);
+
+
+/**
  * pinyin_in_chewing_keyboard:
  * @instance: the pinyin instance.
  * @key: the input key.
@@ -695,6 +706,20 @@ bool pinyin_get_pinyin_key_rest_positions(pinyin_instance_t * instance,
 bool pinyin_get_pinyin_key_rest_length(pinyin_instance_t * instance,
                                        ChewingKeyRest * key_rest,
                                        guint16 * length);
+
+/**
+ * pinyin_get_pinyin_key_rest_offset:
+ * @instance: the pinyin instance.
+ * @cursor: the cursor.
+ * @offset: the offset in the pinyin array.
+ * @returns: whether the get operation is successful.
+ *
+ * Get the offset in the pinyin key array.
+ *
+ */
+bool pinyin_get_pinyin_key_rest_offset(pinyin_instance_t * instance,
+                                       guint16 cursor,
+                                       guint16 * offset);
 
 /**
  * pinyin_get_raw_full_pinyin:

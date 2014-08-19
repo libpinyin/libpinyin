@@ -62,6 +62,7 @@ struct _pinyin_instance_t{
     TokenVector m_prefixes;
     ChewingKeyVector m_pinyin_keys;
     ChewingKeyRestVector m_pinyin_key_rests;
+    size_t m_parsed_len;
     CandidateConstraints m_constraints;
     MatchResults m_match_results;
     CandidateVector m_candidates;
@@ -753,6 +754,9 @@ pinyin_instance_t * pinyin_alloc_instance(pinyin_context_t * context){
     instance->m_pinyin_keys = g_array_new(FALSE, FALSE, sizeof(ChewingKey));
     instance->m_pinyin_key_rests =
         g_array_new(FALSE, FALSE, sizeof(ChewingKeyRest));
+
+    instance->m_parsed_len = 0;
+
     instance->m_constraints = g_array_new
         (TRUE, FALSE, sizeof(lookup_constraint_t));
     instance->m_match_results =
@@ -913,11 +917,12 @@ size_t pinyin_parse_more_full_pinyins(pinyin_instance_t * instance,
     instance->m_raw_full_pinyin = g_strdup(pinyins);
     int pinyin_len = strlen(pinyins);
 
-    int parse_len = context->m_full_pinyin_parser->parse
+    int parsed_len = context->m_full_pinyin_parser->parse
         ( context->m_options, instance->m_pinyin_keys,
           instance->m_pinyin_key_rests, pinyins, pinyin_len);
 
-    return parse_len;
+    instance->m_parsed_len = parsed_len;
+    return parsed_len;
 }
 
 bool pinyin_parse_double_pinyin(pinyin_instance_t * instance,
@@ -936,11 +941,12 @@ size_t pinyin_parse_more_double_pinyins(pinyin_instance_t * instance,
     pinyin_context_t * & context = instance->m_context;
     int pinyin_len = strlen(pinyins);
 
-    int parse_len = context->m_double_pinyin_parser->parse
+    int parsed_len = context->m_double_pinyin_parser->parse
         ( context->m_options, instance->m_pinyin_keys,
           instance->m_pinyin_key_rests, pinyins, pinyin_len);
 
-    return parse_len;
+    instance->m_parsed_len = parsed_len;
+    return parsed_len;
 }
 
 bool pinyin_parse_chewing(pinyin_instance_t * instance,
@@ -959,11 +965,16 @@ size_t pinyin_parse_more_chewings(pinyin_instance_t * instance,
     pinyin_context_t * & context = instance->m_context;
     int chewing_len = strlen(chewings);
 
-    int parse_len = context->m_chewing_parser->parse
+    int parsed_len = context->m_chewing_parser->parse
         ( context->m_options, instance->m_pinyin_keys,
           instance->m_pinyin_key_rests, chewings, chewing_len);
 
-    return parse_len;
+    instance->m_parsed_len = parsed_len;
+    return parsed_len;
+}
+
+size_t pinyin_get_parsed_input_length(pinyin_instance_t * instance) {
+    return instance->m_parsed_len;
 }
 
 bool pinyin_in_chewing_keyboard(pinyin_instance_t * instance,
@@ -1977,6 +1988,7 @@ bool pinyin_train(pinyin_instance_t * instance){
 bool pinyin_reset(pinyin_instance_t * instance){
     g_free(instance->m_raw_full_pinyin);
     instance->m_raw_full_pinyin = NULL;
+    instance->m_parsed_len = 0;
 
     g_array_set_size(instance->m_prefixes, 0);
     g_array_set_size(instance->m_pinyin_keys, 0);
@@ -2197,6 +2209,41 @@ bool pinyin_get_pinyin_key_rest_length(pinyin_instance_t * instance,
                                        ChewingKeyRest * key_rest,
                                        guint16 * length) {
     *length = key_rest->length();
+    return true;
+}
+
+bool pinyin_get_pinyin_key_rest_offset(pinyin_instance_t * instance,
+                                       guint16 cursor,
+                                       guint16 * offset) {
+    assert (cursor <= instance->m_parsed_len);
+
+    *offset = 0;
+
+    guint len = 0;
+    assert (instance->m_pinyin_keys->len ==
+            instance->m_pinyin_key_rests->len);
+    len = instance->m_pinyin_key_rests->len;
+
+    ChewingKeyRestVector & pinyin_key_rests =
+        instance->m_pinyin_key_rests;
+
+    guint inner_cursor = len;
+
+    guint16 prev_end = 0, cur_end;
+    for (size_t i = 0; i < len; ++i) {
+        ChewingKeyRest *pos = NULL;
+        pos = &g_array_index(pinyin_key_rests, ChewingKeyRest, i);
+        cur_end = pos->m_raw_end;
+
+        if (prev_end <= cursor && cursor < cur_end)
+            inner_cursor = i;
+
+        prev_end = cur_end;
+    }
+
+    assert (inner_cursor >= 0);
+    *offset = inner_cursor;
+
     return true;
 }
 
