@@ -25,11 +25,9 @@ import_interpolation \< <MODELFILE>
 gen_unigram
 
 .SH EXAMPLE
-Download the model.text.tar.gz, and extracts all files into a folder, then run the commands below to generate the binary model data.
+Download the model.text.tar.gz, and extracts all files into the data sub-directory, then run the commands below to generate the binary model data.
 
 .RS
-rm gb_char.bin gbk_char.bin phrase_index.bin pinyin_index.bin bigram.db
-
 gen_binary_files --table-dir ../data
 
 import_interpolation < ../data/interpolation.text

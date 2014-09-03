@@ -24,10 +24,9 @@ INCLUDES                = -I$(top_srcdir)/src \
 
 LDADD			= ../../src/libpinyin_internal.la @GLIB2_LIBS@
 
-bin_PROGRAMS		= gen_binary_files \
-			  import_interpolation
-
-noinst_PROGRAMS		= export_interpolation \
+noinst_PROGRAMS		= gen_binary_files \
+			  import_interpolation \
+			  export_interpolation \
 			  gen_pinyin_table
 
 gen_binary_files_SOURCES    = gen_binary_files.cpp
