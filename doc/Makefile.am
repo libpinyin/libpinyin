@@ -16,9 +16,6 @@
 ## Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 
-man_MANS		= libpinyin.1 \
-			  gen_binary_files.1 \
-			  import_interpolation.1 \
-			  gen_unigram.1
+man_MANS		= libpinyin.1
 
 EXTRA_DIST		= $(man_MANS)
