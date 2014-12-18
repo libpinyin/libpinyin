@@ -779,6 +779,9 @@ void pinyin_free_instance(pinyin_instance_t * instance){
     delete instance;
 }
 
+pinyin_context_t * pinyin_get_context (pinyin_instance_t * instance){
+    return instance->m_context;
+}
 
 static bool pinyin_update_constraints(pinyin_instance_t * instance){
     pinyin_context_t * & context = instance->m_context;
@@ -2034,6 +2037,15 @@ bool pinyin_get_pinyin_strings(pinyin_instance_t * instance,
     if (yunmu)
         *yunmu = key->get_yunmu_string();
     return true;
+}
+
+bool pinyin_get_pinyin_is_incomplete(pinyin_instance_t * instance,
+                                     ChewingKey * key) {
+    if (CHEWING_ZERO_MIDDLE == key->m_middle &&
+        CHEWING_ZERO_FINAL == key->m_final)
+        return true;
+
+    return false;
 }
 
 bool pinyin_token_get_phrase(pinyin_instance_t * instance,

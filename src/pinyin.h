@@ -210,6 +210,15 @@ pinyin_instance_t * pinyin_alloc_instance(pinyin_context_t * context);
  */
 void pinyin_free_instance(pinyin_instance_t * instance);
 
+/**
+ * pinyin_get_context:
+ * @instance: the pinyin instance.
+ * @returns: the pinyin context.
+ *
+ * Get the pinyin context from the pinyin instance.
+ *
+ */
+pinyin_context_t * pinyin_get_context (pinyin_instance_t * instance);
 
 /**
  * pinyin_guess_sentence:
@@ -510,6 +519,18 @@ bool pinyin_get_pinyin_strings(pinyin_instance_t * instance,
                                ChewingKey * key,
                                gchar ** shengmu,
                                gchar ** yunmu);
+
+/**
+ * pinyin_get_pinyin_is_incomplete:
+ * @instance: the pinyin instance.
+ * @key: the pinyin key.
+ * @returns: whether the pinyin key is incomplete pinyin.
+ *
+ * Check whether the pinyin key is incomplete pinyin.
+ *
+ */
+bool pinyin_get_pinyin_is_incomplete(pinyin_instance_t * instance,
+                                     ChewingKey * key);
 
 /**
  * pinyin_token_get_phrase:
