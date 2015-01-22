@@ -90,6 +90,13 @@ struct _import_iterator_t{
     guint8 m_phrase_index;
 };
 
+struct _export_iterator_t{
+    pinyin_context_t * m_context;
+    guint8 m_phrase_index;
+    /* null token means no next item. */
+    phrase_token_t m_next_token;
+    guint8 m_next_pronunciation;
+};
 
 static bool check_format(pinyin_context_t * context){
     const char * userdir = context->m_user_dir;
@@ -481,6 +488,118 @@ void pinyin_end_add_phrases(import_iterator_t * iter){
     /* compact the content memory chunk of phrase index. */
     iter->m_context->m_phrase_index->compact();
     iter->m_context->m_modified = true;
+    delete iter;
+}
+
+export_iterator_t * pinyin_begin_get_phrases(pinyin_context_t * context,
+                                             guint index){
+    export_iterator_t * iter = new export_iterator_t;
+    iter->m_context = context;
+    iter->m_phrase_index = index;
+    iter->m_next_token = null_token;
+    iter->m_next_pronunciation = 0;
+
+    /* probe next token. */
+    PhraseIndexRange range;
+    int retval = iter->m_context->m_phrase_index->get_range
+        (iter->m_phrase_index, range);
+    if (retval != ERROR_OK)
+        return iter;
+
+    PhraseItem item;
+    phrase_token_t token = range.m_range_begin;
+    for (; token < range.m_range_end; ++token) {
+        retval = iter->m_context->m_phrase_index->get_phrase_item
+            (token, item);
+        if (ERROR_OK == retval && item.get_n_pronunciation() >= 1) {
+            iter->m_next_token = token;
+            break;
+        }
+    }
+    return iter;
+}
+
+bool pinyin_iterator_has_next_phrase(export_iterator_t * iter){
+    /* no next token. */
+    if (null_token == iter->m_next_token)
+        return false;
+    return true;
+}
+
+/* phrase, pinyin should be freed by g_free(). */
+bool pinyin_iterator_get_next_phrase(export_iterator_t * iter,
+                                     gchar ** phrase,
+                                     gchar ** pinyin,
+                                     gint * count){
+    /* count "-1" means default count. */
+    *phrase = NULL; *pinyin = NULL; *count = -1;
+
+    PhraseItem item;
+    int retval = iter->m_context->m_phrase_index->get_phrase_item
+        (iter->m_next_token, item);
+    /* assume valid next token from previous call. */
+    assert(ERROR_OK == retval);
+
+    /* fill phrase and pronunciation pair. */
+    ucs4_t phrase_ucs4[MAX_PHRASE_LENGTH];
+    guint8 len = item.get_phrase_length();
+    assert(item.get_phrase_string(phrase_ucs4));
+    gchar * phrase_utf8 = g_ucs4_to_utf8
+        (phrase_ucs4, len, NULL, NULL, NULL);
+
+    guint8 nth_pronun = iter->m_next_pronunciation;
+    guint8 n_pronuns = item.get_n_pronunciation();
+    /* assume valid pronunciation from previous call. */
+    assert(nth_pronun < n_pronuns);
+    ChewingKey keys[MAX_PHRASE_LENGTH];
+    guint32 freq = 0;
+    assert(item.get_nth_pronunciation(nth_pronun, keys, freq));
+
+    GPtrArray * array = g_ptr_array_new();
+    for(size_t i = 0; i < len; ++i) {
+        g_ptr_array_add(array, keys[i].get_pinyin_string());
+    }
+    g_ptr_array_add(array, NULL);
+
+    gchar ** strings = (gchar **)g_ptr_array_free(array, FALSE);
+    gchar * pinyins = g_strjoinv("'", strings);
+    g_strfreev(strings);
+
+    /* use default value. */
+    *phrase = phrase_utf8; *pinyin = pinyins;
+    if (freq > 0)
+        *count = freq;
+
+    /* probe next pronunciation. */
+    nth_pronun ++;
+    if (nth_pronun < n_pronuns) {
+        iter->m_next_pronunciation = nth_pronun;
+        return true;
+    }
+
+    iter->m_next_pronunciation = 0;
+    /* probe next token. */
+    PhraseIndexRange range;
+    retval = iter->m_context->m_phrase_index->get_range
+        (iter->m_phrase_index, range);
+    if (retval != ERROR_OK) {
+        iter->m_next_token = null_token;
+        return true;
+    }
+
+    phrase_token_t token = iter->m_next_token + 1;
+    for (; token < range.m_range_end; ++token) {
+        retval = iter->m_context->m_phrase_index->get_phrase_item
+            (token, item);
+        if (ERROR_OK == retval && item.get_n_pronunciation() >= 1) {
+            iter->m_next_token = token;
+            break;
+        }
+    }
+    return true;
+}
+
+void pinyin_end_get_phrases(export_iterator_t * iter){
     delete iter;
 }
 

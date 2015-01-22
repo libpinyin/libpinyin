@@ -38,6 +38,7 @@ typedef struct _pinyin_instance_t pinyin_instance_t;
 typedef struct _lookup_candidate_t lookup_candidate_t;
 
 typedef struct _import_iterator_t import_iterator_t;
+typedef struct _export_iterator_t export_iterator_t;
 
 typedef enum _lookup_candidate_type_t{
     BEST_MATCH_CANDIDATE = 1,
@@ -119,6 +120,18 @@ bool pinyin_iterator_add_phrase(import_iterator_t * iter,
  *
  */
 void pinyin_end_add_phrases(import_iterator_t * iter);
+
+export_iterator_t * pinyin_begin_get_phrases(pinyin_context_t * context,
+                                             guint index);
+
+bool pinyin_iterator_has_next_phrase(export_iterator_t * iter);
+
+bool pinyin_iterator_get_next_phrase(export_iterator_t * iter,
+                                     gchar ** phrase,
+                                     gchar ** pinyin,
+                                     gint * count);
+
+void pinyin_end_get_phrases(export_iterator_t * iter);
 
 /**
  * pinyin_save:
