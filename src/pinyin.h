@@ -121,16 +121,51 @@ bool pinyin_iterator_add_phrase(import_iterator_t * iter,
  */
 void pinyin_end_add_phrases(import_iterator_t * iter);
 
+/**
+ * pinyin_begin_get_phrases:
+ * @context: the pinyin context.
+ * @index: the phrase index to be exported.
+ * @returns: the export iterator.
+ *
+ * Begin to get phrases.
+ *
+ */
 export_iterator_t * pinyin_begin_get_phrases(pinyin_context_t * context,
                                              guint index);
 
+/**
+ * pinyin_iterator_has_next_phrase:
+ * @iter: the export iterator.
+ * @returns: whether the iterator has the next phrase.
+ *
+ * Check whether the iterator has the next phrase.
+ *
+ */
 bool pinyin_iterator_has_next_phrase(export_iterator_t * iter);
 
+/**
+ * pinyin_iterator_get_next_phrase:
+ * @iter: the export iterator.
+ * @phrase: the phrase string.
+ * @pinyin: the pinyin string.
+ * @count: the count of the phrase/pinyin pair, -1 means the default value.
+ * @returns: whether the get next phrase operation succeeded.
+ *
+ * Get a pair of phrase and pinyin with count.
+ *
+ */
 bool pinyin_iterator_get_next_phrase(export_iterator_t * iter,
                                      gchar ** phrase,
                                      gchar ** pinyin,
                                      gint * count);
 
+/**
+ * pinyin_end_get_phrases:
+ * @iter: the export iterator.
+ *
+ * End getting phrases.
+ *
+ */
 void pinyin_end_get_phrases(export_iterator_t * iter);
 
 /**
