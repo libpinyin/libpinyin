@@ -588,6 +588,7 @@ bool pinyin_iterator_get_next_phrase(export_iterator_t * iter,
     }
 
     phrase_token_t token = iter->m_next_token + 1;
+    iter->m_next_token = null_token;
     for (; token < range.m_range_end; ++token) {
         retval = iter->m_context->m_phrase_index->get_phrase_item
             (token, item);
