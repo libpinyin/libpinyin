@@ -2347,10 +2347,6 @@ bool pinyin_get_pinyin_key_rest_length(pinyin_instance_t * instance,
 bool pinyin_get_pinyin_key_rest_offset(pinyin_instance_t * instance,
                                        guint16 cursor,
                                        guint16 * offset) {
-    assert (cursor <= instance->m_parsed_len);
-
-    *offset = 0;
-
     guint len = 0;
     assert (instance->m_pinyin_keys->len ==
             instance->m_pinyin_key_rests->len);
