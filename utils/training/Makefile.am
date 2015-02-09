@@ -28,8 +28,9 @@ LDADD			= ../../src/libpinyin_internal.la @GLIB2_LIBS@
 
 noinst_HEADERS		= k_mixture_model.h
 
+bin_PROGRAMS		= gen_unigram
+
 noinst_PROGRAMS		= gen_ngram \
-			  gen_unigram \
 			  gen_deleted_ngram \
 			  gen_k_mixture_model \
 			  estimate_interpolation \
