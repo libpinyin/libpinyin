@@ -197,10 +197,19 @@ pinyin_context_t * pinyin_init(const char * systemdir, const char * userdir){
     MemoryChunk * chunk = new MemoryChunk;
     filename = g_build_filename
         (context->m_system_dir, SYSTEM_PINYIN_INDEX, NULL);
+
+#ifdef LIBPINYIN_USE_MMAP
+    if (!chunk->mmap(filename)) {
+        fprintf(stderr, "mmap %s failed!\n", filename);
+        return NULL;
+    }
+#else
     if (!chunk->load(filename)) {
         fprintf(stderr, "open %s failed!\n", filename);
         return NULL;
     }
+#endif
+
     g_free(filename);
 
     /* load user chewing table */
@@ -223,10 +232,19 @@ pinyin_context_t * pinyin_init(const char * systemdir, const char * userdir){
     chunk = new MemoryChunk;
     filename = g_build_filename
         (context->m_system_dir, SYSTEM_PHRASE_INDEX, NULL);
+
+#ifdef LIBPINYIN_USE_MMAP
+    if (!chunk->mmap(filename)) {
+        fprintf(stderr, "mmap %s failed!\n", filename);
+        return NULL;
+    }
+#else
     if (!chunk->load(filename)) {
         fprintf(stderr, "open %s failed!\n", filename);
         return NULL;
     }
+#endif
+
     g_free(filename);
 
     /* load user phrase table */
@@ -298,7 +316,14 @@ bool pinyin_load_phrase_library(pinyin_context_t * context,
         /* check bin file in system dir. */
         gchar * chunkfilename = g_build_filename(context->m_system_dir,
                                                  systemfilename, NULL);
-        chunk->load(chunkfilename);
+#ifdef LIBPINYIN_USE_MMAP
+        if (!chunk->mmap(chunkfilename))
+            fprintf(stderr, "mmap %s failed!\n", chunkfilename);
+#else
+        if (!chunk->load(chunkfilename))
+            fprintf(stderr, "open %s failed!\n", chunkfilename);
+#endif
+
         g_free(chunkfilename);
 
         context->m_phrase_index->load(index, chunk);
@@ -325,7 +350,7 @@ bool pinyin_load_phrase_library(pinyin_context_t * context,
         gchar * chunkfilename = g_build_filename(context->m_user_dir,
                                                  userfilename, NULL);
 
-	/* check bin file exists. if not, create a new one. */
+        /* check bin file exists. if not, create a new one. */
         if (chunk->load(chunkfilename)) {
             context->m_phrase_index->load(index, chunk);
         } else {
@@ -644,7 +669,14 @@ bool pinyin_save(pinyin_context_t * context){
             /* check bin file in system dir. */
             gchar * chunkfilename = g_build_filename(context->m_system_dir,
                                                      systemfilename, NULL);
-            chunk->load(chunkfilename);
+#ifdef LIBPINYIN_USE_MMAP
+            if (!chunk->mmap(chunkfilename))
+                fprintf(stderr, "mmap %s failed!\n", chunkfilename);
+#else
+            if (!chunk->load(chunkfilename))
+                fprintf(stderr, "open %s failed!\n", chunkfilename);
+#endif
+
             g_free(chunkfilename);
             context->m_phrase_index->diff(i, chunk, log);
 
@@ -826,7 +858,15 @@ bool pinyin_mask_out(pinyin_context_t * context,
             /* check bin file in system dir. */
             gchar * chunkfilename = g_build_filename(context->m_system_dir,
                                                      systemfilename, NULL);
-            chunk->load(chunkfilename);
+
+#ifdef LIBPINYIN_USE_MMAP
+            if (!chunk->mmap(chunkfilename))
+                fprintf(stderr, "mmap %s failed!\n", chunkfilename);
+#else
+            if (!chunk->load(chunkfilename))
+                fprintf(stderr, "open %s failed!\n", chunkfilename);
+#endif
+
             g_free(chunkfilename);
 
             context->m_phrase_index->load(index, chunk);
