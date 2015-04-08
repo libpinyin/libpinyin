@@ -77,51 +77,51 @@ private:
         if (m_free_func)
             freemem();
 
-	m_data_begin = NULL;
-	m_data_end = NULL;
-	m_allocated = NULL;
-	m_free_func = NULL;
+        m_data_begin = NULL;
+        m_data_end = NULL;
+        m_allocated = NULL;
+        m_free_func = NULL;
     }
     
     void ensure_has_space(size_t new_size){
-	int delta_size = m_data_begin + new_size - m_data_end;
-	if ( delta_size <= 0 ) return;
-	ensure_has_more_space ( delta_size );
+        int delta_size = m_data_begin + new_size - m_data_end;
+        if ( delta_size <= 0 ) return;
+        ensure_has_more_space ( delta_size );
     }
     
     /* enlarge function */
     void ensure_has_more_space(size_t extra_size){
-	if ( 0 == extra_size ) return;
-	size_t newsize;
-	size_t cursize = size();
-	if ( m_free_func != (free_func_t)free ) {
-	    /* copy on resize */
-	    newsize = cursize + extra_size;
-	    /* do the copy */
-	    char * tmp = (char *) malloc(newsize);
-	    assert(tmp);
-	    memset(tmp, 0, newsize);
-	    memmove(tmp, m_data_begin, cursize);
-	    /* free the origin memory */
+        if ( 0 == extra_size ) return;
+        size_t newsize;
+        size_t cursize = size();
+        if ( m_free_func != (free_func_t)free ) {
+            /* copy on resize */
+            newsize = cursize + extra_size;
+            /* do the copy */
+            char * tmp = (char *) malloc(newsize);
+            assert(tmp);
+            memset(tmp, 0, newsize);
+            memmove(tmp, m_data_begin, cursize);
+            /* free the origin memory */
             if (m_free_func)
                 freemem();
-	    /* change varibles */
-	    m_data_begin = tmp;
-	    m_data_end = m_data_begin + cursize;
-	    m_allocated = m_data_begin + newsize;
-	    m_free_func = (free_func_t)free;
-	    return;
-	}
-	/* the memory area is managed by this memory chunk */
-	if ( extra_size <= (size_t) (m_allocated - m_data_end))
-	    return;
-	newsize = std_lite::max( capacity()<<1, cursize + extra_size);
-	m_data_begin = (char *) realloc(m_data_begin, newsize);
-	assert(m_data_begin);
-	memset(m_data_begin + cursize, 0, newsize - cursize);
-	m_data_end = m_data_begin + cursize;
-	m_allocated = m_data_begin + newsize;
-	return;
+            /* change varibles */
+            m_data_begin = tmp;
+            m_data_end = m_data_begin + cursize;
+            m_allocated = m_data_begin + newsize;
+            m_free_func = (free_func_t)free;
+            return;
+        }
+        /* the memory area is managed by this memory chunk */
+        if ( extra_size <= (size_t) (m_allocated - m_data_end))
+            return;
+        newsize = std_lite::max( capacity()<<1, cursize + extra_size);
+        m_data_begin = (char *) realloc(m_data_begin, newsize);
+        assert(m_data_begin);
+        memset(m_data_begin + cursize, 0, newsize - cursize);
+        m_data_end = m_data_begin + cursize;
+        m_allocated = m_data_begin + newsize;
+        return;
     }
     
 public:
@@ -132,10 +132,10 @@ public:
      *
      */
     MemoryChunk(){
-	m_data_begin = NULL;
-	m_data_end = NULL;
-	m_allocated = NULL;
-	m_free_func = NULL;
+        m_data_begin = NULL;
+        m_data_end = NULL;
+        m_allocated = NULL;
+        m_free_func = NULL;
     }
     
     /**
@@ -145,7 +145,7 @@ public:
      *
      */
     ~MemoryChunk(){
-	reset();
+        reset();
     }
 
     /**
@@ -155,7 +155,7 @@ public:
      *
      */
     void* begin() const{
-	return m_data_begin;
+        return m_data_begin;
     }
 
     /**
@@ -175,7 +175,7 @@ public:
      *
      */
     size_t size() const{
-	return m_data_end - m_data_begin;
+        return m_data_end - m_data_begin;
     }
 
     /**
@@ -185,8 +185,8 @@ public:
      *
      */
     void set_size(size_t newsize){
-	ensure_has_space(newsize);
-	m_data_end = m_data_begin + newsize;
+        ensure_has_space(newsize);
+        m_data_end = m_data_begin + newsize;
     }
 
     /**
@@ -196,7 +196,7 @@ public:
      *
      */
     size_t capacity(){
-	return m_allocated - m_data_begin;
+        return m_allocated - m_data_begin;
     }
   
     /**
@@ -210,13 +210,13 @@ public:
      *
      */
     void set_chunk(void* begin, size_t length, free_func_t free_func){
-	if (m_free_func)
+        if (m_free_func)
             freemem();
 	
-	m_data_begin = (char *) begin;
-	m_data_end = (char *) m_data_begin + length;
-	m_allocated = (char *) m_data_begin + length;
-	m_free_func = free_func;
+        m_data_begin = (char *) begin;
+        m_data_end = (char *) m_data_begin + length;
+        m_allocated = (char *) m_data_begin + length;
+        m_free_func = free_func;
     }
   
     /**
@@ -232,10 +232,10 @@ public:
      *
      */
     MemoryChunk * get_sub_chunk(size_t offset, size_t length){
-	MemoryChunk * retval = new MemoryChunk();
-	char * begin_pos = m_data_begin + offset;
-	retval->set_chunk(begin_pos, length, NULL);
-	return retval;
+        MemoryChunk * retval = new MemoryChunk();
+        char * begin_pos = m_data_begin + offset;
+        retval->set_chunk(begin_pos, length, NULL);
+        return retval;
     }
 
     /**
@@ -249,11 +249,11 @@ public:
      *
      */
     bool set_content(size_t offset, const void * data, size_t len){
-	size_t cursize = std_lite::max(size(), offset + len);
-	ensure_has_space(offset + len);
-	memmove(m_data_begin + offset, data, len);
-	m_data_end = m_data_begin + cursize;
-	return true;
+        size_t cursize = std_lite::max(size(), offset + len);
+        ensure_has_space(offset + len);
+        memmove(m_data_begin + offset, data, len);
+        m_data_end = m_data_begin + cursize;
+        return true;
     }
 
     /**
@@ -281,12 +281,12 @@ public:
      *
      */
     bool insert_content(size_t offset, const void * data, size_t length){
-	ensure_has_more_space(length);
-	size_t move_size = size() - offset;
-	memmove(m_data_begin + offset + length, m_data_begin + offset, move_size);
-	memmove(m_data_begin + offset, data, length);
-	m_data_end += length;
-	return true;
+        ensure_has_more_space(length);
+        size_t move_size = size() - offset;
+        memmove(m_data_begin + offset + length, m_data_begin + offset, move_size);
+        memmove(m_data_begin + offset, data, length);
+        m_data_end += length;
+        return true;
     }
 
     /**
@@ -300,10 +300,10 @@ public:
      *
      */
     bool remove_content(size_t offset, size_t length){
-	size_t move_size = size() - offset - length;
-	memmove(m_data_begin + offset, m_data_begin + offset + length, move_size);
-	m_data_end -= length;
-	return true;
+        size_t move_size = size() - offset - length;
+        memmove(m_data_begin + offset, m_data_begin + offset + length, move_size);
+        m_data_end -= length;
+        return true;
     }
 
     /**
@@ -317,10 +317,10 @@ public:
      *
      */
     bool get_content(size_t offset, void * buffer, size_t length){
-	if ( size() < offset + length )
-	    return false;
-	memcpy( buffer, m_data_begin + offset, length);
-	return true;
+        if ( size() < offset + length )
+            return false;
+        memcpy( buffer, m_data_begin + offset, length);
+        return true;
     }
 
     /**
@@ -330,11 +330,11 @@ public:
      *
      */
     void compact_memory(){
-	if ( m_free_func != (free_func_t)free )
-	    return;
-	size_t newsize = size();
-	m_data_begin = (char *) realloc(m_data_begin, newsize);
-	m_allocated = m_data_begin + newsize;
+        if ( m_free_func != (free_func_t)free )
+            return;
+        size_t newsize = size();
+        m_data_begin = (char *) realloc(m_data_begin, newsize);
+        m_allocated = m_data_begin + newsize;
     }
   
     /**
@@ -346,17 +346,17 @@ public:
      *
      */
     bool load(const char * filename){
-	/* free old data */
-	reset();
+        /* free old data */
+        reset();
 
-	int fd = open(filename, O_RDONLY);
-	if (-1 == fd)
-	    return false;
+        int fd = open(filename, O_RDONLY);
+        if (-1 == fd)
+            return false;
 
         off_t file_size = lseek(fd, 0, SEEK_END);
         lseek(fd, 0, SEEK_SET);
 
-	int data_len = file_size;
+        int data_len = file_size;
 
 #ifdef HAVE_MMAP
         void* data = mmap(NULL, data_len, PROT_READ|PROT_WRITE, MAP_PRIVATE,
@@ -369,18 +369,18 @@ public:
 
         set_chunk(data, data_len, (free_func_t)munmap);
 #else
-	void* data = malloc(data_len);
-	if ( !data ){
-	    close(fd);
-	    return false;
-	}
+        void* data = malloc(data_len);
+        if ( !data ){
+            close(fd);
+            return false;
+        }
 
-	data_len = read(fd, data, data_len);
-	set_chunk(data, data_len, (free_func_t)free);
+        data_len = read(fd, data, data_len);
+        set_chunk(data, data_len, (free_func_t)free);
 #endif
 
-	close(fd);
-	return true;
+        close(fd);
+        return true;
     }
 
     /**
@@ -392,19 +392,19 @@ public:
      *
      */
     bool save(const char * filename){
-	int fd = open(filename, O_CREAT|O_WRONLY|O_TRUNC, 0644);
-	if ( -1 == fd )
-	    return false;
+        int fd = open(filename, O_CREAT|O_WRONLY|O_TRUNC, 0644);
+        if ( -1 == fd )
+            return false;
 
-	size_t data_len = write(fd, begin(), size());
-	if ( data_len != size()){
-	    close(fd);
-	    return false;
-	}
+        size_t data_len = write(fd, begin(), size());
+        if ( data_len != size()){
+            close(fd);
+            return false;
+        }
 
-	fsync(fd);
-	close(fd);
-	return true;
+        fsync(fd);
+        close(fd);
+        return true;
     }
 };
 
