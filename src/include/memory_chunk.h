@@ -31,6 +31,7 @@
 #include <stdlib.h>
 #ifdef HAVE_MMAP
 #include <sys/mman.h>
+#define LIBPINYIN_USE_MMAP
 #endif
 #include "stl_lite.h"
 
@@ -358,17 +359,6 @@ public:
 
         int data_len = file_size;
 
-#ifdef HAVE_MMAP
-        void* data = mmap(NULL, data_len, PROT_READ|PROT_WRITE, MAP_PRIVATE,
-                          fd, 0);
-
-        if (MAP_FAILED == data) {
-            close(fd);
-            return false;
-        }
-
-        set_chunk(data, data_len, (free_func_t)munmap);
-#else
         void* data = malloc(data_len);
         if ( !data ){
             close(fd);
@@ -377,11 +367,47 @@ public:
 
         data_len = read(fd, data, data_len);
         set_chunk(data, data_len, (free_func_t)free);
-#endif
 
         close(fd);
         return true;
     }
+
+#ifdef LIBPINYIN_USE_MMAP
+    /**
+     * MemoryChunk::mmap:
+     * @filename: mmap the MemoryChunk from the filename.
+     * @returns: whether the mmap is successful.
+     *
+     * mmap the content from the filename.
+     *
+     */
+    bool mmap(const char * filename){
+        /* free old data */
+        reset();
+
+        int fd = open(filename, O_RDONLY);
+        if (-1 == fd)
+            return false;
+
+        off_t file_size = lseek(fd, 0, SEEK_END);
+        lseek(fd, 0, SEEK_SET);
+
+        int data_len = file_size;
+
+        void* data = ::mmap(NULL, data_len, PROT_READ|PROT_WRITE, MAP_PRIVATE,
+                            fd, 0);
+
+        if (MAP_FAILED == data) {
+            close(fd);
+            return false;
+        }
+
+        set_chunk(data, data_len, (free_func_t)munmap);
+
+        close(fd);
+        return true;
+    }
+#endif
 
     /**
      * MemoryChunk::save:
