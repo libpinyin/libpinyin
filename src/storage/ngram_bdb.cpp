@@ -19,7 +19,30 @@
  *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
+#include <errno.h>
+#include <glib.h>
+#include "memory_chunk.h"
+#include "novel_types.h"
 #include "ngram.h"
+
+using namespace pinyin;
+
+
+Bigram::Bigram(){
+	m_db = NULL;
+}
+
+Bigram::~Bigram(){
+	reset();
+}
+
+void Bigram::reset(){
+	if ( m_db ){
+        m_db->sync(m_db, 0);
+	    m_db->close(m_db, 0);
+	    m_db = NULL;
+	}
+}
 
 bool Bigram::load_db(const char * dbfile){
     reset();

@@ -117,7 +117,7 @@ public:
      *
      */
     bool get_freq(/* in */ phrase_token_t token,
-	       /* out */ guint32 & freq) const;
+                  /* out */ guint32 & freq) const;
     
     /**
      * SingleGram::set_freq:
@@ -129,7 +129,7 @@ public:
      *
      */
     bool set_freq(/* in */ phrase_token_t token,
-		  /* in */ guint32 freq);
+                  /* in */ guint32 freq);
     
     /**
      * SingleGram::get_total_freq:
@@ -192,13 +192,7 @@ class Bigram{
 private:
     DB * m_db;
 
-    void reset(){
-	if ( m_db ){
-        m_db->sync(m_db, 0);
-	    m_db->close(m_db, 0);
-	    m_db = NULL;
-	}
-    }
+    void reset();
 
 public:
     /**
@@ -207,9 +201,7 @@ public:
      * The constructor of the Bigram.
      *
      */
-    Bigram(){
-	m_db = NULL;
-    }
+    Bigram();
 
     /**
      * Bigram::~Bigram:
@@ -217,9 +209,7 @@ public:
      * The destructor of the Bigram.
      *
      */
-    ~Bigram(){
-	reset();
-    }
+    ~Bigram();
 
     /**
      * Bigram::load_db:
