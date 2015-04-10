@@ -78,10 +78,31 @@ AC_CHECK_FUNCS([gettimeofday memmove memset setlocale])
 
 AC_CHECK_HEADERS([libintl.h string.h])
 
-AC_CHECK_HEADER([db.h], [], AC_MSG_ERROR([Cannot find Berkeley DB library version 4]))
+# Check Berkeley DB or Kyoto Cabinet
+DBM="BerkeleyDB"
+AC_ARG_WITH(dbm,
+    AS_HELP_STRING([--with-dbm[=NAME]],
+        [Select BerkeleyDB or KyotoCabinet]),
+        [DBM=$with_dbm], []
+)
 
-AC_SEARCH_LIBS([db_create], [db], [], AC_MSG_ERROR([Cannot find Berkeley DB library version 4]))
+if test x"$DBM" = x"BerkeleyDB"; then
+   # Check Berkeley DB
+   AC_CHECK_HEADER([db.h], [], AC_MSG_ERROR([Cannot find Berkeley DB library version 4]))
 
+   AC_SEARCH_LIBS([db_create], [db], [], AC_MSG_ERROR([Cannot find Berkeley DB library version 4]))
+fi
+
+AM_CONDITIONAL([BERKELEYDB], [test x"$DBM" = x"BerkeleyDB"])
+
+if test x"$DBM" = x"KyotoCabinet"; then
+   # Check Kyoto Cabinet
+   PKG_CHECK_MODULES(KYOTOCABINET, [
+    kyotocabinet
+   ], [])
+fi
+
+AM_CONDITIONAL([KYOTOCABINET], [test x"$DBM" = x"KyotoCabinet"])
 
 AC_CONFIG_FILES([libpinyin.pc
                  libpinyin.spec
@@ -108,4 +129,5 @@ AC_MSG_RESULT([
 Build options:
     Version                     $VERSION
     Install prefix              $prefix
+    DBM                         $DBM
 ])

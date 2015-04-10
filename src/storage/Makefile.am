@@ -49,7 +49,7 @@ libstorage_la_CXXFLAGS	= "-fPIC"
 
 libstorage_la_LDFLAGS	= -static
 
-libstorage_la_SOURCES    = phrase_index.cpp \
+libstorage_la_SOURCES   = phrase_index.cpp \
 			   phrase_large_table2.cpp \
 			   ngram.cpp \
 			   tag_utility.cpp \
@@ -57,3 +57,6 @@ libstorage_la_SOURCES    = phrase_index.cpp \
 			   chewing_large_table.cpp \
 			   table_info.cpp
 
+if BERKELEYDB
+libstorage_la_SOURCES   += ngram_bdb.cpp
+endif
