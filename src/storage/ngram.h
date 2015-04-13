@@ -22,7 +22,11 @@
 #ifndef NGRAM_H
 #define NGRAM_H
 
-#include <db.h>
+#include <config.h>
+
+#ifdef HAVE_BERKELEY_DB
+#include "ngram_bdb.h"
+#endif
 
 namespace pinyin{
 
@@ -181,122 +185,6 @@ public:
     bool prune();
 };
 
-
-/**
- * Bigram:
- *
- * The Bi-gram class.
- *
- */
-class Bigram{
-private:
-    DB * m_db;
-
-    void reset();
-
-public:
-    /**
-     * Bigram::Bigram:
-     *
-     * The constructor of the Bigram.
-     *
-     */
-    Bigram();
-
-    /**
-     * Bigram::~Bigram:
-     *
-     * The destructor of the Bigram.
-     *
-     */
-    ~Bigram();
-
-    /**
-     * Bigram::load_db:
-     * @dbfile: the Berkeley DB file name.
-     * @returns: whether the load operation is successful.
-     *
-     * Load the Berkeley DB into memory.
-     *
-     */
-    bool load_db(const char * dbfile);
-
-    /**
-     * Bigram::save_db:
-     * @dbfile: the Berkeley DB file name.
-     * @returns: whether the save operation is successful.
-     *
-     * Save the in-memory Berkeley DB into disk.
-     *
-     */
-    bool save_db(const char * dbfile);
-
-    /**
-     * Bigram::attach:
-     * @dbfile: the Berkeley DB file name.
-     * @flags: the flags of enum ATTACH_FLAG.
-     * @returns: whether the attach operation is successful.
-     *
-     * Attach this Bigram with the Berkeley DB.
-     *
-     */
-    bool attach(const char * dbfile, guint32 flags);
-
-    /**
-     * Bigram::load:
-     * @index: the previous token in the bi-gram.
-     * @single_gram: the single gram of the previous token.
-     * @returns: whether the load operation is successful.
-     *
-     * Load the single gram of the previous token.
-     *
-     */
-    bool load(/* in */ phrase_token_t index,
-              /* out */ SingleGram * & single_gram);
-
-    /**
-     * Bigram::store:
-     * @index: the previous token in the bi-gram.
-     * @single_gram: the single gram of the previous token.
-     * @returns: whether the store operation is successful.
-     *
-     * Store the single gram of the previous token.
-     *
-     */
-    bool store(/* in */ phrase_token_t index,
-               /* in */ SingleGram * single_gram);
-
-    /**
-     * Bigram::remove:
-     * @index: the previous token in the bi-gram.
-     * @returns: whether the remove operation is successful.
-     *
-     * Remove the single gram of the previous token.
-     *
-     */
-    bool remove(/* in */ phrase_token_t index);
-
-    /**
-     * Bigram::get_all_items:
-     * @items: the GArray to store all previous tokens.
-     * @returns: whether the get operation is successful.
-     *
-     * Get the array of all previous tokens for parameter estimation.
-     *
-     */
-    bool get_all_items(/* out */ GArray * items);
-
-    /**
-     * Bigram::mask_out:
-     * @mask: the mask.
-     * @value: the value.
-     * @returns: whether the mask out operation is successful.
-     *
-     * Mask out the matched items.
-     *
-     */
-    bool mask_out(phrase_token_t mask, phrase_token_t value);
-};
 
 /**
  * merge_single_gram:
