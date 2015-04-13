@@ -91,6 +91,8 @@ if test x"$DBM" = x"BerkeleyDB"; then
    AC_CHECK_HEADER([db.h], [], AC_MSG_ERROR([Cannot find Berkeley DB library version 4]))
 
    AC_SEARCH_LIBS([db_create], [db], [], AC_MSG_ERROR([Cannot find Berkeley DB library version 4]))
+
+   AC_DEFINE([HAVE_BERKELEY_DB], [], [Have Berkeley DB.])
 fi
 
 AM_CONDITIONAL([BERKELEYDB], [test x"$DBM" = x"BerkeleyDB"])
@@ -100,6 +102,8 @@ if test x"$DBM" = x"KyotoCabinet"; then
    PKG_CHECK_MODULES(KYOTOCABINET, [
     kyotocabinet
    ], [])
+
+   AC_DEFINE([HAVE_KYOTO_CABINET], [], [Have Kyoto Cabinet.])
 fi
 
 AM_CONDITIONAL([KYOTOCABINET], [test x"$DBM" = x"KyotoCabinet"])

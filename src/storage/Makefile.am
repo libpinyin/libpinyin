@@ -31,6 +31,7 @@ noinst_HEADERS		= chewing_enum.h \
 			  phrase_index_logger.h \
 			  phrase_large_table2.h \
 			  ngram.h \
+			  ngram_bdb.h \
 			  flexible_ngram.h \
 			  tag_utility.h \
 			  pinyin_parser_table.h \
