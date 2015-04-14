@@ -32,6 +32,7 @@ noinst_HEADERS		= chewing_enum.h \
 			  phrase_large_table2.h \
 			  ngram.h \
 			  ngram_bdb.h \
+			  ngram_kyotodb.h \
 			  flexible_ngram.h \
 			  tag_utility.h \
 			  pinyin_parser_table.h \
@@ -60,4 +61,8 @@ libstorage_la_SOURCES   = phrase_index.cpp \
 
 if BERKELEYDB
 libstorage_la_SOURCES   += ngram_bdb.cpp
+endif
+
+if KYOTOCABINET
+libstorage_la_SOURCES   += ngram_kyotodb.cpp
 endif

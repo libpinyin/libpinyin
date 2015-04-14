@@ -23,9 +23,15 @@
 #define NGRAM_H
 
 #include <config.h>
+#include <glib.h>
+#include "novel_types.h"
 
 #ifdef HAVE_BERKELEY_DB
 #include "ngram_bdb.h"
+#endif
+
+#ifdef HAVE_KYOTO_CABINET
+#include "ngram_kyotodb.h"
 #endif
 
 namespace pinyin{

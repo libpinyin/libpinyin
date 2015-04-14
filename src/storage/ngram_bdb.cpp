@@ -140,8 +140,10 @@ bool Bigram::save_db(const char * dbfile){
     if ( cursorp != NULL )
         cursorp->c_close(cursorp);
 
-    if ( tmp_db != NULL )
+    if ( tmp_db != NULL ) {
+        tmp_db->sync(m_db, 0);
         tmp_db->close(tmp_db, 0);
+    }
 
     return true;
 }
@@ -256,6 +258,7 @@ bool Bigram::get_all_items(GArray * items){
     return true;
 }
 
+/* Note: sync mask_out code with ngram_kyotodb.cpp. */
 bool Bigram::mask_out(phrase_token_t mask, phrase_token_t value){
     GArray * items = g_array_new(FALSE, FALSE, sizeof(phrase_token_t));
 

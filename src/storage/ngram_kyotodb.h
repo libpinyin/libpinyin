@@ -22,7 +22,7 @@
 #ifndef NGRAM_KYOTODB_H
 #define NGRAM_KYOTODB_H
 
-#include <kchashdb.h>
+#include <kcdb.h>
 #include "memory_chunk.h"
 
 namespace pinyin{
@@ -37,12 +37,10 @@ class SingleGram;
  */
 class Bigram{
 private:
-    kyotocabinet::DB * m_db;
+    kyotocabinet::BasicDB * m_db;
 
     /* memory chunk for Kyoto Cabinet. */
     MemoryChunk m_chunk;
-
-    /* Note: sync mask_out code with ngram_bdb.cpp. */
 
     void reset();
 

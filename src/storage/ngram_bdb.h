@@ -38,8 +38,6 @@ class Bigram{
 private:
     DB * m_db;
 
-    /* Note: sync mask_out code with ngram_kyotodb.cpp. */
-
     void reset();
 
 public:
