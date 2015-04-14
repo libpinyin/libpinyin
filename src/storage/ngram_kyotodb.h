@@ -19,10 +19,11 @@
  *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-#ifndef NGRAM_BDB_H
-#define NGRAM_BDB_H
+#ifndef NGRAM_KYOTODB_H
+#define NGRAM_KYOTODB_H
 
-#include <db.h>
+#include <kchashdb.h>
+#include "memory_chunk.h"
 
 namespace pinyin{
 
@@ -36,9 +37,12 @@ class SingleGram;
  */
 class Bigram{
 private:
-    DB * m_db;
+    kyotocabinet::DB * m_db;
 
-    /* Note: sync mask_out code with ngram_kyotodb.cpp. */
+    /* memory chunk for Kyoto Cabinet. */
+    MemoryChunk m_chunk;
+
+    /* Note: sync mask_out code with ngram_bdb.cpp. */
 
     void reset();
 
