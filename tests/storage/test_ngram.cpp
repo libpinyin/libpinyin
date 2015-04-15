@@ -29,8 +29,8 @@ int main(int argc, char * argv[]){
     range.m_range_begin = 0; range.m_range_end = 8;
     single_gram.search(&range,array);
     for ( size_t i = 0; i < array->len; ++i){
-	BigramPhraseItem * item = &g_array_index(array, BigramPhraseItem, i);
-	printf("item:%d:%f\n", item->m_token, item->m_freq);
+        BigramPhraseItem * item = &g_array_index(array, BigramPhraseItem, i);
+        printf("item:%d:%f\n", item->m_token, item->m_freq);
     }
 
     assert(single_gram.get_total_freq(freq));
