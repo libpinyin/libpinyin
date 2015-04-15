@@ -26,9 +26,6 @@
 #include <kcprotodb.h>
 
 
-/* Use DB interface, first check, second reserve the memory chunk,
-   third get value into the chunk. */
-
 /* Use DB::visitor to get_all_items. */
 
 using namespace pinyin;
@@ -133,6 +130,78 @@ bool Bigram::attach(const char * dbfile, guint32 flags){
     m_db = new HashDB;
 
     return m_db->open(dbfile, mode);
+}
+
+/* Use DB interface, first check, second reserve the memory chunk,
+   third get value into the chunk. */
+bool Bigram::load(phrase_token_t index, SingleGram * & single_gram){
+    single_gram = NULL;
+    if ( !m_db )
+        return false;
+
+    const char * kbuf = (char *) &index;
+    const int32_t vsiz = m_db->check(kbuf, sizeof(phrase_token_t));
+
+    m_chunk.set_size(vsiz);
+    char * vbuf = (char *) m_chunk.begin();
+    assert (vsiz == m_db->get(kbuf, sizeof(phrase_token_t),
+                              vbuf, vsiz));
+
+    single_gram = new SingleGram(m_chunk.begin(), vsiz);
+    return true;
+}
+
+bool Bigram::store(phrase_token_t index, SingleGram * single_gram){
+    if ( !m_db )
+        return false;
+
+    const char * kbuf = (char *) &index;
+    char * vbuf = (char *) single_gram->m_chunk.begin();
+    size_t vsiz = single_gram->m_chunk.size();
+    return m_db->set(kbuf, sizeof(phrase_token_t), vbuf, vsiz);
+}
+
+bool Bigram::remove(/* in */ phrase_token_t index){
+    if ( !m_db )
+        return false;
+
+    const char * kbuf = (char *) &index;
+    return m_db->remove(kbuf, sizeof(phrase_token_t));
+}
+
+class KeyCollectVisitor : public DB::Visitor {
+private:
+    GArray * m_items;
+public:
+    KeyCollectVisitor(GArray * items) {
+        m_items = items;
+    }
+
+    virtual const char* visit_full(const char* kbuf, size_t ksiz,
+                                   const char* vbuf, size_t vsiz, size_t* sp) {
+        assert(ksiz == sizeof(phrase_token_t));
+        const phrase_token_t * token = (phrase_token_t *) kbuf;
+        g_array_append_val(m_items, *token);
+        return NOP;
+    }
+
+    virtual const char* visit_empty(const char* kbuf, size_t ksiz, size_t* sp) {
+        /* assume no empty record. */
+        assert (FALSE);
+        return NOP;
+    }
+};
+
+bool Bigram::get_all_items(GArray * items){
+    g_array_set_size(items, 0);
+
+    if ( !m_db )
+        return false;
+
+    KeyCollectVisitor visitor(items);
+    m_db->iterate(&visitor, false);
+
+    return true;
 }
 
 /* Note: sync mask_out code with ngram_bdb.cpp. */
