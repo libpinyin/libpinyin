@@ -36,6 +36,7 @@ noinst_HEADERS		= chewing_enum.h \
 			  flexible_ngram.h \
 			  flexible_single_gram.h \
 			  flexible_ngram_bdb.h \
+			  flexible_ngram_kyotodb.h \
 			  tag_utility.h \
 			  pinyin_parser_table.h \
 			  double_pinyin_table.h \

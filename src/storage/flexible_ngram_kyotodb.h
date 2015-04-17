@@ -2,7 +2,7 @@
  *  libpinyin
  *  Library to deal with pinyin.
  *  
- *  Copyright (C) 2011 Peng Wu <alexepico@gmail.com>
+ *  Copyright (C) 2015 Peng Wu <alexepico@gmail.com>
  *  
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -19,24 +19,14 @@
  *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-
-
-#ifndef FLEXIBLE_NGRAM_H
-#define FLEXIBLE_NGRAM_H
-
-
-/* Note: the signature of the template parameters.
- * struct MagicHeader, ArrayHeader, ArrayItem.
- */
-
-#include "flexible_single_gram.h"
-
-#ifdef HAVE_BERKELEY_DB
-#include "flexible_ngram_bdb.h"
-#endif
+#ifndef FLEXIBLE_NGRAM_KYOTODB_H
+#define FLEXIBLE_NGRAM_KYOTODB_H
 
 #ifdef HAVE_KYOTO_CABINET
-#include "flexible_ngram_kyotodb.h"
+#include <kcdb.h>
 #endif
+
+namespace pinyin{
+};
 
 #endif
