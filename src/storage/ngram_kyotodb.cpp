@@ -141,6 +141,9 @@ bool Bigram::load(phrase_token_t index, SingleGram * & single_gram){
 
     const char * kbuf = (char *) &index;
     const int32_t vsiz = m_db->check(kbuf, sizeof(phrase_token_t));
+    /* -1 on failure. */
+    if (-1 == vsiz)
+        return false;
 
     m_chunk.set_size(vsiz);
     char * vbuf = (char *) m_chunk.begin();

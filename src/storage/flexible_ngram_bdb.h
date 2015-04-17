@@ -103,6 +103,7 @@ public:
 
         if ( !dbfile )
             return false;
+
         int ret = db_create(&m_db, NULL, 0);
         if ( ret != 0 )
             assert(false);
@@ -163,6 +164,7 @@ public:
      */
     bool load(phrase_token_t index,
               FlexibleSingleGram<ArrayHeader, ArrayItem> * & single_gram){
+        single_gram = NULL;
         if ( !m_db )
             return false;
 
@@ -170,8 +172,6 @@ public:
         memset(&db_key, 0, sizeof(DBT));
         db_key.data = &index;
         db_key.size = sizeof(phrase_token_t);
-
-        single_gram = NULL;
 
         DBT db_data;
         memset(&db_data, 0, sizeof(DBT));
