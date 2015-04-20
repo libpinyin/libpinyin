@@ -24,6 +24,10 @@ INCLUDES                = -I$(top_srcdir)/src \
 
 LDADD			= ../../src/libpinyin_internal.la @GLIB2_LIBS@
 
+if KYOTOCABINET
+LDADD                   += @KYOTOCABINET_LIBS@
+endif
+
 bin_PROGRAMS		= gen_binary_files \
 			  import_interpolation
 

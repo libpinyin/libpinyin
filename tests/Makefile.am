@@ -32,6 +32,10 @@ INCLUDES                = -I$(top_srcdir)/src \
 
 LDADD			= ../src/libpinyin.la @GLIB2_LIBS@
 
+if KYOTOCABINET
+LDADD                   += @KYOTOCABINET_LIBS@
+endif
+
 noinst_HEADERS          = timer.h \
 			  tests_helper.h
 
