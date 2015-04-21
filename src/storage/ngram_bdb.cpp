@@ -173,7 +173,8 @@ bool Bigram::attach(const char * dbfile, guint32 flags){
     return true;
 }
 
-bool Bigram::load(phrase_token_t index, SingleGram * & single_gram){
+bool Bigram::load(phrase_token_t index, SingleGram * & single_gram,
+                  bool copy){
     single_gram = NULL;
     if ( !m_db )
         return false;
@@ -189,7 +190,7 @@ bool Bigram::load(phrase_token_t index, SingleGram * & single_gram){
     if ( ret != 0 )
         return false;
 
-    single_gram = new SingleGram(db_data.data, db_data.size);
+    single_gram = new SingleGram(db_data.data, db_data.size, copy);
     return true;
 }
 

@@ -134,7 +134,8 @@ bool Bigram::attach(const char * dbfile, guint32 flags){
 
 /* Use DB interface, first check, second reserve the memory chunk,
    third get value into the chunk. */
-bool Bigram::load(phrase_token_t index, SingleGram * & single_gram){
+bool Bigram::load(phrase_token_t index, SingleGram * & single_gram,
+                  bool copy){
     single_gram = NULL;
     if ( !m_db )
         return false;
@@ -150,7 +151,7 @@ bool Bigram::load(phrase_token_t index, SingleGram * & single_gram){
     assert (vsiz == m_db->get(kbuf, sizeof(phrase_token_t),
                               vbuf, vsiz));
 
-    single_gram = new SingleGram(m_chunk.begin(), vsiz);
+    single_gram = new SingleGram(m_chunk.begin(), vsiz, copy);
     return true;
 }
 

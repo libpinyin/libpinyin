@@ -184,13 +184,15 @@ public:
      * FlexibleBigram::load:
      * @index: the previous token in the flexible bi-gram.
      * @single_gram: the single gram of the previous token.
+     * @copy: whether copy content to the single gram.
      * @returns: whether the load operation is successful.
      *
      * Load the single gram of the previous token.
      *
      */
     bool load(phrase_token_t index,
-              FlexibleSingleGram<ArrayHeader, ArrayItem> * & single_gram){
+              FlexibleSingleGram<ArrayHeader, ArrayItem> * & single_gram,
+              bool copy=false){
         single_gram = NULL;
         if ( !m_db )
             return false;
@@ -209,7 +211,7 @@ public:
                                   vbuf, vsiz));
 
         single_gram = new FlexibleSingleGram<ArrayHeader, ArrayItem>
-            (m_chunk.begin(), vsiz);
+            (m_chunk.begin(), vsiz, copy);
 
         return true;
     }

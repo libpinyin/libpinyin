@@ -92,13 +92,14 @@ public:
      * Bigram::load:
      * @index: the previous token in the bi-gram.
      * @single_gram: the single gram of the previous token.
+     * @copy: whether copy content to the single gram.
      * @returns: whether the load operation is successful.
      *
      * Load the single gram of the previous token.
      *
      */
     bool load(/* in */ phrase_token_t index,
-              /* out */ SingleGram * & single_gram);
+              /* out */ SingleGram * & single_gram, bool copy=false);
 
     /**
      * Bigram::store:
