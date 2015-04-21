@@ -60,7 +60,7 @@ class SingleGram{
 
 private:
     MemoryChunk m_chunk;
-    SingleGram(void * buffer, size_t length);
+    SingleGram(void * buffer, size_t length, bool copy);
 public:
     /**
      * SingleGram::SingleGram:

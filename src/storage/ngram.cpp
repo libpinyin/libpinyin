@@ -39,8 +39,11 @@ SingleGram::SingleGram(){
     memset(m_chunk.begin(), 0, sizeof(guint32));
 }
 
-SingleGram::SingleGram(void * buffer, size_t length){
-    m_chunk.set_chunk(buffer, length, NULL);
+SingleGram::SingleGram(void * buffer, size_t length, bool copy){
+    if (copy)
+        m_chunk.set_content(0, buffer, length);
+    else
+        m_chunk.set_chunk(buffer, length, NULL);
 }
 
 bool SingleGram::get_total_freq(guint32 & total) const{

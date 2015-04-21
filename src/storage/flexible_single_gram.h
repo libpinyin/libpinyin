@@ -42,8 +42,11 @@ class FlexibleSingleGram{
     friend class FlexibleBigram;
 private:
     MemoryChunk m_chunk;
-    FlexibleSingleGram(void * buffer, size_t length){
-        m_chunk.set_chunk(buffer, length, NULL);
+    FlexibleSingleGram(void * buffer, size_t length, bool copy){
+        if (copy)
+            m_chunk.set_content(0, buffer, length);
+        else
+            m_chunk.set_chunk(buffer, length, NULL);
     }
 public:
     /**
