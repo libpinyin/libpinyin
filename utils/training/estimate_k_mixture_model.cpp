@@ -109,10 +109,7 @@ int main(int argc, char * argv[]){
         exit(EINVAL);
     }
 
-    /* TODO: magic header signature check here. */
-    KMixtureModelBigram unigram(K_MIXTURE_MODEL_MAGIC_NUMBER);
-    unigram.attach(bigram_filename, ATTACH_READONLY);
-
+    /* magic header signature check here. */
     KMixtureModelBigram bigram(K_MIXTURE_MODEL_MAGIC_NUMBER);
     bigram.attach(bigram_filename, ATTACH_READONLY);
 
@@ -128,7 +125,7 @@ int main(int argc, char * argv[]){
     for( size_t i = 0; i < deleted_items->len; ++i ){
         phrase_token_t * token = &g_array_index(deleted_items, phrase_token_t, i);
         KMixtureModelSingleGram * single_gram = NULL;
-        bigram.load(*token, single_gram);
+        bigram.load(*token, single_gram, true);
 
         KMixtureModelSingleGram * deleted_single_gram = NULL;
         deleted_bigram.load(*token, deleted_single_gram);
@@ -140,7 +137,7 @@ int main(int argc, char * argv[]){
         assert(deleted_single_gram->get_array_header(deleted_array_header));
 
         if ( 0 != deleted_array_header.m_WC ) {
-            parameter_t lambda = compute_interpolation(deleted_single_gram, &unigram, single_gram);
+            parameter_t lambda = compute_interpolation(deleted_single_gram, &bigram, single_gram);
 
             printf("token:%d lambda:%f\n", *token, lambda);
 

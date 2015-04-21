@@ -392,8 +392,10 @@ public:
         const char * kbuf = (char *) &index;
         const size_t ksiz = sizeof(phrase_token_t);
 
-        const int32_t vsiz = m_db->check(kbuf, ksiz);
-        if (-1 != vsiz) { /* success */
+        int32_t vsiz = m_db->check(kbuf, ksiz);
+        if (-1 == vsiz) { /* not found. */
+            vsiz = sizeof(ArrayHeader);
+        } else { /* found */
             m_chunk.set_size(vsiz);
             char * vbuf = (char *) m_chunk.begin();
             assert(vsiz == m_db->get(kbuf, ksiz, vbuf, vsiz));
