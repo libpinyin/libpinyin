@@ -143,13 +143,27 @@ typedef GArray * CandidateConstraints;
 typedef guint32 pinyin_option_t;
 
 typedef enum {
+    /* for default tables. */
     RESERVED = 0,
     GB_DICTIONARY = 1,
     GBK_DICTIONARY = 2,
     MERGED_DICTIONARY = 3,
     ADDON_DICTIONARY = 4,
     NETWORK_DICTIONARY = 5,
-    USER_DICTIONARY = 6
+    USER_DICTIONARY = 6,
+
+    /* for addon tables. */
+    ART_DICTIONARY = 4,
+    CULTURE_DICTIONARY = 5,
+    ECONOMY_DICTIONARY = 6,
+    GEOLOGY_DICTIONARY = 7,
+    HISTORY_DICTIONARY = 8,
+
+    LIFE_DICTIONARY = 9,
+    NATURE_DICTIONARY = 10,
+    SCITECH_DICTIONARY = 11,
+    SOCIETY_DICTIONARY = 12,
+    SPORT_DICTIONARY = 13,
 } PHRASE_INDEX_LIBRARIES;
 
 G_END_DECLS
