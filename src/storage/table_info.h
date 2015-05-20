@@ -59,7 +59,9 @@ private:
 
     TABLE_PHONETIC_TYPE m_table_phonetic_type;
 
-    pinyin_table_info_t m_table_info[PHRASE_INDEX_LIBRARY_COUNT];
+    pinyin_table_info_t m_default_tables[PHRASE_INDEX_LIBRARY_COUNT];
+
+    pinyin_table_info_t m_addon_tables[PHRASE_INDEX_LIBRARY_COUNT];
 
 private:
     void reset();
@@ -73,7 +75,9 @@ public:
 
     bool load(const char * filename);
 
-    const pinyin_table_info_t * get_table_info();
+    const pinyin_table_info_t * get_default_tables();
+
+    const pinyin_table_info_t * get_addon_tables();
 
     gfloat get_lambda();
 

@@ -29,6 +29,7 @@
 using namespace pinyin;
 
 
+#if 0
 static const pinyin_table_info_t reserved_tables[] = {
     {RESERVED, NULL, NULL, NULL, NOT_USED},
     {GB_DICTIONARY, "gb_char.table", "gb_char.bin", "gb_char.dbin", SYSTEM_FILE},
@@ -38,6 +39,7 @@ static const pinyin_table_info_t reserved_tables[] = {
 
     {USER_DICTIONARY, NULL, NULL, "user.bin", USER_FILE}
 };
+#endif
 
 
 SystemTableInfo2::SystemTableInfo2() {
@@ -47,16 +49,23 @@ SystemTableInfo2::SystemTableInfo2() {
 
     m_table_phonetic_type = PINYIN_TABLE;
 
+#define INIT_TABLE_INFO(tables, index) do {                 \
+        pinyin_table_info_t * table_info = &tables[index];  \
+                                                            \
+        table_info->m_dict_index = index;                   \
+        table_info->m_table_filename = NULL;                \
+        table_info->m_system_filename = NULL;               \
+        table_info->m_user_filename = NULL;                 \
+        table_info->m_file_type = NOT_USED;                 \
+    } while (0)
+
     size_t i;
     for (i = 0; i < PHRASE_INDEX_LIBRARY_COUNT; ++i) {
-        pinyin_table_info_t * table_info = &m_table_info[i];
-
-        table_info->m_dict_index = i;
-        table_info->m_table_filename = NULL;
-        table_info->m_system_filename = NULL;
-        table_info->m_user_filename = NULL;
-        table_info->m_file_type = NOT_USED;
+        INIT_TABLE_INFO(m_default_tables, i);
+        INIT_TABLE_INFO(m_addon_tables, i);
     }
+
+#undef INIT_TABLE_INFO
 }
 
 SystemTableInfo2::~SystemTableInfo2() {
@@ -70,19 +79,26 @@ void SystemTableInfo2::reset() {
 
     m_table_phonetic_type = PINYIN_TABLE;
 
+#define FINI_TABLE_INFO(tables, index) do {                \
+        pinyin_table_info_t * table_info = &tables[index];  \
+                                                            \
+        g_free((gchar *)table_info->m_table_filename);      \
+        table_info->m_table_filename = NULL;                \
+        g_free((gchar *)table_info->m_system_filename);     \
+        table_info->m_system_filename = NULL;               \
+        g_free((gchar *)table_info->m_user_filename);       \
+        table_info->m_user_filename = NULL;                 \
+                                                            \
+        table_info->m_file_type = NOT_USED;                 \
+    } while(0)
+
     size_t i;
     for (i = 0; i < PHRASE_INDEX_LIBRARY_COUNT; ++i) {
-        pinyin_table_info_t * table_info = &m_table_info[i];
-
-        g_free((gchar *)table_info->m_table_filename);
-        table_info->m_table_filename = NULL;
-        g_free((gchar *)table_info->m_system_filename);
-        table_info->m_system_filename = NULL;
-        g_free((gchar *)table_info->m_user_filename);
-        table_info->m_user_filename = NULL;
-
-        table_info->m_file_type = NOT_USED;
+        FINI_TABLE_INFO(m_default_tables, i);
+        FINI_TABLE_INFO(m_addon_tables, i);
     }
+
+#undef FINI_TABLE_INFO
 }
 
 void SystemTableInfo2::postfix_tables() {
@@ -174,6 +190,10 @@ bool SystemTableInfo2::load(const char * filename) {
     m_model_data_version = modelver;
     m_lambda = lambda;
 
+    /* Note: only support pinyin table now. */
+    assert(PINYIN_TABLE == type);
+    m_table_phonetic_type = type;
+
     int index = 0;
     char tablefile[256], sysfile[256], userfile[256], filetype[256];
     while (!feof(input)) {
@@ -207,8 +227,12 @@ bool SystemTableInfo2::load(const char * filename) {
     return true;
 }
 
-const pinyin_table_info_t * SystemTableInfo2::get_table_info() {
-    return m_table_info;
+const pinyin_table_info_t * SystemTableInfo2::get_default_tables() {
+    return m_default_tables;
+}
+
+const pinyin_table_info_t * SystemTableInfo2::get_addon_tables() {
+    return m_addon_tables;
 }
 
 gfloat SystemTableInfo2::get_lambda() {
