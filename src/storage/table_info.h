@@ -28,6 +28,11 @@
 namespace pinyin{
 
 typedef enum {
+    PINYIN_TABLE,                 /* use pinyin. */
+    ZHUYIN_TABLE,                 /* use zhuyin. */
+} TABLE_PHONETIC_TYPE;
+
+typedef enum {
     NOT_USED,                /* not used. */
     SYSTEM_FILE,             /* system phrase file. */
     DICTIONARY,              /* professional dictionary. */
@@ -52,6 +57,8 @@ private:
     int m_model_data_version;
     gfloat m_lambda;
 
+    TABLE_PHONETIC_TYPE m_table_phonetic_type;
+
     pinyin_table_info_t m_table_info[PHRASE_INDEX_LIBRARY_COUNT];
 
 private:
@@ -69,6 +76,8 @@ public:
     const pinyin_table_info_t * get_table_info();
 
     gfloat get_lambda();
+
+    TABLE_PHONETIC_TYPE get_table_phonetic_type();
 };
 
 class UserTableInfo{

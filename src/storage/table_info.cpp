@@ -21,6 +21,7 @@
 
 #include "table_info.h"
 #include <stdio.h>
+#include <stdlib.h>
 #include <assert.h>
 #include <string.h>
 #include <locale.h>
@@ -44,6 +45,8 @@ SystemTableInfo::SystemTableInfo() {
     m_model_data_version = 0;
     m_lambda = 0.;
 
+    m_table_phonetic_type = PINYIN_TABLE;
+
     size_t i;
     for (i = 0; i < PHRASE_INDEX_LIBRARY_COUNT; ++i) {
         pinyin_table_info_t * table_info = &m_table_info[i];
@@ -64,6 +67,8 @@ void SystemTableInfo::reset() {
     m_binary_format_version = 0;
     m_model_data_version = 0;
     m_lambda = 0.;
+
+    m_table_phonetic_type = PINYIN_TABLE;
 
     size_t i;
     for (i = 0; i < PHRASE_INDEX_LIBRARY_COUNT; ++i) {
@@ -151,8 +156,18 @@ bool SystemTableInfo::load(const char * filename) {
         return false;
     }
 
+    TABLE_PHONETIC_TYPE type = PINYIN_TABLE;
+    char * str = NULL;
+    num = fscanf(input, "source table format:%ms", &str);
+    if (0 == strcmp("pinyin", str))
+        type = PINYIN_TABLE;
+    if (0 == strcmp("zhuyin", str))
+        type = ZHUYIN_TABLE;
+    free(str);
+
 #if 0
     printf("binver:%d modelver:%d lambda:%f\n", binver, modelver, lambda);
+    printf("type:%d\n", type);
 #endif
 
     m_binary_format_version = binver;
