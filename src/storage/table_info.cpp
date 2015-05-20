@@ -118,22 +118,6 @@ static guint8 to_index_of_default_tables(const char * str) {
     assert(FALSE);
 }
 
-static guint8 to_index_of_addon_tables(const char * str) {
-    HANDLE(ART_DICTIONARY);
-    HANDLE(CULTURE_DICTIONARY);
-    HANDLE(ECONOMY_DICTIONARY);
-    HANDLE(GEOLOGY_DICTIONARY);
-    HANDLE(HISTORY_DICTIONARY);
-
-    HANDLE(LIFE_DICTIONARY);
-    HANDLE(NATURE_DICTIONARY);
-    HANDLE(SCITECH_DICTIONARY);
-    HANDLE(SOCIETY_DICTIONARY);
-    HANDLE(SPORT_DICTIONARY);
-
-    assert(FALSE);
-}
-
 static gchar * to_string(const char * str) {
     if (0 == strcmp(str, "NULL"))
         return NULL;
@@ -210,11 +194,11 @@ bool SystemTableInfo2::load(const char * filename) {
     m_table_phonetic_type = type;
 
     int index = 0;
-    char tableinfo[256], dictname[256];
+    char tableinfo[256], dictstr[256];
     char tablefile[256], sysfile[256], userfile[256], filetype[256];
     while (!feof(input)) {
         num = fscanf(input, "%256s %256s %256s %256s %256s %256s\n",
-                     tableinfo, dictname, tablefile,
+                     tableinfo, dictstr, tablefile,
                      sysfile, userfile, filetype);
 
         if (6 != num)
@@ -224,10 +208,10 @@ bool SystemTableInfo2::load(const char * filename) {
         pinyin_table_info_t * tables = NULL;
         if (0 == strcmp("default", tableinfo)) {
             tables = m_default_tables;
-            index = to_index_of_default_tables(dictname);
+            index = to_index_of_default_tables(dictstr);
         } else if (0 == strcmp("addon", tableinfo)) {
             tables = m_addon_tables;
-            index = to_index_of_addon_tables(dictname);
+            index = atoi(dictstr);
         } else
             assert(FALSE);
 
