@@ -101,6 +101,39 @@ void SystemTableInfo2::reset() {
 #undef FINI_TABLE_INFO
 }
 
+#define HANDLE(x) do {                          \
+        if (0 == strcmp(str, #x))               \
+            return x;                           \
+    } while (0)
+
+static guint8 to_index_of_default_tables(const char * str) {
+    HANDLE(RESERVED);
+    HANDLE(GB_DICTIONARY);
+    HANDLE(GBK_DICTIONARY);
+    HANDLE(MERGED_DICTIONARY);
+    HANDLE(ADDON_DICTIONARY);
+    HANDLE(NETWORK_DICTIONARY);
+    HANDLE(USER_DICTIONARY);
+
+    assert(FALSE);
+}
+
+static guint8 to_index_of_addon_tables(const char * str) {
+    HANDLE(ART_DICTIONARY);
+    HANDLE(CULTURE_DICTIONARY);
+    HANDLE(ECONOMY_DICTIONARY);
+    HANDLE(GEOLOGY_DICTIONARY);
+    HANDLE(HISTORY_DICTIONARY);
+
+    HANDLE(LIFE_DICTIONARY);
+    HANDLE(NATURE_DICTIONARY);
+    HANDLE(SCITECH_DICTIONARY);
+    HANDLE(SOCIETY_DICTIONARY);
+    HANDLE(SPORT_DICTIONARY);
+
+    assert(FALSE);
+}
+
 static gchar * to_string(const char * str) {
     if (0 == strcmp(str, "NULL"))
         return NULL;
@@ -109,20 +142,16 @@ static gchar * to_string(const char * str) {
 }
 
 static PHRASE_FILE_TYPE to_file_type(const char * str) {
-#define HANDLE(x) {                             \
-        if (0 == strcmp(str, #x))               \
-            return x;                           \
-    }
-
     HANDLE(NOT_USED);
     HANDLE(SYSTEM_FILE);
     HANDLE(DICTIONARY);
     HANDLE(USER_FILE);
 
-    assert(false);
+    assert(FALSE);
+}
 
 #undef HANDLE
-}
+
 
 bool SystemTableInfo2::load(const char * filename) {
     reset();
@@ -161,8 +190,10 @@ bool SystemTableInfo2::load(const char * filename) {
     num = fscanf(input, "source table format:%ms", &str);
     if (0 == strcmp("pinyin", str))
         type = PINYIN_TABLE;
-    if (0 == strcmp("zhuyin", str))
+    else if (0 == strcmp("zhuyin", str))
         type = ZHUYIN_TABLE;
+    else
+        assert(FALSE);
     free(str);
 
 #if 0
@@ -179,19 +210,31 @@ bool SystemTableInfo2::load(const char * filename) {
     m_table_phonetic_type = type;
 
     int index = 0;
+    char tableinfo[256], dictname[256];
     char tablefile[256], sysfile[256], userfile[256], filetype[256];
     while (!feof(input)) {
-        num = fscanf(input, "%d %256s %256s %256s %256s\n",
-                     &index, tablefile, sysfile, userfile, filetype);
+        num = fscanf(input, "%256s %256s %256s %256s %256s %256s\n",
+                     tableinfo, dictname, tablefile,
+                     sysfile, userfile, filetype);
 
-        if (5 != num)
+        if (6 != num)
             continue;
 
-        if (!(0 <= index && index < PHRASE_INDEX_LIBRARY_COUNT))
-            continue;
+        /* decode the table info and the index. */
+        pinyin_table_info_t * tables = NULL;
+        if (0 == strcmp("default", tableinfo)) {
+            tables = m_default_tables;
+            index = to_index_of_default_tables(dictname);
+        } else if (0 == strcmp("addon", tableinfo)) {
+            tables = m_addon_tables;
+            index = to_index_of_addon_tables(dictname);
+        } else
+            assert(FALSE);
+
+        assert(0 <= index && index < PHRASE_INDEX_LIBRARY_COUNT);
 
         /* save into m_table_info. */
-        pinyin_table_info_t * table_info = &m_table_info[index];
+        pinyin_table_info_t * table_info = &tables[index];
         assert(index == table_info->m_dict_index);
 
         table_info->m_table_filename = to_string(tablefile);
@@ -202,9 +245,6 @@ bool SystemTableInfo2::load(const char * filename) {
     }
 
     fclose(input);
-
-    /* postfix reserved tables. */
-    postfix_tables();
 
     setlocale(LC_NUMERIC, locale);
 
