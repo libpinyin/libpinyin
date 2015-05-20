@@ -66,8 +66,6 @@ private:
 private:
     void reset();
 
-    void postfix_tables();
-
 public:
     SystemTableInfo2();
 

@@ -101,22 +101,6 @@ void SystemTableInfo2::reset() {
 #undef FINI_TABLE_INFO
 }
 
-void SystemTableInfo2::postfix_tables() {
-    size_t i;
-    for (i = 0; i < G_N_ELEMENTS(reserved_tables); ++i) {
-        const pinyin_table_info_t * postfix = &reserved_tables[i];
-
-        guint8 index = postfix->m_dict_index;
-        pinyin_table_info_t * table_info = &m_table_info[index];
-        assert(table_info->m_dict_index == index);
-
-        table_info->m_table_filename = g_strdup(postfix->m_table_filename);
-        table_info->m_system_filename = g_strdup(postfix->m_system_filename);
-        table_info->m_user_filename = g_strdup(postfix->m_user_filename);
-        table_info->m_file_type = postfix->m_file_type;
-    }
-}
-
 static gchar * to_string(const char * str) {
     if (0 == strcmp(str, "NULL"))
         return NULL;
