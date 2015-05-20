@@ -40,7 +40,7 @@ static const pinyin_table_info_t reserved_tables[] = {
 };
 
 
-SystemTableInfo::SystemTableInfo() {
+SystemTableInfo2::SystemTableInfo2() {
     m_binary_format_version = 0;
     m_model_data_version = 0;
     m_lambda = 0.;
@@ -59,11 +59,11 @@ SystemTableInfo::SystemTableInfo() {
     }
 }
 
-SystemTableInfo::~SystemTableInfo() {
+SystemTableInfo2::~SystemTableInfo2() {
     reset();
 }
 
-void SystemTableInfo::reset() {
+void SystemTableInfo2::reset() {
     m_binary_format_version = 0;
     m_model_data_version = 0;
     m_lambda = 0.;
@@ -85,7 +85,7 @@ void SystemTableInfo::reset() {
     }
 }
 
-void SystemTableInfo::postfix_tables() {
+void SystemTableInfo2::postfix_tables() {
     size_t i;
     for (i = 0; i < G_N_ELEMENTS(reserved_tables); ++i) {
         const pinyin_table_info_t * postfix = &reserved_tables[i];
@@ -124,7 +124,7 @@ static PHRASE_FILE_TYPE to_file_type(const char * str) {
 #undef HANDLE
 }
 
-bool SystemTableInfo::load(const char * filename) {
+bool SystemTableInfo2::load(const char * filename) {
     reset();
 
     char * locale = setlocale(LC_NUMERIC, "C");
@@ -207,11 +207,11 @@ bool SystemTableInfo::load(const char * filename) {
     return true;
 }
 
-const pinyin_table_info_t * SystemTableInfo::get_table_info() {
+const pinyin_table_info_t * SystemTableInfo2::get_table_info() {
     return m_table_info;
 }
 
-gfloat SystemTableInfo::get_lambda() {
+gfloat SystemTableInfo2::get_lambda() {
     return m_lambda;
 }
 
@@ -284,7 +284,7 @@ bool UserTableInfo::save(const char * filename) {
     return true;
 }
 
-bool UserTableInfo::is_conform(const SystemTableInfo * sysinfo) {
+bool UserTableInfo::is_conform(const SystemTableInfo2 * sysinfo) {
     if (sysinfo->m_binary_format_version != m_binary_format_version)
         return false;
 
@@ -294,7 +294,7 @@ bool UserTableInfo::is_conform(const SystemTableInfo * sysinfo) {
     return true;
 }
 
-bool UserTableInfo::make_conform(const SystemTableInfo * sysinfo) {
+bool UserTableInfo::make_conform(const SystemTableInfo2 * sysinfo) {
     m_binary_format_version = sysinfo->m_binary_format_version;
     m_model_data_version = sysinfo->m_model_data_version;
     return true;

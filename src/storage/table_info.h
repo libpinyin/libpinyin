@@ -50,7 +50,7 @@ typedef struct {
 
 class UserTableInfo;
 
-class SystemTableInfo{
+class SystemTableInfo2{
     friend class UserTableInfo;
 private:
     int m_binary_format_version;
@@ -67,9 +67,9 @@ private:
     void postfix_tables();
 
 public:
-    SystemTableInfo();
+    SystemTableInfo2();
 
-    ~SystemTableInfo();
+    ~SystemTableInfo2();
 
     bool load(const char * filename);
 
@@ -95,9 +95,9 @@ public:
 
     bool save(const char * filename);
 
-    bool is_conform(const SystemTableInfo * sysinfo);
+    bool is_conform(const SystemTableInfo2 * sysinfo);
 
-    bool make_conform(const SystemTableInfo * sysinfo);
+    bool make_conform(const SystemTableInfo2 * sysinfo);
 };
 
 };
