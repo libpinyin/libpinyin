@@ -27,7 +27,7 @@
 int main(int argc, char * argv[]) {
     setlocale(LC_ALL, "");
 
-    SystemTableInfo system_table_info;
+    SystemTableInfo2 system_table_info;
 
     bool retval = system_table_info.load("../../data/table.conf");
     if (!retval) {
@@ -40,7 +40,7 @@ int main(int argc, char * argv[]) {
     size_t i;
     for (i = 0; i < PHRASE_INDEX_LIBRARY_COUNT; ++i) {
         const pinyin_table_info_t * table_info =
-            system_table_info.get_table_info() + i;
+            system_table_info.get_default_tables() + i;
 
         assert(i == table_info->m_dict_index);
         printf("table index:%d\n", table_info->m_dict_index);
