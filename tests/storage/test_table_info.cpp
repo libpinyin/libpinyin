@@ -24,6 +24,31 @@
 #include "pinyin_internal.h"
 
 
+void dump_table_info(const pinyin_table_info_t * table_info) {
+    switch(table_info->m_file_type) {
+    case NOT_USED:
+        printf("not used.\n");
+        break;
+
+    case SYSTEM_FILE:
+        printf("system file:%s %s %s.\n", table_info->m_table_filename,
+               table_info->m_system_filename, table_info->m_user_filename);
+        break;
+
+    case DICTIONARY:
+        printf("dictionary:%s %s %s.\n", table_info->m_table_filename,
+               table_info->m_system_filename, table_info->m_user_filename);
+        break;
+
+    case USER_FILE:
+        printf("user file:%s.\n", table_info->m_user_filename);
+        break;
+
+    default:
+        assert(false);
+    }
+}
+
 int main(int argc, char * argv[]) {
     setlocale(LC_ALL, "");
 
@@ -43,30 +68,19 @@ int main(int argc, char * argv[]) {
             system_table_info.get_default_tables() + i;
 
         assert(i == table_info->m_dict_index);
-        printf("table index:%d\n", table_info->m_dict_index);
+        printf("default table index:%d\n", table_info->m_dict_index);
 
-        switch(table_info->m_file_type) {
-        case NOT_USED:
-            printf("not used.\n");
-            break;
+        dump_table_info(table_info);
+    }
 
-        case SYSTEM_FILE:
-            printf("system file:%s %s %s.\n", table_info->m_table_filename,
-                   table_info->m_system_filename, table_info->m_user_filename);
-            break;
+    for (i = 0; i < PHRASE_INDEX_LIBRARY_COUNT; ++i) {
+        const pinyin_table_info_t * table_info =
+            system_table_info.get_addon_tables() + i;
 
-        case DICTIONARY:
-            printf("dictionary:%s %s %s.\n", table_info->m_table_filename,
-                   table_info->m_system_filename, table_info->m_user_filename);
-            break;
+        assert(i == table_info->m_dict_index);
+        printf("addon table index:%d\n", table_info->m_dict_index);
 
-        case USER_FILE:
-            printf("user file:%s.\n", table_info->m_user_filename);
-            break;
-
-        default:
-            assert(false);
-        }
+        dump_table_info(table_info);
     }
 
     UserTableInfo user_table_info;
