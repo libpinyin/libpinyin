@@ -116,7 +116,7 @@ bool do_one_test(PinyinLookup2 * pinyin_lookup,
 int main(int argc, char * argv[]){
     const char * evals_text = "evals2.text";
 
-    SystemTableInfo system_table_info;
+    SystemTableInfo2 system_table_info;
 
     bool retval = system_table_info.load(SYSTEM_TABLE_INFO);
     if (!retval) {
@@ -139,7 +139,7 @@ int main(int argc, char * argv[]){
     FacadePhraseIndex phrase_index;
 
     const pinyin_table_info_t * phrase_files =
-        system_table_info.get_table_info();
+        system_table_info.get_default_tables();
 
     if (!load_phrase_index(phrase_files, &phrase_index))
         exit(ENOENT);
