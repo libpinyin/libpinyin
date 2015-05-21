@@ -71,7 +71,7 @@ int main(int argc, char * argv[]){
         assert(poss == 0.5);
     }
 
-    SystemTableInfo system_table_info;
+    SystemTableInfo2 system_table_info;
 
     bool retval = system_table_info.load("../../data/table.conf");
     if (!retval) {
@@ -82,7 +82,7 @@ int main(int argc, char * argv[]){
     FacadePhraseIndex phrase_index;
 
     const pinyin_table_info_t * phrase_files =
-        system_table_info.get_table_info();
+        system_table_info.get_default_tables();
 
     if (!load_phrase_table(phrase_files, NULL, NULL, &phrase_index))
         exit(ENOENT);

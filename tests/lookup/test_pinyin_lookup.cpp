@@ -28,7 +28,7 @@
 size_t bench_times = 100;
 
 int main( int argc, char * argv[]){
-    SystemTableInfo system_table_info;
+    SystemTableInfo2 system_table_info;
 
     bool retval = system_table_info.load("../../data/table.conf");
     if (!retval) {
@@ -45,7 +45,7 @@ int main( int argc, char * argv[]){
     largetable.load(options, chunk, NULL);
 
     const pinyin_table_info_t * phrase_files =
-        system_table_info.get_table_info();
+        system_table_info.get_default_tables();
 
     FacadePhraseIndex phrase_index;
     if (!load_phrase_index(phrase_files, &phrase_index))

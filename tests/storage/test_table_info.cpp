@@ -36,8 +36,8 @@ void dump_table_info(const pinyin_table_info_t * table_info) {
         break;
 
     case DICTIONARY:
-        printf("dictionary:%s %s %s.\n", table_info->m_table_filename,
-               table_info->m_system_filename, table_info->m_user_filename);
+        printf("dictionary:%s %s.\n", table_info->m_table_filename,
+               table_info->m_system_filename);
         break;
 
     case USER_FILE:

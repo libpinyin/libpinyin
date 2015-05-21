@@ -53,7 +53,7 @@ bool try_phrase_lookup(PhraseLookup * phrase_lookup,
 int main(int argc, char * argv[]){
     setlocale(LC_ALL, "");
 
-    SystemTableInfo system_table_info;
+    SystemTableInfo2 system_table_info;
 
     bool retval = system_table_info.load("../../data/table.conf");
     if (!retval) {
@@ -68,7 +68,7 @@ int main(int argc, char * argv[]){
     phrase_table.load(chunk, NULL);
 
     const pinyin_table_info_t * phrase_files =
-        system_table_info.get_table_info();
+        system_table_info.get_default_tables();
 
     /* init phrase index */
     FacadePhraseIndex phrase_index;
