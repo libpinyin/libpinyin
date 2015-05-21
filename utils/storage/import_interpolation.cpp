@@ -250,7 +250,7 @@ int main(int argc, char * argv[]){
         exit(EINVAL);
     }
 
-    SystemTableInfo system_table_info;
+    SystemTableInfo2 system_table_info;
 
     gchar * filename = g_build_filename(table_dir, SYSTEM_TABLE_INFO, NULL);
     bool retval = system_table_info.load(filename);
@@ -273,7 +273,7 @@ int main(int argc, char * argv[]){
     FacadePhraseIndex phrase_index;
 
     const pinyin_table_info_t * phrase_files =
-        system_table_info.get_table_info();
+        system_table_info.get_default_tables();
 
     if (!load_phrase_index(phrase_files, &phrase_index))
         exit(ENOENT);
