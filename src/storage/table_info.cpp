@@ -102,9 +102,30 @@ void SystemTableInfo2::reset() {
 }
 
 #define HANDLE(x) do {                          \
-        if (0 == strcmp(str, #x))               \
+        if (0 == strcmp(#x, str))               \
             return x;                           \
     } while (0)
+
+
+static TABLE_PHONETIC_TYPE to_table_phonetic_type(const char * str) {
+    if (0 == strcmp("pinyin", str))
+        return PINYIN_TABLE;
+
+    if (0 == strcmp("zhuyin", str))
+        return ZHUYIN_TABLE;
+
+    assert(FALSE);
+}
+
+static TABLE_TARGET to_table_target(const char * str) {
+    if (0 == strcmp("default", str))
+        return DEFAULT_TABLE;
+
+    if (0 == strcmp("addon", str))
+        return ADDON_TABLE;
+
+    assert(FALSE);
+}
 
 static guint8 to_index_of_default_tables(const char * str) {
     HANDLE(RESERVED);
@@ -119,8 +140,7 @@ static guint8 to_index_of_default_tables(const char * str) {
 }
 
 static gchar * to_string(const char * str) {
-    if (0 == strcmp(str, "NULL"))
-        return NULL;
+    HANDLE(NULL);
 
     return g_strdup(str);
 }
@@ -172,12 +192,7 @@ bool SystemTableInfo2::load(const char * filename) {
     TABLE_PHONETIC_TYPE type = PINYIN_TABLE;
     char * str = NULL;
     num = fscanf(input, "source table format:%ms", &str);
-    if (0 == strcmp("pinyin", str))
-        type = PINYIN_TABLE;
-    else if (0 == strcmp("zhuyin", str))
-        type = ZHUYIN_TABLE;
-    else
-        assert(FALSE);
+    type = to_table_phonetic_type(str);
     free(str);
 
 #if 0
@@ -206,14 +221,17 @@ bool SystemTableInfo2::load(const char * filename) {
 
         /* decode the table info and the index. */
         pinyin_table_info_t * tables = NULL;
-        if (0 == strcmp("default", tableinfo)) {
+        TABLE_TARGET target = to_table_target(tableinfo);
+
+        if (DEFAULT_TABLE == target) {
             tables = m_default_tables;
             index = to_index_of_default_tables(dictstr);
-        } else if (0 == strcmp("addon", tableinfo)) {
+        }
+
+        if (ADDON_TABLE == target) {
             tables = m_addon_tables;
             index = atoi(dictstr);
-        } else
-            assert(FALSE);
+        }
 
         assert(0 <= index && index < PHRASE_INDEX_LIBRARY_COUNT);
 
