@@ -33,34 +33,8 @@ static GOptionEntry entries[] =
 };
 
 /* increase all unigram frequency by a constant. */
-
-int main(int argc, char * argv[]){
-    setlocale(LC_ALL, "");
-
-    GError * error = NULL;
-    GOptionContext * context;
-
-    context = g_option_context_new("- increase uni-gram");
-    g_option_context_add_main_entries(context, entries, NULL);
-    if (!g_option_context_parse(context, &argc, &argv, &error)) {
-        g_print("option parsing failed:%s\n", error->message);
-        exit(EINVAL);
-    }
-
-    SystemTableInfo system_table_info;
-
-    gchar * filename = g_build_filename(table_dir, SYSTEM_TABLE_INFO, NULL);
-    bool retval = system_table_info.load(filename);
-    if (!retval) {
-        fprintf(stderr, "load table.conf failed.\n");
-        exit(ENOENT);
-    }
-    g_free(filename);
-
+bool generate_unigram(const pinyin_table_info_t * phrase_files) {
     FacadePhraseIndex phrase_index;
-
-    const pinyin_table_info_t * phrase_files =
-        system_table_info.get_table_info();
 
     /* Note: please increase the value when corpus size becomes larger.
      *  To avoid zero value when computing unigram frequency in float format.
@@ -74,11 +48,6 @@ int main(int argc, char * argv[]){
             continue;
 
         guint32 freq = 1;
-#if 0
-        /* skip GBK_DICTIONARY. */
-        if (GBK_DICTIONARY == table_info->m_dict_index)
-            freq = 1;
-#endif
 
         const char * binfile = table_info->m_system_filename;
 
@@ -106,6 +75,41 @@ int main(int argc, char * argv[]){
 
     if (!save_dictionary(phrase_files, &phrase_index))
         exit(ENOENT);
+
+    return true;
+}
+
+int main(int argc, char * argv[]){
+    setlocale(LC_ALL, "");
+
+    GError * error = NULL;
+    GOptionContext * context;
+
+    context = g_option_context_new("- increase uni-gram");
+    g_option_context_add_main_entries(context, entries, NULL);
+    if (!g_option_context_parse(context, &argc, &argv, &error)) {
+        g_print("option parsing failed:%s\n", error->message);
+        exit(EINVAL);
+    }
+
+    SystemTableInfo2 system_table_info;
+
+    gchar * filename = g_build_filename(table_dir, SYSTEM_TABLE_INFO, NULL);
+    bool retval = system_table_info.load(filename);
+    if (!retval) {
+        fprintf(stderr, "load table.conf failed.\n");
+        exit(ENOENT);
+    }
+    g_free(filename);
+
+    const pinyin_table_info_t * phrase_files =
+        system_table_info.get_default_tables();
+
+    generate_unigram(phrase_files);
+
+    phrase_files = system_table_info.get_addon_tables();
+
+    generate_unigram(phrase_files);
 
     return 0;
 }
