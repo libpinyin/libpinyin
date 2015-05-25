@@ -64,7 +64,7 @@ bool generate_unigram(const pinyin_table_info_t * phrase_files) {
         int result = phrase_index.get_range(i, range);
         if ( result == ERROR_OK ) {
             for (size_t token = range.m_range_begin;
-                  token <= range.m_range_end; ++token) {
+                  token < range.m_range_end; ++token) {
                 phrase_index.add_unigram_frequency(token, freq);
             }
         }

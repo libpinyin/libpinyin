@@ -622,14 +622,14 @@ int SubPhraseIndex::get_range(/* out */ PhraseIndexRange & range){
     }
 
     /* remove trailing zeros. */
-    const table_offset_t * poffset = 0;
-    for (poffset = end - 1; poffset >= begin + 1; --poffset) {
-        if (0 !=  *poffset)
+    const table_offset_t * poffset = NULL;
+    for (poffset = end; poffset > begin; --poffset) {
+        if (NULL !=  *(poffset - 1))
             break;
     }
 
     range.m_range_begin = 1; /* token starts with 1 in gen_pinyin_table. */
-    range.m_range_end = poffset + 1 - begin; /* removed zeros. */
+    range.m_range_end = poffset - begin + 1; /* removed zeros. */
 
     return ERROR_OK;
 }
