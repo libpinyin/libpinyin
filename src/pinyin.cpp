@@ -130,7 +130,7 @@ static bool _clean_user_files(const char * user_dir,
         const char * userfilename = table_info->m_user_filename;
 
         /* remove dbin file. */
-        filename = g_build_filename(user_dir, userfilename, NULL);
+        gchar * filename = g_build_filename(user_dir, userfilename, NULL);
         unlink(filename);
         g_free(filename);
     }
@@ -199,6 +199,8 @@ static bool _load_phrase_library (const char * system_dir,
                                   const pinyin_table_info_t * table_info){
     /* check whether the sub phrase index is already loaded. */
     PhraseIndexRange range;
+    guint8 index = table_info->m_dict_index;
+
     int retval = phrase_index->get_range(index, range);
     if (ERROR_OK == retval)
         return false;
@@ -501,7 +503,7 @@ bool pinyin_load_phrase_library(pinyin_context_t * context,
     }
 
     _load_phrase_library(context->m_system_dir, context->m_user_dir,
-                         context->m_phrase_index, table_info);
+                         phrase_index, table_info);
 
     return false;
 }
@@ -792,7 +794,7 @@ bool pinyin_save(pinyin_context_t * context){
     context->m_phrase_index->compact();
 
     const pinyin_table_info_t * phrase_files =
-        context->m_system_table_info.get_table_info();
+        context->m_system_table_info.get_default_tables();
 
     /* skip the reserved zero phrase library. */
     for (size_t i = 1; i < PHRASE_INDEX_LIBRARY_COUNT; ++i) {
@@ -985,7 +987,7 @@ bool pinyin_mask_out(pinyin_context_t * context,
     context->m_user_bigram->mask_out(mask, value);
 
     const pinyin_table_info_t * phrase_files =
-        context->m_system_table_info.get_table_info();
+        context->m_system_table_info.get_default_tables();
 
     /* mask out the phrase index. */
     for (size_t index = 1; index < PHRASE_INDEX_LIBRARY_COUNT; ++index) {
