@@ -123,8 +123,8 @@ int main(int argc, char * argv[]){
 
     phrase_files = system_table_info.get_addon_tables();
 
-    generate_binary_files(ADDON_PINYIN_INDEX,
-                          ADDON_PHRASE_INDEX,
+    generate_binary_files(ADDON_SYSTEM_PINYIN_INDEX,
+                          ADDON_SYSTEM_PHRASE_INDEX,
                           phrase_files);
 
     return 0;

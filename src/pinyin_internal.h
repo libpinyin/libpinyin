@@ -58,8 +58,8 @@
 #define USER_PINYIN_INDEX "user_pinyin_index.bin"
 #define SYSTEM_PHRASE_INDEX "phrase_index.bin"
 #define USER_PHRASE_INDEX "user_phrase_index.bin"
-#define ADDON_PINYIN_INDEX "addon_pinyin_index.bin"
-#define ADDON_PHRASE_INDEX "addon_phrase_index.bin"
+#define ADDON_SYSTEM_PINYIN_INDEX "addon_pinyin_index.bin"
+#define ADDON_SYSTEM_PHRASE_INDEX "addon_phrase_index.bin"
 
 
 using namespace pinyin;

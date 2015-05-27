@@ -424,7 +424,7 @@ pinyin_context_t * pinyin_init(const char * systemdir, const char * userdir){
     /* load addon system chewing table. */
     chunk = new MemoryChunk;
     filename = g_build_filename
-        (context->m_system_dir, ADDON_PINYIN_INDEX, NULL);
+        (context->m_system_dir, ADDON_SYSTEM_PINYIN_INDEX, NULL);
 
 #ifdef LIBPINYIN_USE_MMAP
     if (!chunk->mmap(filename)) {
@@ -448,7 +448,7 @@ pinyin_context_t * pinyin_init(const char * systemdir, const char * userdir){
     /* load addon system phrase table */
     chunk = new MemoryChunk;
     filename = g_build_filename
-        (context->m_system_dir, ADDON_PHRASE_INDEX, NULL);
+        (context->m_system_dir, ADDON_SYSTEM_PHRASE_INDEX, NULL);
 
 #ifdef LIBPINYIN_USE_MMAP
     if (!chunk->mmap(filename)) {
