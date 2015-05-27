@@ -115,24 +115,8 @@ struct _export_iterator_t{
     guint8 m_next_pronunciation;
 };
 
-static bool check_format(pinyin_context_t * context){
-    const char * userdir = context->m_user_dir;
-
-    UserTableInfo user_table_info;
-    gchar * filename = g_build_filename
-        (userdir, USER_TABLE_INFO, NULL);
-    user_table_info.load(filename);
-    g_free(filename);
-
-    bool exists = user_table_info.is_conform
-        (&context->m_system_table_info);
-
-    if (exists)
-        return exists;
-
-    const pinyin_table_info_t * phrase_files =
-        context->m_system_table_info.get_table_info();
-
+static bool _clean_user_files(const char * user_dir,
+                              const pinyin_table_info_t * phrase_files){
     /* clean up files, if version mis-matches. */
     for (size_t i = 1; i < PHRASE_INDEX_LIBRARY_COUNT; ++i) {
         const pinyin_table_info_t * table_info = phrase_files + i;
@@ -146,23 +130,49 @@ static bool check_format(pinyin_context_t * context){
         const char * userfilename = table_info->m_user_filename;
 
         /* remove dbin file. */
-        filename = g_build_filename(userdir, userfilename, NULL);
+        filename = g_build_filename(user_dir, userfilename, NULL);
         unlink(filename);
         g_free(filename);
     }
 
+    return true;
+}
+
+static bool check_format(pinyin_context_t * context){
+    const char * user_dir = context->m_user_dir;
+
+    UserTableInfo user_table_info;
+    gchar * filename = g_build_filename
+        (user_dir, USER_TABLE_INFO, NULL);
+    user_table_info.load(filename);
+    g_free(filename);
+
+    bool exists = user_table_info.is_conform
+        (&context->m_system_table_info);
+
+    if (exists)
+        return exists;
+
+    const pinyin_table_info_t * phrase_files = NULL;
+
+    phrase_files = context->m_system_table_info.get_default_tables();
+    _clean_user_files(user_dir, phrase_files);
+
+    phrase_files = context->m_system_table_info.get_addon_tables();
+    _clean_user_files(user_dir, phrase_files);
+
     filename = g_build_filename
-        (userdir, USER_PINYIN_INDEX, NULL);
+        (user_dir, USER_PINYIN_INDEX, NULL);
     unlink(filename);
     g_free(filename);
 
     filename = g_build_filename
-        (userdir, USER_PHRASE_INDEX, NULL);
+        (user_dir, USER_PHRASE_INDEX, NULL);
     unlink(filename);
     g_free(filename);
 
     filename = g_build_filename
-        (userdir, USER_BIGRAM, NULL);
+        (user_dir, USER_BIGRAM, NULL);
     unlink(filename);
     g_free(filename);
 
@@ -181,6 +191,96 @@ static bool mark_version(pinyin_context_t * context){
     g_free(filename);
 
     return retval;
+}
+
+static bool _load_phrase_library (const char * system_dir,
+                                  const char * user_dir,
+                                  FacadePhraseIndex * phrase_index,
+                                  const pinyin_table_info_t * table_info){
+    /* check whether the sub phrase index is already loaded. */
+    PhraseIndexRange range;
+    int retval = phrase_index->get_range(index, range);
+    if (ERROR_OK == retval)
+        return false;
+
+    if (SYSTEM_FILE == table_info->m_file_type) {
+        /* system phrase library */
+        MemoryChunk * chunk = new MemoryChunk;
+
+        const char * systemfilename = table_info->m_system_filename;
+        /* check bin file in system dir. */
+        gchar * chunkfilename = g_build_filename(system_dir,
+                                                 systemfilename, NULL);
+#ifdef LIBPINYIN_USE_MMAP
+        if (!chunk->mmap(chunkfilename))
+            fprintf(stderr, "mmap %s failed!\n", chunkfilename);
+#else
+        if (!chunk->load(chunkfilename))
+            fprintf(stderr, "open %s failed!\n", chunkfilename);
+#endif
+
+        g_free(chunkfilename);
+
+        phrase_index->load(index, chunk);
+
+        const char * userfilename = table_info->m_user_filename;
+
+        chunkfilename = g_build_filename(user_dir,
+                                         userfilename, NULL);
+
+        MemoryChunk * log = new MemoryChunk;
+        log->load(chunkfilename);
+        g_free(chunkfilename);
+
+        /* merge the chunk log. */
+        phrase_index->merge(index, log);
+        return true;
+    }
+
+    if (DICTIONARY == table_info->m_file_type) {
+        /* addon dictionary. */
+        MemoryChunk * chunk = new MemoryChunk;
+
+        const char * systemfilename = table_info->m_system_filename;
+        /* check bin file in system dir. */
+        gchar * chunkfilename = g_build_filename(system_dir,
+                                                 systemfilename, NULL);
+#ifdef LIBPINYIN_USE_MMAP
+        if (!chunk->mmap(chunkfilename))
+            fprintf(stderr, "mmap %s failed!\n", chunkfilename);
+#else
+        if (!chunk->load(chunkfilename))
+            fprintf(stderr, "open %s failed!\n", chunkfilename);
+#endif
+
+        g_free(chunkfilename);
+
+        phrase_index->load(index, chunk);
+
+        return true;
+    }
+
+    if (USER_FILE == table_info->m_file_type) {
+        /* user phrase library */
+        MemoryChunk * chunk = new MemoryChunk;
+        const char * userfilename = table_info->m_user_filename;
+
+        gchar * chunkfilename = g_build_filename(user_dir,
+                                                 userfilename, NULL);
+
+        /* check bin file exists. if not, create a new one. */
+        if (chunk->load(chunkfilename)) {
+            phrase_index->load(index, chunk);
+        } else {
+            delete chunk;
+            phrase_index->create_sub_phrase(index);
+        }
+
+        g_free(chunkfilename);
+        return true;
+    }
+
+    return false;
 }
 
 pinyin_context_t * pinyin_init(const char * systemdir, const char * userdir){
@@ -279,9 +379,20 @@ pinyin_context_t * pinyin_init(const char * systemdir, const char * userdir){
 
     context->m_phrase_index = new FacadePhraseIndex;
 
-    /* hack here: directly call load phrase library. */
-    pinyin_load_phrase_library(context, GB_DICTIONARY);
-    pinyin_load_phrase_library(context, MERGED_DICTIONARY);
+    /* load all default tables. */
+    for (size_t i = 0; i < PHRASE_INDEX_LIBRARY_COUNT; ++i){
+        const pinyin_table_info_t * phrase_files =
+            context->m_system_table_info.get_default_tables();
+
+        const pinyin_table_info_t * table_info =
+            phrase_files + i;
+
+        /* addon dictionary should not in default tables. */
+        assert(DICTIONARY != table_info->m_file_type);
+
+        _load_phrase_library(context->m_system_dir, context->m_user_dir,
+                             context->m_phrase_index, table_info);
+    }
 
     context->m_system_bigram = new Bigram;
     filename = g_build_filename(context->m_system_dir, SYSTEM_BIGRAM, NULL);
@@ -305,93 +416,118 @@ pinyin_context_t * pinyin_init(const char * systemdir, const char * userdir){
          context->m_phrase_table, context->m_phrase_index,
          context->m_system_bigram, context->m_user_bigram);
 
+    /* load addon chewing table. */
+    context->m_addon_pinyin_table = new FacadeChewingTable;
+
+    /* load addon system chewing table. */
+    chunk = new MemoryChunk;
+    filename = g_build_filename
+        (context->m_system_dir, ADDON_PINYIN_INDEX, NULL);
+
+#ifdef LIBPINYIN_USE_MMAP
+    if (!chunk->mmap(filename)) {
+        fprintf(stderr, "mmap %s failed!\n", filename);
+        return NULL;
+    }
+#else
+    if (!chunk->load(filename)) {
+        fprintf(stderr, "open %s failed!\n", filename);
+        return NULL;
+    }
+#endif
+
+    g_free(filename);
+
+    context->m_addon_pinyin_table->load(context->m_options, chunk, NULL);
+
+    /* load addon phrase table */
+    context->m_addon_phrase_table = new FacadePhraseTable2;
+
+    /* load addon system phrase table */
+    chunk = new MemoryChunk;
+    filename = g_build_filename
+        (context->m_system_dir, ADDON_PHRASE_INDEX, NULL);
+
+#ifdef LIBPINYIN_USE_MMAP
+    if (!chunk->mmap(filename)) {
+        fprintf(stderr, "mmap %s failed!\n", filename);
+        return NULL;
+    }
+#else
+    if (!chunk->load(filename)) {
+        fprintf(stderr, "open %s failed!\n", filename);
+        return NULL;
+    }
+#endif
+
+    g_free(filename);
+
+    context->m_addon_phrase_table->load(chunk, NULL);
+
+    context->m_addon_phrase_index = new FacadePhraseIndex;
+
+    /* don't load addon phrase libraries. */
+
     return context;
 }
 
 bool pinyin_load_phrase_library(pinyin_context_t * context,
+                                TABLE_TARGET target,
                                 guint8 index){
     if (!(index < PHRASE_INDEX_LIBRARY_COUNT))
         return false;
 
-    /* check whether the sub phrase index is already loaded. */
-    PhraseIndexRange range;
-    int retval = context->m_phrase_index->get_range(index, range);
-    if (ERROR_OK == retval)
-        return false;
+    const pinyin_table_info_t * phrase_files = NULL;
+    FacadePhraseIndex * phrase_index = NULL;
+    const pinyin_table_info_t * table_info = NULL;
 
-    const pinyin_table_info_t * phrase_files =
-        context->m_system_table_info.get_table_info();
+    if (DEFAULT_TABLE == target) {
+        phrase_files = context->m_system_table_info.get_default_tables();
+        phrase_index = context->m_phrase_index;
+        table_info = phrase_files + index;
 
-    const pinyin_table_info_t * table_info = phrase_files + index;
-
-    if (SYSTEM_FILE == table_info->m_file_type ||
-        DICTIONARY == table_info->m_file_type) {
-        /* system phrase library */
-        MemoryChunk * chunk = new MemoryChunk;
-
-        const char * systemfilename = table_info->m_system_filename;
-        /* check bin file in system dir. */
-        gchar * chunkfilename = g_build_filename(context->m_system_dir,
-                                                 systemfilename, NULL);
-#ifdef LIBPINYIN_USE_MMAP
-        if (!chunk->mmap(chunkfilename))
-            fprintf(stderr, "mmap %s failed!\n", chunkfilename);
-#else
-        if (!chunk->load(chunkfilename))
-            fprintf(stderr, "open %s failed!\n", chunkfilename);
-#endif
-
-        g_free(chunkfilename);
-
-        context->m_phrase_index->load(index, chunk);
-
-        const char * userfilename = table_info->m_user_filename;
-
-        chunkfilename = g_build_filename(context->m_user_dir,
-                                         userfilename, NULL);
-
-        MemoryChunk * log = new MemoryChunk;
-        log->load(chunkfilename);
-        g_free(chunkfilename);
-
-        /* merge the chunk log. */
-        context->m_phrase_index->merge(index, log);
-        return true;
+        /* Only SYSTEM_FILE or USER_FILE is allowed here. */
+        assert(SYSTEM_FILE == table_info->m_file_type
+               || USER_FILE == table_info->m_file_type);
     }
 
-    if (USER_FILE == table_info->m_file_type) {
-        /* user phrase library */
-        MemoryChunk * chunk = new MemoryChunk;
-        const char * userfilename = table_info->m_user_filename;
+    if (ADDON_TABLE == target) {
+        phrase_files = context->m_system_table_info.get_addon_tables();
+        phrase_index = context->m_addon_phrase_index;
+        table_info = phrase_files + index;
 
-        gchar * chunkfilename = g_build_filename(context->m_user_dir,
-                                                 userfilename, NULL);
-
-        /* check bin file exists. if not, create a new one. */
-        if (chunk->load(chunkfilename)) {
-            context->m_phrase_index->load(index, chunk);
-        } else {
-            delete chunk;
-            context->m_phrase_index->create_sub_phrase(index);
-        }
-
-        g_free(chunkfilename);
-        return true;
+        /* Only DICTIONARY is allowed here. */
+        assert(DICTIONARY == table_info->m_file_type);
     }
+
+    _load_phrase_library(context->m_system_dir, context->m_user_dir,
+                         context->m_phrase_index, table_info);
 
     return false;
 }
 
 bool pinyin_unload_phrase_library(pinyin_context_t * context,
+                                  TABLE_TARGET target,
                                   guint8 index){
-    /* gb_char.bin and merged.bin can't be unloaded. */
-    if (GB_DICTIONARY == index || MERGED_DICTIONARY == index)
-        return false;
-
     assert(index < PHRASE_INDEX_LIBRARY_COUNT);
 
-    context->m_phrase_index->unload(index);
-    return true;
+    /* default table. */
+    if (DEFAULT_TABLE == target) {
+        /* only GBK table can be unloaded. */
+        if (GBK_DICTIONARY != index)
+            return false;
+
+        context->m_phrase_index->unload(index);
+        return true;
+    }
+
+    /* addon table. */
+    if (ADDON_TABLE == target) {
+        context->m_addon_phrase_index->unload(index);
+        return true;
+    }
+
+    return false;
 }
 
 import_iterator_t * pinyin_begin_add_phrases(pinyin_context_t * context,
@@ -829,6 +965,9 @@ void pinyin_fini(pinyin_context_t * context){
     delete context->m_user_bigram;
     delete context->m_pinyin_lookup;
     delete context->m_phrase_lookup;
+    delete context->m_addon_pinyin_table;
+    delete context->m_addon_phrase_table;
+    delete context->m_addon_phrase_index;
 
     g_free(context->m_system_dir);
     g_free(context->m_user_dir);

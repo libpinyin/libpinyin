@@ -63,6 +63,7 @@ pinyin_context_t * pinyin_init(const char * systemdir, const char * userdir);
 /**
  * pinyin_load_phrase_library:
  * @context: the pinyin context.
+ * @target: the table target.
  * @index: the phrase index to be loaded.
  * @returns: whether the load succeeded.
  *
@@ -70,11 +71,13 @@ pinyin_context_t * pinyin_init(const char * systemdir, const char * userdir);
  *
  */
 bool pinyin_load_phrase_library(pinyin_context_t * context,
+                                TABLE_TARGET target,
                                 guint8 index);
 
 /**
  * pinyin_unload_phrase_library:
  * @context: the pinyin context.
+ * @target: the table target.
  * @index: the phrase index to be unloaded.
  * @returns: whether the unload succeeded.
  *
@@ -82,6 +85,7 @@ bool pinyin_load_phrase_library(pinyin_context_t * context,
  *
  */
 bool pinyin_unload_phrase_library(pinyin_context_t * context,
+                                  TABLE_TARGET target,
                                   guint8 index);
 
 /**
