@@ -36,33 +36,50 @@ typedef GArray * CandidateVector; /* GArray of lookup_candidate_t */
 struct _pinyin_context_t{
     pinyin_option_t m_options;
 
+    /* input parsers. */
     FullPinyinParser2 * m_full_pinyin_parser;
     DoublePinyinParser2 * m_double_pinyin_parser;
     ChewingParser2 * m_chewing_parser;
 
+    /* default tables. */
     FacadeChewingTable * m_pinyin_table;
     FacadePhraseTable2 * m_phrase_table;
     FacadePhraseIndex * m_phrase_index;
     Bigram * m_system_bigram;
     Bigram * m_user_bigram;
 
+    /* lookups. */
     PinyinLookup2 * m_pinyin_lookup;
     PhraseLookup * m_phrase_lookup;
+
+    /* addon tables. */
+    FacadeChewingTable * m_addon_pinyin_table;
+    FacadePhraseTable2 * m_addon_phrase_table;
+    FacadePhraseIndex * m_addon_phrase_index;
 
     char * m_system_dir;
     char * m_user_dir;
     bool m_modified;
 
-    SystemTableInfo m_system_table_info;
+    SystemTableInfo2 m_system_table_info;
 };
 
 struct _pinyin_instance_t{
+    /* pointer of pinyin_context_t. */
     pinyin_context_t * m_context;
+
+    /* cached user input full pinyin. */
     gchar * m_raw_full_pinyin;
+
+    /* the tokens of phrases before the user input. */
     TokenVector m_prefixes;
+
+    /* cached parsed pinyin keys. */
     ChewingKeyVector m_pinyin_keys;
     ChewingKeyRestVector m_pinyin_key_rests;
     size_t m_parsed_len;
+
+    /* cached pinyin lookup variables. */
     CandidateConstraints m_constraints;
     MatchResults m_match_results;
     CandidateVector m_candidates;
