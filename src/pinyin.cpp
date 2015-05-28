@@ -1456,6 +1456,8 @@ static void _compute_frequency_of_items(pinyin_context_t * context,
 
         gfloat bigram_poss = 0; guint32 total_freq = 0;
 
+        gfloat lambda = context->m_system_table_info.get_lambda();
+
         /* handle addon candidates first. */
         if (ADDON_CANDIDATE == item->m_candidate_type) {
             total_freq = context->m_phrase_index->
@@ -1488,8 +1490,6 @@ static void _compute_frequency_of_items(pinyin_context_t * context,
         phrase_index->get_phrase_item(token, cached_item);
         total_freq = phrase_index->get_phrase_index_total_freq();
         assert (0 < total_freq);
-
-        gfloat lambda = context->m_system_table_info.get_lambda();
 
         /* Note: possibility value <= 1.0. */
         guint32 freq = (lambda * bigram_poss +
@@ -2272,7 +2272,7 @@ int pinyin_choose_candidate(pinyin_instance_t * instance,
         ucs4_t phrase[MAX_PHRASE_LENGTH];
         item.get_phrase_string(phrase);
         context->m_phrase_table->add_index(len, phrase, token);
-        context->m_phrase_index->add_phrase_item(token, item);
+        context->m_phrase_index->add_phrase_item(token, &item);
 
         /* update the candidate. */
         candidate->m_candidate_type = NORMAL_CANDIDATE;
