@@ -2467,20 +2467,9 @@ bool pinyin_token_get_phrase(pinyin_instance_t * instance,
                              guint * len,
                              gchar ** utf8_str) {
     pinyin_context_t * & context = instance->m_context;
-    PhraseItem item;
-    ucs4_t buffer[MAX_PHRASE_LENGTH];
 
-    int retval = context->m_phrase_index->get_phrase_item(token, item);
-    if (ERROR_OK != retval)
-        return false;
-
-    item.get_phrase_string(buffer);
-    guint length = item.get_phrase_length();
-    if (len)
-        *len = length;
-    if (utf8_str)
-        *utf8_str = g_ucs4_to_utf8(buffer, length, NULL, NULL, NULL);
-    return true;
+    return _token_get_phrase(context->m_phrase_index,
+                             token, len, utf8_str);
 }
 
 bool pinyin_token_get_n_pronunciation(pinyin_instance_t * instance,
