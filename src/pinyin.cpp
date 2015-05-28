@@ -2205,6 +2205,37 @@ int pinyin_choose_candidate(pinyin_instance_t * instance,
     if (BEST_MATCH_CANDIDATE == candidate->m_candidate_type)
         return instance->m_pinyin_keys->len;
 
+    if (ADDON_CANDIDATE == candidate->m_candidate_type) {
+        PhraseItem item;
+        context->m_addon_phrase_index->get_phrase_item
+            (candidate->m_token, item);
+
+        guint8 len = item.get_phrase_length();
+        guint8 npron = item.get_n_pronunciation();
+
+        PhraseIndexRange range;
+        context->m_phrase_index->get_range(ADDON_DICTIONARY, range);
+        /* assume not over flow here. */
+        phrase_token_t token = range.m_range_end;
+
+        /* add pinyin index. */
+        for (size_t i = 0; i < npron; ++i) {
+            ChewingKey keys[MAX_PHRASE_LENGTH];
+            guint32 freq = 0;
+            item.get_nth_pronunciation(i, keys, freq);
+            context->m_pinyin_table->add_index(len, keys, token);
+        }
+        /* add phrase index. */
+        ucs4_t phrase[MAX_PHRASE_LENGTH];
+        item.get_phrase_string(phrase);
+        context->m_phrase_table->add_index(len, phrase, token);
+        context->m_phrase_index->add_phrase_item(token, item);
+
+        /* update the candidate. */
+        candidate->m_candidate_type = NORMAL_CANDIDATE;
+        candidate->m_token = token;
+    }
+
     if (DIVIDED_CANDIDATE == candidate->m_candidate_type ||
         RESPLIT_CANDIDATE == candidate->m_candidate_type) {
         /* update full pinyin. */
