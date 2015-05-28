@@ -1657,7 +1657,7 @@ bool pinyin_guess_candidates(pinyin_instance_t * instance,
 
     PhraseIndexRanges addon_ranges;
     memset(addon_ranges, 0, sizeof(addon_ranges));
-    context->m_addon_phrase_index->prepare_ranges(ranges);
+    context->m_addon_phrase_index->prepare_ranges(addon_ranges);
 
     GArray * items = g_array_new(FALSE, FALSE, sizeof(lookup_candidate_t));
 
@@ -1994,6 +1994,11 @@ bool pinyin_guess_full_pinyin_candidates(pinyin_instance_t * instance,
     memset(ranges, 0, sizeof(ranges));
     context->m_phrase_index->prepare_ranges(ranges);
 
+    /* will not handle addon dictionaries in divided or resplit candidate. */
+    PhraseIndexRanges addon_ranges;
+    memset(addon_ranges, 0, sizeof(addon_ranges));
+    context->m_addon_phrase_index->prepare_ranges(addon_ranges);
+
     GArray * items = g_array_new(FALSE, FALSE, sizeof(lookup_candidate_t));
 
     if (1 == pinyin_len) {
@@ -2053,6 +2058,9 @@ bool pinyin_guess_full_pinyin_candidates(pinyin_instance_t * instance,
         int retval = context->m_pinyin_table->search
             (i, keys, ranges);
 
+        retval = context->m_addon_pinyin_table->search
+            (i, keys, addon_ranges) || retval;
+
         found = (retval & SEARCH_OK) || found;
 
         if ( !found )
@@ -2060,6 +2068,10 @@ bool pinyin_guess_full_pinyin_candidates(pinyin_instance_t * instance,
 
         lookup_candidate_t template_item;
         _append_items(ranges, &template_item, items);
+
+        lookup_candidate_t addon_template_item;
+        addon_template_item.m_candidate_type = ADDON_CANDIDATE;
+        _append_items(addon_ranges, &addon_template_item, items);
 
 #if 0
         g_array_sort(items, compare_item_with_token);
