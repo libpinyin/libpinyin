@@ -1305,6 +1305,26 @@ bool pinyin_in_chewing_keyboard(pinyin_instance_t * instance,
         (context->m_options, key, symbol);
 }
 
+static bool _token_get_phrase(FacadePhraseIndex * phrase_index,
+                              phrase_token_t token,
+                              guint * len,
+                              gchar ** utf8_str) {
+    PhraseItem item;
+    ucs4_t buffer[MAX_PHRASE_LENGTH];
+
+    int retval = phrase_index->get_phrase_item(token, item);
+    if (ERROR_OK != retval)
+        return false;
+
+    item.get_phrase_string(buffer);
+    guint length = item.get_phrase_length();
+    if (len)
+        *len = length;
+    if (utf8_str)
+        *utf8_str = g_ucs4_to_utf8(buffer, length, NULL, NULL, NULL);
+    return true;
+}
+
 #if 0
 static gint compare_item_with_token(gconstpointer lhs,
                                     gconstpointer rhs) {
@@ -1437,6 +1457,24 @@ static void _compute_frequency_of_items(pinyin_context_t * context,
         phrase_token_t & token = item->m_token;
 
         gfloat bigram_poss = 0; guint32 total_freq = 0;
+
+        /* handle addon candidates first. */
+        if (ADDON_CANDIDATE == item->m_candidate_type) {
+            total_freq = context->m_phrase_index->
+                get_phrase_index_total_freq();
+
+            /* assume the unigram of every addon phrases is 1. */
+            context->m_addon_phrase_index->get_phrase_item
+                (token, cached_item);
+
+            /* Note: possibility value <= 1.0. */
+            guint32 freq = ((1 - lambda) *
+                            cached_item.get_unigram_frequency() /
+                            (gfloat) total_freq) * 256 * 256 * 256;
+            item->m_freq = freq;
+            continue;
+        }
+
         if (options & DYNAMIC_ADJUST) {
             if (null_token != prev_token) {
                 guint32 bigram_freq = 0;
@@ -1503,8 +1541,15 @@ static bool _compute_phrase_strings_of_items(pinyin_instance_t * instance,
         case DIVIDED_CANDIDATE:
         case RESPLIT_CANDIDATE:
         case PREDICTED_CANDIDATE:
-            pinyin_token_get_phrase
-                (instance, candidate->m_token, NULL,
+            _token_get_phrase
+                (instance->m_context->m_phrase_index,
+                 candidate->m_token, NULL,
+                 &(candidate->m_phrase_string));
+            break;
+        case ADDON_CANDIDATE:
+            _token_get_phrase
+                (instance->m_context->m_addon_phrase_index,
+                 candidate->m_token, NULL,
                  &(candidate->m_phrase_string));
             break;
         case ZOMBIE_CANDIDATE:
