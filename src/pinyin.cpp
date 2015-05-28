@@ -474,62 +474,60 @@ pinyin_context_t * pinyin_init(const char * systemdir, const char * userdir){
 }
 
 bool pinyin_load_phrase_library(pinyin_context_t * context,
-                                TABLE_TARGET target,
                                 guint8 index){
     if (!(index < PHRASE_INDEX_LIBRARY_COUNT))
         return false;
 
-    const pinyin_table_info_t * phrase_files = NULL;
-    FacadePhraseIndex * phrase_index = NULL;
-    const pinyin_table_info_t * table_info = NULL;
+    const pinyin_table_info_t * phrase_files =
+        context->m_system_table_info.get_default_tables();
+    FacadePhraseIndex * phrase_index = context->m_phrase_index;
+    const pinyin_table_info_t * table_info = phrase_files + index;
 
-    if (DEFAULT_TABLE == target) {
-        phrase_files = context->m_system_table_info.get_default_tables();
-        phrase_index = context->m_phrase_index;
-        table_info = phrase_files + index;
+    /* Only SYSTEM_FILE or USER_FILE is allowed here. */
+    assert(SYSTEM_FILE == table_info->m_file_type
+           || USER_FILE == table_info->m_file_type);
 
-        /* Only SYSTEM_FILE or USER_FILE is allowed here. */
-        assert(SYSTEM_FILE == table_info->m_file_type
-               || USER_FILE == table_info->m_file_type);
-    }
-
-    if (ADDON_TABLE == target) {
-        phrase_files = context->m_system_table_info.get_addon_tables();
-        phrase_index = context->m_addon_phrase_index;
-        table_info = phrase_files + index;
-
-        /* Only DICTIONARY is allowed here. */
-        assert(DICTIONARY == table_info->m_file_type);
-    }
-
-    _load_phrase_library(context->m_system_dir, context->m_user_dir,
-                         phrase_index, table_info);
-
-    return false;
+    return _load_phrase_library(context->m_system_dir, context->m_user_dir,
+                                phrase_index, table_info);
 }
 
 bool pinyin_unload_phrase_library(pinyin_context_t * context,
-                                  TABLE_TARGET target,
                                   guint8 index){
     assert(index < PHRASE_INDEX_LIBRARY_COUNT);
 
     /* default table. */
-    if (DEFAULT_TABLE == target) {
-        /* only GBK table can be unloaded. */
-        if (GBK_DICTIONARY != index)
-            return false;
+    /* only GBK table can be unloaded. */
+    if (GBK_DICTIONARY != index)
+        return false;
 
-        context->m_phrase_index->unload(index);
-        return true;
-    }
+    context->m_phrase_index->unload(index);
+    return true;
+}
+
+bool pinyin_load_addon_phrase_library(pinyin_context_t * context,
+                                      guint8 index){
+    if (!(index < PHRASE_INDEX_LIBRARY_COUNT))
+        return false;
+
+    const pinyin_table_info_t * phrase_files =
+        context->m_system_table_info.get_addon_tables();
+    FacadePhraseIndex * phrase_index = context->m_addon_phrase_index;
+    const pinyin_table_info_t * table_info = phrase_files + index;
+
+    /* Only DICTIONARY is allowed here. */
+    assert(DICTIONARY == table_info->m_file_type);
+
+    return _load_phrase_library(context->m_system_dir, context->m_user_dir,
+                                phrase_index, table_info);
+}
+
+bool pinyin_unload_addon_phrase_library(pinyin_context_t * context,
+                                        guint8 index){
+    assert(index < PHRASE_INDEX_LIBRARY_COUNT);
 
     /* addon table. */
-    if (ADDON_TABLE == target) {
-        context->m_addon_phrase_index->unload(index);
-        return true;
-    }
-
-    return false;
+    context->m_addon_phrase_index->unload(index);
+    return true;
 }
 
 import_iterator_t * pinyin_begin_add_phrases(pinyin_context_t * context,

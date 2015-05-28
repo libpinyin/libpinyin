@@ -33,6 +33,11 @@ typedef enum {
 } TABLE_PHONETIC_TYPE;
 
 typedef enum {
+    DEFAULT_TABLE,
+    ADDON_TABLE,
+} TABLE_TARGET;
+
+typedef enum {
     NOT_USED,                /* not used. */
     SYSTEM_FILE,             /* system phrase file. */
     DICTIONARY,              /* professional dictionary. */
