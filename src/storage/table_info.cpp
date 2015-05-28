@@ -139,6 +139,10 @@ static guint8 to_index_of_default_tables(const char * str) {
     assert(FALSE);
 }
 
+static guint8 to_index_of_addon_tables(const char * str) {
+    return atoi(str);
+}
+
 static gchar * to_string(const char * str) {
     HANDLE(NULL);
 
@@ -230,7 +234,7 @@ bool SystemTableInfo2::load(const char * filename) {
 
         if (ADDON_TABLE == target) {
             tables = m_addon_tables;
-            index = atoi(dictstr);
+            index = to_index_of_addon_tables(dictstr);
         }
 
         assert(0 <= index && index < PHRASE_INDEX_LIBRARY_COUNT);

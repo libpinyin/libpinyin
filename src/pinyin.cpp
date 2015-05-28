@@ -1379,8 +1379,7 @@ static phrase_token_t _get_previous_token(pinyin_instance_t * instance,
     return prev_token;
 }
 
-static void _append_items(pinyin_context_t * context,
-                          PhraseIndexRanges ranges,
+static void _append_items(PhraseIndexRanges ranges,
                           lookup_candidate_t * template_item,
                           CandidateVector items) {
     /* reduce and append to a single GArray. */
@@ -1656,6 +1655,10 @@ bool pinyin_guess_candidates(pinyin_instance_t * instance,
     memset(ranges, 0, sizeof(ranges));
     context->m_phrase_index->prepare_ranges(ranges);
 
+    PhraseIndexRanges addon_ranges;
+    memset(addon_ranges, 0, sizeof(addon_ranges));
+    context->m_addon_phrase_index->prepare_ranges(ranges);
+
     GArray * items = g_array_new(FALSE, FALSE, sizeof(lookup_candidate_t));
 
     for (i = pinyin_len; i >= 1; --i) {
@@ -1668,11 +1671,18 @@ bool pinyin_guess_candidates(pinyin_instance_t * instance,
         int retval = context->m_pinyin_table->search
             (i, keys, ranges);
 
+        retval = context->m_addon_pinyin_table->search
+            (i, keys, addon_ranges) || retval;
+
         if ( !(retval & SEARCH_OK) )
             continue;
 
         lookup_candidate_t template_item;
-        _append_items(context, ranges, &template_item, items);
+        _append_items(ranges, &template_item, items);
+
+        lookup_candidate_t addon_template_item;
+        addon_template_item.m_candidate_type = ADDON_CANDIDATE;
+        _append_items(addon_ranges, &addon_template_item, items);
 
 #if 0
         g_array_sort(items, compare_item_with_token);
@@ -1794,7 +1804,7 @@ static bool _try_divided_table(pinyin_instance_t * instance,
             template_item.m_orig_rest = orig_rest;
             template_item.m_new_pinyins = new_pinyins;
 
-            _append_items(context, ranges, &template_item, items);
+            _append_items(ranges, &template_item, items);
             found = true;
         }
         g_free(new_pinyins);
@@ -1932,7 +1942,7 @@ static bool _try_resplit_table(pinyin_instance_t * instance,
             template_item.m_orig_rest = orig_rest;
             template_item.m_new_pinyins = new_pinyins;
 
-            _append_items(context, ranges, &template_item, items);
+            _append_items(ranges, &template_item, items);
             found = true;
         }
         g_free(new_pinyins);
@@ -2049,7 +2059,7 @@ bool pinyin_guess_full_pinyin_candidates(pinyin_instance_t * instance,
             continue;
 
         lookup_candidate_t template_item;
-        _append_items(context, ranges, &template_item, items);
+        _append_items(ranges, &template_item, items);
 
 #if 0
         g_array_sort(items, compare_item_with_token);
