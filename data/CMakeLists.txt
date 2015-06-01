@@ -4,6 +4,8 @@ set(
     gbk_char.bin
     phrase_index.bin
     pinyin_index.bin
+    addon_phrase_index.bin
+    addon_pinyin_index.bin
     bigram.db
 )
 
@@ -46,9 +48,9 @@ add_custom_command(
     COMMENT
         "Downloading textual model data..."
     COMMAND
-       wget http://downloads.sourceforge.net/libpinyin/models/model8.text.tar.gz
+       wget http://downloads.sourceforge.net/libpinyin/models/model9.text.tar.gz
     COMMAND
-       tar xvf model8.text.tar.gz -C ${CMAKE_SOURCE_DIR}/data
+       tar xvf model9.text.tar.gz -C ${CMAKE_SOURCE_DIR}/data
 )
 
 add_custom_command(

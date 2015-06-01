@@ -31,6 +31,7 @@ textual_model_data	= interpolation2.text \
 
 
 binary_model_data	= phrase_index.bin pinyin_index.bin \
+				addon_phrase_index.bin addon_pinyin_index.bin \
 				bigram.db \
 				$(binfiles)
 
@@ -48,8 +49,8 @@ libpinyin_dbdir		= $(libdir)/libpinyin/data
 CLEANFILES		= $(binary_model_data)
 
 interpolation2.text:
-	wget http://downloads.sourceforge.net/libpinyin/models/model8.text.tar.gz
-	tar xvf model8.text.tar.gz -C $(top_srcdir)/data
+	wget http://downloads.sourceforge.net/libpinyin/models/model9.text.tar.gz
+	tar xvf model9.text.tar.gz -C $(top_srcdir)/data
 
 
 $(tablefiles) table.conf: interpolation2.text
