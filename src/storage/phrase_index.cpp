@@ -629,7 +629,7 @@ int SubPhraseIndex::get_range(/* out */ PhraseIndexRange & range){
     }
 
     range.m_range_begin = 1; /* token starts with 1 in gen_pinyin_table. */
-    range.m_range_end = poffset - begin + 1; /* removed zeros. */
+    range.m_range_end = poffset - begin; /* removed zeros. */
 
     return ERROR_OK;
 }
