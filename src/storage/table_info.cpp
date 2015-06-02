@@ -194,10 +194,9 @@ bool SystemTableInfo2::load(const char * filename) {
     }
 
     TABLE_PHONETIC_TYPE type = PINYIN_TABLE;
-    char * str = NULL;
-    num = fscanf(input, "source table format:%ms", &str);
+    char str[256];
+    num = fscanf(input, "source table format:%256s", str);
     type = to_table_phonetic_type(str);
-    free(str);
 
 #if 0
     printf("binver:%d modelver:%d lambda:%f\n", binver, modelver, lambda);
