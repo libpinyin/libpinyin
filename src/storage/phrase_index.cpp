@@ -556,7 +556,7 @@ bool FacadePhraseIndex::load_text(guint8 phrase_index, FILE * infile){
 	    item_ptr->set_phrase_string(written, phrase_ucs4);
 	}
 
-        pinyin_option_t options = USE_TONE;
+    pinyin_option_t options = USE_TONE;
 	FullPinyinParser2 parser;
 	ChewingKeyVector keys = g_array_new(FALSE, FALSE, sizeof(ChewingKey));
 	ChewingKeyRestVector key_rests =
@@ -623,7 +623,7 @@ int SubPhraseIndex::get_range(/* out */ PhraseIndexRange & range){
 
     /* remove trailing zeros. */
     const table_offset_t * poffset = NULL;
-    for (poffset = end; poffset > begin; --poffset) {
+    for (poffset = end; poffset > begin + 1; --poffset) {
         if (NULL !=  *(poffset - 1))
             break;
     }
