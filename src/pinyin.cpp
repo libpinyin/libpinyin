@@ -514,6 +514,9 @@ bool pinyin_load_addon_phrase_library(pinyin_context_t * context,
     FacadePhraseIndex * phrase_index = context->m_addon_phrase_index;
     const pinyin_table_info_t * table_info = phrase_files + index;
 
+    if (NOT_USED == table_info->m_file_type)
+        return false;
+
     /* Only DICTIONARY is allowed here. */
     assert(DICTIONARY == table_info->m_file_type);
 
