@@ -389,6 +389,9 @@ pinyin_context_t * pinyin_init(const char * systemdir, const char * userdir){
         const pinyin_table_info_t * table_info =
             phrase_files + i;
 
+        if (NOT_USED == table_info->m_file_type)
+            continue;
+
         /* addon dictionary should not in default tables. */
         assert(DICTIONARY != table_info->m_file_type);
 
