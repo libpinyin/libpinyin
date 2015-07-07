@@ -1,5 +1,5 @@
 version 1.1.91
-* support Kyoto Cabinet as alternatvie to Berkeley DB.
+* support Kyoto Cabinet as alternative to Berkeley DB.
 * improve multiple dictionaries support feature.
 
 version 1.1.0
