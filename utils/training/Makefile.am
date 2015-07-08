@@ -26,10 +26,6 @@ INCLUDES		= -I$(top_srcdir)/src \
 
 LDADD			= ../../src/libpinyin_internal.la @GLIB2_LIBS@
 
-if KYOTOCABINET
-LDADD                  += @KYOTOCABINET_LIBS@
-endif
-
 noinst_HEADERS		= k_mixture_model.h
 
 bin_PROGRAMS		= gen_unigram
