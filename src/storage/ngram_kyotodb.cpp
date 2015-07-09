@@ -76,6 +76,9 @@ bool Bigram::load_db(const char * dbfile){
     /* create on-memory db. */
     m_db = new ProtoHashDB;
 
+    if ( !m_db->open("-", ProtoHashDB::OWRITER|ProtoHashDB::OCREATE) )
+        return false;
+
     /* load db into memory. */
     BasicDB * tmp_db = new HashDB;
     tmp_db->open(dbfile, BasicDB::OREADER);
