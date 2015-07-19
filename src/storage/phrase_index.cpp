@@ -624,7 +624,7 @@ int SubPhraseIndex::get_range(/* out */ PhraseIndexRange & range){
     /* remove trailing zeros. */
     const table_offset_t * poffset = NULL;
     for (poffset = end; poffset > begin + 1; --poffset) {
-        if (NULL !=  *(poffset - 1))
+        if (0 !=  *(poffset - 1))
             break;
     }
 
