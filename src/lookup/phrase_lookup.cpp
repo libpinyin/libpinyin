@@ -38,7 +38,7 @@ static bool populate_prefixes(GPtrArray * steps_index,
                               GPtrArray * steps_content) {
 
     lookup_key_t initial_key = sentence_start;
-    lookup_value_t initial_value(log(1));
+    lookup_value_t initial_value(log(1.f));
     initial_value.m_handles[1] = sentence_start;
 
     LookupStepContent initial_step_content = (LookupStepContent)
