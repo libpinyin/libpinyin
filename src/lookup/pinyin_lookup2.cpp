@@ -133,7 +133,7 @@ static bool populate_prefixes(GPtrArray * steps_index,
     for (size_t i = 0; i < prefixes->len; ++i) {
         phrase_token_t token = g_array_index(prefixes, phrase_token_t, i);
         lookup_key_t initial_key = token;
-        lookup_value_t initial_value(log(1));
+        lookup_value_t initial_value(log(1.f));
         initial_value.m_handles[1] = token;
 
         LookupStepContent initial_step_content = (LookupStepContent)
