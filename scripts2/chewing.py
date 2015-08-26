@@ -20,72 +20,81 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 
-ASCII_CHEWING_INITIAL_MAP = {
-    "CHEWING_ZERO_INITIAL" : None,    #Zero Initial
-    "CHEWING_B" : "ㄅ",
-    "CHEWING_C" : "ㄘ",
-    "CHEWING_CH" : "ㄔ",
-    "CHEWING_D" : "ㄉ",
-    "CHEWING_F" : "ㄈ",
-    "CHEWING_H" : "ㄏ",
-    "CHEWING_G" : "ㄍ",
-    "CHEWING_K" : "ㄎ",
-    "CHEWING_J" : "ㄐ",
-    "CHEWING_M" : "ㄇ",
-    "CHEWING_N" : "ㄋ",
-    "CHEWING_L" : "ㄌ",
-    "CHEWING_R" : "ㄖ",
-    "CHEWING_P" : "ㄆ",
-    "CHEWING_Q" : "ㄑ",
-    "CHEWING_S" : "ㄙ",
-    "CHEWING_SH" : "ㄕ",
-    "CHEWING_T" : "ㄊ",
-    "PINYIN_W" : None,                #Invalid Chewing
-    "CHEWING_X" : "ㄒ",
-    "PINYIN_Y" : None,                #Invalid Chewing
-    "CHEWING_Z" : "ㄗ",
-    "CHEWING_ZH" : "ㄓ",
-}
+ASCII_CHEWING_INITIAL_LIST = [
+    ("CHEWING_ZERO_INITIAL" , None),    #Zero Initial
+    ("CHEWING_B" , "ㄅ"),
+    ("CHEWING_C" , "ㄘ"),
+    ("CHEWING_CH" , "ㄔ"),
+    ("CHEWING_D" , "ㄉ"),
+    ("CHEWING_F" , "ㄈ"),
+    ("CHEWING_H" , "ㄏ"),
+    ("CHEWING_G" , "ㄍ"),
+    ("CHEWING_K" , "ㄎ"),
+    ("CHEWING_J" , "ㄐ"),
+    ("CHEWING_M" , "ㄇ"),
+    ("CHEWING_N" , "ㄋ"),
+    ("CHEWING_L" , "ㄌ"),
+    ("CHEWING_R" , "ㄖ"),
+    ("CHEWING_P" , "ㄆ"),
+    ("CHEWING_Q" , "ㄑ"),
+    ("CHEWING_S" , "ㄙ"),
+    ("CHEWING_SH" , "ㄕ"),
+    ("CHEWING_T" , "ㄊ"),
+    ("PINYIN_W" , None),                #Invalid Chewing
+    ("CHEWING_X" , "ㄒ"),
+    ("PINYIN_Y" , None),                #Invalid Chewing
+    ("CHEWING_Z" , "ㄗ"),
+    ("CHEWING_ZH" , "ㄓ"),
+]
 
-CHEWING_ASCII_INITIAL_MAP = dict([(v, k) for k, v in ASCII_CHEWING_INITIAL_MAP.items() if v])
+ASCII_CHEWING_INITIAL_MAP = dict(ASCII_CHEWING_INITIAL_LIST)
 
-ASCII_CHEWING_MIDDLE_MAP = {
-    "CHEWING_ZERO_MIDDLE" : None,     #Zero Middle
-    "CHEWING_I" : "ㄧ",
-    "CHEWING_U" : "ㄨ",
-    "CHEWING_V" : "ㄩ",
-}
+CHEWING_ASCII_INITIAL_MAP = dict([(v, k) for k, v in ASCII_CHEWING_INITIAL_LIST if v])
 
-CHEWING_ASCII_MIDDLE_MAP = dict([(v, k) for k, v in ASCII_CHEWING_MIDDLE_MAP.items() if v])
 
-ASCII_CHEWING_FINAL_MAP = {
-    "CHEWING_ZERO_FINAL" : None,      #Zero Final
-    "CHEWING_A" : "ㄚ",
-    "CHEWING_AI" : "ㄞ",
-    "CHEWING_AN" : "ㄢ",
-    "CHEWING_ANG" : "ㄤ",
-    "CHEWING_AO" : "ㄠ",
-    "CHEWING_E" : "ㄝ",                # merge "ㄝ" and "ㄜ"
-    "INVALID_EA" : None,               #Invalid Pinyin/Chewing
-    "CHEWING_EI" : "ㄟ",
-    "CHEWING_EN" : "ㄣ",
-    "CHEWING_ENG" : "ㄥ",
-    "CHEWING_ER" : "ㄦ",
-    "CHEWING_NG" : "ㄫ",
-    "CHEWING_O" : "ㄛ",
-    "PINYIN_ONG" : None,               #"ueng"
-    "CHEWING_OU" : "ㄡ",
-    "PINYIN_IN" : None,                #"ien"
-    "PINYIN_ING" : None,               #"ieng"
-}
+ASCII_CHEWING_MIDDLE_LIST = [
+    ("CHEWING_ZERO_MIDDLE" , None),     #Zero Middle
+    ("CHEWING_I" , "ㄧ"),
+    ("CHEWING_U" , "ㄨ"),
+    ("CHEWING_V" , "ㄩ"),
+]
 
-CHEWING_ASCII_FINAL_MAP = dict([(v, k) for k, v in ASCII_CHEWING_FINAL_MAP.items() if v])
+ASCII_CHEWING_MIDDLE_MAP = dict(ASCII_CHEWING_MIDDLE_LIST)
 
-ASCII_CHEWING_TONE_MAP = {
-    "CHEWING_ZERO_TONE" : None,     #Zero Tone
-    "CHEWING_1" : " ",
-    "CHEWING_2" : "ˊ",
-    "CHEWING_3" : "ˇ",
-    "CHEWING_4" : "ˋ",
-    "CHEWING_5" : "˙",
-}
+CHEWING_ASCII_MIDDLE_MAP = dict([(v, k) for k, v in ASCII_CHEWING_MIDDLE_LIST if v])
+
+
+ASCII_CHEWING_FINAL_LIST = [
+    ("CHEWING_ZERO_FINAL" , None),      #Zero Final
+    ("CHEWING_A" , "ㄚ"),
+    ("CHEWING_AI" , "ㄞ"),
+    ("CHEWING_AN" , "ㄢ"),
+    ("CHEWING_ANG" , "ㄤ"),
+    ("CHEWING_AO" , "ㄠ"),
+    ("CHEWING_E" , "ㄝ"),                # merge "ㄝ" and "ㄜ"
+    ("INVALID_EA" , None),               #Invalid Pinyin/Chewing
+    ("CHEWING_EI" , "ㄟ"),
+    ("CHEWING_EN" , "ㄣ"),
+    ("CHEWING_ENG" , "ㄥ"),
+    ("CHEWING_ER" , "ㄦ"),
+    ("CHEWING_NG" , "ㄫ"),
+    ("CHEWING_O" , "ㄛ"),
+    ("PINYIN_ONG" , None),               #"ueng"
+    ("CHEWING_OU" , "ㄡ"),
+    ("PINYIN_IN" , None),                #"ien"
+    ("PINYIN_ING" , None),               #"ieng"
+]
+
+ASCII_CHEWING_FINAL_MAP = dict(ASCII_CHEWING_FINAL_LIST)
+
+CHEWING_ASCII_FINAL_MAP = dict([(v, k) for k, v in ASCII_CHEWING_FINAL_LIST if v])
+
+
+ASCII_CHEWING_TONE_LIST = [
+    ("CHEWING_ZERO_TONE" , None),     #Zero Tone
+    ("CHEWING_1" , " "),
+    ("CHEWING_2" , "ˊ"),
+    ("CHEWING_3" , "ˇ"),
+    ("CHEWING_4" , "ˋ"),
+    ("CHEWING_5" , "˙"),
+]
