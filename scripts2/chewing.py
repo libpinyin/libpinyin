@@ -98,3 +98,19 @@ ASCII_CHEWING_TONE_LIST = [
     ("CHEWING_4" , "ˋ"),
     ("CHEWING_5" , "˙"),
 ]
+
+### main function ###
+if __name__ == "__main__":
+    print(ASCII_CHEWING_INITIAL_LIST)
+    print(ASCII_CHEWING_INITIAL_MAP)
+    print(CHEWING_ASCII_INITIAL_MAP)
+
+    print(ASCII_CHEWING_MIDDLE_LIST)
+    print(ASCII_CHEWING_MIDDLE_MAP)
+    print(CHEWING_ASCII_MIDDLE_MAP)
+
+    print(ASCII_CHEWING_FINAL_LIST)
+    print(ASCII_CHEWING_FINAL_MAP)
+    print(CHEWING_ASCII_FINAL_MAP)
+
+    print(ASCII_CHEWING_TONE_LIST)
