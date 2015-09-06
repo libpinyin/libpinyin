@@ -157,7 +157,7 @@ def gen_table_index(content_table):
                 chewingkey = 'ChewingKey({0}, {1}, {2})'.format(initial, middle, final)
                 index = -1
                 try:
-                    index = [x[2] for x in content_table].index(chewingkey)
+                    index = [x[4] for x in content_table].index(chewingkey)
                 except ValueError:
                     pass
 

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # vim:set et sts=4 sw=4:
 #
-# libzhuyin - Library to deal with zhuyin.
+# libpinyin - Library to deal with pinyin.
 #
 # Copyright (C) 2011 Peng Wu <alexepico@gmail.com>
 #
@@ -21,10 +21,11 @@
 
 import operator
 import itertools
-from bopomofo import BOPOMOFO_HANYU_PINYIN_MAP, BOPOMOFO_LUOMA_PINYIN_MAP, BOPOMOFO_SECONDARY_BOPOMOFO_MAP
-from pinyintable import *
-from correct import *
-from chewingkey import gen_table_index
+import chewing
+from pyzymap import ZHUYIN_PINYIN_MAP, ZHUYIN_LUOMA_PINYIN_MAP, ZHUYIN_SECONDARY_ZHUYIN_MAP
+from pyzymap import PINYIN_ZHUYIN_MAP, ZHUYIN_SPECIAL_INITIAL_SET_IN_PINYIN_FORM
+from fullpinyin import PINYIN_LIST, SHENGMU_LIST
+from options import *
 from utils import shuffle_all
 
 
@@ -38,16 +39,147 @@ hsu_bopomofo_index = []
 eten26_bopomofo_index = []
 
 
+pinyin_list = sorted(PINYIN_ZHUYIN_MAP.keys())
+shengmu_list = sorted(SHENGMU_LIST)
+
+
+def check_pinyin_chewing_map():
+    for pinyin_key in PINYIN_LIST:
+        if pinyin_key in pinyin_list:
+            pass
+        else:
+            print("pinyin %s has no chewing mapping", pinyin_key)
+
+
+def get_chewing(pinyin_key):
+    initial, middle, final = \
+        'CHEWING_ZERO_INITIAL', 'CHEWING_ZERO_MIDDLE', 'CHEWING_ZERO_FINAL'
+    assert pinyin_key != None
+    assert pinyin_key in PINYIN_ZHUYIN_MAP
+
+    #handle 'w' and 'y'
+    if pinyin_key[0] == 'w':
+        initial = 'PINYIN_W'
+    if pinyin_key[0] == 'y':
+        initial = 'PINYIN_Y'
+
+    #get chewing string
+    bopomofo_str = PINYIN_ZHUYIN_MAP[pinyin_key]
+
+    #handle bopomofo ZHUYIN_SPECIAL_INITIAL_SET_IN_PINYIN_FORM
+    if pinyin_key in ZHUYIN_SPECIAL_INITIAL_SET_IN_PINYIN_FORM:
+        middle = "CHEWING_I"
+    #normal process
+    for char in bopomofo_str:
+        if char in chewing.CHEWING_ASCII_INITIAL_MAP:
+            initial = chewing.CHEWING_ASCII_INITIAL_MAP[char]
+        if char in chewing.CHEWING_ASCII_MIDDLE_MAP:
+            middle = chewing.CHEWING_ASCII_MIDDLE_MAP[char]
+        if char in chewing.CHEWING_ASCII_FINAL_MAP:
+            final = chewing.CHEWING_ASCII_FINAL_MAP[char]
+        if char == "ㄜ":  # merge "ㄝ" and "ㄜ"
+            final = "CHEWING_E"
+
+    post_process_rules = {
+        #handle "ueng"/"ong"
+        ("CHEWING_U", "CHEWING_ENG"): ("CHEWING_ZERO_MIDDLE", "PINYIN_ONG"),
+        #handle "veng"/"iong"
+        ("CHEWING_V", "CHEWING_ENG"): ("CHEWING_I", "PINYIN_ONG"),
+        #handle "ien"/"in"
+        ("CHEWING_I", "CHEWING_EN"): ("CHEWING_ZERO_MIDDLE", "PINYIN_IN"),
+        #handle "ieng"/"ing"
+        ("CHEWING_I", "CHEWING_ENG"): ("CHEWING_ZERO_MIDDLE", "PINYIN_ING"),
+        }
+
+    if (middle, final) in post_process_rules:
+        (middle, final) = post_process_rules[(middle, final)]
+
+    return initial, middle, final
+
+
+def gen_pinyin_list():
+    for p in itertools.chain(gen_pinyins(),
+                             gen_shengmu(),
+                             ):
+        yield p
+
+
+def gen_pinyins():
+    #generate all pinyins in bopomofo
+    for pinyin_key in pinyin_list:
+        flags = []
+        if pinyin_key in PINYIN_ZHUYIN_MAP.keys():
+            flags.append("IS_BOPOMOFO")
+        if pinyin_key in PINYIN_LIST or \
+                pinyin_key in SHENGMU_LIST:
+            flags.append("IS_PINYIN")
+        if pinyin_key in shengmu_list:
+            flags.append("PINYIN_INCOMPLETE")
+        chewing_key = PINYIN_ZHUYIN_MAP[pinyin_key]
+        if chewing_key in chewing.CHEWING_ASCII_INITIAL_MAP and \
+                pinyin_key not in ZHUYIN_SPECIAL_INITIAL_SET_IN_PINYIN_FORM:
+            flags.append("CHEWING_INCOMPLETE")
+        yield pinyin_key, chewing_key, \
+            flags, get_chewing(pinyin_key)
+
+
+def get_shengmu_chewing(shengmu):
+    assert shengmu in shengmu_list, "Expected shengmu here."
+    chewing_key = 'CHEWING_{0}'.format(shengmu.upper())
+    if chewing_key in chewing.ASCII_CHEWING_INITIAL_MAP:
+        initial = chewing_key
+    else:
+        initial = 'PINYIN_{0}'.format(shengmu.upper())
+    return initial, "CHEWING_ZERO_MIDDLE", "CHEWING_ZERO_FINAL"
+
+def gen_shengmu():
+    #generate all shengmu
+    for shengmu in shengmu_list:
+        if shengmu in pinyin_list:
+            continue
+        flags = ["IS_PINYIN", "PINYIN_INCOMPLETE"]
+        chewing_key = get_shengmu_chewing(shengmu)
+        chewing_initial = chewing_key[0]
+        if chewing_initial in chewing.ASCII_CHEWING_INITIAL_MAP:
+            chewing_initial = chewing.ASCII_CHEWING_INITIAL_MAP[chewing_initial]
+        yield shengmu, chewing_initial, \
+            flags, chewing_key
+
+
+def gen_corrects():
+    #generate corrections
+    for correct, wrong in auto_correct:
+        flags = ['IS_PINYIN', 'PINYIN_CORRECT_{0}_{1}'.format(wrong.upper(),
+                                                              correct.upper())]
+        for pinyin_key in pinyin_list:
+            #fixes partial pinyin instead of the whole pinyin
+            if pinyin_key.endswith(correct) and pinyin_key != correct:
+                chewing_key = PINYIN_ZHUYIN_MAP[pinyin_key]
+                new_pinyin_key = pinyin_key.replace(correct, wrong)
+                yield pinyin_key, new_pinyin_key, chewing_key,\
+                    flags, get_chewing(pinyin_key)
+
+
+def gen_u_to_v():
+    #generate U to V
+    for correct, wrong, flags in auto_correct_ext:
+        #over-ride flags
+        flags = ['IS_PINYIN', 'PINYIN_CORRECT_V_U']
+        pinyin_key = correct
+        chewing_key = PINYIN_ZHUYIN_MAP[pinyin_key]
+        yield correct, wrong, chewing_key, flags, get_chewing(pinyin_key)
+
+
 #pinyin table
 def filter_pinyin_list():
     for (pinyin, bopomofo, flags, chewing) in gen_pinyin_list():
         (luoma, second) = (None, None)
 
-        if bopomofo in BOPOMOFO_LUOMA_PINYIN_MAP:
-            luoma = BOPOMOFO_LUOMA_PINYIN_MAP[bopomofo]
+        if bopomofo in ZHUYIN_LUOMA_PINYIN_MAP:
+            luoma = ZHUYIN_LUOMA_PINYIN_MAP[bopomofo]
 
-        if bopomofo in BOPOMOFO_SECONDARY_BOPOMOFO_MAP:
-            second = BOPOMOFO_SECONDARY_BOPOMOFO_MAP[bopomofo]
+        if bopomofo in ZHUYIN_SECONDARY_ZHUYIN_MAP:
+            second = ZHUYIN_SECONDARY_ZHUYIN_MAP[bopomofo]
 
         flags = '|'.join(flags)
         chewing = "ChewingKey({0})".format(', '.join(chewing))
@@ -173,7 +305,7 @@ def gen_luoma_pinyin_index():
 def gen_bopomofo_index():
     entries = []
     for (shuffle, flags, correct) in shuffle_bopomofo_index:
-        pinyin = BOPOMOFO_HANYU_PINYIN_MAP[correct]
+        pinyin = ZHUYIN_PINYIN_MAP[correct]
         index = [x[0] for x in content_table].index(pinyin)
         entry = '{{"{0}", {1}, {2}}}'.format(shuffle, flags, index)
         entries.append(entry)
@@ -190,7 +322,7 @@ def gen_secondary_bopomofo_index():
 def gen_hsu_bopomofo_index():
     entries = []
     for (wrong, flags, correct) in hsu_bopomofo_index:
-        pinyin = BOPOMOFO_HANYU_PINYIN_MAP[correct]
+        pinyin = ZHUYIN_PINYIN_MAP[correct]
         index = [x[0] for x in content_table].index(pinyin)
         entry = '{{"{0}" /* "{1}" */, {2}, {3}}}'.format \
                 (wrong, pinyin, flags, index)
@@ -200,7 +332,7 @@ def gen_hsu_bopomofo_index():
 def gen_eten26_bopomofo_index():
     entries = []
     for (wrong, flags, correct) in eten26_bopomofo_index:
-        pinyin = BOPOMOFO_HANYU_PINYIN_MAP[correct]
+        pinyin = ZHUYIN_PINYIN_MAP[correct]
         index = [x[0] for x in content_table].index(pinyin)
         entry = '{{"{0}" /* "{1}" */, {2}, {3}}}'.format \
                 (wrong, pinyin, flags, index)
@@ -250,7 +382,7 @@ def handle_special_rules(bopomofo, corrects):
     return handle_rules(bopomofo, corrects)
 
 def gen_chewing_key_table():
-    return gen_table_index(content_table)
+    return chewing.gen_table_index(content_table)
 
 
 #init code
@@ -263,8 +395,15 @@ sort_all()
 
 ### main function ###
 if __name__ == "__main__":
+    #pre-check here
+    check_pinyin_chewing_map()
+
+    #dump
+    for p in gen_pinyin_list():
+        print (p)
+
     #s = gen_content_table() + gen_hanyu_pinyin_index() + gen_bopomofo_index()
     #s = gen_content_table() + gen_luoma_pinyin_index() + gen_secondary_bopomofo_index()
-    s = gen_hsu_bopomofo_index() + gen_eten26_bopomofo_index()
-    #s = gen_chewing_key_table()
+    #s = gen_hsu_bopomofo_index() + gen_eten26_bopomofo_index()
+    s = gen_chewing_key_table()
     print(s)
