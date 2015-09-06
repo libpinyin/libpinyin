@@ -30,13 +30,13 @@ from utils import shuffle_all
 
 
 content_table = []
-hanyu_pinyin_index = []
+pinyin_index = []
 luoma_pinyin_index = []
-bopomofo_index = []
-shuffle_bopomofo_index = []
-secondary_bopomofo_index = []
-hsu_bopomofo_index = []
-eten26_bopomofo_index = []
+zhuyin_index = []
+shuffle_zhuyin_index = []
+secondary_zhuyin_index = []
+hsu_zhuyin_index = []
+eten26_zhuyin_index = []
 
 
 pinyin_list = sorted(PINYIN_ZHUYIN_MAP.keys())
@@ -188,65 +188,65 @@ def filter_pinyin_list():
         content_table.append((pinyin, bopomofo, luoma, second, chewing))
 
         if "IS_PINYIN" in flags:
-            hanyu_pinyin_index.append((pinyin, flags))
+            pinyin_index.append((pinyin, flags))
         if luoma:
             luoma_pinyin_index.append((luoma, "IS_PINYIN"))
         if "IS_BOPOMOFO" in flags:
-            bopomofo_index.append((bopomofo, flags))
+            zhuyin_index.append((bopomofo, flags))
         if second:
-            secondary_bopomofo_index.append((second, "IS_PINYIN"))
+            secondary_zhuyin_index.append((second, "IS_PINYIN"))
 
 
-def populate_more_bopomofo_index():
-    for (bopomofo, flags) in bopomofo_index:
+def populate_more_zhuyin_index():
+    for (bopomofo, flags) in zhuyin_index:
         correct = bopomofo
         # populate hsu bopomofo index
         matches = itertools.chain(handle_rules(bopomofo, hsu_correct),
                                   handle_special_rules(bopomofo, hsu_correct_special))
         for wrong in matches:
             newflags = '|'.join((flags, 'HSU_CORRECT'))
-            hsu_bopomofo_index.append((wrong, newflags, correct))
+            hsu_zhuyin_index.append((wrong, newflags, correct))
 
         # populate eten26 bopomofo index
         matches = itertools.chain(handle_rules(bopomofo, eten26_correct),
                                   handle_special_rules(bopomofo, eten26_correct_special))
         for wrong in matches:
             newflags = '|'.join((flags, 'ETEN26_CORRECT'))
-            eten26_bopomofo_index.append((wrong, newflags, correct))
+            eten26_zhuyin_index.append((wrong, newflags, correct))
 
-    for (bopomofo, flags) in bopomofo_index:
+    for (bopomofo, flags) in zhuyin_index:
         correct = bopomofo
         # remove duplicate items
-        if bopomofo not in [x[0] for x in hsu_bopomofo_index]:
-            hsu_bopomofo_index.append((bopomofo, flags, correct))
+        if bopomofo not in [x[0] for x in hsu_zhuyin_index]:
+            hsu_zhuyin_index.append((bopomofo, flags, correct))
 
-        if bopomofo not in [x[0] for x in eten26_bopomofo_index]:
-            eten26_bopomofo_index.append((bopomofo, flags, correct))
+        if bopomofo not in [x[0] for x in eten26_zhuyin_index]:
+            eten26_zhuyin_index.append((bopomofo, flags, correct))
 
     # populate shuffled bopomofo index
-    for (bopomofo, flags) in bopomofo_index:
+    for (bopomofo, flags) in zhuyin_index:
         correct = bopomofo
-        shuffle_bopomofo_index.append((bopomofo, flags, correct))
+        shuffle_zhuyin_index.append((bopomofo, flags, correct))
         newflags = '|'.join((flags, 'SHUFFLE_CORRECT'))
         for shuffle in shuffle_all(bopomofo):
-            assert shuffle not in [x[0] for x in shuffle_bopomofo_index]
-            shuffle_bopomofo_index.append((shuffle, newflags, correct))
+            assert shuffle not in [x[0] for x in shuffle_zhuyin_index]
+            shuffle_zhuyin_index.append((shuffle, newflags, correct))
 
 
 def sort_all():
-    global content_table, hanyu_pinyin_index, luoma_pinyin_index
-    global bopomofo_index, shuffle_bopomofo_index, secondary_bopomofo_index
-    global hsu_bopomofo_index, eten26_bopomofo_index
+    global content_table, pinyin_index, luoma_pinyin_index
+    global zhuyin_index, shuffle_zhuyin_index, secondary_zhuyin_index
+    global hsu_zhuyin_index, eten26_zhuyin_index
 
     #remove duplicates
     content_table = list(set(content_table))
-    hanyu_pinyin_index = list(set(hanyu_pinyin_index))
+    pinyin_index = list(set(pinyin_index))
     luoma_pinyin_index = list(set(luoma_pinyin_index))
-    bopomofo_index = list(set(bopomofo_index))
-    shuffle_bopomofo_index = list(set(shuffle_bopomofo_index))
-    secondary_bopomofo_index = list(set(secondary_bopomofo_index))
-    hsu_bopomofo_index = list(set(hsu_bopomofo_index))
-    eten26_bopomofo_index = list(set(eten26_bopomofo_index))
+    zhuyin_index = list(set(zhuyin_index))
+    shuffle_zhuyin_index = list(set(shuffle_zhuyin_index))
+    secondary_zhuyin_index = list(set(secondary_zhuyin_index))
+    hsu_zhuyin_index = list(set(hsu_zhuyin_index))
+    eten26_zhuyin_index = list(set(eten26_zhuyin_index))
 
     #define sort function
     sortfunc = operator.itemgetter(0)
@@ -255,15 +255,14 @@ def sort_all():
     #prepend zero item to reserve the invalid item
     content_table.insert(0, ("", "", "", "", "ChewingKey()"))
     #sort index
-    hanyu_pinyin_index = sorted(hanyu_pinyin_index, key=sortfunc)
+    pinyin_index = sorted(pinyin_index, key=sortfunc)
     luoma_pinyin_index = sorted(luoma_pinyin_index, key=sortfunc)
-    bopomofo_index = sorted(bopomofo_index, key=sortfunc)
-    shuffle_bopomofo_index = sorted(shuffle_bopomofo_index, key=sortfunc)
-    secondary_bopomofo_index = sorted(secondary_bopomofo_index, key=sortfunc)
-    hsu_bopomofo_index = sorted(hsu_bopomofo_index, key=sortfunc)
-    eten26_bopomofo_index = sorted(eten26_bopomofo_index, key=sortfunc)
+    zhuyin_index = sorted(zhuyin_index, key=sortfunc)
+    shuffle_zhuyin_index = sorted(shuffle_zhuyin_index, key=sortfunc)
+    secondary_zhuyin_index = sorted(secondary_zhuyin_index, key=sortfunc)
+    hsu_zhuyin_index = sorted(hsu_zhuyin_index, key=sortfunc)
+    eten26_zhuyin_index = sorted(eten26_zhuyin_index, key=sortfunc)
 
-'''
 def get_sheng_yun(pinyin):
     if pinyin == None:
         return None, None
@@ -276,19 +275,19 @@ def get_sheng_yun(pinyin):
         if s in shengmu_list:
             return s, pinyin[i:]
     return "", pinyin
-'''
 
 def gen_content_table():
     entries = []
     for ((pinyin, bopomofo, luoma, second, chewing)) in content_table:
-        entry = '{{"{0}", "{1}", "{2}", "{3}" ,{4}}}'.format(pinyin, bopomofo, luoma, second, chewing)
+        (shengmu, yunmu) = get_sheng_yun(pinyin)
+        entry = '{{"{0}", "{1}", "{2}", "{3}", "{4}", "{5}" ,{6}}}'.format(pinyin, shengmu, yunmu, bopomofo, luoma, second, chewing)
         entries.append(entry)
     return ',\n'.join(entries)
 
 
-def gen_hanyu_pinyin_index():
+def gen_pinyin_index():
     entries = []
-    for (pinyin, flags) in hanyu_pinyin_index:
+    for (pinyin, flags) in pinyin_index:
         index = [x[0] for x in content_table].index(pinyin)
         entry = '{{"{0}", {1}, {2}}}'.format(pinyin, flags, index)
         entries.append(entry)
@@ -302,26 +301,26 @@ def gen_luoma_pinyin_index():
         entries.append(entry)
     return ',\n'.join(entries)
 
-def gen_bopomofo_index():
+def gen_zhuyin_index():
     entries = []
-    for (shuffle, flags, correct) in shuffle_bopomofo_index:
+    for (shuffle, flags, correct) in shuffle_zhuyin_index:
         pinyin = ZHUYIN_PINYIN_MAP[correct]
         index = [x[0] for x in content_table].index(pinyin)
         entry = '{{"{0}", {1}, {2}}}'.format(shuffle, flags, index)
         entries.append(entry)
     return ',\n'.join(entries)
 
-def gen_secondary_bopomofo_index():
+def gen_secondary_zhuyin_index():
     entries = []
-    for (bopomofo, flags) in secondary_bopomofo_index:
+    for (bopomofo, flags) in secondary_zhuyin_index:
         index = [x[3] for x in content_table].index(bopomofo)
         entry = '{{"{0}", {1}, {2}}}'.format(bopomofo, flags, index)
         entries.append(entry)
     return ',\n'.join(entries)
 
-def gen_hsu_bopomofo_index():
+def gen_hsu_zhuyin_index():
     entries = []
-    for (wrong, flags, correct) in hsu_bopomofo_index:
+    for (wrong, flags, correct) in hsu_zhuyin_index:
         pinyin = ZHUYIN_PINYIN_MAP[correct]
         index = [x[0] for x in content_table].index(pinyin)
         entry = '{{"{0}" /* "{1}" */, {2}, {3}}}'.format \
@@ -329,9 +328,9 @@ def gen_hsu_bopomofo_index():
         entries.append(entry)
     return ',\n'.join(entries)
 
-def gen_eten26_bopomofo_index():
+def gen_eten26_zhuyin_index():
     entries = []
-    for (wrong, flags, correct) in eten26_bopomofo_index:
+    for (wrong, flags, correct) in eten26_zhuyin_index:
         pinyin = ZHUYIN_PINYIN_MAP[correct]
         index = [x[0] for x in content_table].index(pinyin)
         entry = '{{"{0}" /* "{1}" */, {2}, {3}}}'.format \
@@ -406,7 +405,7 @@ def gen_table_index_for_chewing_key(content_table):
 filter_pinyin_list()
 check_rules(hsu_correct, hsu_correct_special)
 check_rules(eten26_correct, eten26_correct_special)
-populate_more_bopomofo_index()
+populate_more_zhuyin_index()
 sort_all()
 
 
@@ -419,8 +418,8 @@ if __name__ == "__main__":
     for p in gen_pinyin_list():
         print (p)
 
-    #s = gen_content_table() + gen_hanyu_pinyin_index() + gen_bopomofo_index()
-    #s = gen_content_table() + gen_luoma_pinyin_index() + gen_secondary_bopomofo_index()
-    #s = gen_hsu_bopomofo_index() + gen_eten26_bopomofo_index()
+    s = gen_content_table() + gen_pinyin_index() + gen_zhuyin_index()
+    s = gen_content_table() + gen_luoma_pinyin_index() + gen_secondary_zhuyin_index()
+    s = gen_hsu_zhuyin_index() + gen_eten26_zhuyin_index()
     s = gen_table_index_for_chewing_key(content_table)
     print(s)
