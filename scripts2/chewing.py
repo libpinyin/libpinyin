@@ -99,6 +99,73 @@ ASCII_CHEWING_TONE_LIST = [
     ("CHEWING_5" , "˙"),
 ]
 
+
+CHEWING_INITIAL_LIST = [k for k, v in ASCII_CHEWING_INITIAL_LIST]
+
+CHEWING_MIDDLE_LIST  = [k for k, v in ASCII_CHEWING_MIDDLE_LIST]
+
+CHEWING_FINAL_LIST   = [k for k, v in ASCII_CHEWING_FINAL_LIST]
+
+CHEWING_TONE_LIST    = [k for k, v in ASCII_CHEWING_TONE_LIST]
+
+
+def gen_entries(items, last_enum, num_enum):
+    entries = []
+    for enum, item in enumerate(items, start=0):
+        entry = '{0} = {1}'.format(item, enum)
+        entries.append(entry)
+
+    #last enum
+    entry = last_enum + ' = ' + items[-1]
+    entries.append(entry)
+
+    #num enum
+    entry = num_enum + ' = ' + last_enum + ' + 1'
+    entries.append(entry)
+
+    return ",\n".join(entries)
+
+
+def gen_initials():
+    return gen_entries(CHEWING_INITIAL_LIST, 'CHEWING_LAST_INITIAL',
+                       'CHEWING_NUMBER_OF_INITIALS')
+
+
+def gen_middles():
+    return gen_entries(CHEWING_MIDDLE_LIST, 'CHEWING_LAST_MIDDLE',
+                       'CHEWING_NUMBER_OF_MIDDLES')
+
+
+def gen_finals():
+    return gen_entries(CHEWING_FINAL_LIST, 'CHEWING_LAST_FINAL',
+                       'CHEWING_NUMBER_OF_FINALS')
+
+
+def gen_tones():
+    return gen_entries(CHEWING_TONE_LIST, 'CHEWING_LAST_TONE',
+                       'CHEWING_NUMBER_OF_TONES')
+
+
+def gen_table_index(content_table):
+    entries = []
+    for i in range(0, len(CHEWING_INITIAL_LIST)):
+        initial = CHEWING_INITIAL_LIST[i]
+        for m in range(0, len(CHEWING_MIDDLE_LIST)):
+            middle = CHEWING_MIDDLE_LIST[m]
+            for f in range(0, len(CHEWING_FINAL_LIST)):
+                final = CHEWING_FINAL_LIST[f]
+                chewingkey = 'ChewingKey({0}, {1}, {2})'.format(initial, middle, final)
+                index = -1
+                try:
+                    index = [x[2] for x in content_table].index(chewingkey)
+                except ValueError:
+                    pass
+
+                entry = '{0:<7} /* {1} */'.format(index, chewingkey)
+                entries.append(entry)
+    return ",\n".join(entries)
+
+
 ### main function ###
 if __name__ == "__main__":
     print(ASCII_CHEWING_INITIAL_LIST)
@@ -114,3 +181,8 @@ if __name__ == "__main__":
     print(CHEWING_ASCII_FINAL_MAP)
 
     print(ASCII_CHEWING_TONE_LIST)
+
+    print(gen_initials())
+    print(gen_middles())
+    print(gen_finals())
+    print(gen_tones())
