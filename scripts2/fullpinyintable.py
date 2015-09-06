@@ -43,7 +43,7 @@ pinyin_list = sorted(PINYIN_ZHUYIN_MAP.keys())
 shengmu_list = sorted(SHENGMU_LIST)
 
 
-def check_pinyin_chewing_map():
+def check_pinyin_zhuyin_map():
     for pinyin_key in PINYIN_LIST:
         if pinyin_key in pinyin_list:
             pass
@@ -381,8 +381,25 @@ def handle_special_rules(bopomofo, corrects):
 # Note: special rules always contains '*'
     return handle_rules(bopomofo, corrects)
 
-def gen_chewing_key_table():
-    return chewing.gen_table_index(content_table)
+
+def gen_table_index_for_chewing_key(content_table):
+    entries = []
+    for i in range(0, len(chewing.CHEWING_INITIAL_LIST)):
+        initial = chewing.CHEWING_INITIAL_LIST[i]
+        for m in range(0, len(chewing.CHEWING_MIDDLE_LIST)):
+            middle = chewing.CHEWING_MIDDLE_LIST[m]
+            for f in range(0, len(chewing.CHEWING_FINAL_LIST)):
+                final = chewing.CHEWING_FINAL_LIST[f]
+                chewingkey = 'ChewingKey({0}, {1}, {2})'.format(initial, middle, final)
+                index = -1
+                try:
+                    index = [x[4] for x in content_table].index(chewingkey)
+                except ValueError:
+                    pass
+
+                entry = '{0:<7} /* {1} */'.format(index, chewingkey)
+                entries.append(entry)
+    return ",\n".join(entries)
 
 
 #init code
@@ -396,7 +413,7 @@ sort_all()
 ### main function ###
 if __name__ == "__main__":
     #pre-check here
-    check_pinyin_chewing_map()
+    check_pinyin_zhuyin_map()
 
     #dump
     for p in gen_pinyin_list():
@@ -405,5 +422,5 @@ if __name__ == "__main__":
     #s = gen_content_table() + gen_hanyu_pinyin_index() + gen_bopomofo_index()
     #s = gen_content_table() + gen_luoma_pinyin_index() + gen_secondary_bopomofo_index()
     #s = gen_hsu_bopomofo_index() + gen_eten26_bopomofo_index()
-    s = gen_chewing_key_table()
+    s = gen_table_index_for_chewing_key(content_table)
     print(s)
