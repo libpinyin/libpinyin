@@ -21,6 +21,7 @@
 
 
 from doublepinyin import SHUANGPIN_SCHEMAS
+from fullpinyin import YUNMU_LIST
 
 
 def gen_shengmu_table(scheme):
@@ -56,6 +57,61 @@ def gen_yunmu_table(scheme):
     return ',\n'.join(entries)
 
 
+#https://zh.wikipedia.org/zh-hans/双拼
+def gen_fallback_table2(scheme):
+    entries = []
+    #select yunmu mapping
+    yun = SHUANGPIN_SCHEMAS[scheme][1]
+    for yunmu in sorted(YUNMU_LIST):
+        char1 = yunmu[0]
+        char2 = None
+        for k, v in yun.items():
+            if len(v) == 1:
+                if yunmu == v[0]:
+                    char2 = k
+            if len(v) == 2:
+                if yunmu == v[0] or yunmu == v[1]:
+                    char2 = k
+
+        if char2 == None:
+            continue
+        index = char1 + char2
+        entry = '{{"{0}", "{1}"}}'.format(index, yunmu)
+        entries.append(entry)
+    return ',\n'.join(entries)
+
+
+def gen_fallback_table3(scheme):
+    entries = []
+    #select yunmu mapping
+    yun = SHUANGPIN_SCHEMAS[scheme][1]
+    for yunmu in sorted(YUNMU_LIST):
+        #special case for double character yunmu
+        if len(yunmu) == 2:
+            entry = '{{"{0}", "{1}"}}'.format(yunmu, yunmu)
+            entries.append(entry)
+            continue
+
+        #same as gen_fallback_table2
+        char1 = yunmu[0]
+        char2 = None
+        for k, v in yun.items():
+            if len(v) == 1:
+                if yunmu == v[0]:
+                    char2 = k
+            if len(v) == 2:
+                if yunmu == v[0] or yunmu == v[1]:
+                    char2 = k
+
+        if char2 == None:
+            continue
+        index = char1 + char2
+        entry = '{{"{0}", "{1}"}}'.format(index, yunmu)
+        entries.append(entry)
+    return ',\n'.join(entries)
+
+
+
 '''
 def get_table_content(tablename):
     (scheme, part) = tablename.split('_', 1)
@@ -68,4 +124,6 @@ def get_table_content(tablename):
 
 ### main function ###
 if __name__ == "__main__":
-    pass
+    print(gen_fallback_table2("PYJJ"))
+    print(gen_fallback_table3("ZRM"))
+    print(gen_fallback_table3("XHE"))
