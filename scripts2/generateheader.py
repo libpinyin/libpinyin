@@ -20,9 +20,11 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 
+import os
 from argparse import ArgumentParser
 from chewing import gen_initials, gen_middles, gen_finals, gen_tones
-from fullpinyintable import gen_content_table, gen_pinyin_index, gen_luoma_pinyin_index, gen_secondary_zhuyin_index, gen_zhuyin_index, gen_hsu_zhuyin_index, gen_eten26_zhuyin_index, gen_divided_table, gen_resplit_table, gen_chewing_key_table
+from fullpinyintable import gen_content_table, gen_pinyin_index, gen_luoma_pinyin_index, gen_secondary_zhuyin_index, gen_zhuyin_index, gen_hsu_zhuyin_index, gen_eten26_zhuyin_index, gen_table_index_for_chewing_key
+from specialtable import gen_divided_table, gen_resplit_table
 from doublepinyintable import gen_shengmu_table, gen_yunmu_table
 from bopomofotable import gen_chewing_symbols, gen_chewing_initials, gen_chewing_middles, gen_chewing_finals, gen_chewing_tones
 
@@ -63,7 +65,7 @@ def get_table_content(tablename):
     if tablename == 'RESPLIT_TABLE':
         return gen_resplit_table()
     if tablename == 'TABLE_INDEX':
-        return gen_chewing_key_table()
+        return gen_table_index_for_chewing_key()
 
     #double pinyin table
     (scheme, part) = tablename.split('_', 1)
@@ -108,6 +110,6 @@ if __name__ == "__main__":
                         help='input file.')
 
     args = parser.parse_args()
-    print(args)
+    #print(args)
     expand_file(args.infile)
 

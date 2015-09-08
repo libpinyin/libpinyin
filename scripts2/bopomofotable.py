@@ -23,7 +23,6 @@
 
 import os
 from operator import itemgetter
-from utils import expand_file
 from bopomofo import *
 
 def escape_char(ch):
