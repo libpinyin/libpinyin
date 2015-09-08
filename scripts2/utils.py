@@ -21,9 +21,6 @@
 # MA  02110-1301, USA.
 
 
-import os
-
-
 def shuffle_all(instr):
     for output in shuffle_recur(instr):
         if output == instr:

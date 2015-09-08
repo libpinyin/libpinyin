@@ -423,5 +423,5 @@ if __name__ == "__main__":
     s = gen_content_table() + gen_pinyin_index() + gen_zhuyin_index()
     s = gen_content_table() + gen_luoma_pinyin_index() + gen_secondary_zhuyin_index()
     s = gen_hsu_zhuyin_index() + gen_eten26_zhuyin_index()
-    s = gen_table_index_for_chewing_key(content_table)
+    s = gen_table_index_for_chewing_key()
     print(s)
