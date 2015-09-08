@@ -1,0 +1,45 @@
+#ifndef CHEWING_ENUM_H
+#define CHEWING_ENUM_H
+
+namespace pinyin{
+
+/**
+ * @brief enums of chewing initial element.
+ */
+
+enum ChewingInitial
+{
+@CHEWING_INITIAL@
+};
+
+
+/**
+ * @brief enums of chewing middle element.
+ */
+
+enum ChewingMiddle
+{
+@CHEWING_MIDDLE@
+};
+
+
+/**
+ * @brief enums of chewing final element.
+ */
+enum ChewingFinal
+{
+@CHEWING_FINAL@
+};
+
+
+/**
+ * @brief enums of chewing tone element.
+ */
+enum ChewingTone
+{
+@CHEWING_TONE@
+};
+
+};
+
+#endif
