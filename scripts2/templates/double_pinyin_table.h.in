@@ -1,0 +1,56 @@
+#ifndef DOUBLE_PINYIN_TABLE_H
+#define DOUBLE_PINYIN_TABLE_H
+
+namespace pinyin{
+
+const double_pinyin_scheme_shengmu_item_t double_pinyin_mspy_sheng[] = {
+@MSPY_SHENG@
+};
+
+const double_pinyin_scheme_yunmu_item_t double_pinyin_mspy_yun[] = {
+@MSPY_YUN@
+};
+
+const double_pinyin_scheme_shengmu_item_t double_pinyin_zrm_sheng[] = {
+@ZRM_SHENG@
+};
+
+const double_pinyin_scheme_yunmu_item_t double_pinyin_zrm_yun[] = {
+@ZRM_YUN@
+};
+
+const double_pinyin_scheme_shengmu_item_t double_pinyin_abc_sheng[] = {
+@ABC_SHENG@
+};
+
+const double_pinyin_scheme_yunmu_item_t double_pinyin_abc_yun[] = {
+@ABC_YUN@
+};
+
+const double_pinyin_scheme_shengmu_item_t double_pinyin_zgpy_sheng[] = {
+@ZGPY_SHENG@
+};
+
+const double_pinyin_scheme_yunmu_item_t double_pinyin_zgpy_yun[] = {
+@ZGPY_YUN@
+};
+
+const double_pinyin_scheme_shengmu_item_t double_pinyin_pyjj_sheng[] = {
+@PYJJ_SHENG@
+};
+
+const double_pinyin_scheme_yunmu_item_t double_pinyin_pyjj_yun[] = {
+@PYJJ_YUN@
+};
+
+const double_pinyin_scheme_shengmu_item_t double_pinyin_xhe_sheng[] = {
+@XHE_SHENG@
+};
+
+const double_pinyin_scheme_yunmu_item_t double_pinyin_xhe_yun[] = {
+@XHE_YUN@
+};
+
+};
+
+#endif
