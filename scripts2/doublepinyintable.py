@@ -20,8 +20,9 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 
+import os
 from doublepinyin import SHUANGPIN_SCHEMAS
-from fullpinyin import YUNMU_LIST
+from fullpinyin import PINYIN_LIST, YUNMU_LIST
 
 
 def gen_shengmu_table(scheme):
@@ -63,6 +64,10 @@ def gen_fallback_table2(scheme):
     #select yunmu mapping
     yun = SHUANGPIN_SCHEMAS[scheme][1]
     for yunmu in sorted(YUNMU_LIST):
+        #skip invalid yunmu
+        if not yunmu in PINYIN_LIST:
+            continue
+
         char1 = yunmu[0]
         char2 = None
         for k, v in yun.items():
@@ -73,8 +78,7 @@ def gen_fallback_table2(scheme):
                 if yunmu == v[0] or yunmu == v[1]:
                     char2 = k
 
-        if char2 == None:
-            continue
+        assert char2 != None
         index = char1 + char2
         entry = '{{"{0}", "{1}"}}'.format(index, yunmu)
         entries.append(entry)
@@ -86,6 +90,10 @@ def gen_fallback_table3(scheme):
     #select yunmu mapping
     yun = SHUANGPIN_SCHEMAS[scheme][1]
     for yunmu in sorted(YUNMU_LIST):
+        #skip invalid yunmu
+        if not yunmu in PINYIN_LIST:
+            continue
+
         #special case for double character yunmu
         if len(yunmu) == 2:
             entry = '{{"{0}", "{1}"}}'.format(yunmu, yunmu)
@@ -103,8 +111,7 @@ def gen_fallback_table3(scheme):
                 if yunmu == v[0] or yunmu == v[1]:
                     char2 = k
 
-        if char2 == None:
-            continue
+        assert char2 != None
         index = char1 + char2
         entry = '{{"{0}", "{1}"}}'.format(index, yunmu)
         entries.append(entry)
@@ -124,6 +131,8 @@ def get_table_content(tablename):
 
 ### main function ###
 if __name__ == "__main__":
-    print(gen_fallback_table2("PYJJ"))
-    print(gen_fallback_table3("ZRM"))
-    print(gen_fallback_table3("XHE"))
+    print(gen_fallback_table2("PYJJ"), os.linesep)
+
+    print(gen_fallback_table3("ZRM"), os.linesep)
+
+    print(gen_fallback_table3("XHE"), os.linesep)
