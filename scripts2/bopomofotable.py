@@ -101,21 +101,6 @@ def gen_chewing_tones(scheme):
     return ",\n".join(entries)
 
 
-'''
-def get_table_content(tablename):
-    (scheme, part) = tablename.split('_', 1)
-    if part == "SYMBOLS":
-        return gen_chewing_symbols(scheme)
-    if part == "INITIALS":
-        return gen_chewing_initials(scheme)
-    if part == "MIDDLES":
-        return gen_chewing_middles(scheme)
-    if part == "FINALS":
-        return gen_chewing_finals(scheme)
-    if part == "TONES":
-        return gen_chewing_tones(scheme)
-'''
-
 ### main function ###
 if __name__ == "__main__":
     print(gen_chewing_symbols("HSU"), os.linesep)

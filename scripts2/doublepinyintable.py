@@ -118,17 +118,6 @@ def gen_fallback_table3(scheme):
     return ',\n'.join(entries)
 
 
-
-'''
-def get_table_content(tablename):
-    (scheme, part) = tablename.split('_', 1)
-    if part == "SHENG":
-        return gen_shengmu_table(scheme)
-    if part == "YUN":
-        return gen_yunmu_table(scheme)
-'''
-
-
 ### main function ###
 if __name__ == "__main__":
     print(gen_fallback_table2("PYJJ"), os.linesep)
