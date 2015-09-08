@@ -1,0 +1,52 @@
+#ifndef PINYIN_PARSER_TABLE_H
+#define PINYIN_PARSER_TABLE_H
+
+namespace zhuyin{
+
+const pinyin_index_item_t hanyu_pinyin_index[] = {
+@PINYIN_INDEX@
+};
+
+const pinyin_index_item_t luoma_pinyin_index[] = {
+@LUOMA_PINYIN_INDEX@
+};
+
+const chewing_index_item_t bopomofo_index[] = {
+@ZHUYIN_INDEX@
+};
+
+const pinyin_index_item_t secondary_bopomofo_index[] = {
+@SECONDARY_ZHUYIN_INDEX@
+};
+
+const chewing_index_item_t hsu_bopomofo_index[] = {
+@HSU_ZHUYIN_INDEX@
+};
+
+const chewing_index_item_t eten26_bopomofo_index[] = {
+@ETEN26_ZHUYIN_INDEX@
+};
+
+const content_table_item_t content_table[] = {
+@CONTENT_TABLE@
+};
+
+#if 0
+const divided_table_item_t divided_table[] = {
+
+};
+
+const resplit_table_item_t resplit_table[] = {
+
+};
+#endif
+
+const gint chewing_key_table[CHEWING_NUMBER_OF_INITIALS *
+                             CHEWING_NUMBER_OF_MIDDLES *
+                             CHEWING_NUMBER_OF_FINALS] = {
+@TABLE_INDEX@
+};
+
+};
+
+#endif
