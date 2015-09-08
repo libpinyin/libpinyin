@@ -383,7 +383,7 @@ def handle_special_rules(bopomofo, corrects):
     return handle_rules(bopomofo, corrects)
 
 
-def gen_table_index_for_chewing_key(content_table):
+def gen_table_index_for_chewing_key():
     entries = []
     for i in range(0, len(chewing.CHEWING_INITIAL_LIST)):
         initial = chewing.CHEWING_INITIAL_LIST[i]
