@@ -43,26 +43,26 @@ def check_pinyin_zhuyin_map():
             print("pinyin %s has no chewing mapping", pinyin_key)
 
 
-def get_chewing(pinyin_key):
+def get_chewing(pinyin):
     initial, middle, final = \
         'CHEWING_ZERO_INITIAL', 'CHEWING_ZERO_MIDDLE', 'CHEWING_ZERO_FINAL'
-    assert pinyin_key != None
-    assert pinyin_key in PINYIN_ZHUYIN_MAP
+    assert pinyin != None
+    assert pinyin in PINYIN_ZHUYIN_MAP
 
     #handle 'w' and 'y'
-    if pinyin_key[0] == 'w':
+    if pinyin[0] == 'w':
         initial = 'PINYIN_W'
-    if pinyin_key[0] == 'y':
+    if pinyin[0] == 'y':
         initial = 'PINYIN_Y'
 
-    #get chewing string
-    bopomofo_str = PINYIN_ZHUYIN_MAP[pinyin_key]
+    #get zhuyin string
+    zhuyin = PINYIN_ZHUYIN_MAP[pinyin]
 
-    #handle bopomofo ZHUYIN_SPECIAL_INITIAL_SET_IN_PINYIN_FORM
-    if pinyin_key in ZHUYIN_SPECIAL_INITIAL_SET_IN_PINYIN_FORM:
+    #handle zhuyin ZHUYIN_SPECIAL_INITIAL_SET_IN_PINYIN_FORM
+    if pinyin in ZHUYIN_SPECIAL_INITIAL_SET_IN_PINYIN_FORM:
         middle = "CHEWING_I"
     #normal process
-    for char in bopomofo_str:
+    for char in zhuyin:
         if char in chewing.CHEWING_ASCII_INITIAL_MAP:
             initial = chewing.CHEWING_ASCII_INITIAL_MAP[char]
         if char in chewing.CHEWING_ASCII_MIDDLE_MAP:
@@ -92,27 +92,28 @@ def get_chewing(pinyin_key):
 def gen_pinyin_list():
     for p in itertools.chain(gen_pinyins(),
                              gen_shengmu(),
+                             gen_corrects(),
+                             gen_u_to_v(),
                              ):
         yield p
 
 
 def gen_pinyins():
-    #generate all pinyins in bopomofo
-    for pinyin_key in pinyin_list:
+    #generate all pinyins
+    for pinyin in pinyin_list:
         flags = []
-        if pinyin_key in PINYIN_ZHUYIN_MAP.keys():
-            flags.append("IS_BOPOMOFO")
-        if pinyin_key in PINYIN_LIST or \
-                pinyin_key in SHENGMU_LIST:
+        if pinyin in PINYIN_ZHUYIN_MAP.keys():
+            flags.append("IS_CHEWING")
+        if pinyin in PINYIN_LIST or \
+                pinyin in SHENGMU_LIST:
             flags.append("IS_PINYIN")
-        if pinyin_key in shengmu_list:
+        if pinyin in shengmu_list:
             flags.append("PINYIN_INCOMPLETE")
-        chewing_key = PINYIN_ZHUYIN_MAP[pinyin_key]
-        if chewing_key in chewing.CHEWING_ASCII_INITIAL_MAP and \
-                pinyin_key not in ZHUYIN_SPECIAL_INITIAL_SET_IN_PINYIN_FORM:
+        zhuyin = PINYIN_ZHUYIN_MAP[pinyin]
+        if zhuyin in chewing.CHEWING_ASCII_INITIAL_MAP and \
+                pinyin not in ZHUYIN_SPECIAL_INITIAL_SET_IN_PINYIN_FORM:
             flags.append("CHEWING_INCOMPLETE")
-        yield pinyin_key, chewing_key, \
-            flags, get_chewing(pinyin_key)
+        yield pinyin, pinyin, zhuyin, flags, get_chewing(pinyin)
 
 
 def get_shengmu_chewing(shengmu):
@@ -134,8 +135,7 @@ def gen_shengmu():
         chewing_initial = chewing_key[0]
         if chewing_initial in chewing.ASCII_CHEWING_INITIAL_MAP:
             chewing_initial = chewing.ASCII_CHEWING_INITIAL_MAP[chewing_initial]
-        yield shengmu, chewing_initial, \
-            flags, chewing_key
+        yield shengmu, shengmu, chewing_initial, flags, chewing_key
 
 
 def gen_corrects():
@@ -143,13 +143,13 @@ def gen_corrects():
     for correct, wrong in auto_correct:
         flags = ['IS_PINYIN', 'PINYIN_CORRECT_{0}_{1}'.format(wrong.upper(),
                                                               correct.upper())]
-        for pinyin_key in pinyin_list:
+        for pinyin in pinyin_list:
             #fixes partial pinyin instead of the whole pinyin
-            if pinyin_key.endswith(correct) and pinyin_key != correct:
-                chewing_key = PINYIN_ZHUYIN_MAP[pinyin_key]
-                new_pinyin_key = pinyin_key.replace(correct, wrong)
-                yield pinyin_key, new_pinyin_key, chewing_key,\
-                    flags, get_chewing(pinyin_key)
+            if pinyin.endswith(correct) and pinyin != correct:
+                zhuyin = PINYIN_ZHUYIN_MAP[pinyin]
+                wrong_pinyin = pinyin.replace(correct, wrong)
+                yield pinyin, wrong_pinyin, zhuyin,\
+                    flags, get_chewing(pinyin)
 
 
 def gen_u_to_v():
@@ -157,9 +157,9 @@ def gen_u_to_v():
     for correct, wrong, flags in auto_correct_ext:
         #over-ride flags
         flags = ['IS_PINYIN', 'PINYIN_CORRECT_V_U']
-        pinyin_key = correct
-        chewing_key = PINYIN_ZHUYIN_MAP[pinyin_key]
-        yield correct, wrong, chewing_key, flags, get_chewing(pinyin_key)
+        pinyin = correct
+        zhuyin = PINYIN_ZHUYIN_MAP[pinyin]
+        yield correct, wrong, zhuyin, flags, get_chewing(pinyin)
 
 
 #pinyin table
@@ -174,63 +174,66 @@ eten26_zhuyin_index = []
 
 
 def filter_pinyin_list():
-    for (pinyin, bopomofo, flags, chewing) in gen_pinyin_list():
+    for (correct, wrong, zhuyin, flags, chewing_key) in gen_pinyin_list():
         (luoma, second) = (None, None)
 
-        if bopomofo in ZHUYIN_LUOMA_PINYIN_MAP:
-            luoma = ZHUYIN_LUOMA_PINYIN_MAP[bopomofo]
+        if zhuyin in ZHUYIN_LUOMA_PINYIN_MAP:
+            luoma = ZHUYIN_LUOMA_PINYIN_MAP[zhuyin]
 
-        if bopomofo in ZHUYIN_SECONDARY_ZHUYIN_MAP:
-            second = ZHUYIN_SECONDARY_ZHUYIN_MAP[bopomofo]
+        if zhuyin in ZHUYIN_SECONDARY_ZHUYIN_MAP:
+            second = ZHUYIN_SECONDARY_ZHUYIN_MAP[zhuyin]
 
         flags = '|'.join(flags)
-        chewing = "ChewingKey({0})".format(', '.join(chewing))
+        chewing_key = "ChewingKey({0})".format(', '.join(chewing_key))
         #correct = correct.replace("v", "ü")
 
-        content_table.append((pinyin, bopomofo, luoma, second, chewing))
+        content_table.append((correct, zhuyin, luoma, second, chewing_key))
 
         if "IS_PINYIN" in flags:
-            pinyin_index.append((pinyin, flags))
+            pinyin_index.append((wrong, flags, correct))
+        #skip pinyin correct options
+        if correct != wrong:
+            continue
         if luoma:
             luoma_pinyin_index.append((luoma, "IS_PINYIN"))
-        if "IS_BOPOMOFO" in flags:
-            zhuyin_index.append((bopomofo, flags))
         if second:
             secondary_zhuyin_index.append((second, "IS_PINYIN"))
+        if "IS_CHEWING" in flags:
+            zhuyin_index.append((zhuyin, flags))
 
 
 def populate_more_zhuyin_index():
-    for (bopomofo, flags) in zhuyin_index:
-        correct = bopomofo
-        # populate hsu bopomofo index
-        matches = itertools.chain(handle_rules(bopomofo, hsu_correct),
-                                  handle_special_rules(bopomofo, hsu_correct_special))
+    for (zhuyin, flags) in zhuyin_index:
+        correct = zhuyin
+        # populate hsu zhuyin index
+        matches = itertools.chain(handle_rules(zhuyin, hsu_correct),
+                                  handle_special_rules(zhuyin, hsu_correct_special))
         for wrong in matches:
             newflags = '|'.join((flags, 'HSU_CORRECT'))
             hsu_zhuyin_index.append((wrong, newflags, correct))
 
-        # populate eten26 bopomofo index
-        matches = itertools.chain(handle_rules(bopomofo, eten26_correct),
-                                  handle_special_rules(bopomofo, eten26_correct_special))
+        # populate eten26 zhuyin index
+        matches = itertools.chain(handle_rules(zhuyin, eten26_correct),
+                                  handle_special_rules(zhuyin, eten26_correct_special))
         for wrong in matches:
             newflags = '|'.join((flags, 'ETEN26_CORRECT'))
             eten26_zhuyin_index.append((wrong, newflags, correct))
 
-    for (bopomofo, flags) in zhuyin_index:
-        correct = bopomofo
+    for (zhuyin, flags) in zhuyin_index:
+        correct = zhuyin
         # remove duplicate items
-        if bopomofo not in [x[0] for x in hsu_zhuyin_index]:
-            hsu_zhuyin_index.append((bopomofo, flags, correct))
+        if zhuyin not in [x[0] for x in hsu_zhuyin_index]:
+            hsu_zhuyin_index.append((zhuyin, flags, correct))
 
-        if bopomofo not in [x[0] for x in eten26_zhuyin_index]:
-            eten26_zhuyin_index.append((bopomofo, flags, correct))
+        if zhuyin not in [x[0] for x in eten26_zhuyin_index]:
+            eten26_zhuyin_index.append((zhuyin, flags, correct))
 
-    # populate shuffled bopomofo index
-    for (bopomofo, flags) in zhuyin_index:
-        correct = bopomofo
-        shuffle_zhuyin_index.append((bopomofo, flags, correct))
+    # populate shuffled zhuyin index
+    for (zhuyin, flags) in zhuyin_index:
+        correct = zhuyin
+        shuffle_zhuyin_index.append((zhuyin, flags, correct))
         newflags = '|'.join((flags, 'SHUFFLE_CORRECT'))
-        for shuffle in shuffle_all(bopomofo):
+        for shuffle in shuffle_all(zhuyin):
             assert shuffle not in [x[0] for x in shuffle_zhuyin_index]
             shuffle_zhuyin_index.append((shuffle, newflags, correct))
 
@@ -280,26 +283,34 @@ def get_sheng_yun(pinyin):
 
 def gen_content_table():
     entries = []
-    for ((pinyin, bopomofo, luoma, second, chewing)) in content_table:
+    for ((pinyin, zhuyin, luoma, second, chewing_key)) in content_table:
         (shengmu, yunmu) = get_sheng_yun(pinyin)
-        entry = '{{"{0}", "{1}", "{2}", "{3}", "{4}", "{5}" ,{6}}}'.format(pinyin, shengmu, yunmu, bopomofo, luoma, second, chewing)
+        entry = '{{"{0}", "{1}", "{2}", "{3}", "{4}", "{5}", {6}}}'.format(pinyin, shengmu, yunmu, zhuyin, luoma, second, chewing_key)
         entries.append(entry)
     return ',\n'.join(entries)
 
 
 def gen_pinyin_index():
     entries = []
-    for (pinyin, flags) in pinyin_index:
-        index = [x[0] for x in content_table].index(pinyin)
-        entry = '{{"{0}", {1}, {2}}}'.format(pinyin, flags, index)
+    for (wrong, flags, correct) in pinyin_index:
+        index = [x[0] for x in content_table].index(correct)
+        entry = '{{"{0}", {1}, {2}}}'.format(wrong, flags, index)
         entries.append(entry)
     return ',\n'.join(entries)
 
 def gen_luoma_pinyin_index():
     entries = []
-    for (pinyin, flags) in luoma_pinyin_index:
-        index = [x[2] for x in content_table].index(pinyin)
-        entry = '{{"{0}", {1}, {2}}}'.format(pinyin, flags, index)
+    for (luoma, flags) in luoma_pinyin_index:
+        index = [x[2] for x in content_table].index(luoma)
+        entry = '{{"{0}", {1}, {2}}}'.format(luoma, flags, index)
+        entries.append(entry)
+    return ',\n'.join(entries)
+
+def gen_secondary_zhuyin_index():
+    entries = []
+    for (secondary, flags) in secondary_zhuyin_index:
+        index = [x[3] for x in content_table].index(secondary)
+        entry = '{{"{0}", {1}, {2}}}'.format(secondary, flags, index)
         entries.append(entry)
     return ',\n'.join(entries)
 
@@ -309,14 +320,6 @@ def gen_zhuyin_index():
         pinyin = ZHUYIN_PINYIN_MAP[correct]
         index = [x[0] for x in content_table].index(pinyin)
         entry = '{{"{0}", {1}, {2}}}'.format(shuffle, flags, index)
-        entries.append(entry)
-    return ',\n'.join(entries)
-
-def gen_secondary_zhuyin_index():
-    entries = []
-    for (bopomofo, flags) in secondary_zhuyin_index:
-        index = [x[3] for x in content_table].index(bopomofo)
-        entry = '{{"{0}", {1}, {2}}}'.format(bopomofo, flags, index)
         entries.append(entry)
     return ',\n'.join(entries)
 
@@ -356,31 +359,31 @@ def check_rules(rules, specials):
         assert '*' in correct
         check_rule(correct, wrong)
 
-def handle_rules(bopomofo, corrects):
+def handle_rules(zhuyin, corrects):
     matches = []
     for (correct, wrong) in corrects:
         if '*' not in correct:
-            if correct == bopomofo:
+            if correct == zhuyin:
                 matches.append(wrong)
         elif correct.endswith('*'):
             starts = correct[0:-1]
-            if bopomofo.startswith(starts):
-                remained = bopomofo[len(starts):]
+            if zhuyin.startswith(starts):
+                remained = zhuyin[len(starts):]
                 newstr = wrong[0:-1] + remained
                 matches.append(newstr)
     return matches
 
-def handle_special_rules(bopomofo, corrects):
-# special rules require additional check m_middle == zero
+def handle_special_rules(zhuyin, corrects):
+    # special rules require additional check m_middle == zero
     matches = []
-    if 'ㄧ' in bopomofo:
+    if 'ㄧ' in zhuyin:
         return matches
-    if 'ㄨ' in bopomofo:
+    if 'ㄨ' in zhuyin:
         return matches
-    if 'ㄩ' in bopomofo:
+    if 'ㄩ' in zhuyin:
         return matches
-# Note: special rules always contains '*'
-    return handle_rules(bopomofo, corrects)
+    # Note: special rules always contains '*'
+    return handle_rules(zhuyin, corrects)
 
 
 def gen_table_index_for_chewing_key():
