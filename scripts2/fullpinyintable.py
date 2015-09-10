@@ -175,19 +175,19 @@ eten26_zhuyin_index = []
 
 def filter_pinyin_list():
     for (correct, wrong, zhuyin, flags, chewing_key) in gen_pinyin_list():
-        (luoma, second) = (None, None)
+        (luoma, secondary) = (None, None)
 
         if zhuyin in ZHUYIN_LUOMA_PINYIN_MAP:
             luoma = ZHUYIN_LUOMA_PINYIN_MAP[zhuyin]
 
         if zhuyin in ZHUYIN_SECONDARY_ZHUYIN_MAP:
-            second = ZHUYIN_SECONDARY_ZHUYIN_MAP[zhuyin]
+            secondary = ZHUYIN_SECONDARY_ZHUYIN_MAP[zhuyin]
 
         flags = '|'.join(flags)
         chewing_key = "ChewingKey({0})".format(', '.join(chewing_key))
         #correct = correct.replace("v", "ü")
 
-        content_table.append((correct, zhuyin, luoma, second, chewing_key))
+        content_table.append((correct, zhuyin, luoma, secondary, chewing_key))
 
         if "IS_PINYIN" in flags:
             pinyin_index.append((wrong, flags, correct))
@@ -196,8 +196,8 @@ def filter_pinyin_list():
             continue
         if luoma:
             luoma_pinyin_index.append((luoma, "IS_PINYIN"))
-        if second:
-            secondary_zhuyin_index.append((second, "IS_PINYIN"))
+        if secondary:
+            secondary_zhuyin_index.append((secondary, "IS_PINYIN"))
         if "IS_CHEWING" in flags:
             zhuyin_index.append((zhuyin, flags))
 
