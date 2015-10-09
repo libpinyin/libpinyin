@@ -312,10 +312,10 @@ void gen_phrase_file(const char * outputfile, int phrase_index){
 
                 guint32 freq = chewing_and_freq->freq;
 
-                /* avoid zero freq */
+                /* avoid zero freq. */
                 if (freq < 3) freq = 3;
 
-		fprintf(outfile, "%s\t%s\t%d\t%d\n",
+                fprintf(outfile, "%s\t%s\t%d\t%d\n",
                         pinyin_str, phrase_str,
                         PHRASE_INDEX_MAKE_TOKEN(phrase_index, token), freq);
 
