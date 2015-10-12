@@ -1,0 +1,15 @@
+all: pinyins.txt
+
+
+pinyins.txt:
+	python3 tools/distill.py
+
+
+update-header: pinyins.txt
+	python3 generateheader.py templates/pinyin_parser_table.h.in > ../src/storage/pinyin_parser_table.h
+	python3 generateheader.py templates/double_pinyin_table.h.in > ../src/storage/double_pinyin_table.h
+	python3 generateheader.py templates/zhuyin_table.h.in > ../src/storage/chewing_table.h
+	python3 generateheader.py templates/chewing_enum.h.in > ../src/storage/chewing_enum.h
+
+
+.PHONY: pinyins.txt

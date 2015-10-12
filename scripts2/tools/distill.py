@@ -40,8 +40,8 @@ def load_phrase(filename):
 
     phrasefile.close()
 
-load_phrase("../../data/gb_char.table")
-load_phrase("../../data/gbk_char.table")
+load_phrase("../data/gb_char.table")
+load_phrase("../data/gbk_char.table")
 
 
 def save_pinyin(filename):
