@@ -40,7 +40,7 @@ noinst_HEADERS		= chewing_enum.h \
 			  tag_utility.h \
 			  pinyin_parser_table.h \
 			  double_pinyin_table.h \
-			  chewing_table.h \
+			  zhuyin_table.h \
 			  pinyin_phrase2.h \
 			  chewing_large_table.h \
 			  facade_chewing_table.h \

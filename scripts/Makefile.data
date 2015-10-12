@@ -8,7 +8,7 @@ pinyins.txt:
 update-header: pinyins.txt
 	python3 genpinyinheader.py > ../src/storage/pinyin_parser_table.h
 	python3 gendoublepinyinheader.py > ../src/storage/double_pinyin_table.h
-	python3 genbopomofoheader.py > ../src/storage/chewing_table.h
+	python3 genbopomofoheader.py > ../src/storage/zhuyin_table.h
 	python3 genchewingkey.py > ../src/storage/chewing_enum.h
 
 
