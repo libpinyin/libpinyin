@@ -1,7 +1,7 @@
 #ifndef CHEWING_TABLE_H
 #define CHEWING_TABLE_H
 
-namespace zhuyin{
+namespace pinyin{
 
 const chewing_symbol_item_t chewing_standard_symbols[] = {
 @STANDARD_SYMBOLS@

@@ -209,14 +209,14 @@ def populate_more_zhuyin_index():
         matches = itertools.chain(handle_rules(zhuyin, hsu_correct),
                                   handle_special_rules(zhuyin, hsu_correct_special))
         for wrong in matches:
-            newflags = '|'.join((flags, 'HSU_CORRECT'))
+            newflags = '|'.join((flags, 'ZHUYIN_CORRECT_HSU'))
             hsu_zhuyin_index.append((wrong, newflags, correct))
 
         # populate eten26 zhuyin index
         matches = itertools.chain(handle_rules(zhuyin, eten26_correct),
                                   handle_special_rules(zhuyin, eten26_correct_special))
         for wrong in matches:
-            newflags = '|'.join((flags, 'ETEN26_CORRECT'))
+            newflags = '|'.join((flags, 'ZHUYIN_CORRECT_ETEN26'))
             eten26_zhuyin_index.append((wrong, newflags, correct))
 
     for (zhuyin, flags) in zhuyin_index:
@@ -232,7 +232,7 @@ def populate_more_zhuyin_index():
     for (zhuyin, flags) in zhuyin_index:
         correct = zhuyin
         shuffle_zhuyin_index.append((zhuyin, flags, correct))
-        newflags = '|'.join((flags, 'SHUFFLE_CORRECT'))
+        newflags = '|'.join((flags, 'ZHUYIN_CORRECT_SHUFFLE'))
         for shuffle in shuffle_all(zhuyin):
             assert shuffle not in [x[0] for x in shuffle_zhuyin_index]
             shuffle_zhuyin_index.append((shuffle, newflags, correct))
