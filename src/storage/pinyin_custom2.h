@@ -30,14 +30,14 @@ G_BEGIN_DECLS
  * PinyinTableFlag:
  */
 enum PinyinTableFlag{
-    IS_CHEWING = 1U << 1,
-    IS_PINYIN = 1U << 2,
+    IS_PINYIN = 1U << 1,
+    IS_ZHUYIN = 1U << 2,
     PINYIN_INCOMPLETE = 1U << 3,
-    CHEWING_INCOMPLETE = 1U << 4,
+    ZHUYIN_INCOMPLETE = 1U << 4,
     USE_TONE = 1U << 5,
     USE_DIVIDED_TABLE = 1U << 6,
     USE_RESPLIT_TABLE = 1U << 7,
-    DYNAMIC_ADJUST = 1U << 8
+    DYNAMIC_ADJUST = 1U << 8,
 };
 
 /**
@@ -80,6 +80,30 @@ enum PinyinCorrection2{
 };
 
 /**
+ * PinyinCorrection2:
+ *
+ * The enums of pinyin corrections.
+ *
+ */
+enum ZhuyinCorrection2{
+    ZHUYIN_CORRECT_HSU = 1U << 29,
+    ZHUYIN_CORRECT_ETEN26 = 1U << 30,
+    ZHUYIN_CORRECT_SHUFFLE = 1U << 31,
+    ZHUYIN_CORRECT_ALL = 0x7U << 29
+};
+
+/**
+ * @brief enums of Full Pinyin Schemes.
+ */
+enum FullPinyinScheme
+{
+    FULL_PINYIN_HANYU = 1,
+    FULL_PINYIN_LUOMA = 2,
+    FULL_PINYIN_SECONDARY_BOPOMOFO = 3,
+    FULL_PINYIN_DEFAULT = FULL_PINYIN_HANYU
+};
+
+/**
  * @brief enums of Double Pinyin Schemes.
  */
 enum DoublePinyinScheme
@@ -95,15 +119,20 @@ enum DoublePinyinScheme
 };
 
 /**
- * @brief enums of Chewing Schemes.
+ * @brief enums of Zhuyin Schemes.
  */
-enum ChewingScheme
+enum ZhuyinScheme
 {
-    CHEWING_STANDARD = 1,
-    CHEWING_IBM      = 2,
-    CHEWING_GINYIEH  = 3,
-    CHEWING_ETEN     = 4,
-    CHEWING_DEFAULT  = CHEWING_STANDARD
+    ZHUYIN_STANDARD = 1,
+    ZHUYIN_HSU      = 2,
+    ZHUYIN_IBM      = 3,
+    ZHUYIN_GINYIEH  = 4,
+    ZHUYIN_ETEN     = 5,
+    ZHUYIN_ETEN26   = 6,
+    ZHUYIN_STANDARD_DVORAK = 7,
+    ZHUYIN_HSU_DVORAK = 8,
+    ZHUYIN_DACHEN_CP26 = 9,
+    ZHUYIN_DEFAULT  = ZHUYIN_STANDARD
 };
 
 G_END_DECLS
