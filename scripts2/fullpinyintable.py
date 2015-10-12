@@ -103,7 +103,7 @@ def gen_pinyins():
     for pinyin in pinyin_list:
         flags = []
         if pinyin in PINYIN_ZHUYIN_MAP.keys():
-            flags.append("IS_CHEWING")
+            flags.append("IS_ZHUYIN")
         if pinyin in PINYIN_LIST or \
                 pinyin in SHENGMU_LIST:
             flags.append("IS_PINYIN")
@@ -112,7 +112,7 @@ def gen_pinyins():
         zhuyin = PINYIN_ZHUYIN_MAP[pinyin]
         if zhuyin in chewing.CHEWING_ASCII_INITIAL_MAP and \
                 pinyin not in ZHUYIN_SPECIAL_INITIAL_SET_IN_PINYIN_FORM:
-            flags.append("CHEWING_INCOMPLETE")
+            flags.append("ZHUYIN_INCOMPLETE")
         yield pinyin, pinyin, zhuyin, flags, get_chewing(pinyin)
 
 
@@ -198,7 +198,7 @@ def filter_pinyin_list():
             luoma_pinyin_index.append((luoma, "IS_PINYIN"))
         if secondary:
             secondary_zhuyin_index.append((secondary, "IS_PINYIN"))
-        if "IS_CHEWING" in flags:
+        if "IS_ZHUYIN" in flags:
             zhuyin_index.append((zhuyin, flags))
 
 
