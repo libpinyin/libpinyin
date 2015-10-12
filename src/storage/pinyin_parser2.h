@@ -33,7 +33,9 @@ typedef struct {
     const char * m_pinyin_str;
     const char * m_shengmu_str;
     const char * m_yunmu_str;
-    const char * m_chewing_str;
+    const char * m_zhuyin_str;
+    const char * m_luoma_pinyin_str;
+    const char * m_secondary_zhuyin_str;
     ChewingKey   m_chewing_key;
 } content_table_item_t;
 
@@ -240,7 +242,7 @@ protected:
 public:
     ChewingParser2() {
         m_symbol_table = NULL; m_tone_table = NULL;
-        set_scheme(CHEWING_DEFAULT);
+        set_scheme(ZHUYIN_DEFAULT);
     }
 
     virtual ~ChewingParser2() {}
@@ -250,7 +252,7 @@ public:
     virtual int parse(pinyin_option_t options, ChewingKeyVector & keys, ChewingKeyRestVector & key_rests, const char *str, int len) const;
 
 public:
-    bool set_scheme(ChewingScheme scheme);
+    bool set_scheme(ZhuyinScheme scheme);
     bool in_chewing_scheme(pinyin_option_t options, const char key, const char ** symbol) const;
 };
 
@@ -310,7 +312,7 @@ inline int pinyin_compare_middle_and_final2(pinyin_option_t options,
         return 0;
 
     /* both pinyin and chewing incomplete options will enable this. */
-    if (options & (PINYIN_INCOMPLETE | CHEWING_INCOMPLETE)) {
+    if (options & (PINYIN_INCOMPLETE | ZHUYIN_INCOMPLETE)) {
         if (middle_lhs == CHEWING_ZERO_MIDDLE &&
             final_lhs == CHEWING_ZERO_FINAL)
             return 0;

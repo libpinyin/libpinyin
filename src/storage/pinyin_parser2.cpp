@@ -31,7 +31,7 @@
 #include "chewing_key.h"
 #include "pinyin_parser_table.h"
 #include "double_pinyin_table.h"
-#include "chewing_table.h"
+#include "zhuyin_table.h"
 
 
 using namespace pinyin;
@@ -60,11 +60,11 @@ static bool check_pinyin_options(pinyin_option_t options, const pinyin_index_ite
 
 static bool check_chewing_options(pinyin_option_t options, const chewing_index_item_t * item) {
     guint32 flags = item->m_flags;
-    assert (flags & IS_CHEWING);
+    assert (flags & IS_ZHUYIN);
 
     /* handle incomplete chewing. */
-    if (flags & CHEWING_INCOMPLETE) {
-        if (!(options & CHEWING_INCOMPLETE))
+    if (flags & ZHUYIN_INCOMPLETE) {
+        if (!(options & ZHUYIN_INCOMPLETE))
             return false;
     }
 
@@ -115,9 +115,9 @@ gchar * _ChewingKey::get_chewing_string() {
     const content_table_item_t & item = content_table[index];
 
     if (CHEWING_ZERO_TONE == m_tone) {
-        return g_strdup(item.m_chewing_str);
+        return g_strdup(item.m_zhuyin_str);
     } else {
-        return g_strdup_printf("%s%s", item.m_chewing_str,
+        return g_strdup_printf("%s%s", item.m_zhuyin_str,
                                chewing_tone_table[m_tone]);
     }
 }
@@ -197,7 +197,7 @@ static inline bool search_chewing_index(pinyin_option_t options,
     std_lite::pair<const chewing_index_item_t *,
                    const chewing_index_item_t *> range;
     range = std_lite::equal_range
-        (chewing_index, chewing_index + G_N_ELEMENTS(chewing_index),
+        (zhuyin_index, zhuyin_index + G_N_ELEMENTS(zhuyin_index),
          item, compare_chewing_less_than);
 
     guint16 range_len = range.second - range.first;
@@ -659,7 +659,7 @@ bool DoublePinyinParser2::parse_one_key(pinyin_option_t options,
     }
 
     ChewingTone tone = CHEWING_ZERO_TONE;
-    options &= ~(PINYIN_INCOMPLETE|CHEWING_INCOMPLETE);
+    options &= ~(PINYIN_INCOMPLETE|ZHUYIN_INCOMPLETE);
     options |= PINYIN_CORRECT_UE_VE | PINYIN_CORRECT_V_U;
 
     /* parse tone */
@@ -940,21 +940,21 @@ int ChewingParser2::parse(pinyin_option_t options, ChewingKeyVector & keys,
 }
 
 
-bool ChewingParser2::set_scheme(ChewingScheme scheme) {
+bool ChewingParser2::set_scheme(ZhuyinScheme scheme) {
     switch(scheme) {
-    case CHEWING_STANDARD:
+    case ZHUYIN_STANDARD:
         m_symbol_table = chewing_standard_symbols;
         m_tone_table   = chewing_standard_tones;
         return true;
-    case CHEWING_IBM:
+    case ZHUYIN_IBM:
         m_symbol_table = chewing_ibm_symbols;
         m_tone_table   = chewing_ibm_tones;
         return true;
-    case CHEWING_GINYIEH:
+    case ZHUYIN_GINYIEH:
         m_symbol_table = chewing_ginyieh_symbols;
         m_tone_table   = chewing_ginyieh_tones;
         return true;
-    case CHEWING_ETEN:
+    case ZHUYIN_ETEN:
         m_symbol_table = chewing_eten_symbols;
         m_tone_table   = chewing_eten_tones;
         return true;
