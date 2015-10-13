@@ -82,6 +82,8 @@ def gen_fallback_table2(scheme):
         index = char1 + char2
         entry = '{{"{0}", "{1}"}}'.format(index, yunmu)
         entries.append(entry)
+
+    entries.append('{NULL, NULL}')
     return ',\n'.join(entries)
 
 
@@ -115,11 +117,17 @@ def gen_fallback_table3(scheme):
         index = char1 + char2
         entry = '{{"{0}", "{1}"}}'.format(index, yunmu)
         entries.append(entry)
+
+    entries.append('{NULL, NULL}')
     return ',\n'.join(entries)
 
 
 ### main function ###
 if __name__ == "__main__":
+    print(gen_shengmu_table("PYJJ"), os.linesep)
+
+    print(gen_yunmu_table("PYJJ"), os.linesep)
+
     print(gen_fallback_table2("PYJJ"), os.linesep)
 
     print(gen_fallback_table3("ZRM"), os.linesep)
