@@ -96,6 +96,20 @@ const double_pinyin_scheme_shengmu_item_t double_pinyin_zrm_sheng[] = {
 {NULL } /* ; */
 };
 
+const double_pinyin_scheme_fallback_item_t double_pinyin_zrm_fallback[] = {
+{"aa", "a"},
+{"ai", "ai"},
+{"an", "an"},
+{"ah", "ang"},
+{"ao", "ao"},
+{"ee", "e"},
+{"ei", "ei"},
+{"en", "en"},
+{"er", "er"},
+{"oo", "o"},
+{"ou", "ou"}
+};
+
 const double_pinyin_scheme_yunmu_item_t double_pinyin_zrm_yun[] = {
 {{"a"    , NULL   }} /* A */,
 {{"ou"   , NULL   }} /* B */,
@@ -306,6 +320,20 @@ const double_pinyin_scheme_yunmu_item_t double_pinyin_pyjj_yun[] = {
 {{NULL   , NULL   }} /* ; */
 };
 
+const double_pinyin_scheme_fallback_item_t double_pinyin_pyjj_fallback[] = {
+{"aa", "a"},
+{"as", "ai"},
+{"af", "an"},
+{"ag", "ang"},
+{"ad", "ao"},
+{"ee", "e"},
+{"ew", "ei"},
+{"er", "en"},
+{"eq", "er"},
+{"oo", "o"},
+{"op", "ou"}
+};
+
 const double_pinyin_scheme_shengmu_item_t double_pinyin_xhe_sheng[] = {
 {"'"  } /* A */,
 {"b"  } /* B */,
@@ -364,6 +392,20 @@ const double_pinyin_scheme_yunmu_item_t double_pinyin_xhe_yun[] = {
 {{"un"   , NULL   }} /* Y */,
 {{"ou"   , NULL   }} /* Z */,
 {{NULL   , NULL   }} /* ; */
+};
+
+const double_pinyin_scheme_fallback_item_t double_pinyin_xhe_fallback[] = {
+{"aa", "a"},
+{"ai", "ai"},
+{"an", "an"},
+{"ah", "ang"},
+{"ao", "ao"},
+{"ee", "e"},
+{"ei", "ei"},
+{"en", "en"},
+{"er", "er"},
+{"oo", "o"},
+{"ou", "ou"}
 };
 
 };
