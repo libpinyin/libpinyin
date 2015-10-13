@@ -734,18 +734,28 @@ bool DoublePinyinParser2::parse_one_key(pinyin_option_t options,
             g_free(pinyin);
         } while(0);
 
-#if 1
-        /* support two letter yunmu from full pinyin */
-        if (0 == strcmp(sheng, "")) {
-            pinyin = g_strndup(str, 2);
-            if (search_pinyin_index(options, pinyin, key)) {
+        /* support fallback table for double pinyin. */
+        if (m_fallback_table) {
+            input = g_strndup(str, 2);
+
+            const char * yunmu = NULL;
+            const double_pinyin_scheme_fallback_item_t * item =
+                m_fallback_table;
+
+            while(NULL != item->m_input) {
+                if (0 == strcmp(item->m_input, input))
+                    yummu = item->m_yunmu;
+                item++;
+            }
+
+            if (NULL != yummu && search_pinyin_index(options, yummu, key)) {
                 key.m_tone = tone;
-                g_free(pinyin);
+                g_free(input);
                 return true;
             }
-            g_free(pinyin);
+            g_free(input);
+            return false;
         }
-#endif
     }
 
     return false;
