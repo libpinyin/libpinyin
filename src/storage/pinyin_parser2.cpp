@@ -736,19 +736,20 @@ bool DoublePinyinParser2::parse_one_key(pinyin_option_t options,
 
         /* support fallback table for double pinyin. */
         if (m_fallback_table) {
-            input = g_strndup(str, 2);
+            gchar * input = g_strndup(str, 2);
 
             const char * yunmu = NULL;
             const double_pinyin_scheme_fallback_item_t * item =
                 m_fallback_table;
 
+            /* as the fallback table is short, just iterate the table. */
             while(NULL != item->m_input) {
                 if (0 == strcmp(item->m_input, input))
-                    yummu = item->m_yunmu;
+                    yunmu = item->m_yunmu;
                 item++;
             }
 
-            if (NULL != yummu && search_pinyin_index(options, yummu, key)) {
+            if (NULL != yunmu && search_pinyin_index(options, yunmu, key)) {
                 key.m_tone = tone;
                 g_free(input);
                 return true;
