@@ -242,6 +242,12 @@ bool FullPinyinParser2::parse_one_key (pinyin_option_t options,
             parsed_len --;
             tone_pos = parsed_len;
         }
+
+        /* check the force tone option. */
+        if (options & FORCE_TONE && CHEWING_ZERO_TONE == tone) {
+            g_free(input);
+            return false;
+        }
     }
 
     /* parse pinyin core staff here. */
@@ -638,6 +644,10 @@ bool DoublePinyinParser2::parse_one_key(pinyin_option_t options,
                                         const char *str, int len) const {
     options &= ~(PINYIN_CORRECT_ALL|PINYIN_AMB_ALL);
 
+    /* force tone requires at least 3 characters. */
+    if (options & FORCE_TONE && 3 != len)
+        return false;
+
     if (1 == len) {
         if (!(options & PINYIN_INCOMPLETE))
             return false;
@@ -651,11 +661,10 @@ bool DoublePinyinParser2::parse_one_key(pinyin_option_t options,
         if (NULL == sheng || strcmp(sheng, "'") == 0)
             return false;
 
-        if (search_pinyin_index(options, sheng, key)) {
+        if (search_pinyin_index(options, sheng, key))
             return true;
-        } else {
+        else
             return false;
-        }
     }
 
     ChewingTone tone = CHEWING_ZERO_TONE;
@@ -670,6 +679,10 @@ bool DoublePinyinParser2::parse_one_key(pinyin_option_t options,
         if (!('0' < ch && ch <= '5'))
             return false;
         tone = (ChewingTone) (ch - '0');
+
+        /* check the force tone option. */
+        if (options & FORCE_TONE && CHEWING_ZERO_TONE == tone)
+            return false;
     }
 
     if (2 == len || 3 == len) {
