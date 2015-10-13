@@ -107,7 +107,8 @@ const double_pinyin_scheme_fallback_item_t double_pinyin_zrm_fallback[] = {
 {"en", "en"},
 {"er", "er"},
 {"oo", "o"},
-{"ou", "ou"}
+{"ou", "ou"},
+{NULL, NULL}
 };
 
 const double_pinyin_scheme_yunmu_item_t double_pinyin_zrm_yun[] = {
@@ -331,7 +332,8 @@ const double_pinyin_scheme_fallback_item_t double_pinyin_pyjj_fallback[] = {
 {"er", "en"},
 {"eq", "er"},
 {"oo", "o"},
-{"op", "ou"}
+{"op", "ou"},
+{NULL, NULL}
 };
 
 const double_pinyin_scheme_shengmu_item_t double_pinyin_xhe_sheng[] = {
@@ -405,7 +407,8 @@ const double_pinyin_scheme_fallback_item_t double_pinyin_xhe_fallback[] = {
 {"en", "en"},
 {"er", "er"},
 {"oo", "o"},
-{"ou", "ou"}
+{"ou", "ou"},
+{NULL, NULL}
 };
 
 };
