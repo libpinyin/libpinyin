@@ -195,18 +195,22 @@ public:
  * Parse the double pinyin string into an array of struct ChewingKeys.
  *
  */
-/* The valid input chars of ShuangPin is a-z and ';'
+/* The valid input chars of double pinyin is a-z and ';'
  */
 class DoublePinyinParser2 : public PhoneticParser2
 {
-    /* Note: two internal pointers to double pinyin scheme table. */
+    /* Note: three internal pointers to double pinyin scheme table. */
 protected:
-    const double_pinyin_scheme_shengmu_item_t * m_shengmu_table;
-    const double_pinyin_scheme_yunmu_item_t   * m_yunmu_table;
+    const double_pinyin_scheme_shengmu_item_t  * m_shengmu_table;
+    const double_pinyin_scheme_yunmu_item_t    * m_yunmu_table;
+    const double_pinyin_scheme_fallback_item_t * m_fallback_table;
 
 public:
     DoublePinyinParser2() {
-        m_shengmu_table = NULL; m_yunmu_table = NULL;
+        m_shengmu_table = NULL;
+        m_yunmu_table = NULL;
+        m_fallback_table = NULL;
+
         set_scheme(DOUBLE_PINYIN_DEFAULT);
     }
 

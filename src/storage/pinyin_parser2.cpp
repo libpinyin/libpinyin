@@ -799,11 +799,14 @@ int DoublePinyinParser2::parse(pinyin_option_t options, ChewingKeyVector & keys,
 #undef IS_KEY
 
 bool DoublePinyinParser2::set_scheme(DoublePinyinScheme scheme) {
+    /* most double pinyin schemes doesn't use fallback table. */
+    m_fallback_table = NULL;
 
     switch (scheme) {
     case DOUBLE_PINYIN_ZRM:
-        m_shengmu_table = double_pinyin_zrm_sheng;
-        m_yunmu_table   = double_pinyin_zrm_yun;
+        m_shengmu_table  = double_pinyin_zrm_sheng;
+        m_yunmu_table    = double_pinyin_zrm_yun;
+        m_fallback_table = double_pinyin_zrm_fallback;
         return true;
     case DOUBLE_PINYIN_MS:
         m_shengmu_table = double_pinyin_mspy_sheng;
@@ -818,12 +821,14 @@ bool DoublePinyinParser2::set_scheme(DoublePinyinScheme scheme) {
         m_yunmu_table   = double_pinyin_abc_yun;
         return true;
     case DOUBLE_PINYIN_PYJJ:
-        m_shengmu_table = double_pinyin_pyjj_sheng;
-        m_yunmu_table   = double_pinyin_pyjj_yun;
+        m_shengmu_table  = double_pinyin_pyjj_sheng;
+        m_yunmu_table    = double_pinyin_pyjj_yun;
+        m_fallback_table = double_pinyin_pyjj_fallback;
         return true;
     case DOUBLE_PINYIN_XHE:
-        m_shengmu_table = double_pinyin_xhe_sheng;
-        m_yunmu_table   = double_pinyin_xhe_yun;
+        m_shengmu_table  = double_pinyin_xhe_sheng;
+        m_yunmu_table    = double_pinyin_xhe_yun;
+        m_fallback_table = double_pinyin_xhe_fallback;
         return true;
     case DOUBLE_PINYIN_CUSTOMIZED:
         assert(FALSE);
