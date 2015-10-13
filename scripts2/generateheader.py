@@ -25,7 +25,7 @@ from argparse import ArgumentParser
 from chewing import gen_initials, gen_middles, gen_finals, gen_tones
 from fullpinyintable import gen_content_table, gen_pinyin_index, gen_luoma_pinyin_index, gen_secondary_zhuyin_index, gen_zhuyin_index, gen_hsu_zhuyin_index, gen_eten26_zhuyin_index, gen_table_index_for_chewing_key
 from specialtable import gen_divided_table, gen_resplit_table
-from doublepinyintable import gen_shengmu_table, gen_yunmu_table
+from doublepinyintable import gen_shengmu_table, gen_yunmu_table, gen_fallback_table2, gen_fallback_table3
 from bopomofotable import gen_chewing_symbols, gen_chewing_initials, gen_chewing_middles, gen_chewing_finals, gen_chewing_tones
 
 
@@ -73,6 +73,10 @@ def get_table_content(tablename):
         return gen_shengmu_table(scheme)
     if part == "YUN":
         return gen_yunmu_table(scheme)
+    if part == "FALLBACK2":
+        return gen_fallback_table2(scheme)
+    if part == "FALLBACK3":
+        return gen_fallback_table3(scheme)
 
     #zhuyin table
     (scheme, part) = tablename.split('_', 1)

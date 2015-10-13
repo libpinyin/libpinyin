@@ -74,6 +74,11 @@ typedef struct {
 } double_pinyin_scheme_yunmu_item_t;
 
 typedef struct {
+    const char * m_input;
+    const char * m_yunmu;
+} double_pinyin_scheme_fallback_item_t;
+
+typedef struct {
     const char m_input;
     const char * m_chewing;
 } chewing_symbol_item_t;

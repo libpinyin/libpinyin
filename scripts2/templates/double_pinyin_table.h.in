@@ -15,6 +15,10 @@ const double_pinyin_scheme_shengmu_item_t double_pinyin_zrm_sheng[] = {
 @ZRM_SHENG@
 };
 
+const double_pinyin_scheme_fallback_item_t double_pinyin_zrm_fallback[] = {
+@ZRM_FALLBACK3@
+};
+
 const double_pinyin_scheme_yunmu_item_t double_pinyin_zrm_yun[] = {
 @ZRM_YUN@
 };
@@ -43,12 +47,20 @@ const double_pinyin_scheme_yunmu_item_t double_pinyin_pyjj_yun[] = {
 @PYJJ_YUN@
 };
 
+const double_pinyin_scheme_fallback_item_t double_pinyin_pyjj_fallback[] = {
+@PYJJ_FALLBACK2@
+};
+
 const double_pinyin_scheme_shengmu_item_t double_pinyin_xhe_sheng[] = {
 @XHE_SHENG@
 };
 
 const double_pinyin_scheme_yunmu_item_t double_pinyin_xhe_yun[] = {
 @XHE_YUN@
+};
+
+const double_pinyin_scheme_fallback_item_t double_pinyin_xhe_fallback[] = {
+@XHE_FALLBACK3@
 };
 
 };
