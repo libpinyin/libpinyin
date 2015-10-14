@@ -58,56 +58,6 @@ static bool check_pinyin_options(pinyin_option_t options, const pinyin_index_ite
     return true;
 }
 
-gint _ChewingKey::get_table_index() {
-    assert(m_initial <  CHEWING_NUMBER_OF_INITIALS);
-    assert(m_middle < CHEWING_NUMBER_OF_MIDDLES);
-    assert(m_final < CHEWING_NUMBER_OF_FINALS);
-
-    gint index = chewing_key_table[(m_initial * CHEWING_NUMBER_OF_MIDDLES + m_middle) * CHEWING_NUMBER_OF_FINALS + m_final];
-    return index == -1 ? 0 : index;
-}
-
-gchar * _ChewingKey::get_pinyin_string() {
-    assert(m_tone < CHEWING_NUMBER_OF_TONES);
-    gint index = get_table_index();
-    assert(index < (int) G_N_ELEMENTS(content_table));
-    const content_table_item_t & item = content_table[index];
-
-    if (CHEWING_ZERO_TONE == m_tone) {
-        return g_strdup(item.m_pinyin_str);
-    } else {
-        return g_strdup_printf("%s%d", item.m_pinyin_str, m_tone);
-    }
-}
-
-gchar * _ChewingKey::get_shengmu_string() {
-    gint index = get_table_index();
-    assert(index < (int) G_N_ELEMENTS(content_table));
-    const content_table_item_t & item = content_table[index];
-    return g_strdup(item.m_shengmu_str);
-}
-
-gchar * _ChewingKey::get_yunmu_string() {
-    gint index = get_table_index();
-    assert(index < (int) G_N_ELEMENTS(content_table));
-    const content_table_item_t & item = content_table[index];
-    return g_strdup(item.m_yunmu_str);
-}
-
-gchar * _ChewingKey::get_chewing_string() {
-    assert(m_tone < CHEWING_NUMBER_OF_TONES);
-    gint index = get_table_index();
-    assert(index < (int) G_N_ELEMENTS(content_table));
-    const content_table_item_t & item = content_table[index];
-
-    if (CHEWING_ZERO_TONE == m_tone) {
-        return g_strdup(item.m_zhuyin_str);
-    } else {
-        return g_strdup_printf("%s%s", item.m_zhuyin_str,
-                               chewing_tone_table[m_tone]);
-    }
-}
-
 
 /* Pinyin Parsers */
 
