@@ -438,6 +438,26 @@ int FullPinyinParser2::final_step(size_t step_len, ChewingKeyVector & keys,
     return parsed_len;
 }
 
+bool FullPinyinParser2::set_scheme(ZhuyinScheme scheme){
+    switch(scheme){
+    case FULL_PINYIN_HANYU:
+        m_pinyin_index = hanyu_pinyin_index;
+        m_pinyin_index_len = G_N_ELEMENTS(hanyu_pinyin_index);
+        break;
+    case FULL_PINYIN_LUOMA:
+        m_pinyin_index = luoma_pinyin_index;
+        m_pinyin_index_len = G_N_ELEMENTS(luoma_pinyin_index);
+        break;
+    case FULL_PINYIN_SECONDARY_BOPOMOFO:
+        m_pinyin_index = secondary_bopomofo_index;
+        m_pinyin_index_len = G_N_ELEMENTS(secondary_bopomofo_index);
+        break;
+    default:
+        assert(false);
+    }
+    return true;
+}
+
 bool FullPinyinParser2::post_process2(pinyin_option_t options,
                                       ChewingKeyVector & keys,
                                       ChewingKeyRestVector & key_rests,

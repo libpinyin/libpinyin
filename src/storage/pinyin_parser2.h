@@ -186,6 +186,9 @@ public:
      *   the parse method will use dynamic programming to drive parse_one_key.
      */
     virtual int parse(pinyin_option_t options, ChewingKeyVector & keys, ChewingKeyRestVector & key_rests, const char *str, int len) const;
+
+public:
+    bool set_scheme(ZhuyinScheme scheme);
 };
 
 

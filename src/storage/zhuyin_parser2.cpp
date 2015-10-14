@@ -89,28 +89,7 @@ static inline bool search_chewing_index(pinyin_option_t options,
 }
 
 
-bool FullPinyinParser2::set_scheme(ZhuyinScheme scheme){
-    switch(scheme){
-    case FULL_PINYIN_HANYU:
-        m_pinyin_index = hanyu_pinyin_index;
-        m_pinyin_index_len = G_N_ELEMENTS(hanyu_pinyin_index);
-        break;
-    case FULL_PINYIN_LUOMA:
-        m_pinyin_index = luoma_pinyin_index;
-        m_pinyin_index_len = G_N_ELEMENTS(luoma_pinyin_index);
-        break;
-    case FULL_PINYIN_SECONDARY_BOPOMOFO:
-        m_pinyin_index = secondary_bopomofo_index;
-        m_pinyin_index_len = G_N_ELEMENTS(secondary_bopomofo_index);
-        break;
-    default:
-        assert(false);
-    }
-    return true;
-}
-
 /* the chewing string must be freed with g_free. */
-
 static bool search_chewing_symbols(const chewing_symbol_item_t * symbol_table,
                                    const char key, const char ** chewing) {
     *chewing = "";

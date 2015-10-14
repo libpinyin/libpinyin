@@ -59,6 +59,7 @@ libstorage_la_SOURCES   = phrase_index.cpp \
 			   ngram.cpp \
 			   tag_utility.cpp \
 			   pinyin_parser2.cpp \
+			   zhuyin_parser2.cpp \
 			   chewing_large_table.cpp \
 			   table_info.cpp
 
