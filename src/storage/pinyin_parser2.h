@@ -261,11 +261,11 @@ public:
  * Parse the chewing string into an array of struct ChewingKeys.
  *
  * Several keyboard scheme are supported:
- * * CHEWING_STANDARD  Standard ZhuYin keyboard, which maps 1 to Bo(ㄅ), q to Po(ㄆ) etc.
- * * CHEWING_IBM       IBM ZhuYin keyboard, which maps 1 to Bo(ㄅ), 2 to Po(ㄆ) etc.
- * * CHEWING_GINYIEH   Gin-Yieh ZhuYin keyboard.
- * * CHEWING_ETEN      Eten (倚天) ZhuYin keyboard.
- * * CHEWING_STANDARD_DVORAK      Standard Dvorak ZhuYin keyboard
+ * * ZHUYIN_STANDARD  Standard ZhuYin keyboard, which maps 1 to Bo(ㄅ), q to Po(ㄆ) etc.
+ * * ZHUYIN_IBM       IBM ZhuYin keyboard, which maps 1 to Bo(ㄅ), 2 to Po(ㄆ) etc.
+ * * ZHUYIN_GINYIEH   Gin-Yieh ZhuYin keyboard.
+ * * ZHUYIN_ETEN      Eten (倚天) ZhuYin keyboard.
+ * * ZHUYIN_STANDARD_DVORAK      Standard Dvorak ZhuYin keyboard
  *
  */
 
