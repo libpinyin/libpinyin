@@ -147,6 +147,8 @@ public:
 class FullPinyinParser2 : public PhoneticParser2
 {
     /* Note: some internal pointers to full pinyin table. */
+    const pinyin_index_item_t * m_pinyin_index;
+    size_t m_pinyin_index_len;
 
 protected:
     ParseValueVector m_parse_steps;
@@ -188,7 +190,7 @@ public:
     virtual int parse(pinyin_option_t options, ChewingKeyVector & keys, ChewingKeyRestVector & key_rests, const char *str, int len) const;
 
 public:
-    bool set_scheme(ZhuyinScheme scheme);
+    bool set_scheme(FullPinyinScheme scheme);
 };
 
 
@@ -280,7 +282,7 @@ protected:
 public:
     ChewingSimpleParser2() {
         m_symbol_table = NULL; m_tone_table = NULL;
-        set_scheme(CHEWING_DEFAULT);
+        set_scheme(ZHUYIN_DEFAULT);
     }
 
     virtual ~ChewingSimpleParser2() {}
@@ -324,7 +326,7 @@ public:
         m_chewing_index = NULL; m_chewing_index_len = 0;
         m_initial_table = NULL; m_middle_table = NULL;
         m_final_table   = NULL; m_tone_table = NULL;
-        set_scheme(CHEWING_HSU);
+        set_scheme(ZHUYIN_HSU);
     }
 
     virtual ~ChewingDiscreteParser2() {}

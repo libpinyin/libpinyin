@@ -168,31 +168,27 @@ static inline bool search_pinyin_index(pinyin_option_t options,
     return false;
 }
 
-static bool compare_chewing_less_than(const chewing_index_item_t & lhs,
-                                      const chewing_index_item_t & rhs){
-    return 0 > strcmp(lhs.m_chewing_input, rhs.m_chewing_input);
-}
-
-static inline bool search_chewing_index(pinyin_option_t options,
-                                        const char * chewing,
+static inline bool search_pinyin_index2(pinyin_option_t options,
+                                        const pinyin_index_item_t * index,
+                                        size_t len,
+                                        const char * pinyin,
                                         ChewingKey & key){
-    chewing_index_item_t item;
+    pinyin_index_item_t item;
     memset(&item, 0, sizeof(item));
-    item.m_chewing_input = chewing;
+    item.m_pinyin_input = pinyin;
 
-    std_lite::pair<const chewing_index_item_t *,
-                   const chewing_index_item_t *> range;
+    std_lite::pair<const pinyin_index_item_t *,
+                   const pinyin_index_item_t *> range;
     range = std_lite::equal_range
-        (zhuyin_index, zhuyin_index + G_N_ELEMENTS(zhuyin_index),
-         item, compare_chewing_less_than);
+        (index, index + len,
+         item, compare_pinyin_less_than);
 
     guint16 range_len = range.second - range.first;
-    assert (range_len <= 1);
-
+    assert(range_len <= 1);
     if (range_len == 1) {
-        const chewing_index_item_t * index = range.first;
+        const pinyin_index_item_t * index = range.first;
 
-        if (!check_chewing_options(options, index))
+        if (!check_pinyin_options(options, index))
             return false;
 
         key = content_table[index->m_table_index].m_chewing_key;
@@ -203,11 +199,14 @@ static inline bool search_chewing_index(pinyin_option_t options,
     return false;
 }
 
+
 /* Full Pinyin Parser */
 FullPinyinParser2::FullPinyinParser2 (){
+    m_pinyin_index = NULL; m_pinyin_index_len = 0;
     m_parse_steps = g_array_new(TRUE, FALSE, sizeof(parse_value_t));
-}
 
+    set_scheme(FULL_PINYIN_DEFAULT);
+}
 
 bool FullPinyinParser2::parse_one_key (pinyin_option_t options,
                                        ChewingKey & key,
@@ -240,7 +239,8 @@ bool FullPinyinParser2::parse_one_key (pinyin_option_t options,
 
     /* Note: optimize here? */
     input[parsed_len] = '\0';
-    if (!search_pinyin_index(options, input, key)) {
+    if (!search_pinyin_index2(options, m_pinyin_index, m_pinyin_index_len,
+                              input, key)) {
         g_free(input);
         return false;
     }
@@ -438,19 +438,19 @@ int FullPinyinParser2::final_step(size_t step_len, ChewingKeyVector & keys,
     return parsed_len;
 }
 
-bool FullPinyinParser2::set_scheme(ZhuyinScheme scheme){
+bool FullPinyinParser2::set_scheme(FullPinyinScheme scheme){
     switch(scheme){
     case FULL_PINYIN_HANYU:
-        m_pinyin_index = hanyu_pinyin_index;
-        m_pinyin_index_len = G_N_ELEMENTS(hanyu_pinyin_index);
+        m_pinyin_index = pinyin_index;
+        m_pinyin_index_len = G_N_ELEMENTS(pinyin_index);
         break;
     case FULL_PINYIN_LUOMA:
         m_pinyin_index = luoma_pinyin_index;
         m_pinyin_index_len = G_N_ELEMENTS(luoma_pinyin_index);
         break;
     case FULL_PINYIN_SECONDARY_BOPOMOFO:
-        m_pinyin_index = secondary_bopomofo_index;
-        m_pinyin_index_len = G_N_ELEMENTS(secondary_bopomofo_index);
+        m_pinyin_index = secondary_zhuyin_index;
+        m_pinyin_index_len = G_N_ELEMENTS(secondary_zhuyin_index);
         break;
     default:
         assert(false);
