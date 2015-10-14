@@ -159,9 +159,9 @@ static int search_chewing_symbols2(const zhuyin_symbol_item_t * symbol_table,
     return num;
 }
 
-bool ChewingSimpleParser2::parse_one_key(pinyin_option_t options,
-                                         ChewingKey & key,
-                                         const char * str, int len) const {
+bool ZhuyinSimpleParser2::parse_one_key(pinyin_option_t options,
+                                        ChewingKey & key,
+                                        const char * str, int len) const {
     options &= ~PINYIN_AMB_ALL;
     unsigned char tone = CHEWING_ZERO_TONE;
 
@@ -212,10 +212,10 @@ bool ChewingSimpleParser2::parse_one_key(pinyin_option_t options,
 }
 
 /* only characters in chewing keyboard scheme are accepted here. */
-int ChewingSimpleParser2::parse(pinyin_option_t options,
-                                ChewingKeyVector & keys,
-                                ChewingKeyRestVector & key_rests,
-                                const char *str, int len) const {
+int ZhuyinSimpleParser2::parse(pinyin_option_t options,
+                               ChewingKeyVector & keys,
+                               ChewingKeyRestVector & key_rests,
+                               const char *str, int len) const {
     /* add keyboard mapping specific options. */
     options |= m_options;
 
@@ -263,7 +263,7 @@ int ChewingSimpleParser2::parse(pinyin_option_t options,
 }
 
 
-bool ChewingSimpleParser2::set_scheme(ZhuyinScheme scheme) {
+bool ZhuyinSimpleParser2::set_scheme(ZhuyinScheme scheme) {
     m_options = ZHUYIN_CORRECT_SHUFFLE;
 
     switch(scheme) {
@@ -293,9 +293,9 @@ bool ChewingSimpleParser2::set_scheme(ZhuyinScheme scheme) {
     return false;
 }
 
-bool ChewingSimpleParser2::in_chewing_scheme(pinyin_option_t options,
-                                             const char key,
-                                             gchar ** & symbols) const {
+bool ZhuyinSimpleParser2::in_chewing_scheme(pinyin_option_t options,
+                                            const char key,
+                                            gchar ** & symbols) const {
     symbols = NULL;
     GPtrArray * array = g_ptr_array_new();
 
@@ -324,9 +324,9 @@ bool ChewingSimpleParser2::in_chewing_scheme(pinyin_option_t options,
     return false;
 }
 
-bool ChewingDiscreteParser2::parse_one_key(pinyin_option_t options,
-                                           ChewingKey & key,
-                                           const char * str, int len) const {
+bool ZhuyinDiscreteParser2::parse_one_key(pinyin_option_t options,
+                                          ChewingKey & key,
+                                          const char * str, int len) const {
     if (0 == len)
         return false;
 
@@ -396,10 +396,10 @@ probe:
 }
 
 /* only characters in chewing keyboard scheme are accepted here. */
-int ChewingDiscreteParser2::parse(pinyin_option_t options,
-                                  ChewingKeyVector & keys,
-                                  ChewingKeyRestVector & key_rests,
-                                  const char *str, int len) const {
+int ZhuyinDiscreteParser2::parse(pinyin_option_t options,
+                                 ChewingKeyVector & keys,
+                                 ChewingKeyRestVector & key_rests,
+                                 const char *str, int len) const {
     /* add keyboard mapping specific options. */
     options |= m_options;
 
@@ -446,7 +446,7 @@ int ChewingDiscreteParser2::parse(pinyin_option_t options,
     return parsed_len;
 }
 
-bool ChewingDiscreteParser2::set_scheme(ZhuyinScheme scheme) {
+bool ZhuyinDiscreteParser2::set_scheme(ZhuyinScheme scheme) {
     m_options = 0;
 
 #define INIT_PARSER(index, table) {                     \
@@ -480,9 +480,9 @@ bool ChewingDiscreteParser2::set_scheme(ZhuyinScheme scheme) {
     return true;
 }
 
-bool ChewingDiscreteParser2::in_chewing_scheme(pinyin_option_t options,
-                                               const char key,
-                                               gchar ** & symbols) const {
+bool ZhuyinDiscreteParser2::in_chewing_scheme(pinyin_option_t options,
+                                              const char key,
+                                              gchar ** & symbols) const {
     symbols = NULL;
     GPtrArray * array = g_ptr_array_new();
 
@@ -531,7 +531,7 @@ end:
     return false;
 }
 
-ChewingDaChenCP26Parser2::ChewingDaChenCP26Parser2() {
+ZhuyinDaChenCP26Parser2::ZhuyinDaChenCP26Parser2() {
     m_chewing_index = zhuyin_index;
     m_chewing_index_len = G_N_ELEMENTS(zhuyin_index);
 
@@ -541,9 +541,9 @@ ChewingDaChenCP26Parser2::ChewingDaChenCP26Parser2() {
     m_tone_table    = chewing_dachen_cp26_tones;
 }
 
-bool ChewingDaChenCP26Parser2::parse_one_key(pinyin_option_t options,
-                                             ChewingKey & key,
-                                             const char *str, int len) const {
+bool ZhuyinDaChenCP26Parser2::parse_one_key(pinyin_option_t options,
+                                            ChewingKey & key,
+                                            const char *str, int len) const {
     if (0 == len)
         return false;
 
@@ -731,10 +731,10 @@ probe:
     return false;
 }
 
-int ChewingDaChenCP26Parser2::parse(pinyin_option_t options,
-                                    ChewingKeyVector & keys,
-                                    ChewingKeyRestVector & key_rests,
-                                    const char *str, int len) const {
+int ZhuyinDaChenCP26Parser2::parse(pinyin_option_t options,
+                                   ChewingKeyVector & keys,
+                                   ChewingKeyRestVector & key_rests,
+                                   const char *str, int len) const {
     g_array_set_size(keys, 0);
     g_array_set_size(key_rests, 0);
 
@@ -804,9 +804,9 @@ int ChewingDaChenCP26Parser2::parse(pinyin_option_t options,
 }
 
 
-bool ChewingDaChenCP26Parser2::in_chewing_scheme(pinyin_option_t options,
-                                                 const char key,
-                                                 gchar ** & symbols) const {
+bool ZhuyinDaChenCP26Parser2::in_chewing_scheme(pinyin_option_t options,
+                                                const char key,
+                                                gchar ** & symbols) const {
     symbols = NULL;
     GPtrArray * array = g_ptr_array_new();
 
@@ -860,14 +860,14 @@ end:
     return false;
 }
 
-ChewingDirectParser2::ChewingDirectParser2 (){
+ZhuyinDirectParser2::ZhuyinDirectParser2 (){
     m_chewing_index = zhuyin_index;
     m_chewing_index_len = G_N_ELEMENTS(zhuyin_index);
 }
 
-bool ChewingDirectParser2::parse_one_key(pinyin_option_t options,
-                                         ChewingKey & key,
-                                         const char *str, int len) const {
+bool ZhuyinDirectParser2::parse_one_key(pinyin_option_t options,
+                                        ChewingKey & key,
+                                        const char *str, int len) const {
     options &= ~PINYIN_AMB_ALL;
     /* by default, chewing will use the first tone. */
     unsigned char tone = CHEWING_1;
@@ -919,10 +919,10 @@ bool ChewingDirectParser2::parse_one_key(pinyin_option_t options,
     return false;
 }
 
-int ChewingDirectParser2::parse(pinyin_option_t options,
-                                ChewingKeyVector & keys,
-                                ChewingKeyRestVector & key_rests,
-                                const char *str, int len) const {
+int ZhuyinDirectParser2::parse(pinyin_option_t options,
+                               ChewingKeyVector & keys,
+                               ChewingKeyRestVector & key_rests,
+                               const char *str, int len) const {
     g_array_set_size(keys, 0);
     g_array_set_size(key_rests, 0);
 

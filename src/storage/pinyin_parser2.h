@@ -230,19 +230,19 @@ public:
 };
 
 /**
- * ChewingParser2:
+ * ZhuyinParser2:
  *
  * Parse the chewing input string into an array of struct ChewingKeys.
  *
  */
-class ChewingParser2 : public PhoneticParser2
+class ZhuyinParser2 : public PhoneticParser2
 {
 public:
-    virtual ~ChewingParser2() {}
+    virtual ~ZhuyinParser2() {}
 
 public:
     /**
-     * ChewingParser2::in_chewing_scheme:
+     * ZhuyinParser2::in_chewing_scheme:
      * @options: the pinyin options.
      * @key: the user input ascii character.
      * @symbol: the corresponding chewing symbol.
@@ -256,7 +256,7 @@ public:
 
 
  /**
- * ChewingSimpleParser2:
+ * ZhuyinSimpleParser2:
  *
  * Parse the chewing string into an array of struct ChewingKeys.
  *
@@ -269,7 +269,7 @@ public:
  *
  */
 
-class ChewingSimpleParser2 : public ChewingParser2
+class ZhuyinSimpleParser2 : public ZhuyinParser2
 {
     /* internal options for chewing parsing. */
     pinyin_option_t m_options;
@@ -280,12 +280,12 @@ protected:
     const zhuyin_tone_item_t   * m_tone_table;
 
 public:
-    ChewingSimpleParser2() {
+    ZhuyinSimpleParser2() {
         m_symbol_table = NULL; m_tone_table = NULL;
         set_scheme(ZHUYIN_DEFAULT);
     }
 
-    virtual ~ChewingSimpleParser2() {}
+    virtual ~ZhuyinSimpleParser2() {}
 
     virtual bool parse_one_key(pinyin_option_t options, ChewingKey & key, const char *str, int len) const;
 
@@ -298,7 +298,7 @@ public:
 
 
 /**
- * ChewingDiscreteParser2:
+ * ZhuyinDiscreteParser2:
  *
  * Parse the chewing string into an array of struct ChewingKeys.
  *
@@ -306,7 +306,7 @@ public:
  *
  */
 
-class ChewingDiscreteParser2 : public ChewingParser2
+class ZhuyinDiscreteParser2 : public ZhuyinParser2
 {
 protected:
     /* internal options for chewing parsing. */
@@ -321,7 +321,7 @@ protected:
     const zhuyin_tone_item_t   * m_tone_table;
 
 public:
-    ChewingDiscreteParser2() {
+    ZhuyinDiscreteParser2() {
         m_options = 0;
         m_chewing_index = NULL; m_chewing_index_len = 0;
         m_initial_table = NULL; m_middle_table = NULL;
@@ -329,7 +329,7 @@ public:
         set_scheme(ZHUYIN_HSU);
     }
 
-    virtual ~ChewingDiscreteParser2() {}
+    virtual ~ZhuyinDiscreteParser2() {}
 
     virtual bool parse_one_key(pinyin_option_t options, ChewingKey & key, const char *str, int len) const;
 
@@ -341,7 +341,7 @@ public:
 };
 
 
-class ChewingDaChenCP26Parser2 : public ChewingParser2
+class ZhuyinDaChenCP26Parser2 : public ZhuyinParser2
 {
     /* some internal pointers to chewing scheme table. */
     const chewing_index_item_t * m_chewing_index;
@@ -352,9 +352,9 @@ class ChewingDaChenCP26Parser2 : public ChewingParser2
     const zhuyin_tone_item_t   * m_tone_table;
 
 public:
-    ChewingDaChenCP26Parser2();
+    ZhuyinDaChenCP26Parser2();
 
-    virtual ~ChewingDaChenCP26Parser2() {}
+    virtual ~ZhuyinDaChenCP26Parser2() {}
 
     virtual bool parse_one_key(pinyin_option_t options, ChewingKey & key, const char *str, int len) const;
 
@@ -366,15 +366,15 @@ public:
 
 
 /* Direct Parser for Chewing table load. */
-class ChewingDirectParser2 : public PhoneticParser2
+class ZhuyinDirectParser2 : public PhoneticParser2
 {
     const chewing_index_item_t * m_chewing_index;
     size_t m_chewing_index_len;
 
 public:
-    ChewingDirectParser2();
+    ZhuyinDirectParser2();
 
-    virtual ~ChewingDirectParser2() {}
+    virtual ~ZhuyinDirectParser2() {}
 
     virtual bool parse_one_key(pinyin_option_t options, ChewingKey & key, const char *str, int len) const;
 
