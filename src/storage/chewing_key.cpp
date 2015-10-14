@@ -48,6 +48,37 @@ gchar * _ChewingKey::get_pinyin_string() {
     }
 }
 
+gchar * _ChewingKey::get_shengmu_string() {
+    gint index = get_table_index();
+    assert(index < (int) G_N_ELEMENTS(content_table));
+    const content_table_item_t & item = content_table[index];
+    return g_strdup(item.m_shengmu_str);
+}
+
+gchar * _ChewingKey::get_yunmu_string() {
+    gint index = get_table_index();
+    assert(index < (int) G_N_ELEMENTS(content_table));
+    const content_table_item_t & item = content_table[index];
+    return g_strdup(item.m_yunmu_str);
+}
+
+gchar * _ChewingKey::get_zhuyin_string() {
+    assert(m_tone < CHEWING_NUMBER_OF_TONES);
+    gint index = get_table_index();
+    assert(index < (int) G_N_ELEMENTS(content_table));
+    const content_table_item_t & item = content_table[index];
+
+    if (CHEWING_ZERO_TONE == m_tone) {
+        return g_strdup(item.m_zhuyin_str);
+    } else if (CHEWING_1 == m_tone) {
+        /* for first tone, usually not display it. */
+        return g_strdup(item.m_zhuyin_str);
+    } else {
+        return g_strdup_printf("%s%s", item.m_zhuyin_str,
+                               chewing_tone_table[m_tone]);
+    }
+}
+
 gchar * _ChewingKey::get_luoma_pinyin_string() {
     assert(m_tone < CHEWING_NUMBER_OF_TONES);
     gint index = get_table_index();
@@ -71,36 +102,5 @@ gchar * _ChewingKey::get_secondary_zhuyin_string() {
         return g_strdup(item.m_secondary_zhuyin_str);
     } else {
         return g_strdup_printf("%s%d", item.m_secondary_zhuyin_str, m_tone);
-    }
-}
-
-gchar * _ChewingKey::get_shengmu_string() {
-    gint index = get_table_index();
-    assert(index < (int) G_N_ELEMENTS(content_table));
-    const content_table_item_t & item = content_table[index];
-    return g_strdup(item.m_shengmu_str);
-}
-
-gchar * _ChewingKey::get_yunmu_string() {
-    gint index = get_table_index();
-    assert(index < (int) G_N_ELEMENTS(content_table));
-    const content_table_item_t & item = content_table[index];
-    return g_strdup(item.m_yunmu_str);
-}
-
-gchar * _ChewingKey::get_chewing_string() {
-    assert(m_tone < CHEWING_NUMBER_OF_TONES);
-    gint index = get_table_index();
-    assert(index < (int) G_N_ELEMENTS(content_table));
-    const content_table_item_t & item = content_table[index];
-
-    if (CHEWING_ZERO_TONE == m_tone) {
-        return g_strdup(item.m_zhuyin_str);
-    } else if (CHEWING_1 == m_tone) {
-        /* for first tone, usually not display it. */
-        return g_strdup(item.m_zhuyin_str);
-    } else {
-        return g_strdup_printf("%s%s", item.m_zhuyin_str,
-                               chewing_tone_table[m_tone]);
     }
 }
