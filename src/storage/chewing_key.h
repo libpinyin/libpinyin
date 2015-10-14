@@ -66,11 +66,11 @@ public:
 
     /* Note: the return value should be freed by g_free. */
     gchar * get_pinyin_string();
-    gchar * get_luoma_pinyin_string();
-    gchar * get_secondary_zhuyin_string();
     gchar * get_shengmu_string();
     gchar * get_yunmu_string();
-    gchar * get_chewing_string();
+    gchar * get_zhuyin_string();
+    gchar * get_luoma_pinyin_string();
+    gchar * get_secondary_zhuyin_string();
 };
 
 typedef struct _ChewingKey ChewingKey;

@@ -96,6 +96,9 @@ gchar * _ChewingKey::get_chewing_string() {
 
     if (CHEWING_ZERO_TONE == m_tone) {
         return g_strdup(item.m_zhuyin_str);
+    } else if (CHEWING_1 == m_tone) {
+        /* for first tone, usually not display it. */
+        return g_strdup(item.m_zhuyin_str);
     } else {
         return g_strdup_printf("%s%s", item.m_zhuyin_str,
                                chewing_tone_table[m_tone]);
