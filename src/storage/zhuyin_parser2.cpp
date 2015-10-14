@@ -102,7 +102,7 @@ static inline bool search_chewing_index(pinyin_option_t options,
 
 
 /* the chewing string must be freed with g_free. */
-static bool search_chewing_symbols(const chewing_symbol_item_t * symbol_table,
+static bool search_chewing_symbols(const zhuyin_symbol_item_t * symbol_table,
                                    const char key, const char ** chewing) {
     *chewing = "";
     /* just iterate the table, as we only have < 50 items. */
@@ -116,7 +116,7 @@ static bool search_chewing_symbols(const chewing_symbol_item_t * symbol_table,
     return false;
 }
 
-static bool search_chewing_tones(const chewing_tone_item_t * tone_table,
+static bool search_chewing_tones(const zhuyin_tone_item_t * tone_table,
                                  const char key, unsigned char * tone) {
     *tone = CHEWING_ZERO_TONE;
     /* just iterate the table, as we only have < 10 items. */
@@ -130,7 +130,7 @@ static bool search_chewing_tones(const chewing_tone_item_t * tone_table,
     return false;
 }
 
-static int search_chewing_symbols2(const chewing_symbol_item_t * symbol_table,
+static int search_chewing_symbols2(const zhuyin_symbol_item_t * symbol_table,
                                    const char key,
                                    const char ** first,
                                    const char ** second) {

@@ -81,12 +81,12 @@ typedef struct {
 typedef struct {
     const char m_input;
     const char * m_chewing;
-} chewing_symbol_item_t;
+} zhuyin_symbol_item_t;
 
 typedef struct {
     const char m_input;
     const char m_tone;
-} chewing_tone_item_t;
+} zhuyin_tone_item_t;
 
 typedef GArray * ParseValueVector;
 
@@ -276,8 +276,8 @@ class ChewingSimpleParser2 : public ChewingParser2
 
     /* Note: some internal pointers to chewing scheme table. */
 protected:
-    const chewing_symbol_item_t * m_symbol_table;
-    const chewing_tone_item_t   * m_tone_table;
+    const zhuyin_symbol_item_t * m_symbol_table;
+    const zhuyin_tone_item_t   * m_tone_table;
 
 public:
     ChewingSimpleParser2() {
@@ -315,10 +315,10 @@ protected:
     /* some internal pointers to chewing scheme table. */
     const chewing_index_item_t * m_chewing_index;
     size_t m_chewing_index_len;
-    const chewing_symbol_item_t * m_initial_table;
-    const chewing_symbol_item_t * m_middle_table;
-    const chewing_symbol_item_t * m_final_table;
-    const chewing_tone_item_t   * m_tone_table;
+    const zhuyin_symbol_item_t * m_initial_table;
+    const zhuyin_symbol_item_t * m_middle_table;
+    const zhuyin_symbol_item_t * m_final_table;
+    const zhuyin_tone_item_t   * m_tone_table;
 
 public:
     ChewingDiscreteParser2() {
@@ -346,10 +346,10 @@ class ChewingDaChenCP26Parser2 : public ChewingParser2
     /* some internal pointers to chewing scheme table. */
     const chewing_index_item_t * m_chewing_index;
     size_t m_chewing_index_len;
-    const chewing_symbol_item_t * m_initial_table;
-    const chewing_symbol_item_t * m_middle_table;
-    const chewing_symbol_item_t * m_final_table;
-    const chewing_tone_item_t   * m_tone_table;
+    const zhuyin_symbol_item_t * m_initial_table;
+    const zhuyin_symbol_item_t * m_middle_table;
+    const zhuyin_symbol_item_t * m_final_table;
+    const zhuyin_tone_item_t   * m_tone_table;
 
 public:
     ChewingDaChenCP26Parser2();
