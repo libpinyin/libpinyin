@@ -34,6 +34,13 @@
 
 using namespace pinyin;
 
+const guint16 max_chewing_length       = 4;  /* include tone. */
+
+const guint16 max_chewing_dachen26_length = 12; /* include tone. */
+
+const guint16 max_utf8_length = 6;
+
+
 static bool check_chewing_options(pinyin_option_t options, const chewing_index_item_t * item) {
     guint32 flags = item->m_flags;
     assert (flags & IS_ZHUYIN);
@@ -54,6 +61,11 @@ static bool check_chewing_options(pinyin_option_t options, const chewing_index_i
     }
 
     return true;
+}
+
+static bool compare_chewing_less_than(const chewing_index_item_t & lhs,
+                                      const chewing_index_item_t & rhs){
+    return 0 > strcmp(lhs.m_chewing_input, rhs.m_chewing_input);
 }
 
 static inline bool search_chewing_index(pinyin_option_t options,
@@ -150,7 +162,7 @@ static int search_chewing_symbols2(const chewing_symbol_item_t * symbol_table,
 bool ChewingSimpleParser2::parse_one_key(pinyin_option_t options,
                                          ChewingKey & key,
                                          const char * str, int len) const {
-    options &= ~ZHUYIN_AMB_ALL;
+    options &= ~PINYIN_AMB_ALL;
     unsigned char tone = CHEWING_ZERO_TONE;
 
     int symbols_len = len;
@@ -186,8 +198,8 @@ bool ChewingSimpleParser2::parse_one_key(pinyin_option_t options,
     }
 
     /* search the chewing in the chewing index table. */
-    if (chewing && search_chewing_index(options, bopomofo_index,
-                                        G_N_ELEMENTS(bopomofo_index),
+    if (chewing && search_chewing_index(options, zhuyin_index,
+                                        G_N_ELEMENTS(zhuyin_index),
                                         chewing, key)) {
         /* save back tone if available. */
         key.m_tone = tone;
@@ -198,8 +210,6 @@ bool ChewingSimpleParser2::parse_one_key(pinyin_option_t options,
     g_free(chewing);
     return false;
 }
-
-#endif
 
 /* only characters in chewing keyboard scheme are accepted here. */
 int ChewingSimpleParser2::parse(pinyin_option_t options,
@@ -254,26 +264,26 @@ int ChewingSimpleParser2::parse(pinyin_option_t options,
 
 
 bool ChewingSimpleParser2::set_scheme(ZhuyinScheme scheme) {
-    m_options = SHUFFLE_CORRECT;
+    m_options = ZHUYIN_CORRECT_SHUFFLE;
 
     switch(scheme) {
-    case CHEWING_STANDARD:
+    case ZHUYIN_STANDARD:
         m_symbol_table = chewing_standard_symbols;
         m_tone_table   = chewing_standard_tones;
         return true;
-    case CHEWING_IBM:
+    case ZHUYIN_IBM:
         m_symbol_table = chewing_ibm_symbols;
         m_tone_table   = chewing_ibm_tones;
         return true;
-    case CHEWING_GINYIEH:
+    case ZHUYIN_GINYIEH:
         m_symbol_table = chewing_ginyieh_symbols;
         m_tone_table   = chewing_ginyieh_tones;
         return true;
-    case CHEWING_ETEN:
+    case ZHUYIN_ETEN:
         m_symbol_table = chewing_eten_symbols;
         m_tone_table   = chewing_eten_tones;
         return true;
-    case CHEWING_STANDARD_DVORAK:
+    case ZHUYIN_STANDARD_DVORAK:
         m_symbol_table = chewing_standard_dvorak_symbols;
         m_tone_table   = chewing_standard_dvorak_tones;
     default:
@@ -320,7 +330,7 @@ bool ChewingDiscreteParser2::parse_one_key(pinyin_option_t options,
     if (0 == len)
         return false;
 
-    options &= ~ZHUYIN_AMB_ALL;
+    options &= ~PINYIN_AMB_ALL;
 
     int index = 0;
     const char * initial = "";
@@ -449,17 +459,17 @@ bool ChewingDiscreteParser2::set_scheme(ZhuyinScheme scheme) {
     }
 
     switch(scheme) {
-    case CHEWING_HSU:
-        m_options = HSU_CORRECT;
-        INIT_PARSER(hsu_bopomofo_index, hsu);
+    case ZHUYIN_HSU:
+        m_options = ZHUYIN_CORRECT_HSU;
+        INIT_PARSER(hsu_zhuyin_index, hsu);
         break;
-    case CHEWING_ETEN26:
-        m_options = ETEN26_CORRECT;
-        INIT_PARSER(eten26_bopomofo_index, eten26);
+    case ZHUYIN_ETEN26:
+        m_options = ZHUYIN_CORRECT_ETEN26;
+        INIT_PARSER(eten26_zhuyin_index, eten26);
         break;
-    case CHEWING_HSU_DVORAK:
-        m_options = HSU_CORRECT;
-        INIT_PARSER(hsu_bopomofo_index, hsu_dvorak);
+    case ZHUYIN_HSU_DVORAK:
+        m_options = ZHUYIN_CORRECT_HSU;
+        INIT_PARSER(hsu_zhuyin_index, hsu_dvorak);
         break;
     default:
         assert(FALSE);
@@ -522,8 +532,8 @@ end:
 }
 
 ChewingDaChenCP26Parser2::ChewingDaChenCP26Parser2() {
-    m_chewing_index = bopomofo_index;
-    m_chewing_index_len = G_N_ELEMENTS(bopomofo_index);
+    m_chewing_index = zhuyin_index;
+    m_chewing_index_len = G_N_ELEMENTS(zhuyin_index);
 
     m_initial_table = chewing_dachen_cp26_initials;
     m_middle_table  = chewing_dachen_cp26_middles;
@@ -537,7 +547,7 @@ bool ChewingDaChenCP26Parser2::parse_one_key(pinyin_option_t options,
     if (0 == len)
         return false;
 
-    options &= ~ZHUYIN_AMB_ALL;
+    options &= ~PINYIN_AMB_ALL;
 
     const char * initial = "";
     const char * middle  = "";
@@ -851,14 +861,14 @@ end:
 }
 
 ChewingDirectParser2::ChewingDirectParser2 (){
-    m_chewing_index = bopomofo_index;
-    m_chewing_index_len = G_N_ELEMENTS(bopomofo_index);
+    m_chewing_index = zhuyin_index;
+    m_chewing_index_len = G_N_ELEMENTS(zhuyin_index);
 }
 
 bool ChewingDirectParser2::parse_one_key(pinyin_option_t options,
                                          ChewingKey & key,
                                          const char *str, int len) const {
-    options &= ~ZHUYIN_AMB_ALL;
+    options &= ~PINYIN_AMB_ALL;
     /* by default, chewing will use the first tone. */
     unsigned char tone = CHEWING_1;
 
