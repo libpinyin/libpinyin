@@ -224,37 +224,63 @@ public:
     bool set_scheme(DoublePinyinScheme scheme);
 };
 
-
 /**
  * ChewingParser2:
+ *
+ * Parse the chewing input string into an array of struct ChewingKeys.
+ *
+ */
+class ChewingParser2 : public PhoneticParser2
+{
+public:
+    virtual ~ChewingParser2() {}
+
+public:
+    /**
+     * ChewingParser2::in_chewing_scheme:
+     * @options: the pinyin options.
+     * @key: the user input ascii character.
+     * @symbol: the corresponding chewing symbol.
+     * @returns: whether the character is in the chewing scheme.
+     *
+     * Check whether the input character is in the chewing keyboard mapping.
+     *
+     */
+    virtual bool in_chewing_scheme(pinyin_option_t options, const char key, gchar ** & symbols) const = 0;
+};
+
+
+ /**
+ * ChewingSimpleParser2:
  *
  * Parse the chewing string into an array of struct ChewingKeys.
  *
  * Several keyboard scheme are supported:
- * * Chewing_STANDARD  Standard ZhuYin keyboard, which maps 1 to Bo(ㄅ), q to Po(ㄆ) etc.
- * * Chewing_IBM       IBM ZhuYin keyboard, which maps 1 to Bo(ㄅ), 2 to Po(ㄆ) etc.
- * * Chewing_GINYIEH   Gin-Yieh ZhuYin keyboard.
- * * Chewing_ETEN      Eten (倚天) ZhuYin keyboard.
+ * * CHEWING_STANDARD  Standard ZhuYin keyboard, which maps 1 to Bo(ㄅ), q to Po(ㄆ) etc.
+ * * CHEWING_IBM       IBM ZhuYin keyboard, which maps 1 to Bo(ㄅ), 2 to Po(ㄆ) etc.
+ * * CHEWING_GINYIEH   Gin-Yieh ZhuYin keyboard.
+ * * CHEWING_ETEN      Eten (倚天) ZhuYin keyboard.
+ * * CHEWING_STANDARD_DVORAK      Standard Dvorak ZhuYin keyboard
  *
  */
 
-/* Note: maybe yunmus shuffle will be supported later.
- *         currently this feature is postponed.
- */
-class ChewingParser2 : public PhoneticParser2
+class ChewingSimpleParser2 : public ChewingParser2
 {
+    /* internal options for chewing parsing. */
+    pinyin_option_t m_options;
+
     /* Note: some internal pointers to chewing scheme table. */
 protected:
     const chewing_symbol_item_t * m_symbol_table;
     const chewing_tone_item_t   * m_tone_table;
 
 public:
-    ChewingParser2() {
+    ChewingSimpleParser2() {
         m_symbol_table = NULL; m_tone_table = NULL;
-        set_scheme(ZHUYIN_DEFAULT);
+        set_scheme(CHEWING_DEFAULT);
     }
 
-    virtual ~ChewingParser2() {}
+    virtual ~ChewingSimpleParser2() {}
 
     virtual bool parse_one_key(pinyin_option_t options, ChewingKey & key, const char *str, int len) const;
 
@@ -262,7 +288,92 @@ public:
 
 public:
     bool set_scheme(ZhuyinScheme scheme);
-    bool in_chewing_scheme(pinyin_option_t options, const char key, const char ** symbol) const;
+    virtual bool in_chewing_scheme(pinyin_option_t options, const char key, gchar ** & symbols) const;
+};
+
+
+/**
+ * ChewingDiscreteParser2:
+ *
+ * Parse the chewing string into an array of struct ChewingKeys.
+ *
+ * Initially will support HSU, HSU Dvorak and ETEN26.
+ *
+ */
+
+class ChewingDiscreteParser2 : public ChewingParser2
+{
+protected:
+    /* internal options for chewing parsing. */
+    pinyin_option_t m_options;
+
+    /* some internal pointers to chewing scheme table. */
+    const chewing_index_item_t * m_chewing_index;
+    size_t m_chewing_index_len;
+    const chewing_symbol_item_t * m_initial_table;
+    const chewing_symbol_item_t * m_middle_table;
+    const chewing_symbol_item_t * m_final_table;
+    const chewing_tone_item_t   * m_tone_table;
+
+public:
+    ChewingDiscreteParser2() {
+        m_options = 0;
+        m_chewing_index = NULL; m_chewing_index_len = 0;
+        m_initial_table = NULL; m_middle_table = NULL;
+        m_final_table   = NULL; m_tone_table = NULL;
+        set_scheme(CHEWING_HSU);
+    }
+
+    virtual ~ChewingDiscreteParser2() {}
+
+    virtual bool parse_one_key(pinyin_option_t options, ChewingKey & key, const char *str, int len) const;
+
+    virtual int parse(pinyin_option_t options, ChewingKeyVector & keys, ChewingKeyRestVector & key_rests, const char *str, int len) const;
+
+public:
+    bool set_scheme(ZhuyinScheme scheme);
+    virtual bool in_chewing_scheme(pinyin_option_t options, const char key, gchar ** & symbols) const;
+};
+
+
+class ChewingDaChenCP26Parser2 : public ChewingParser2
+{
+    /* some internal pointers to chewing scheme table. */
+    const chewing_index_item_t * m_chewing_index;
+    size_t m_chewing_index_len;
+    const chewing_symbol_item_t * m_initial_table;
+    const chewing_symbol_item_t * m_middle_table;
+    const chewing_symbol_item_t * m_final_table;
+    const chewing_tone_item_t   * m_tone_table;
+
+public:
+    ChewingDaChenCP26Parser2();
+
+    virtual ~ChewingDaChenCP26Parser2() {}
+
+    virtual bool parse_one_key(pinyin_option_t options, ChewingKey & key, const char *str, int len) const;
+
+    virtual int parse(pinyin_option_t options, ChewingKeyVector & keys, ChewingKeyRestVector & key_rests, const char *str, int len) const;
+
+public:
+    virtual bool in_chewing_scheme(pinyin_option_t options, const char key, gchar ** & symbols) const;
+};
+
+
+/* Direct Parser for Chewing table load. */
+class ChewingDirectParser2 : public PhoneticParser2
+{
+    const chewing_index_item_t * m_chewing_index;
+    size_t m_chewing_index_len;
+
+public:
+    ChewingDirectParser2();
+
+    virtual ~ChewingDirectParser2() {}
+
+    virtual bool parse_one_key(pinyin_option_t options, ChewingKey & key, const char *str, int len) const;
+
+    virtual int parse(pinyin_option_t options, ChewingKeyVector & keys, ChewingKeyRestVector & key_rests, const char *str, int len) const;
 };
 
 
