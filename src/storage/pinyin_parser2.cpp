@@ -803,3 +803,102 @@ bool DoublePinyinParser2::set_scheme(DoublePinyinScheme scheme) {
 
     return false; /* no such scheme. */
 }
+
+
+PinyinDirectParser2::PinyinDirectParser2 (){
+    m_pinyin_index = pinyin_index;
+    m_pinyin_index_len = G_N_ELEMENTS(pinyin_index);
+}
+
+bool PinyinDirectParser2::parse_one_key(pinyin_option_t options,
+                                        ChewingKey & key,
+                                        const char *str, int len) const {
+    /* "'" are not accepted in parse_one_key. */
+    gchar * input = g_strndup(str, len);
+    assert(NULL == strchr(input, '\''));
+
+    guint16 tone = CHEWING_ZERO_TONE; guint16 tone_pos = 0;
+    guint16 parsed_len = len;
+    key = ChewingKey();
+
+    if (options & USE_TONE) {
+        /* find the tone in the last character. */
+        char chr = input[parsed_len - 1];
+        if ( '0' < chr && chr <= '5' ) {
+            tone = chr - '0';
+            parsed_len --;
+            tone_pos = parsed_len;
+        }
+
+        /* check the force tone option. */
+        if (options & FORCE_TONE && CHEWING_ZERO_TONE == tone) {
+            g_free(input);
+            return false;
+        }
+    }
+
+    /* parse pinyin core staff here. */
+
+    /* Note: optimize here? */
+    input[parsed_len] = '\0';
+    if (!search_pinyin_index2(options, m_pinyin_index, m_pinyin_index_len,
+                              input, key)) {
+        g_free(input);
+        return false;
+    }
+
+    if (options & USE_TONE) {
+        /* post processing tone. */
+        if ( parsed_len == tone_pos ) {
+            if (tone != CHEWING_ZERO_TONE) {
+                key.m_tone = tone;
+                parsed_len ++;
+            }
+        }
+    }
+
+    g_free(input);
+    return parsed_len == len;
+}
+
+int PinyinDirectParser2::parse(pinyin_option_t options,
+                               ChewingKeyVector & keys,
+                               ChewingKeyRestVector & key_rests,
+                               const char *str, int len) const {
+    g_array_set_size(keys, 0);
+    g_array_set_size(key_rests, 0);
+
+    ChewingKey key; ChewingKeyRest key_rest;
+
+    int parsed_len = 0;
+    int i = 0, cur = 0, next = 0;
+    while (cur < len) {
+        /* probe next position */
+        for (i = cur; i < len; ++i) {
+            if (' ' == str[i] || '\'' == str[i])
+                break;
+        }
+        next = i;
+
+        if (parse_one_key(options, key, str + cur, next - cur)) {
+            key_rest.m_raw_begin = cur; key_rest.m_raw_end = next;
+
+            /* save the pinyin. */
+            g_array_append_val(keys, key);
+            g_array_append_val(key_rests, key_rest);
+        } else {
+            return parsed_len;
+        }
+
+        /* skip consecutive spaces. */
+        for (i = next; i < len; ++i) {
+            if (' ' != str[i] && '\'' != str[i])
+                break;
+        }
+
+        cur = i;
+        parsed_len = i;
+    }
+
+    return parsed_len;
+}

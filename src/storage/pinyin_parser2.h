@@ -229,6 +229,23 @@ public:
     bool set_scheme(DoublePinyinScheme scheme);
 };
 
+/* Direct Parser for Pinyin table load. */
+class PinyinDirectParser2 : public PhoneticParser2
+{
+    const pinyin_index_item_t * m_pinyin_index;
+    size_t m_pinyin_index_len;
+
+public:
+    PinyinDirectParser2();
+
+    virtual ~PinyinDirectParser2() {}
+
+    virtual bool parse_one_key(pinyin_option_t options, ChewingKey & key, const char *str, int len) const;
+
+    virtual int parse(pinyin_option_t options, ChewingKeyVector & keys, ChewingKeyRestVector & key_rests, const char *str, int len) const;
+};
+
+
 /**
  * ZhuyinParser2:
  *
@@ -365,7 +382,7 @@ public:
 };
 
 
-/* Direct Parser for Chewing table load. */
+/* Direct Parser for Zhuyin table load. */
 class ZhuyinDirectParser2 : public PhoneticParser2
 {
     const chewing_index_item_t * m_chewing_index;
