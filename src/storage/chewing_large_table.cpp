@@ -679,7 +679,7 @@ bool ChewingLargeTable::load_text(FILE * infile) {
 
         glong len = g_utf8_strlen(phrase, -1);
 
-        FullPinyinParser2 parser;
+        PinyinDirectParser2 parser;
         ChewingKeyVector keys;
         ChewingKeyRestVector key_rests;
 

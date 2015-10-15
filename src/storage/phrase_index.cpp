@@ -557,7 +557,7 @@ bool FacadePhraseIndex::load_text(guint8 phrase_index, FILE * infile){
 	}
 
     pinyin_option_t options = USE_TONE;
-	FullPinyinParser2 parser;
+	PinyinDirectParser2 parser;
 	ChewingKeyVector keys = g_array_new(FALSE, FALSE, sizeof(ChewingKey));
 	ChewingKeyRestVector key_rests =
             g_array_new(FALSE, FALSE, sizeof(ChewingKeyRest));
