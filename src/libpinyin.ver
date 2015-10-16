@@ -43,7 +43,7 @@ LIBPINYIN {
         pinyin_lookup_tokens;
         pinyin_train;
         pinyin_reset;
-        pinyin_get_chewing_string;
+        pinyin_get_zhuyin_string;
         pinyin_get_pinyin_string;
         pinyin_get_luoma_pinyin_string;
         pinyin_get_secondary_zhuyin_string;

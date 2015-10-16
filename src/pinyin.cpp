@@ -2429,14 +2429,14 @@ bool pinyin_reset(pinyin_instance_t * instance){
     return true;
 }
 
-bool pinyin_get_chewing_string(pinyin_instance_t * instance,
-                               ChewingKey * key,
-                               gchar ** utf8_str) {
+bool pinyin_get_zhuyin_string(pinyin_instance_t * instance,
+                              ChewingKey * key,
+                              gchar ** utf8_str) {
     *utf8_str = NULL;
     if (0 == key->get_table_index())
         return false;
 
-    *utf8_str = key->get_chewing_string();
+    *utf8_str = key->get_zhuyin_string();
     return true;
 }
 
