@@ -4,7 +4,7 @@ LIBPINYIN {
         pinyin_save;
         pinyin_set_full_pinyin_scheme;
         pinyin_set_double_pinyin_scheme;
-        pinyin_set_chewing_scheme;
+        pinyin_set_zhuyin_scheme;
         pinyin_load_phrase_library;
         pinyin_unload_phrase_library;
         pinyin_load_addon_phrase_library;

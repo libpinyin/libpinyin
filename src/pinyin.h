@@ -228,16 +228,16 @@ bool pinyin_set_double_pinyin_scheme(pinyin_context_t * context,
                                      DoublePinyinScheme scheme);
 
 /**
- * pinyin_set_chewing_scheme:
+ * pinyin_set_zhuyin_scheme:
  * @context: the pinyin context.
- * @scheme: the chewing scheme.
- * @returns: whether the set chewing scheme succeeded.
+ * @scheme: the zhuyin scheme.
+ * @returns: whether the set zhuyin scheme succeeded.
  *
- * Change the chewing scheme of the pinyin context.
+ * Change the zhuyin scheme of the pinyin context.
  *
  */
-bool pinyin_set_chewing_scheme(pinyin_context_t * context,
-                               ChewingScheme scheme);
+bool pinyin_set_zhuyin_scheme(pinyin_context_t * context,
+                              ZhuyinScheme scheme);
 
 /**
  * pinyin_fini:
