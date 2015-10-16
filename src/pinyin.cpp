@@ -2451,6 +2451,28 @@ bool pinyin_get_pinyin_string(pinyin_instance_t * instance,
     return true;
 }
 
+bool pinyin_get_luoma_pinyin_string(pinyin_instance_t * instance,
+                                    ChewingKey * key,
+                                    gchar ** utf8_str) {
+    *utf8_str = NULL;
+    if (0 == key->get_table_index())
+        return false;
+
+    *utf8_str = key->get_luoma_pinyin_string();
+    return true;
+}
+
+bool pinyin_get_secondary_zhuyin_string(pinyin_instance_t * instance,
+                                        ChewingKey * key,
+                                        gchar ** utf8_str) {
+    *utf8_str = NULL;
+    if (0 == key->get_table_index())
+        return false;
+
+    *utf8_str = key->get_secondary_zhuyin_string();
+    return true;
+}
+
 bool pinyin_get_pinyin_strings(pinyin_instance_t * instance,
                                ChewingKey * key,
                                gchar ** shengmu,

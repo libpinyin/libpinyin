@@ -45,6 +45,8 @@ LIBPINYIN {
         pinyin_reset;
         pinyin_get_chewing_string;
         pinyin_get_pinyin_string;
+        pinyin_get_luoma_pinyin_string;
+        pinyin_get_secondary_zhuyin_string;
         pinyin_get_pinyin_strings;
         pinyin_get_pinyin_is_incomplete;
         pinyin_token_get_phrase;

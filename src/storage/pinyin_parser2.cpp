@@ -398,7 +398,7 @@ bool FullPinyinParser2::set_scheme(FullPinyinScheme scheme){
         m_pinyin_index = luoma_pinyin_index;
         m_pinyin_index_len = G_N_ELEMENTS(luoma_pinyin_index);
         break;
-    case FULL_PINYIN_SECONDARY_BOPOMOFO:
+    case FULL_PINYIN_SECONDARY_ZHUYIN:
         m_pinyin_index = secondary_zhuyin_index;
         m_pinyin_index_len = G_N_ELEMENTS(secondary_zhuyin_index);
         break;
