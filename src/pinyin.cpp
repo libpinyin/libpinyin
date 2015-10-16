@@ -1339,7 +1339,7 @@ bool pinyin_in_chewing_keyboard(pinyin_instance_t * instance,
                                 const char key, gchar *** symbols) {
     pinyin_context_t * & context = instance->m_context;
     return context->m_chewing_parser->in_chewing_scheme
-        (context->m_options, key, *symbol);
+        (context->m_options, key, *symbols);
 }
 
 static bool _token_get_phrase(FacadePhraseIndex * phrase_index,

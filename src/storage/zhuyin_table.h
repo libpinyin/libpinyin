@@ -488,7 +488,7 @@ const zhuyin_tone_item_t chewing_dachen_cp26_tones[] = {
 {'\0', 0}
 };
 
-const char * chewing_tone_table[CHEWING_NUMBER_OF_TONES] = {
+static const char * chewing_tone_table[CHEWING_NUMBER_OF_TONES] = {
 "",
 " ",
 "ˊ",
