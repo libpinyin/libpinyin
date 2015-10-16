@@ -458,14 +458,15 @@ size_t pinyin_get_parsed_input_length(pinyin_instance_t * instance);
  * pinyin_in_chewing_keyboard:
  * @instance: the pinyin instance.
  * @key: the input key.
- * @symbol: the chewing symbol.
+ * @symbol: the zhuyin symbols must be freed by g_strfreev.
  * @returns: whether the key is in current chewing scheme.
  *
  * Check whether the input key is in current chewing scheme.
  *
  */
 bool pinyin_in_chewing_keyboard(pinyin_instance_t * instance,
-                                const char key, const char ** symbol);
+                                const char key, gchar *** symbols);
+
 /**
  * pinyin_guess_candidates:
  * @instance: the pinyin instance.
