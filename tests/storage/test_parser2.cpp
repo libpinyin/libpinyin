@@ -31,19 +31,15 @@
 
 static const gchar * parsername = "";
 static gboolean incomplete = FALSE;
+static const gchar * schemename = "";
 
 static GOptionEntry entries[] =
 {
-    {"parser", 'p', 0, G_OPTION_ARG_STRING, &parsername, "parser", "fullpinyin doublepinyin chewing"},
+    {"parser", 'p', 0, G_OPTION_ARG_STRING, &parsername, "parser", "fullpinyin doublepinyin zhuyin pinyindirect zhuyindirect"},
     {"incomplete", 'i', 0, G_OPTION_ARG_NONE, &incomplete, "incomplete pinyin", NULL},
+    {"scheme", 's', 0, G_OPTION_ARG_STRING, &schemename, "scheme", "standard hsu dachen26"},
     {NULL}
 };
-
-#if 0
-    "  -s <scheme> specify scheme for doublepinyin/chewing.\n"
-    "     schemes for doublepinyin: zrm, ms, ziguang, abc, pyjj, xhe.\n"
-    "     schemes for chewing: standard, ibm, ginyieh, eten.\n"
-#endif
 
 
 size_t bench_times = 1000;
@@ -64,7 +60,7 @@ int main(int argc, char * argv[]) {
 
     pinyin_option_t options = PINYIN_CORRECT_ALL | USE_TONE | USE_RESPLIT_TABLE;
     if (incomplete)
-        options |= PINYIN_INCOMPLETE | CHEWING_INCOMPLETE;
+        options |= PINYIN_INCOMPLETE | ZHUYIN_INCOMPLETE;
 
     PhoneticParser2 * parser = NULL;
     ChewingKeyVector keys = g_array_new(FALSE, FALSE, sizeof(ChewingKey));
@@ -76,9 +72,20 @@ int main(int argc, char * argv[]) {
         parser = new FullPinyinParser2();
     } else if (strcmp("doublepinyin", parsername) == 0) {
         parser = new DoublePinyinParser2();
-    } else if (strcmp("chewing", parsername) == 0) {
-        parser = new ChewingParser2();
+    } else if (strcmp("zhuyin", parsername) == 0) {
+        if (strcmp("standard", schemename) == 0) {
+            parser = new ZhuyinSimpleParser2();
+        } else if (strcmp("hsu", schemename) == 0) {
+            parser = new ZhuyinDiscreteParser2();
+        } else if (strcmp("dachen26", schemename) == 0) {
+            parser = new ZhuyinDaChenCP26Parser2();
+        }
+    } else if (strcmp("pinyindirect", parsername) == 0) {
+        parser = new PinyinDirectParser2();
+    } else if (strcmp("zhuyindirect", parsername) == 0) {
+        parser = new ZhuyinDirectParser2();
     }
+
 
     if (!parser)
         parser = new FullPinyinParser2();
