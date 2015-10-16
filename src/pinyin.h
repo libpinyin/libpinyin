@@ -204,6 +204,18 @@ void pinyin_end_get_phrases(export_iterator_t * iter);
 bool pinyin_save(pinyin_context_t * context);
 
 /**
+ * pinyin_set_full_pinyin_scheme:
+ * @context: the pinyin context.
+ * @scheme: the full pinyin scheme.
+ * @returns: whether the set full pinyin scheme succeeded.
+ *
+ * Change the full pinyin scheme of the pinyin context.
+ *
+ */
+bool pinyin_set_full_pinyin_scheme(pinyin_context_t * context,
+                                   FullPinyinScheme scheme);
+
+/**
  * pinyin_set_double_pinyin_scheme:
  * @context: the pinyin context.
  * @scheme: the double pinyin scheme.

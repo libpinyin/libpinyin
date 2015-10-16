@@ -948,6 +948,12 @@ bool pinyin_save(pinyin_context_t * context){
     return true;
 }
 
+bool pinyin_set_full_pinyin_scheme(pinyin_context_t * context,
+                                   FullPinyinScheme scheme){
+    context->m_full_pinyin_parser->set_scheme(scheme);
+    return true;
+}
+
 bool pinyin_set_double_pinyin_scheme(pinyin_context_t * context,
                                      DoublePinyinScheme scheme){
     context->m_double_pinyin_parser->set_scheme(scheme);

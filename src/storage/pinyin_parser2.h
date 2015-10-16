@@ -232,6 +232,7 @@ public:
 /* Direct Parser for Pinyin table load. */
 class PinyinDirectParser2 : public PhoneticParser2
 {
+    /* Only support Hanyu Pinyin now. */
     const pinyin_index_item_t * m_pinyin_index;
     size_t m_pinyin_index_len;
 
