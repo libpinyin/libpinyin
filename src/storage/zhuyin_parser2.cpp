@@ -310,8 +310,10 @@ bool ZhuyinSimpleParser2::in_chewing_scheme(pinyin_option_t options,
         return true;
     }
 
-    if (!(options & USE_TONE))
+    if (!(options & USE_TONE)) {
+        g_ptr_array_free(array, TRUE);
         return false;
+    }
 
     if (search_chewing_tones(m_tone_table, key, &tone)) {
         g_ptr_array_add(array, g_strdup(chewing_tone_table[tone]));
@@ -321,6 +323,7 @@ bool ZhuyinSimpleParser2::in_chewing_scheme(pinyin_option_t options,
         return true;
     }
 
+    g_ptr_array_free(array, TRUE);
     return false;
 }
 
