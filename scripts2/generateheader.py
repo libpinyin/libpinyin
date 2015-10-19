@@ -91,6 +91,8 @@ def get_table_content(tablename):
     if part == "TONES":
         return gen_chewing_tones(scheme)
 
+    assert False, "No such table."
+
 
 def expand_file(filename):
     infile = open(filename, "r")

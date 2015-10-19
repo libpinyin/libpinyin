@@ -165,9 +165,9 @@ def gen_u_to_v():
 #pinyin table
 content_table = []
 pinyin_index = []
-luoma_pinyin_index = []
 zhuyin_index = []
 shuffle_zhuyin_index = []
+luoma_pinyin_index = []
 secondary_zhuyin_index = []
 hsu_zhuyin_index = []
 eten26_zhuyin_index = []
@@ -246,9 +246,9 @@ def sort_all():
     #remove duplicates
     content_table = list(set(content_table))
     pinyin_index = list(set(pinyin_index))
-    luoma_pinyin_index = list(set(luoma_pinyin_index))
     zhuyin_index = list(set(zhuyin_index))
     shuffle_zhuyin_index = list(set(shuffle_zhuyin_index))
+    luoma_pinyin_index = list(set(luoma_pinyin_index))
     secondary_zhuyin_index = list(set(secondary_zhuyin_index))
     hsu_zhuyin_index = list(set(hsu_zhuyin_index))
     eten26_zhuyin_index = list(set(eten26_zhuyin_index))
@@ -261,9 +261,9 @@ def sort_all():
     content_table.insert(0, ("", "", "", "", "ChewingKey()"))
     #sort index
     pinyin_index = sorted(pinyin_index, key=sortfunc)
-    luoma_pinyin_index = sorted(luoma_pinyin_index, key=sortfunc)
     zhuyin_index = sorted(zhuyin_index, key=sortfunc)
     shuffle_zhuyin_index = sorted(shuffle_zhuyin_index, key=sortfunc)
+    luoma_pinyin_index = sorted(luoma_pinyin_index, key=sortfunc)
     secondary_zhuyin_index = sorted(secondary_zhuyin_index, key=sortfunc)
     hsu_zhuyin_index = sorted(hsu_zhuyin_index, key=sortfunc)
     eten26_zhuyin_index = sorted(eten26_zhuyin_index, key=sortfunc)
@@ -283,9 +283,9 @@ def get_sheng_yun(pinyin):
 
 def gen_content_table():
     entries = []
-    for ((pinyin, zhuyin, luoma, second, chewing_key)) in content_table:
+    for ((pinyin, zhuyin, luoma, secondary, chewing_key)) in content_table:
         (shengmu, yunmu) = get_sheng_yun(pinyin)
-        entry = '{{"{0}", "{1}", "{2}", "{3}", "{4}", "{5}", {6}}}'.format(pinyin, shengmu, yunmu, zhuyin, luoma, second, chewing_key)
+        entry = '{{"{0}", "{1}", "{2}", "{3}", "{4}", "{5}", {6}}}'.format(pinyin, shengmu, yunmu, zhuyin, luoma, secondary, chewing_key)
         entries.append(entry)
     return ',\n'.join(entries)
 
