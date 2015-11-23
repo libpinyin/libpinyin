@@ -649,8 +649,9 @@ bool DoublePinyinParser2::parse_one_key(pinyin_option_t options,
 
         int charid = ch == ';' ? 26 : ch - 'a';
         const char * sheng = m_shengmu_table[charid].m_shengmu;
+        gchar * pinyin = NULL;
         if (NULL == sheng)
-            return false;
+            goto fallback;
         if (0 == strcmp(sheng, "'"))
             sheng = "";
 
@@ -659,7 +660,6 @@ bool DoublePinyinParser2::parse_one_key(pinyin_option_t options,
         if (!IS_KEY(ch))
             return false;
 
-        gchar * pinyin = NULL;
         do {
 
             charid = ch == ';' ? 26 : ch - 'a';
@@ -690,6 +690,7 @@ bool DoublePinyinParser2::parse_one_key(pinyin_option_t options,
             g_free(pinyin);
         } while(0);
 
+    fallback:
         /* support fallback table for double pinyin. */
         if (m_fallback_table) {
             gchar * input = g_strndup(str, 2);
