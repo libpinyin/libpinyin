@@ -48,9 +48,9 @@ add_custom_command(
     COMMENT
         "Downloading textual model data..."
     COMMAND
-       wget http://downloads.sourceforge.net/libpinyin/models/model10.text.tar.gz
+       wget http://downloads.sourceforge.net/libpinyin/models/model11.text.tar.gz
     COMMAND
-       tar xvf model10.text.tar.gz -C ${CMAKE_SOURCE_DIR}/data
+       tar xvf model11.text.tar.gz -C ${CMAKE_SOURCE_DIR}/data
 )
 
 add_custom_command(
