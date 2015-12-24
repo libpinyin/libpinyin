@@ -544,6 +544,22 @@ ZhuyinDaChenCP26Parser2::ZhuyinDaChenCP26Parser2() {
     m_tone_table    = chewing_dachen_cp26_tones;
 }
 
+static int count_same_chars(const char * str, int len) {
+    assert(len > 0);
+
+    int count = 0;
+    const char cur_char = str[0];
+
+    for (int i = 0; i < len; ++i) {
+        if (cur_char != str[i])
+            break;
+        ++count;
+    }
+
+    assert(count >= 1);
+    return count;
+}
+
 bool ZhuyinDaChenCP26Parser2::parse_one_key(pinyin_option_t options,
                                             ChewingKey & key,
                                             const char *str, int len) const {
@@ -581,26 +597,19 @@ bool ZhuyinDaChenCP26Parser2::parse_one_key(pinyin_option_t options,
     if (0 == len)
         return false;
 
-    int i; int choice;
+    int choice; int count;
 
     /* probe initial */
     do {
         ch = input[index];
+        count = count_same_chars(input + index, len - index);
         if (search_chewing_symbols2(m_initial_table, ch, &first, &second)) {
-            index ++;
+            index += count;
             if (NULL == second) {
                 initial = first;
                 break;
             } else {
-                choice = 0;
-                /* zero out the same char */
-                for (i = index; i < len; ++i) {
-                    if (input[i] == ch) {
-                        input[i] = '\0';
-                        choice ++;
-                    }
-                }
-                choice = choice % 2;
+                choice = (count - 1) % 2;
                 if (0 == choice)
                     initial = first;
                 if (1 == choice)
@@ -609,12 +618,6 @@ bool ZhuyinDaChenCP26Parser2::parse_one_key(pinyin_option_t options,
         }
     } while (0);
 
-    /* skip zeros */
-    for (; index < len; index ++) {
-        if ('\0' != input[index])
-            break;
-    }
-
     if (index == len)
         goto probe;
 
@@ -622,56 +625,36 @@ bool ZhuyinDaChenCP26Parser2::parse_one_key(pinyin_option_t options,
     /* probe middle */
     do {
         ch = input[index];
+        count = count_same_chars(input + index, len - index);
         /* handle 'u' */
         if ('u' == ch) {
-            index ++;
-            choice = 0;
-            /* zero out the same char */
-            for (i = index; i < len; ++i) {
-                if ('u' == input[i]) {
-                    input[i] = '\0';
-                    choice ++;
-                }
-                choice = choice % 3;
-                if (0 == choice)
-                    middle = "ㄧ";
-                if (1 == choice)
-                    final = "ㄚ";
-                if (2 == choice) {
-                    middle = "ㄧ";
-                    final = "ㄚ";
-                }
+            choice = (count - 1) % 3;
+            if (0 == choice)
+                middle = "ㄧ";
+            if (1 == choice)
+                final = "ㄚ";
+            if (2 == choice) {
+                middle = "ㄧ";
+                final = "ㄚ";
             }
         }
         /* handle 'm' */
         if ('m' == ch) {
-            index ++;
-            choice = 0;
-            /* zero out the same char */
-            for (i = index; i < len; ++i) {
-                if ('m' == input[i]) {
-                    input[i] = '\0';
-                    choice ++;
-                }
-                choice = choice % 2;
-                if (0 == choice)
-                    middle = "ㄩ";
-                if (1 == choice)
-                    final = "ㄡ";
-            }
+            choice = (count - 1) % 2;
+            if (0 == choice)
+                middle = "ㄩ";
+            if (1 == choice)
+                final = "ㄡ";
+        }
+        /* handle 'j' */
+        if ('j' == ch) {
+            middle = "ㄨ";
         }
         if (search_chewing_symbols2(m_middle_table, ch, &first, &second)) {
+            index += count;
             assert(NULL == second);
-            index ++;
-            middle = first;
         }
     } while(0);
-
-    /* skip zeros */
-    for (; index < len; index ++) {
-        if ('\0' != input[index])
-            break;
-    }
 
     if (index == len)
         goto probe;
@@ -683,21 +666,14 @@ bool ZhuyinDaChenCP26Parser2::parse_one_key(pinyin_option_t options,
             break;
 
         ch = input[index];
+        count = count_same_chars(input + index, len - index);
         if (search_chewing_symbols2(m_final_table, ch, &first, &second)) {
-            index ++;
+            index += count;
             if (NULL == second) {
                 final = first;
                 break;
             } else {
-                choice = 0;
-                /* zero out the same char */
-                for (i = index; i < len; ++i) {
-                    if (input[i] == ch) {
-                        input[i] = '\0';
-                        choice ++;
-                    }
-                }
-                choice = choice % 2;
+                choice = (count - 1) % 2;
                 if (0 == choice)
                     final = first;
                 if (1 == choice)
@@ -705,12 +681,6 @@ bool ZhuyinDaChenCP26Parser2::parse_one_key(pinyin_option_t options,
             }
         }
     } while(0);
-
-    /* skip zeros */
-    for (; index < len; index ++) {
-        if ('\0' != input[index])
-            break;
-    }
 
     if (index == len)
         goto probe;
