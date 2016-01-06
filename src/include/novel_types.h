@@ -142,6 +142,12 @@ typedef GArray * CandidateConstraints;
 
 typedef guint32 pinyin_option_t;
 
+typedef guint32 pinyin_standard_option_t;
+
+typedef guint32 pinyin_fuzzy_option_t;
+
+typedef guint32 pinyin_correct_option_t;
+
 typedef enum {
     /* for default tables. */
     RESERVED = 0,
