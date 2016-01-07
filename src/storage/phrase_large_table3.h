@@ -25,7 +25,7 @@
 #include "novel_types.h"
 #include "memory_chunk.h"
 
-typename Trie;
+typedef struct _Trie   Trie;
 
 namespace pinyin{
 
@@ -34,21 +34,12 @@ protected:
     Trie * m_index;
     MemoryChunk * m_content;
 
-    void reset(){
-        if (m_index) {
-            trie_free(m_index);
-            m_index = NULL;
-        }
+    void reset();
 
-        if ( m_chunk ){
-            delete m_chunk;
-            m_chunk = NULL;
-        }
-    }
 public:
     PhraseLargeTable3(){
         m_index = NULL;
-        m_chunk = NULL;
+        m_content = NULL;
     }
 
     ~PhraseLargeTable3(){
@@ -56,9 +47,9 @@ public:
     }
 
     /* load/store method */
-    bool load(Trie * trie, MemoryChunk * chunk);
+    bool load(Trie * index, MemoryChunk * content);
 
-    bool store(Trie * new_trie, MemoryChunk * new_chunk);
+    bool store(Trie * new_index, MemoryChunk * new_content);
 
     bool load_text(FILE * file);
 
