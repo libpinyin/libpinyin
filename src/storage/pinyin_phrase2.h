@@ -29,40 +29,6 @@
 
 namespace pinyin{
 
-inline int pinyin_exact_compare2(const ChewingKey * key_lhs,
-                                 const ChewingKey * key_rhs,
-                                 int phrase_length){
-    int i;
-    int result;
-
-    /* compare initial */
-    for (i = 0; i < phrase_length; ++i) {
-        result = key_lhs[i].m_initial - key_rhs[i].m_initial;
-        if (0 != result)
-            return result;
-    }
-
-    /* compare middle and final */
-    for (i = 0; i < phrase_length; ++i) {
-        result = key_lhs[i].m_middle - key_rhs[i].m_middle;
-        if (0 != result)
-            return result;
-        result = key_lhs[i].m_final - key_rhs[i].m_final;
-        if (0 != result)
-            return result;
-    }
-
-    /* compare tone */
-    for (i = 0; i < phrase_length; ++i) {
-        result = key_lhs[i].m_tone - key_rhs[i].m_tone;
-        if (0 != result)
-            return result;
-    }
-
-    return 0;
-}
-
-
 /* compare pinyins with chewing internal representations. */
 inline int pinyin_compare_initial2(pinyin_option_t options,
                                    ChewingInitial lhs,
