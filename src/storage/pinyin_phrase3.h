@@ -60,6 +60,23 @@ inline int pinyin_exact_compare2(const ChewingKey * key_lhs,
     return 0;
 }
 
+/* for find the element in the phrase array */
+template<size_t phrase_length>
+inline int phrase_exact_compare2(const PinyinIndexItem2<phrase_length> &lhs,
+                                 const PinyinIndexItem2<phrase_length> &rhs)
+{
+    ChewingKey * keys_lhs = (ChewingKey *) lhs.m_keys;
+    ChewingKey * keys_rhs = (ChewingKey *) rhs.m_keys;
+    return pinyin_exact_compare2(keys_lhs, keys_rhs, phrase_length);
+}
+
+template<size_t phrase_length>
+inline bool phrase_exact_less_than2(const PinyinIndexItem2<phrase_length> &lhs,
+                                    const PinyinIndexItem2<phrase_length> &rhs)
+{
+    return 0 > phrase_exact_compare2<phrase_length>(lhs, rhs);
+}
+
 
 };
 
