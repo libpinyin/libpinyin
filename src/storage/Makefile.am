@@ -56,6 +56,7 @@ libstorage_la_LDFLAGS	= -static
 
 libstorage_la_SOURCES   = phrase_index.cpp \
 			   phrase_large_table2.cpp \
+			   phrase_large_table3.cpp \
 			   ngram.cpp \
 			   tag_utility.cpp \
 			   chewing_key.cpp \

@@ -78,6 +78,9 @@ AC_CHECK_FUNCS([gettimeofday memmove memset setlocale])
 
 AC_CHECK_HEADERS([libintl.h string.h])
 
+# Check Double Array Trie Tree
+PKG_CHECK_MODULES(DATRIE, [datrie-0.2 >= 0.2])
+
 # Check Berkeley DB or Kyoto Cabinet
 DBM="BerkeleyDB"
 AC_ARG_WITH(dbm,

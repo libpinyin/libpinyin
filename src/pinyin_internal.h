@@ -32,6 +32,7 @@
 #include "pinyin_phrase2.h"
 #include "chewing_large_table.h"
 #include "phrase_large_table2.h"
+#include "phrase_large_table3.h"
 #include "facade_chewing_table.h"
 #include "facade_phrase_table2.h"
 #include "phrase_index.h"

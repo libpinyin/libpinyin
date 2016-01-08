@@ -44,7 +44,7 @@ noinst_LTLIBRARIES	= libpinyin_internal.la
 
 libpinyin_la_SOURCES	= pinyin.cpp
 
-libpinyin_la_LIBADD	= storage/libstorage.la lookup/liblookup.la @GLIB2_LIBS@
+libpinyin_la_LIBADD	= storage/libstorage.la lookup/liblookup.la @GLIB2_LIBS@ @DATRIE_LIBS@
 
 libpinyin_la_LDFLAGS	= -Wl,--version-script=$(srcdir)/libpinyin.ver \
 			  -version-info @LT_VERSION_INFO@
