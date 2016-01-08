@@ -78,15 +78,6 @@ typedef struct {
     const char * m_yunmu;
 } double_pinyin_scheme_fallback_item_t;
 
-typedef struct {
-    const char m_input;
-    const char * m_chewing;
-} zhuyin_symbol_item_t;
-
-typedef struct {
-    const char m_input;
-    const char m_tone;
-} zhuyin_tone_item_t;
 
 typedef GArray * ParseValueVector;
 

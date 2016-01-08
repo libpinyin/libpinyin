@@ -22,6 +22,7 @@
 #include "chewing_key.h"
 #include <assert.h>
 #include "pinyin_parser2.h"
+#include "zhuyin_parser2.h"
 #include "pinyin_parser_table.h"
 #include "zhuyin_table.h"
 
