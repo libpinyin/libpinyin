@@ -30,6 +30,7 @@ noinst_HEADERS		= chewing_enum.h \
 			  phrase_index.h \
 			  phrase_index_logger.h \
 			  phrase_large_table2.h \
+			  phrase_large_table3.h \
 			  ngram.h \
 			  ngram_bdb.h \
 			  ngram_kyotodb.h \
@@ -42,6 +43,7 @@ noinst_HEADERS		= chewing_enum.h \
 			  double_pinyin_table.h \
 			  zhuyin_table.h \
 			  pinyin_phrase2.h \
+			  pinyin_phrase3.h \
 			  chewing_large_table.h \
 			  facade_chewing_table.h \
 			  facade_phrase_table2.h \

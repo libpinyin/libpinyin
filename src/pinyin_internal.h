@@ -30,6 +30,7 @@
 #include "chewing_key.h"
 #include "pinyin_parser2.h"
 #include "pinyin_phrase2.h"
+#include "pinyin_phrase3.h"
 #include "chewing_large_table.h"
 #include "phrase_large_table2.h"
 #include "phrase_large_table3.h"
