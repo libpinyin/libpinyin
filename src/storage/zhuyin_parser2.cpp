@@ -19,7 +19,7 @@
  *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-#include "pinyin_parser2.h"
+#include "zhuyin_parser2.h"
 #include <ctype.h>
 #include <assert.h>
 #include <stdio.h>

@@ -29,6 +29,7 @@
 #include "pinyin_custom2.h"
 #include "chewing_key.h"
 #include "pinyin_parser2.h"
+#include "zhuyin_parser2.h"
 #include "pinyin_phrase2.h"
 #include "pinyin_phrase3.h"
 #include "chewing_large_table.h"

@@ -27,6 +27,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "pinyin_parser2.h"
+#include "zhuyin_parser2.h"
 
 
 static const gchar * parsername = "";

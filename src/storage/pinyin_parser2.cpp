@@ -32,7 +32,6 @@
 #include "chewing_key.h"
 #include "pinyin_parser_table.h"
 #include "double_pinyin_table.h"
-#include "zhuyin_table.h"
 
 
 using namespace pinyin;

@@ -28,7 +28,7 @@
 #include "pinyin_custom2.h"
 #include "pinyin_parser2.h"
 
-namespace zhuyin{
+namespace pinyin{
 
 /**
  * ZhuyinParser2:
