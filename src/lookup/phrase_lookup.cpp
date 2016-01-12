@@ -24,6 +24,7 @@
 #include "novel_types.h"
 #include "phrase_index.h"
 #include "facade_phrase_table2.h"
+#include "facade_phrase_table3.h"
 #include "phrase_lookup.h"
 
 using namespace pinyin;
