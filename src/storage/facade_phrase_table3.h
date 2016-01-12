@@ -85,7 +85,7 @@ public:
         if (user_index && user_content) {
             m_user_phrase_table = new PhraseLargeTable3;
             result = m_user_phrase_table->load
-                (user_index, system_content) || result;
+                (user_index, user_content) || result;
         }
         return result;
     }
