@@ -22,6 +22,7 @@
 #ifndef PHRASE_LARGE_TABLE3_H
 #define PHRASE_LARGE_TABLE3_H
 
+#include <stdio.h>
 #include "novel_types.h"
 #include "memory_chunk.h"
 
@@ -47,9 +48,9 @@ public:
     }
 
     /* load/store method */
-    bool load(Trie * index, MemoryChunk * content);
+    bool load(FILE * index, MemoryChunk * content);
 
-    bool store(Trie * new_index, MemoryChunk * new_content);
+    bool store(FILE * new_index, MemoryChunk * new_content);
 
     bool load_text(FILE * file);
 
