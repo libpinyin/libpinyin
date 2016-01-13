@@ -38,10 +38,7 @@ protected:
     void reset();
 
 public:
-    PhraseLargeTable3(){
-        m_index = NULL;
-        m_content = NULL;
-    }
+    PhraseLargeTable3();
 
     ~PhraseLargeTable3(){
         reset();
