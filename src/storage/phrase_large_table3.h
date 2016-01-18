@@ -26,14 +26,12 @@
 #include "novel_types.h"
 #include "memory_chunk.h"
 
-typedef struct _Trie   Trie;
 
 namespace pinyin{
 
 class PhraseLargeTable3{
 protected:
-    Trie * m_index;
-    MemoryChunk * m_content;
+    /* member variables. */
 
     void reset();
 

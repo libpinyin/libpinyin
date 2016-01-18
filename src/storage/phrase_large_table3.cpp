@@ -19,48 +19,9 @@
  *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-#include <datrie/trie.h>
 #include "phrase_large_table3.h"
 
 namespace pinyin{
-void PhraseLargeTable3::reset() {
-    if (m_index) {
-        trie_free(m_index);
-        m_index = NULL;
-    }
-    if (m_content) {
-        delete m_content;
-        m_content = NULL;
-    }
-}
-
-PhraseLargeTable3::PhraseLargeTable3() {
-    AlphaMap * map = alpha_map_new();
-    /* include ucs4 characters. */
-    alpha_map_add_range(map, 1, UINT_MAX);
-    m_index = trie_new(map);
-    alpha_map_free(map);
-
-    m_content = new MemoryChunk;
-}
-
-bool PhraseLargeTable3::load(FILE * index, MemoryChunk * content) {
-    reset();
-
-    m_index = trie_fread(index);
-    if (NULL == m_index)
-        return false;
-    m_content = content;
-    return true;
-}
-
-bool PhraseLargeTable3::store(FILE * new_index, MemoryChunk * new_content) {
-    int retval = trie_fwrite(m_index, new_index);
-    if (retval)
-        return false;
-    new_content->set_content(0, m_content->begin(), m_content->size());
-    return true;
-}
 
 /* load text method */
 
