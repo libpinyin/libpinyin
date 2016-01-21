@@ -23,6 +23,35 @@
 
 namespace pinyin{
 
+/**
+ * Data Structure:
+ * m_chunk consists of table entry header and array of tokens.
+ */
+
+class PhraseTableEntry{
+    friend class PhraseLargeTable3;
+protected:
+    MemoryChunk m_chunk;
+
+private:
+    /* Disallow used outside. */
+    PhraseTableEntry() {}
+
+public:
+    /* search method */
+    int search(/* in */ const ucs4_t phrase[], /* out */ PhraseTokens tokens) const;
+
+    /* add_index/remove_index method */
+    int add_index(/* in */ const ucs4_t phrase[], /* in */ phrase_token_t token);
+    int remove_index(/* in */ const ucs4_t phrase[], /* in */ phrase_token_t token);
+
+    /* get length method */
+    int get_length() const;
+
+    /* mask out method */
+    bool mask_out(phrase_token_t mask, phrase_token_t value);
+};
+
 /* load text method */
 
 bool PhraseLargeTable3::load_text(FILE * infile){

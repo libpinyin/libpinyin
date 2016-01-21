@@ -125,7 +125,10 @@ const phrase_token_t token_min = 0;
 const phrase_token_t token_max = UINT_MAX;
 
 const char c_separate = '#';
+
 typedef guint32 table_offset_t;
+
+typedef guint32 table_entry_header_t;
 
 typedef double parameter_t;
 
