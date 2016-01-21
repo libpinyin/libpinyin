@@ -35,7 +35,15 @@ protected:
 
 private:
     /* Disallow used outside. */
-    PhraseTableEntry() {}
+    PhraseTableEntry() {
+        m_chunk.set_size(sizeof(table_entry_header_t));
+        memset(m_chunk.begin(), 0, m_chunk.size());
+    }
+
+protected:
+    table_entry_header_t get_header();
+
+    void set_header(table_entry_header_t header);
 
 public:
     /* search method */
