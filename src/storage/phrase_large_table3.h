@@ -65,6 +65,44 @@ public:
     bool mask_out(phrase_token_t mask, phrase_token_t value);
 };
 
+/**
+ * Data Structure:
+ * m_chunk consists of table entry header and array of tokens.
+ */
+
+class PhraseTableEntry{
+    friend class PhraseLargeTable3;
+protected:
+    MemoryChunk m_chunk;
+
+private:
+    /* Disallow used outside. */
+    PhraseTableEntry() {
+        m_chunk.set_size(sizeof(table_entry_header_t));
+        memset(m_chunk.begin(), 0, m_chunk.size());
+    }
+
+protected:
+    table_entry_header_t get_header();
+
+    void set_header(table_entry_header_t header);
+
+public:
+    /* search method */
+    int search(/* out */ PhraseTokens tokens) const;
+
+    /* add_index/remove_index method */
+    int add_index(/* in */ phrase_token_t token);
+    int remove_index(/* in */ phrase_token_t token);
+
+    /* get length method */
+    int get_length() const;
+
+    /* mask out method */
+    bool mask_out(phrase_token_t mask, phrase_token_t value);
+};
+
+
 static inline int reduce_tokens(const PhraseTokens tokens,
                                 TokenVector tokenarray) {
     int num = 0;
