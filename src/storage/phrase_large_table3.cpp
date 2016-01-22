@@ -47,11 +47,11 @@ protected:
 
 public:
     /* search method */
-    int search(/* in */ const ucs4_t phrase[], /* out */ PhraseTokens tokens) const;
+    int search(/* out */ PhraseTokens tokens) const;
 
     /* add_index/remove_index method */
-    int add_index(/* in */ const ucs4_t phrase[], /* in */ phrase_token_t token);
-    int remove_index(/* in */ const ucs4_t phrase[], /* in */ phrase_token_t token);
+    int add_index(/* in */ phrase_token_t token);
+    int remove_index(/* in */ phrase_token_t token);
 
     /* get length method */
     int get_length() const;

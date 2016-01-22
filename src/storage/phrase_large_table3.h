@@ -29,9 +29,12 @@
 
 namespace pinyin{
 
+class PhraseTableEntry;
+
 class PhraseLargeTable3{
 protected:
     /* member variables. */
+    PhraseTableEntry * m_entry;
 
     void reset();
 
