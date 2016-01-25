@@ -83,7 +83,7 @@ private:
     }
 
 protected:
-    table_entry_header_t get_header();
+    table_entry_header_t get_header() const;
 
     void set_header(table_entry_header_t header);
 

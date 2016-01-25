@@ -24,6 +24,49 @@
 namespace pinyin{
 
 
+table_entry_header_t PhraseTableEntry::get_header() const {
+    table_entry_header_t * head = (table_entry_header_t *) m_chunk.begin();
+    return *head;
+}
+
+void PhraseTableEntry::set_header(table_entry_header_t header) {
+    table_entry_header_t * head = (table_entry_header_t *) m_chunk.begin();
+    *head = header;
+}
+
+int PhraseTableEntry::search(/* out */ PhraseTokens tokens) const {
+    int result = SEARCH_NONE;
+
+    const char * content = (char *) m_chunk.begin() +
+        sizeof(table_entry_header_t);
+    const phrase_token_t * begin = (phrase_token_t *) content;
+    const phrase_token_t * end = (phrase_token_t *) m_chunk.end();
+
+    const phrase_token_t * iter = NULL;
+    GArray * array = NULL;
+
+    for (iter = begin; iter != end; ++iter) {
+        phrase_token_t token = *iter;
+
+        /* filter out disabled sub phrase indices. */
+        array = tokens[PHRASE_INDEX_LIBRARY_INDEX(token)];
+        if (NULL == array)
+            continue;
+
+        result |= SEARCH_OK;
+
+        g_array_append_val(array, token);
+    }
+
+    /* check SEARCH_CONTINUED flag in header */
+    table_entry_header_t header = get_header();
+    if (header & SEARCH_CONTINUED)
+        result |= SEARCH_CONTINUED;
+
+    return result;
+}
+
+
 /* load text method */
 
 bool PhraseLargeTable3::load_text(FILE * infile){
