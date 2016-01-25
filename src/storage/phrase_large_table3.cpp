@@ -34,6 +34,8 @@ void PhraseTableEntry::set_header(table_entry_header_t header) {
     *head = header;
 }
 
+/* search method */
+
 int PhraseTableEntry::search(/* out */ PhraseTokens tokens) const {
     int result = SEARCH_NONE;
 
@@ -64,6 +66,39 @@ int PhraseTableEntry::search(/* out */ PhraseTokens tokens) const {
         result |= SEARCH_CONTINUED;
 
     return result;
+}
+
+/* add_index/remove_index method */
+int PhraseTableEntry::add_index(/* in */ phrase_token_t token) {
+    const char * content = (char *) m_chunk.begin() +
+        sizeof(table_entry_header_t);
+    const phrase_token_t * begin = (phrase_token_t *) content;
+    const phrase_token_t * end = (phrase_token_t *) m_chunk.end();
+
+    const phrase_token_t * cur_token;
+    for (cur_token = begin; cur_token != end; ++cur_token) {
+        if (*cur_token == token)
+            return ERROR_INSERT_ITEM_EXISTS;
+        if (*cur_token > token)
+            break;
+    }
+
+    int offset = sizeof(table_entry_header_t) /* header */ +
+        (cur_token - begin) * sizeof(phrase_token_t);
+    m_chunk.insert_content(offset, &token, sizeof(phrase_token_t));
+    return ERROR_OK;
+}
+
+
+
+/* get length method */
+int PhraseTableEntry::get_length() const {
+    const char * content = (char *) m_chunk.begin() +
+        sizeof(table_entry_header_t);
+    const phrase_token_t * begin = (phrase_token_t *) content;
+    const phrase_token_t * end = (phrase_token_t *) m_chunk.end();
+
+    return begin - end;
 }
 
 
