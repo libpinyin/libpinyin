@@ -69,6 +69,7 @@ int PhraseTableEntry::search(/* out */ PhraseTokens tokens) const {
 }
 
 /* add_index/remove_index method */
+
 int PhraseTableEntry::add_index(/* in */ phrase_token_t token) {
     const char * content = (char *) m_chunk.begin() +
         sizeof(table_entry_header_t);
@@ -89,9 +90,29 @@ int PhraseTableEntry::add_index(/* in */ phrase_token_t token) {
     return ERROR_OK;
 }
 
+int PhraseTableEntry::remove_index(/* in */ phrase_token_t token) {
+    const char * content = (char *) m_chunk.begin() +
+        sizeof(table_entry_header_t);
+    const phrase_token_t * begin = (phrase_token_t *) content;
+    const phrase_token_t * end = (phrase_token_t *) m_chunk.end();
 
+    const phrase_token_t * cur_token;
+    for (cur_token = begin; cur_token != end; ++cur_token) {
+        if (*cur_token == token)
+            break;
+    }
+
+    if (cur_token == end)
+        return ERROR_REMOVE_ITEM_DONOT_EXISTS;
+
+    int offset = sizeof(table_entry_header_t) /* header */ +
+        (cur_token - begin) * sizeof(phrase_token_t);
+    m_chunk.remove_content(offset, sizeof(phrase_token_t));
+    return ERROR_OK;
+}
 
 /* get length method */
+
 int PhraseTableEntry::get_length() const {
     const char * content = (char *) m_chunk.begin() +
         sizeof(table_entry_header_t);
