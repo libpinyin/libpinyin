@@ -46,9 +46,10 @@ public:
     }
 
     /* load/store method */
-    bool load(FILE * index, MemoryChunk * content);
+    /* use in-memory DBM here, for better performance. */
+    bool load(const char * filename);
 
-    bool store(FILE * new_index, MemoryChunk * new_content);
+    bool store(const char * new_filename);
 
     bool load_text(FILE * file);
 

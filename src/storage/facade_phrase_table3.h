@@ -72,28 +72,28 @@ public:
         reset();
     }
 
-    bool load(FILE * system_index, MemoryChunk * system_content,
-              FILE * user_index, MemoryChunk * user_content) {
+    bool load(const char * system_filename,
+              const char * user_filename) {
         reset();
 
         bool result = false;
-        if (system_index && system_content) {
+        if (system_filename) {
             m_system_phrase_table = new PhraseLargeTable3;
             result = m_system_phrase_table->load
-                (system_index, system_content) || result;
+                (system_filename) || result;
         }
-        if (user_index && user_content) {
+        if (user_filename) {
             m_user_phrase_table = new PhraseLargeTable3;
             result = m_user_phrase_table->load
-                (user_index, user_content) || result;
+                (user_filename) || result;
         }
         return result;
     }
 
-    bool store(FILE * new_user_index, MemoryChunk * new_user_content) {
+    bool store(const char * new_user_filename) {
         if (NULL == m_user_phrase_table)
             return false;
-        return m_user_phrase_table->store(new_user_index, new_user_content);
+        return m_user_phrase_table->store(new_user_filename);
     }
 
     /**
