@@ -29,43 +29,6 @@
 
 namespace pinyin{
 
-class PhraseTableEntry;
-
-class PhraseLargeTable3{
-protected:
-    /* member variables. */
-    PhraseTableEntry * m_entry;
-
-    void reset();
-
-public:
-    PhraseLargeTable3();
-
-    ~PhraseLargeTable3(){
-        reset();
-    }
-
-    /* load/store method */
-    /* use in-memory DBM here, for better performance. */
-    bool load(const char * filename);
-
-    bool store(const char * new_filename);
-
-    bool load_text(FILE * file);
-
-    /* search method */
-    int search(int phrase_length, /* in */ const ucs4_t phrase[],
-               /* out */ PhraseTokens tokens) const;
-
-    /* add_index/remove_index method */
-    int add_index(int phrase_length, /* in */ const ucs4_t phrase[], /* in */ phrase_token_t token);
-
-    int remove_index(int phrase_length, /* in */ const ucs4_t phrase[], /* in */ phrase_token_t token);
-
-    /* mask out method */
-    bool mask_out(phrase_token_t mask, phrase_token_t value);
-};
-
 /**
  * Data Structure:
  * m_chunk consists of table entry header and array of tokens.
