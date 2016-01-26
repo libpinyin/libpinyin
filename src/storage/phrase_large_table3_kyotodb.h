@@ -22,13 +22,18 @@
 #ifndef PHRASE_LARGE_TABLE3_KYOTODB_H
 #define PHRASE_LARGE_TABLE3_KYOTODB_H
 
+#include <kcdb.h>
+
 namespace pinyin{
 
 class PhraseTableEntry;
 
 class PhraseLargeTable3{
-protected:
+private:
     /* member variables. */
+    kyotocabinet::BasicDB * m_db;
+
+protected:
     PhraseTableEntry * m_entry;
 
     void reset();

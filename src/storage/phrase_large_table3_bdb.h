@@ -22,13 +22,18 @@
 #ifndef PHRASE_LARGE_TABLE3_BDB_H
 #define PHRASE_LARGE_TABLE3_BDB_H
 
+#include <db.h>
+
 namespace pinyin{
 
 class PhraseTableEntry;
 
 class PhraseLargeTable3{
-protected:
+private:
     /* member variables. */
+    DB * m_db;
+
+protected:
     PhraseTableEntry * m_entry;
 
     void reset();
