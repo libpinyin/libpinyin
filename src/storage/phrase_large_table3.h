@@ -26,6 +26,13 @@
 #include "novel_types.h"
 #include "memory_chunk.h"
 
+#ifdef HAVE_BERKELEY_DB
+#include "phrase_large_table3_bdb.h"
+#endif
+
+#ifdef HAVE_KYOTO_CABINET
+#include "phrase_large_table3_kyotodb.h"
+#endif
 
 namespace pinyin{
 
