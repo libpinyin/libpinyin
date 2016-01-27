@@ -20,6 +20,7 @@
  */
 
 #include "phrase_large_table3.h"
+#include <errno.h>
 
 
 namespace pinyin{
@@ -29,7 +30,7 @@ PhraseLargeTable3::PhraseLargeTable3() {
     m_entry = NULL;
 }
 
-PhraseLargeTable3::reset() {
+void PhraseLargeTable3::reset() {
     if (m_db) {
         m_db->sync(m_db, 0);
         m_db->close(m_db, 0);
