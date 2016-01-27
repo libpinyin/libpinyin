@@ -45,13 +45,16 @@ public:
         reset();
     }
 
+    /* attach method */
+    bool attach(const char * dbfile, guint32 flags);
+
     /* load/store method */
     /* use in-memory DBM here, for better performance. */
     bool load(const char * filename);
 
     bool store(const char * new_filename);
 
-    bool load_text(FILE * file);
+    bool load_text(FILE * infile);
 
     /* search method */
     int search(int phrase_length, /* in */ const ucs4_t phrase[],

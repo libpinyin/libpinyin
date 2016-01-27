@@ -79,8 +79,8 @@ public:
         bool result = false;
         if (system_filename) {
             m_system_phrase_table = new PhraseLargeTable3;
-            result = m_system_phrase_table->load
-                (system_filename) || result;
+            result = m_system_phrase_table->attach
+                (system_filename, ATTACH_READONLY) || result;
         }
         if (user_filename) {
             m_user_phrase_table = new PhraseLargeTable3;
