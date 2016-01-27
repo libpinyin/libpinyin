@@ -59,7 +59,7 @@ bool Bigram::load_db(const char * dbfile){
     /* load db into memory. */
     DB * tmp_db = NULL;
     ret = db_create(&tmp_db, NULL, 0);
-    assert(ret == 0);
+    assert(0 == ret);
 
     if (NULL == tmp_db)
         return false;
@@ -107,7 +107,7 @@ bool Bigram::save_db(const char * dbfile){
         return false;
 
     ret = db_create(&tmp_db, NULL, 0);
-    assert(ret == 0);
+    assert(0 == ret);
 
     if (NULL == tmp_db)
         return false;
@@ -162,8 +162,7 @@ bool Bigram::attach(const char * dbfile, guint32 flags){
     if ( !dbfile )
         return false;
     int ret = db_create(&m_db, NULL, 0);
-    if ( ret != 0 )
-        assert(false);
+    assert(0 == ret);
 	
     ret = m_db->open(m_db, NULL, dbfile, NULL,
                      DB_HASH, db_flags, 0644);
