@@ -84,7 +84,7 @@ public:
         }
         if (user_filename) {
             m_user_phrase_table = new PhraseLargeTable3;
-            result = m_user_phrase_table->load
+            result = m_user_phrase_table->load_db
                 (user_filename) || result;
         }
         return result;
@@ -93,7 +93,7 @@ public:
     bool store(const char * new_user_filename) {
         if (NULL == m_user_phrase_table)
             return false;
-        return m_user_phrase_table->store(new_user_filename);
+        return m_user_phrase_table->store_db(new_user_filename);
     }
 
     /**

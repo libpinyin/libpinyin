@@ -73,7 +73,7 @@ bool PhraseLargeTable3::attach(const char * dbfile, guint32 flags) {
 }
 
 /* load/store method */
-bool PhraseLargeTable3::load(const char * filename) {
+bool PhraseLargeTable3::load_db(const char * filename) {
     reset();
 
     /* create in memory db. */
@@ -130,7 +130,7 @@ bool PhraseLargeTable3::load(const char * filename) {
     return true;
 }
 
-bool PhraseLargeTable3::store(const char * new_filename) {
+bool PhraseLargeTable3::store_db(const char * new_filename) {
     DB * tmp_db = NULL;
 
     int ret = unlink(new_filename);

@@ -50,9 +50,9 @@ public:
 
     /* load/store method */
     /* use in-memory DBM here, for better performance. */
-    bool load(const char * filename);
+    bool load_db(const char * filename);
 
-    bool store(const char * new_filename);
+    bool store_db(const char * new_filename);
 
     bool load_text(FILE * infile);
 
