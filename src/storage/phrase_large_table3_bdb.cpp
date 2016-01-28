@@ -179,5 +179,30 @@ bool PhraseLargeTable3::store_db(const char * new_filename) {
     return true;
 }
 
+/* search method */
+int PhraseLargeTable3::search(int phrase_length,
+                              /* in */ const ucs4_t phrase[],
+                              /* out */ PhraseTokens tokens) const {
+    int result = SEARCH_NONE;
+
+    if (NULL == m_db)
+        return result;
+    assert(NULL != m_entry);
+
+    DBT db_key;
+    memset(&db_key, 0, sizeof(DBT));
+    db_key.data = (void *)phrase;
+    db_key.size = phrase_length * sizeof(ucs4_t);
+
+    DBT db_data;
+    memset(&db_data, 0, sizeof(DBT));
+    int ret = m_db->get(m_db, NULL, &db_key, &db_data, 0);
+    if (ret != 0)
+        return result;
+
+    m_entry->m_chunk.set_chunk(db_data.data, db_data.size, NULL);
+    result = m_entry->search(tokens);
+    return result;
+}
 
 };
