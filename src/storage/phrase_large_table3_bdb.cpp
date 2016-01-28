@@ -191,7 +191,7 @@ int PhraseLargeTable3::search(int phrase_length,
 
     DBT db_key;
     memset(&db_key, 0, sizeof(DBT));
-    db_key.data = (void *)phrase;
+    db_key.data = (void *) phrase;
     db_key.size = phrase_length * sizeof(ucs4_t);
 
     DBT db_data;
@@ -202,6 +202,100 @@ int PhraseLargeTable3::search(int phrase_length,
 
     m_entry->m_chunk.set_chunk(db_data.data, db_data.size, NULL);
     result = m_entry->search(tokens);
+    return result;
+}
+
+/* add_index/remove_index method */
+int PhraseLargeTable3::add_index(int phrase_length,
+                                 /* in */ const ucs4_t phrase[],
+                                 /* in */ phrase_token_t token) {
+    assert(NULL != m_db);
+    assert(NULL != m_entry);
+
+    /* load phrase table entry. */
+    DBT db_key;
+    memset(&db_key, 0, sizeof(DBT));
+    db_key.data = (void *) phrase;
+    db_key.size = phrase_length * sizeof(ucs4_t);
+
+    DBT db_data;
+    memset(&db_data, 0, sizeof(DBT));
+    int ret = m_db->get(m_db, NULL, &db_key, &db_data, 0);
+
+    if (ret != 0) {
+        /* new entry. */
+        PhraseTableEntry entry;
+        entry.add_index(token);
+
+        memset(&db_data, 0, sizeof(DBT));
+        db_data.data = entry.m_chunk.begin();
+        db_data.size = entry.m_chunk.size();
+        ret = m_db->put(m_db, NULL, &db_key, &db_data, 0);
+        if (ret != 0)
+            return ERROR_FILE_CORRUPTION;
+
+        /* recursively set header with continued information. */
+        for (size_t len = phrase_length - 1; len > 0; --len) {
+            memset(&db_key, 0, sizeof(DBT));
+            db_key.data = (void *) phrase;
+            db_key.size = len * sizeof(ucs4_t);
+
+            memset(&db_data, 0, sizeof(DBT));
+            ret = m_db->get(m_db, NULL, &db_key, &db_data, 0);
+            if (ret != 0) {
+                /* new entry with only header. */
+                table_entry_header_t header = SEARCH_CONTINUED;
+                entry.m_chunk.set_chunk(&header,
+                                        sizeof(table_entry_header_t),
+                                        NULL);
+
+                /* store header. */
+                memset(&db_data, 0, sizeof(DBT));
+                db_data.data = entry.m_chunk.begin();
+                db_data.size = entry.m_chunk.size();
+                ret = m_db->put(m_db, NULL, &db_key, &db_data, 0);
+                if (ret != 0)
+                    return ERROR_FILE_CORRUPTION;
+            } else {
+                /* found entry, verify the header. */
+                entry.m_chunk.set_chunk(db_data.data, db_data.size, NULL);
+                table_entry_header_t header = entry.get_header();
+                if (header & SEARCH_CONTINUED)
+                    return ERROR_OK;
+
+                /* set the header. */
+                entry.set_header(header | SEARCH_CONTINUED);
+
+                /* store header. */
+                memset(&db_data, 0, sizeof(DBT));
+                db_data.data = entry.m_chunk.begin();
+                db_data.size = entry.m_chunk.size();
+                ret = m_db->put(m_db, NULL, &db_key, &db_data, 0);
+                if (ret != 0)
+                    return ERROR_FILE_CORRUPTION;
+
+#if 0
+                /* actually the previous headers are set. */
+                return ERROR_OK;
+#endif
+            }
+        }
+
+        return ERROR_OK;
+    }
+
+    /* continued information is already set. */
+    m_entry->m_chunk.set_chunk(db_data.data, db_data.size, NULL);
+    int result = m_entry->add_index(token);
+
+    /* store the entry. */
+    memset(&db_data, 0, sizeof(DBT));
+    db_data.data = m_entry->m_chunk.begin();
+    db_data.size = m_entry->m_chunk.size();
+    ret = m_db->put(m_db, NULL, &db_key, &db_data, 0);
+    if (ret != 0)
+        return ERROR_FILE_CORRUPTION;
+
     return result;
 }
 
