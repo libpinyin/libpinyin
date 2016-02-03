@@ -24,24 +24,12 @@
 namespace pinyin{
 
 
-table_entry_header_t PhraseTableEntry::get_header() const {
-    table_entry_header_t * head = (table_entry_header_t *) m_chunk.begin();
-    return *head;
-}
-
-void PhraseTableEntry::set_header(table_entry_header_t header) {
-    table_entry_header_t * head = (table_entry_header_t *) m_chunk.begin();
-    *head = header;
-}
-
 /* search method */
 
 int PhraseTableEntry::search(/* out */ PhraseTokens tokens) const {
     int result = SEARCH_NONE;
 
-    const char * content = (char *) m_chunk.begin() +
-        sizeof(table_entry_header_t);
-    const phrase_token_t * begin = (phrase_token_t *) content;
+    const phrase_token_t * begin = (phrase_token_t *) m_chunk.begin();
     const phrase_token_t * end = (phrase_token_t *) m_chunk.end();
 
     const phrase_token_t * iter = NULL;
@@ -60,20 +48,13 @@ int PhraseTableEntry::search(/* out */ PhraseTokens tokens) const {
         g_array_append_val(array, token);
     }
 
-    /* check SEARCH_CONTINUED flag in header */
-    table_entry_header_t header = get_header();
-    if (header & SEARCH_CONTINUED)
-        result |= SEARCH_CONTINUED;
-
     return result;
 }
 
 /* add_index/remove_index method */
 
 int PhraseTableEntry::add_index(/* in */ phrase_token_t token) {
-    const char * content = (char *) m_chunk.begin() +
-        sizeof(table_entry_header_t);
-    const phrase_token_t * begin = (phrase_token_t *) content;
+    const phrase_token_t * begin = (phrase_token_t *) m_chunk.begin();
     const phrase_token_t * end = (phrase_token_t *) m_chunk.end();
 
     const phrase_token_t * cur_token;
@@ -84,16 +65,13 @@ int PhraseTableEntry::add_index(/* in */ phrase_token_t token) {
             break;
     }
 
-    int offset = sizeof(table_entry_header_t) /* header */ +
-        (cur_token - begin) * sizeof(phrase_token_t);
+    int offset = (cur_token - begin) * sizeof(phrase_token_t);
     m_chunk.insert_content(offset, &token, sizeof(phrase_token_t));
     return ERROR_OK;
 }
 
 int PhraseTableEntry::remove_index(/* in */ phrase_token_t token) {
-    const char * content = (char *) m_chunk.begin() +
-        sizeof(table_entry_header_t);
-    const phrase_token_t * begin = (phrase_token_t *) content;
+    const phrase_token_t * begin = (phrase_token_t *) m_chunk.begin();
     const phrase_token_t * end = (phrase_token_t *) m_chunk.end();
 
     const phrase_token_t * cur_token;
@@ -105,8 +83,7 @@ int PhraseTableEntry::remove_index(/* in */ phrase_token_t token) {
     if (cur_token == end)
         return ERROR_REMOVE_ITEM_DONOT_EXISTS;
 
-    int offset = sizeof(table_entry_header_t) /* header */ +
-        (cur_token - begin) * sizeof(phrase_token_t);
+    int offset = (cur_token - begin) * sizeof(phrase_token_t);
     m_chunk.remove_content(offset, sizeof(phrase_token_t));
     return ERROR_OK;
 }
@@ -114,9 +91,7 @@ int PhraseTableEntry::remove_index(/* in */ phrase_token_t token) {
 /* get length method */
 
 int PhraseTableEntry::get_length() const {
-    const char * content = (char *) m_chunk.begin() +
-        sizeof(table_entry_header_t);
-    const phrase_token_t * begin = (phrase_token_t *) content;
+    const phrase_token_t * begin = (phrase_token_t *) m_chunk.begin();
     const phrase_token_t * end = (phrase_token_t *) m_chunk.end();
 
     return begin - end;
@@ -125,9 +100,7 @@ int PhraseTableEntry::get_length() const {
 /* mask out method */
 
 bool PhraseTableEntry::mask_out(phrase_token_t mask, phrase_token_t value) {
-    const char * content = (char *) m_chunk.begin() +
-        sizeof(table_entry_header_t);
-    const phrase_token_t * begin = (phrase_token_t *) content;
+    const phrase_token_t * begin = (phrase_token_t *) m_chunk.begin();
     const phrase_token_t * end = (phrase_token_t *) m_chunk.end();
 
     const phrase_token_t * cur_token;
@@ -135,8 +108,7 @@ bool PhraseTableEntry::mask_out(phrase_token_t mask, phrase_token_t value) {
         if ((*cur_token & mask) != value)
             continue;
 
-        int offset = sizeof(table_entry_header_t) /* header */ +
-            (cur_token - begin) * sizeof(phrase_token_t);
+        int offset = (cur_token - begin) * sizeof(phrase_token_t);
         m_chunk.remove_content(offset, sizeof(phrase_token_t));
 
         /* update chunk end. */
