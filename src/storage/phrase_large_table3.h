@@ -38,7 +38,7 @@ namespace pinyin{
 
 /**
  * Data Structure:
- * m_chunk consists of table entry header and array of tokens.
+ * m_chunk consists of array of tokens.
  */
 
 class PhraseTableEntry{
@@ -48,15 +48,7 @@ protected:
 
 private:
     /* Disallow used outside. */
-    PhraseTableEntry() {
-        m_chunk.set_size(sizeof(table_entry_header_t));
-        memset(m_chunk.begin(), 0, m_chunk.size());
-    }
-
-protected:
-    table_entry_header_t get_header() const;
-
-    void set_header(table_entry_header_t header);
+    PhraseTableEntry() {}
 
 public:
     /* search method */
