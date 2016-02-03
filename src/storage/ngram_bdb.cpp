@@ -37,11 +37,11 @@ Bigram::~Bigram(){
 }
 
 void Bigram::reset(){
-	if ( m_db ){
+    if ( m_db ){
         m_db->sync(m_db, 0);
-	    m_db->close(m_db, 0);
-	    m_db = NULL;
-	}
+        m_db->close(m_db, 0);
+        m_db = NULL;
+    }
 }
 
 bool Bigram::load_db(const char * dbfile){

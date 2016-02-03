@@ -45,6 +45,7 @@ void Bigram::reset(){
         m_db->synchronize();
         m_db->close();
         delete m_db;
+        m_db = NULL;
     }
 }
 
