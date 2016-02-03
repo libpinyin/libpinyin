@@ -128,8 +128,6 @@ const char c_separate = '#';
 
 typedef guint32 table_offset_t;
 
-typedef guint32 table_entry_header_t;
-
 typedef double parameter_t;
 
 /* Array of ChewingKey/ChewingKeyRest */
