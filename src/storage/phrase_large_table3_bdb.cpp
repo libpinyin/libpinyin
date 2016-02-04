@@ -313,5 +313,68 @@ int PhraseLargeTable3::remove_index(int phrase_length,
     return ERROR_OK;
 }
 
+/* mask out method */
+/* assume it is in-memory dbm. */
+bool PhraseLargeTable3::mask_out(phrase_token_t mask,
+                                 phrase_token_t value) {
+    /* use copy and sweep algorithm here. */
+    DB * tmp_db = NULL;
+
+    int ret = db_create(&tmp_db, NULL, 0);
+    assert(0 == ret);
+
+    if (NULL == tmp_db)
+        return false;
+
+    /* create in memory db. */
+    ret = tmp_db->open(tmp_db, NULL, NULL, NULL,
+                       DB_BTREE, DB_CREATE, 0600);
+    if (ret != 0)
+        return false;
+
+    PhraseTableEntry entry;
+
+    DBC * cursorp = NULL;
+    DBT db_key, db_data;
+
+    /* Get a cursor */
+    m_db->cursor(m_db, NULL, &cursorp, 0);
+
+    if (NULL == cursorp)
+        return false;
+
+    /* Initialize our DBTs. */
+    memset(&db_key, 0, sizeof(DBT));
+    memset(&db_data, 0, sizeof(DBT));
+
+    /* Iterate over the database, retrieving each record in turn. */
+    while((ret = cursorp->c_get(cursorp, &db_key, &db_data, DB_NEXT)) == 0) {
+        entry.m_chunk.set_chunk(db_data.data, db_data.size, NULL);
+
+        int length = entry.get_length();
+        entry.mask_out(mask, value);
+
+        /* no changes. */
+        if (length == entry.get_length())
+            continue;
+
+        memset(&db_data, 0, sizeof(DBT));
+        db_data.data = entry.m_chunk.begin();
+        db_data.size = entry.m_chunk.size();
+        int ret = tmp_db->put(tmp_db, NULL, &db_key, &db_data, 0);
+        assert(ret == 0);
+    }
+    assert(ret == DB_NOTFOUND);
+
+    /* Cursors must be closed */
+    if (cursorp != NULL)
+        cursorp->c_close(cursorp);
+
+    m_db->sync(m_db, 0);
+    m_db->close(m_db, 0);
+
+    m_db = tmp_db;
+    return true;
+}
 
 };
