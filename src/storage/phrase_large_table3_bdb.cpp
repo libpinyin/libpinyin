@@ -351,12 +351,7 @@ bool PhraseLargeTable3::mask_out(phrase_token_t mask,
     while((ret = cursorp->c_get(cursorp, &db_key, &db_data, DB_NEXT)) == 0) {
         entry.m_chunk.set_chunk(db_data.data, db_data.size, NULL);
 
-        int length = entry.get_length();
         entry.mask_out(mask, value);
-
-        /* no changes. */
-        if (length == entry.get_length())
-            continue;
 
         memset(&db_data, 0, sizeof(DBT));
         db_data.data = entry.m_chunk.begin();
