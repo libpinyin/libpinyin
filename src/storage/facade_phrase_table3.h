@@ -108,11 +108,13 @@ public:
      */
     int search(int phrase_length, /* in */ const ucs4_t phrase[],
                /* out */ PhraseTokens tokens) const {
+#if 0
         /* clear tokens. */
         for (size_t i = 0; i < PHRASE_INDEX_LIBRARY_COUNT; ++i) {
             if (tokens[i])
                 g_array_set_size(tokens[i], 0);
         }
+#endif
 
         int result = SEARCH_NONE;
 
