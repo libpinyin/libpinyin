@@ -74,21 +74,22 @@ public:
 bool Bigram::load_db(const char * dbfile){
     reset();
 
-    /* create on-memory db. */
+    /* create in-memory db. */
     m_db = new ProtoHashDB;
 
-    if ( !m_db->open("-", ProtoHashDB::OWRITER|ProtoHashDB::OCREATE) )
+    if ( !m_db->open("-", BasicDB::OREADER|BasicDB::OWRITER|BasicDB::OCREATE) )
         return false;
 
     /* load db into memory. */
     BasicDB * tmp_db = new HashDB;
-    tmp_db->open(dbfile, BasicDB::OREADER);
+    if (!tmp_db->open(dbfile, BasicDB::OREADER))
+        return false;
 
     CopyVisitor visitor(m_db);
     tmp_db->iterate(&visitor, false);
 
-    if (tmp_db != NULL)
-        tmp_db->close();
+    tmp_db->close();
+    delete tmp_db;
 
     return true;
 }
@@ -107,10 +108,9 @@ bool Bigram::save_db(const char * dbfile){
     CopyVisitor visitor(tmp_db);
     m_db->iterate(&visitor, false);
 
-    if (tmp_db != NULL) {
-        tmp_db->synchronize();
-        tmp_db->close();
-    }
+    tmp_db->synchronize();
+    tmp_db->close();
+    delete tmp_db;
 
     return true;
 }
