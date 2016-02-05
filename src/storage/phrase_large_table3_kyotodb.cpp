@@ -19,3 +19,30 @@
  *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
+#include "phrase_large_table3_kyotodb.h"
+
+
+namespace pinyin{
+
+PhraseLargeTable3::PhraseLargeTable3() {
+    m_db = NULL;
+    m_entry = NULL;
+}
+
+void PhraseLargeTable3::reset() {
+    if (m_db) {
+        m_db->synchronize();
+        m_db->close();
+        delete m_db;
+        m_db = NULL;
+    }
+
+    m_chunk.set_size(0);
+
+    if (m_entry) {
+        delete m_entry;
+        m_entry = NULL;
+    }
+}
+
+};

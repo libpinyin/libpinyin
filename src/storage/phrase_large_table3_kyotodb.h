@@ -22,6 +22,8 @@
 #ifndef PHRASE_LARGE_TABLE3_KYOTODB_H
 #define PHRASE_LARGE_TABLE3_KYOTODB_H
 
+#include "novel_types.h"
+#include "memory_chunk.h"
 #include <kcdb.h>
 
 namespace pinyin{
@@ -32,6 +34,7 @@ class PhraseLargeTable3{
 private:
     /* member variables. */
     kyotocabinet::BasicDB * m_db;
+    MemoryChunk m_chunk;
 
 protected:
     PhraseTableEntry * m_entry;
