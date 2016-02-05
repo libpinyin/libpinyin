@@ -77,5 +77,6 @@ libstorage_la_SOURCES   += ngram_bdb.cpp \
 endif
 
 if KYOTOCABINET
-libstorage_la_SOURCES   += ngram_kyotodb.cpp
+libstorage_la_SOURCES   += ngram_kyotodb.cpp \
+			   phrase_large_table3_kyotodb.cpp
 endif
