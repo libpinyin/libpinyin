@@ -51,7 +51,7 @@ public:
     /* attach method */
     bool attach(const char * dbfile, guint32 flags);
 
-    /* load/store method */
+    /* load_db/store_db method */
     /* use in-memory DBM here, for better performance. */
     bool load_db(const char * filename);
 

@@ -22,6 +22,8 @@
 #include "phrase_large_table3_kyotodb.h"
 #include "phrase_large_table3.h"
 #include <kchashdb.h>
+#include <kcprotodb.h>
+
 
 using namespace kyotocabinet;
 
@@ -74,6 +76,7 @@ bool PhraseLargeTable3::attach(const char * dbfile, guint32 flags) {
 
 /* Use DB::visitor. */
 
+/* Kyoto Cabinet requires non-NULL pointer for zero length value. */
 static const char * empty_vbuf = (char *)UINTPTR_MAX;
 
 /* Use CopyVisitor2 to avoid linking problems. */
@@ -96,5 +99,50 @@ public:
         return NOP;
     }
 };
+
+/* load_db/store_db method */
+/* use in-memory DBM here, for better performance. */
+bool PhraseLargeTable3::load_db(const char * filename) {
+    reset();
+
+    /* create in-memory db. */
+    m_db = new ProtoTreeDB;
+
+    if (!m_db->open("-", BasicDB::OREADER|BasicDB::OWRITER|BasicDB::OCREATE))
+        return false;
+
+    /* load db into memory. */
+    BasicDB * tmp_db = new TreeDB;
+    if (!tmp_db->open(filename, BasicDB::OREADER))
+        return false;
+
+    CopyVisitor2 visitor(m_db);
+    tmp_db->iterate(&visitor, false);
+
+    tmp_db->close();
+    delete tmp_db;
+
+    return true;
+}
+
+bool PhraseLargeTable3::store_db(const char * new_filename){
+    int ret = unlink(new_filename);
+    if ( ret != 0 && errno != ENOENT)
+        return false;
+
+    BasicDB * tmp_db = new TreeDB;
+    if (!tmp_db->open(new_filename, BasicDB::OWRITER|BasicDB::OCREATE))
+        return false;
+
+    CopyVisitor2 visitor(tmp_db);
+    m_db->iterate(&visitor, false);
+
+    tmp_db->synchronize();
+    tmp_db->close();
+    delete tmp_db;
+
+    return true;
+}
+
 
 };
