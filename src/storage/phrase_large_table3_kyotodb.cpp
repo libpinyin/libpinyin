@@ -20,7 +20,10 @@
  */
 
 #include "phrase_large_table3_kyotodb.h"
+#include "phrase_large_table3.h"
+#include <kchashdb.h>
 
+using namespace kyotocabinet;
 
 namespace pinyin{
 
@@ -44,5 +47,54 @@ void PhraseLargeTable3::reset() {
         m_entry = NULL;
     }
 }
+
+
+/* attach method */
+bool PhraseLargeTable3::attach(const char * dbfile, guint32 flags) {
+    reset();
+    uint32_t mode = 0;
+
+    if (flags & ATTACH_READONLY)
+        mode |= BasicDB::OREADER;
+    if (flags & ATTACH_READWRITE) {
+        assert( !( flags & ATTACH_READONLY ) );
+        mode |= BasicDB::OREADER | BasicDB::OWRITER;
+    }
+    if (flags & ATTACH_CREATE)
+        mode |= BasicDB::OCREATE;
+
+    if (!dbfile)
+        return false;
+
+    m_db = new TreeDB;
+
+    return m_db->open(dbfile, mode);
+}
+
+
+/* Use DB::visitor. */
+
+static const char * empty_vbuf = (char *)UINTPTR_MAX;
+
+/* Use CopyVisitor2 to avoid linking problems. */
+class CopyVisitor2 : public DB::Visitor {
+private:
+    BasicDB * m_db;
+public:
+    CopyVisitor2(BasicDB * db) {
+        m_db = db;
+    }
+
+    virtual const char* visit_full(const char* kbuf, size_t ksiz,
+                                   const char* vbuf, size_t vsiz, size_t* sp) {
+        m_db->set(kbuf, ksiz, vbuf, vsiz);
+        return NOP;
+    }
+
+    virtual const char* visit_empty(const char* kbuf, size_t ksiz, size_t* sp) {
+        m_db->set(kbuf, ksiz, empty_vbuf, 0);
+        return NOP;
+    }
+};
 
 };
