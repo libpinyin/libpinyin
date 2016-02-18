@@ -34,7 +34,6 @@ class PhraseLargeTable3{
 private:
     /* member variables. */
     kyotocabinet::BasicDB * m_db;
-    MemoryChunk m_chunk;
 
 protected:
     PhraseTableEntry * m_entry;

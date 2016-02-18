@@ -42,8 +42,6 @@ void PhraseLargeTable3::reset() {
         m_db = NULL;
     }
 
-    m_chunk.set_size(0);
-
     if (m_entry) {
         delete m_entry;
         m_entry = NULL;
@@ -142,6 +140,37 @@ bool PhraseLargeTable3::store_db(const char * new_filename){
     delete tmp_db;
 
     return true;
+}
+
+/* search method */
+int PhraseLargeTable3::search(int phrase_length,
+                              /* in */ const ucs4_t phrase[],
+                              /* out */ PhraseTokens tokens) const {
+    int result = SEARCH_NONE;
+
+    if (NULL == m_db)
+        return result;
+    assert(NULL != m_entry);
+
+    const char * kbuf = (char *) phrase;
+    const int32_t vsiz = m_db->check(kbuf, phrase_length * sizeof(ucs4_t));
+    /* -1 on failure. */
+    if (-1 == vsiz)
+        return result;
+
+    /* continue searching. */
+    result |= SEARCH_CONTINUED;
+    if (0 == vsiz)
+        return result;
+
+    m_entry->m_chunk.set_size(vsiz);
+    char * vbuf = (char *) m_entry->m_chunk.begin();
+    assert (vsiz == m_db->get(kbuf, phrase_length * sizeof(ucs4_t),
+                              vbuf, vsiz));
+
+    result = m_entry->search(tokens) | result;
+
+    return result;
 }
 
 
