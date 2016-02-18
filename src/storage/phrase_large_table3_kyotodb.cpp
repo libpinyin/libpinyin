@@ -173,5 +173,65 @@ int PhraseLargeTable3::search(int phrase_length,
     return result;
 }
 
+/* add_index/remove_index method */
+int PhraseLargeTable3::add_index(int phrase_length,
+                                 /* in */ const ucs4_t phrase[],
+                                 /* in */ phrase_token_t token) {
+    assert(NULL != m_db);
+    assert(NULL != m_entry);
+
+    bool retval = false;
+
+    /* load phrase table entry. */
+    const char * kbuf = (char *) phrase;
+    size_t ksiz = phrase_length * sizeof(ucs4_t);
+    int32_t vsiz = m_db->check(kbuf, ksiz);
+    char * vbuf = NULL;
+    if (-1 == vsiz) {
+        /* new entry. */
+        PhraseTableEntry entry;
+        entry.add_index(token);
+
+        vbuf = (char *) entry.m_chunk.begin();
+        vsiz = entry.m_chunk.size();
+        retval = m_db->set(kbuf, ksiz, vbuf, vsiz);
+        if (!retval)
+            return ERROR_FILE_CORRUPTION;
+
+        /* recursively add keys for continued information. */
+        for (size_t len = phrase_length - 1; len > 0; --len) {
+            ksiz = len * sizeof(ucs4_t);
+
+            vsiz = m_db->check(kbuf, ksiz);
+            /* found entry. */
+            if (-1 != vsiz)
+                return ERROR_OK;
+
+            /* new entry with empty content. */
+            retval = m_db->set(kbuf, ksiz, empty_vbuf, 0);
+            if (!retval)
+                return ERROR_FILE_CORRUPTION;
+        }
+
+        return ERROR_OK;
+    }
+
+    /* already have keys. */
+    m_entry->m_chunk.set_size(vsiz);
+    /* m_chunk may re-allocate here. */
+    vbuf = (char *) m_entry->m_chunk.begin();
+    assert(vsiz == m_db->get(kbuf, ksiz, vbuf, vsiz));
+
+    int result = m_entry->add_index(token);
+
+    /* store the entry. */
+    vbuf = (char *) m_entry->m_chunk.begin();
+    vsiz = m_entry->m_chunk.size();
+    retval = m_db->set(kbuf, ksiz, vbuf, vsiz);
+    if (!retval)
+        return ERROR_FILE_CORRUPTION;
+
+    return result;
+}
 
 };
