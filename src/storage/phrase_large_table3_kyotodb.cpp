@@ -235,4 +235,36 @@ int PhraseLargeTable3::add_index(int phrase_length,
     return result;
 }
 
+int PhraseLargeTable3::remove_index(int phrase_length,
+                                    /* in */ const ucs4_t phrase[],
+                                    /* in */ phrase_token_t token) {
+    assert(NULL != m_db);
+    assert(NULL != m_entry);
+
+    const char * kbuf = (char *) phrase;
+    const size_t ksiz = phrase_length * sizeof(ucs4_t);
+    char * vbuf = NULL;
+    int32_t vsiz = m_db->check(kbuf, ksiz);
+    if (vsiz < (signed) sizeof(ucs4_t))
+        return ERROR_REMOVE_ITEM_DONOT_EXISTS;
+
+    /* contains at least one token. */
+    m_entry->m_chunk.set_size(vsiz);
+    /* m_chunk may re-allocate here. */
+    vbuf = (char *) m_entry->m_chunk.begin();
+    assert(vsiz == m_db->get(kbuf, ksiz, vbuf, vsiz));
+
+    int result = m_entry->remove_index(token);
+    if (ERROR_OK != result)
+        return result;
+
+    /* for safety. */
+    vbuf = (char *) m_entry->m_chunk.begin();
+    vsiz = m_entry->m_chunk.size();
+    if (!m_db->set(kbuf, ksiz, vbuf, vsiz))
+        return ERROR_FILE_CORRUPTION;
+
+    return ERROR_OK;
+}
+
 };
