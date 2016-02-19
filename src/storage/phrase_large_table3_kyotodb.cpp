@@ -164,6 +164,7 @@ int PhraseLargeTable3::search(int phrase_length,
         return result;
 
     m_entry->m_chunk.set_size(vsiz);
+    /* m_chunk may re-allocate here. */
     char * vbuf = (char *) m_entry->m_chunk.begin();
     assert (vsiz == m_db->get(kbuf, phrase_length * sizeof(ucs4_t),
                               vbuf, vsiz));
@@ -185,8 +186,8 @@ int PhraseLargeTable3::add_index(int phrase_length,
     /* load phrase table entry. */
     const char * kbuf = (char *) phrase;
     size_t ksiz = phrase_length * sizeof(ucs4_t);
-    int32_t vsiz = m_db->check(kbuf, ksiz);
     char * vbuf = NULL;
+    int32_t vsiz = m_db->check(kbuf, ksiz);
     if (-1 == vsiz) {
         /* new entry. */
         PhraseTableEntry entry;
