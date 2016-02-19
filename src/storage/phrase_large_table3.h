@@ -40,9 +40,11 @@ namespace pinyin{
  * Data Structure:
  * m_chunk consists of array of tokens.
  */
+class MaskOutVisitor;
 
 class PhraseTableEntry{
     friend class PhraseLargeTable3;
+    friend class MaskOutVisitor;
 protected:
     MemoryChunk m_chunk;
 

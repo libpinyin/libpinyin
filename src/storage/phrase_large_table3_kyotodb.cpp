@@ -67,6 +67,7 @@ bool PhraseLargeTable3::attach(const char * dbfile, guint32 flags) {
         return false;
 
     m_db = new TreeDB;
+    m_entry = new PhraseTableEntry;
 
     return m_db->open(dbfile, mode);
 }
@@ -119,6 +120,8 @@ bool PhraseLargeTable3::load_db(const char * filename) {
 
     tmp_db->close();
     delete tmp_db;
+
+    m_entry = new PhraseTableEntry;
 
     return true;
 }
@@ -265,6 +268,58 @@ int PhraseLargeTable3::remove_index(int phrase_length,
         return ERROR_FILE_CORRUPTION;
 
     return ERROR_OK;
+}
+
+
+class MaskOutVisitor : public DB::Visitor {
+private:
+    BasicDB * m_db;
+    phrase_token_t m_mask;
+    phrase_token_t m_value;
+
+    PhraseTableEntry m_entry;
+public:
+    MaskOutVisitor(BasicDB * db, phrase_token_t mask, phrase_token_t value) {
+        m_db = db;
+        m_mask = mask;
+        m_value = value;
+    }
+
+    virtual const char* visit_full(const char* kbuf, size_t ksiz,
+                                   const char* vbuf, size_t vsiz, size_t* sp) {
+        m_entry.m_chunk.set_content(0, vbuf, vsiz);
+        m_entry.mask_out(m_mask, m_value);
+
+        vbuf = (char *) m_entry.m_chunk.begin();
+        vsiz = m_entry.m_chunk.size();
+        assert(m_db->set(kbuf, ksiz, vbuf, vsiz));
+        return NOP;
+    }
+
+    virtual const char* visit_empty(const char* kbuf, size_t ksiz, size_t* sp) {
+        m_db->set(kbuf, ksiz, empty_vbuf, 0);
+        return NOP;
+    }
+};
+
+/* mask out method */
+/* assume it is in-memory dbm. */
+bool PhraseLargeTable3::mask_out(phrase_token_t mask,
+                                 phrase_token_t value) {
+    /* use copy and sweep algorithm here. */
+    BasicDB * tmp_db = new ProtoTreeDB;
+    if (!tmp_db->open("-", BasicDB::OREADER|BasicDB::OWRITER|BasicDB::OCREATE))
+        return false;
+
+    MaskOutVisitor visitor(tmp_db, mask, value);
+    m_db->iterate(&visitor, false);
+
+    reset();
+
+    m_db = tmp_db;
+    m_entry = new PhraseTableEntry;
+
+    return true;
 }
 
 };
