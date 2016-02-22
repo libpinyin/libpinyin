@@ -23,9 +23,11 @@ int main(int argc, char * argv[]){
     if (!load_phrase_table(phrase_files, NULL, &largetable, &phrase_index))
         exit(ENOENT);
 
+#if 0
     MemoryChunk * chunk = new MemoryChunk;
     largetable.store(chunk);
     largetable.load(chunk);
+#endif
 
     char* linebuf = NULL; size_t size = 0; ssize_t read;
     while ((read = getline(&linebuf, &size, stdin)) != -1) {
@@ -47,14 +49,24 @@ int main(int argc, char * argv[]){
         phrase_index.prepare_tokens(tokens);
 
         guint32 start = record_time();
-        for (size_t i = 0; i < bench_times; ++i){
+        size_t i = 0;
+        for (i = 0; i < bench_times; ++i){
             phrase_index.clear_tokens(tokens);
             largetable.search(phrase_len, new_phrase, tokens);
         }
         print_time(start, bench_times);
 
+        /* test search continued information. */
+        int retval = SEARCH_NONE;
+        for (i = 1; i < phrase_len; ++i) {
+            phrase_index.clear_tokens(tokens);
+            retval = largetable.search(i, new_phrase, tokens);
+            if (retval & SEARCH_CONTINUED)
+                printf("return continued information with length:%d\n", i);
+        }
+
         phrase_index.clear_tokens(tokens);
-        int retval = largetable.search(phrase_len, new_phrase, tokens);
+        retval = largetable.search(phrase_len, new_phrase, tokens);
 
         if (retval & SEARCH_OK) {
             for (size_t i = 0; i < PHRASE_INDEX_LIBRARY_COUNT; ++i) {
