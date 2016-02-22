@@ -26,8 +26,16 @@
 namespace pinyin{
 
 PhraseLargeTable3::PhraseLargeTable3() {
+    /* create in-memory db. */
     m_db = NULL;
-    m_entry = NULL;
+    int ret = db_create(&m_db, NULL, 0);
+    assert(0 == ret);
+
+    ret = m_db->open(m_db, NULL, NULL, NULL,
+                     DB_BTREE, DB_CREATE, 0600);
+    assert(0 == ret);
+
+    m_entry = new PhraseTableEntry;
 }
 
 void PhraseLargeTable3::reset() {
@@ -76,7 +84,7 @@ bool PhraseLargeTable3::attach(const char * dbfile, guint32 flags) {
 bool PhraseLargeTable3::load_db(const char * filename) {
     reset();
 
-    /* create in memory db. */
+    /* create in-memory db. */
     int ret = db_create(&m_db, NULL, 0);
     assert(0 == ret);
 
