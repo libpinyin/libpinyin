@@ -96,6 +96,88 @@ public:
             return false;
         return m_user_chewing_table->store_db(new_user_filename);
     }
+
+    /**
+     * FacadeChewingTable2::search:
+     * @phrase_length: the length of the phrase to be searched.
+     * @keys: the pinyin key of the phrase to be searched.
+     * @ranges: the array of GArrays to store the matched phrase token.
+     * @returns: the search result of enum SearchResult.
+     *
+     * Search the phrase tokens according to the pinyin keys.
+     *
+     */
+    int search(int phrase_length, /* in */ const ChewingKey keys[],
+               /* out */ PhraseIndexRanges ranges) const {
+#if 0
+        /* clear ranges. */
+        for (size_t i = 0; i < PHRASE_INDEX_LIBRARY_COUNT; ++i) {
+            if (ranges[i])
+                g_array_set_size(ranges[i], 0);
+        }
+#endif
+        int result = SEARCH_NONE;
+
+        if (NULL != m_system_chewing_table)
+            result |= m_system_chewing_table->search
+                (phrase_length, keys, ranges);
+
+        if (NULL != m_user_chewing_table)
+            result |= m_user_chewing_table->search
+                (phrase_length, keys, ranges);
+
+        return result;
+    }
+
+    /**
+     * FacadeChewingTable2::add_index:
+     * @phrase_length: the length of the phrase to be added.
+     * @keys: the pinyin keys of the phrase to be added.
+     * @token: the token of the phrase to be added.
+     * @returns: the add result of enum ErrorResult.
+     *
+     * Add the phrase token to the user chewing table.
+     *
+     */
+    int add_index(int phrase_length, /* in */ const ChewingKey keys[],
+                  /* in */ phrase_token_t token) {
+        if (NULL == m_user_chewing_table)
+            return ERROR_NO_USER_TABLE;
+        return m_user_chewing_table->add_index(phrase_length, keys, token);
+    }
+
+    /**
+     * FacadeChewingTable2::remove_index:
+     * @phrase_length: the length of the phrase to be removed.
+     * @keys: the pinyin keys of the phrase to be removed.
+     * @token: the token of the phrase to be removed.
+     * @returns: the remove result of enum ErrorResult.
+     *
+     * Remove the phrase token from the user chewing table.
+     *
+     */
+    int remove_index(int phrase_length, /* in */ const ChewingKey keys[],
+                     /* in */ phrase_token_t token) {
+        if (NULL == m_user_chewing_table)
+            return ERROR_NO_USER_TABLE;
+        return m_user_chewing_table->remove_index(phrase_length, keys, token);
+    }
+
+    /**
+     * FacadeChewingTable2::mask_out:
+     * @mask: the mask.
+     * @value: the value.
+     * @returns: whether the mask out operation is successful.
+     *
+     * Mask out the matched chewing index.
+     *
+     */
+    bool mask_out(phrase_token_t mask, phrase_token_t value) {
+        if (NULL == m_user_chewing_table)
+            return false;
+        return m_user_chewing_table->mask_out(mask, value);
+    }
+
 };
 
 };
