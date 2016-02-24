@@ -60,6 +60,47 @@ inline int pinyin_exact_compare2(const ChewingKey * key_lhs,
     return 0;
 }
 
+/* compare pinyins with chewing internal representations,
+   fuzzy pinyin is not handled here. */
+inline int pinyin_compare_initial3(ChewingInitial lhs,
+                                   ChewingInitial rhs) {
+    return (lhs - rhs);
+}
+
+inline int pinyin_compare_middle_and_final3(ChewingMiddle middle_lhs,
+                                            ChewingMiddle middle_rhs,
+                                            ChewingFinal final_lhs,
+                                            ChewingFinal final_rhs) {
+    if (middle_lhs == middle_rhs && final_lhs == final_rhs)
+        return 0;
+
+    /* handle in-complete pinyin here. */
+    if (middle_lhs == CHEWING_ZERO_MIDDLE &&
+        final_lhs == CHEWING_ZERO_FINAL)
+        return 0;
+    if (middle_rhs == CHEWING_ZERO_MIDDLE &&
+        final_rhs == CHEWING_ZERO_FINAL)
+        return 0;
+
+    /* compare chewing middle first. */
+    int middle_diff = middle_lhs - middle_rhs;
+    if (middle_diff)
+        return middle_diff;
+
+    return (final_lhs - final_rhs);
+}
+
+inline int pinyin_compare_tone3(ChewingTone lhs,
+                                ChewingTone rhs) {
+    if (lhs == rhs)
+        return 0;
+    if (lhs == CHEWING_ZERO_TONE)
+        return 0;
+    if (rhs == CHEWING_ZERO_TONE)
+        return 0;
+    return (lhs - rhs);
+}
+
 
 template<size_t phrase_length>
 struct PinyinIndexItem2{
