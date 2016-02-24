@@ -101,6 +101,44 @@ inline int pinyin_compare_tone3(ChewingTone lhs,
     return (lhs - rhs);
 }
 
+inline int pinyin_compare_with_tones(const ChewingKey * key_lhs,
+                                     const ChewingKey * key_rhs,
+                                     int phrase_length){
+    int i;
+    int result;
+
+    /* compare initial */
+    for (i = 0; i < phrase_length; ++i) {
+        result = pinyin_compare_initial3
+            ((ChewingInitial)key_lhs[i].m_initial,
+             (ChewingInitial)key_rhs[i].m_initial);
+        if (0 != result)
+            return result;
+    }
+
+    /* compare middle and final */
+    for (i = 0; i < phrase_length; ++i) {
+        result = pinyin_compare_middle_and_final3
+            ((ChewingMiddle)key_lhs[i].m_middle,
+             (ChewingMiddle)key_rhs[i].m_middle,
+             (ChewingFinal) key_lhs[i].m_final,
+             (ChewingFinal) key_rhs[i].m_final);
+        if (0 != result)
+            return result;
+    }
+
+    /* compare tone */
+    for (i = 0; i < phrase_length; ++i) {
+        result = pinyin_compare_tone3
+            ((ChewingTone)key_lhs[i].m_tone,
+             (ChewingTone)key_rhs[i].m_tone);
+        if (0 != result)
+            return result;
+    }
+
+    return 0;
+}
+
 
 template<size_t phrase_length>
 struct PinyinIndexItem2{
