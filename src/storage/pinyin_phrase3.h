@@ -24,6 +24,7 @@
 
 #include "novel_types.h"
 #include "chewing_key.h"
+#include <assert.h>
 
 namespace pinyin{
 
@@ -139,8 +140,8 @@ inline int pinyin_compare_with_tones(const ChewingKey * key_lhs,
     return 0;
 }
 
-inline bool contains_incomplete_pinyin(int phrase_length,
-                                       const ChewingKey * keys) {
+inline bool contains_incomplete_pinyin(const ChewingKey * keys,
+                                       int phrase_length) {
     for (int i = 0; i < phrase_length; ++i) {
         const ChewingKey key = keys[i];
         if (CHEWING_ZERO_MIDDLE == key.m_middle &&
@@ -151,6 +152,26 @@ inline bool contains_incomplete_pinyin(int phrase_length,
     }
 
     return false;
+}
+
+inline void compute_chewing_index(const ChewingKey * in_keys,
+                                  ChewingKey * out_keys,
+                                  int phrase_length) {
+    for (int i = 0; i < phrase_length; ++i) {
+        ChewingKey key = in_keys[i];
+        key.m_tone = CHEWING_ZERO_TONE;
+        out_keys[i] = key;
+    }
+}
+
+inline void compute_incomplete_chewing_index(const ChewingKey * in_keys,
+                                             ChewingKey * out_keys,
+                                             int phrase_length) {
+    for (int i = 0; i < phrase_length; ++i) {
+        ChewingKey key;
+        key.m_initial = in_keys[i].m_initial;
+        out_keys[i] = key;
+    }
 }
 
 template<size_t phrase_length>
