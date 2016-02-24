@@ -60,6 +60,20 @@ inline int pinyin_exact_compare2(const ChewingKey * key_lhs,
     return 0;
 }
 
+
+template<size_t phrase_length>
+struct PinyinIndexItem2{
+    phrase_token_t m_token;
+    ChewingKey m_keys[phrase_length];
+public:
+    PinyinIndexItem2<phrase_length> (const ChewingKey * keys,
+                                     phrase_token_t token) {
+        memmove(m_keys, keys, sizeof(ChewingKey) * phrase_length);
+        m_token = token;
+    }
+};
+
+
 /* for find the element in the phrase array */
 template<size_t phrase_length>
 inline int phrase_exact_compare2(const PinyinIndexItem2<phrase_length> &lhs,

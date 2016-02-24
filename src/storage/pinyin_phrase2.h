@@ -299,19 +299,6 @@ inline void compute_upper_value2(pinyin_option_t options,
 }
 
 
-template<size_t phrase_length>
-struct PinyinIndexItem2{
-    phrase_token_t m_token;
-    ChewingKey m_keys[phrase_length];
-public:
-    PinyinIndexItem2<phrase_length> (const ChewingKey * keys,
-                                     phrase_token_t token) {
-        memmove(m_keys, keys, sizeof(ChewingKey) * phrase_length);
-        m_token = token;
-    }
-};
-
-
 };
 
 #endif
