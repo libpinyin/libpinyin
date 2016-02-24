@@ -139,6 +139,19 @@ inline int pinyin_compare_with_tones(const ChewingKey * key_lhs,
     return 0;
 }
 
+inline bool contains_incomplete_pinyin(int phrase_length,
+                                       const ChewingKey * keys) {
+    for (int i = 0; i < phrase_length; ++i) {
+        const ChewingKey key = keys[i];
+        if (CHEWING_ZERO_MIDDLE == key.m_middle &&
+            CHEWING_ZERO_FINAL == key.m_final) {
+            assert(CHEWING_ZERO_TONE == key.m_tone);
+            return true;
+        }
+    }
+
+    return false;
+}
 
 template<size_t phrase_length>
 struct PinyinIndexItem2{
