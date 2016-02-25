@@ -34,6 +34,9 @@ class ChewingTableEntry{
 protected:
     MemoryChunk m_chunk;
 
+    /* cache for storing the chewing keys index. */
+    ChewingKey m_cache_index[phrase_length];
+
 private:
     /* Disallow used outside. */
     ChewingTableEntry() {}
