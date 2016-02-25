@@ -26,6 +26,14 @@
 #include "memory_chunk.h"
 #include "chewing_key.h"
 
+#ifdef HAVE_BERKELEY_DB
+#include "chewing_large_table2_bdb.h"
+#endif
+
+#ifdef HAVE_KYOTO_CABINET
+#include "chewing_large_table2_kyotodb.h"
+#endif
+
 namespace pinyin{
 
 template<size_t phrase_length>
