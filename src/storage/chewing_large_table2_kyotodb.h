@@ -19,12 +19,13 @@
  *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-#ifndef CHEWING_LARGE_TABLE2_BDB_H
-#define CHEWING_LARGE_TABLE2_BDB_H
+#ifndef CHEWING_LARGE_TABLE2_KYOTODB_H
+#define CHEWING_LARGE_TABLE2_KYOTODB_H
 
+#include "novel_types.h"
+#include "memory_chunk.h"
 #include <stdio.h>
-#include <db.h>
-#include <glib.h>
+#include <kcdb.h>
 
 namespace pinyin{
 
@@ -34,7 +35,7 @@ class ChewingTableEntry;
 class ChewingLargeTable2{
 private:
     /* member variables. */
-    DB * m_db;
+    kyotocabinet::BasicDB * m_db;
 
 protected:
     /* Array of ChewingTableEntry. */
