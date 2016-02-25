@@ -48,7 +48,11 @@ noinst_HEADERS		= chewing_enum.h \
 			  pinyin_phrase2.h \
 			  pinyin_phrase3.h \
 			  chewing_large_table.h \
+			  chewing_large_table2.h \
+			  chewing_large_table2_bdb.h \
+			  chewing_large_table2_kyotodb.h \
 			  facade_chewing_table.h \
+			  facade_chewing_table2.h \
 			  facade_phrase_table2.h \
 			  facade_phrase_table3.h \
 			  table_info.h
