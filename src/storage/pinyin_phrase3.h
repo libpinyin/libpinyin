@@ -102,6 +102,7 @@ inline int pinyin_compare_tone3(ChewingTone lhs,
     return (lhs - rhs);
 }
 
+/* compare with incomplete pinyin and zero tone. */
 inline int pinyin_compare_with_tones(const ChewingKey * key_lhs,
                                      const ChewingKey * key_rhs,
                                      int phrase_length){
