@@ -36,6 +36,7 @@
 
 namespace pinyin{
 
+/* As this is a template class, the code will be in the header file. */
 template<size_t phrase_length>
 class ChewingTableEntry{
     friend class ChewingLargeTable2;

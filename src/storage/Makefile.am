@@ -73,6 +73,7 @@ libstorage_la_SOURCES   = phrase_index.cpp \
 			   pinyin_parser2.cpp \
 			   zhuyin_parser2.cpp \
 			   chewing_large_table.cpp \
+			   chewing_large_table2.cpp \
 			   table_info.cpp
 
 if BERKELEYDB
