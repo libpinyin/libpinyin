@@ -179,7 +179,13 @@ template<size_t phrase_length>
 struct PinyinIndexItem2{
     phrase_token_t m_token;
     ChewingKey m_keys[phrase_length];
+
 public:
+    PinyinIndexItem2<phrase_length> () {
+        memset(m_keys, 0, sizeof(ChewingKey) * phrase_length);
+        m_token = null_token;
+    }
+
     PinyinIndexItem2<phrase_length> (const ChewingKey * keys,
                                      phrase_token_t token) {
         memmove(m_keys, keys, sizeof(ChewingKey) * phrase_length);
@@ -205,6 +211,21 @@ inline bool phrase_exact_less_than2(const PinyinIndexItem2<phrase_length> &lhs,
     return 0 > phrase_exact_compare2<phrase_length>(lhs, rhs);
 }
 
+template<size_t phrase_length>
+inline int phrase_compare_with_tones(const PinyinIndexItem2<phrase_length> &lhs,
+                                     const PinyinIndexItem2<phrase_length> &rhs)
+{
+    ChewingKey * keys_lhs = (ChewingKey *) lhs.m_keys;
+    ChewingKey * keys_rhs = (ChewingKey *) rhs.m_keys;
+    return pinyin_compare_with_tones(keys_lhs, keys_rhs, phrase_length);
+}
+
+template<size_t phrase_length>
+inline int phrase_less_than_with_tones(const PinyinIndexItem2<phrase_length> &lhs,
+                                       const PinyinIndexItem2<phrase_length> &rhs)
+{
+    return 0 > phrase_compare_with_tones<phrase_length>(lhs, rhs);
+}
 
 };
 

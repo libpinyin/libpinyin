@@ -25,6 +25,8 @@
 #include "novel_types.h"
 #include "memory_chunk.h"
 #include "chewing_key.h"
+#include "pinyin_phrase2.h"
+#include "pinyin_phrase3.h"
 
 #ifdef HAVE_BERKELEY_DB
 #include "chewing_large_table2_bdb.h"
@@ -41,19 +43,81 @@ template<size_t phrase_length>
 class ChewingTableEntry{
     friend class ChewingLargeTable2;
 protected:
+    typedef PinyinIndexItem2<phrase_length> IndexItem;
+
+protected:
     MemoryChunk m_chunk;
 
-    /* cache for storing the chewing keys index. */
-    ChewingKey m_cache_index[phrase_length];
+    /* The cache item of IndexItem. */
+    IndexItem m_cache_item;
 
 private:
     /* Disallow used outside. */
     ChewingTableEntry() {}
 
 public:
+    /* convert method. */
+    /* compress consecutive tokens */
+    int convert(const ChewingKey keys[],
+     IndexItem * begin, IndexItem * end,
+     PhraseIndexRanges ranges) const {
+        IndexItem * iter = NULL;
+        PhraseIndexRange cursor;
+        GArray * head, * cursor_head = NULL;
+
+        int result = SEARCH_NONE;
+        /* TODO: check the below code */
+        cursor.m_range_begin = null_token; cursor.m_range_end = null_token;
+        for (iter = begin; iter != end; ++iter) {
+            if (0 != pinyin_compare_with_tones
+                (keys, iter->m_keys, phrase_length))
+                continue;
+
+            phrase_token_t token = iter->m_token;
+            head = ranges[PHRASE_INDEX_LIBRARY_INDEX(token)];
+            if (NULL == head)
+                continue;
+
+            result |= SEARCH_OK;
+
+            if (null_token == cursor.m_range_begin) {
+                cursor.m_range_begin = token;
+                cursor.m_range_end   = token + 1;
+                cursor_head = head;
+            } else if (cursor.m_range_end == token &&
+                       PHRASE_INDEX_LIBRARY_INDEX(cursor.m_range_begin) ==
+                       PHRASE_INDEX_LIBRARY_INDEX(token)) {
+                ++cursor.m_range_end;
+            } else {
+                g_array_append_val(cursor_head, cursor);
+                cursor.m_range_begin = token; cursor.m_range_end = token + 1;
+                cursor_head = head;
+            }
+        }
+
+        if (null_token == cursor.m_range_begin)
+            return result;
+
+        g_array_append_val(cursor_head, cursor);
+        return result;
+    }
+
     /* search method */
     int search(/* in */ const ChewingKey keys[],
-               /* out */ PhraseIndexRanges ranges) const;
+               /* out */ PhraseIndexRanges ranges) const {
+        int result = SEARCH_NONE;
+
+        compute_chewing_index(keys, m_cache_item.m_keys, phrase_length);
+
+        const IndexItem * begin = (IndexItem *) m_chunk.begin();
+        const IndexItem * end = (IndexItem *) m_chunk.end();
+
+        std_lite::pair<const IndexItem *, const IndexItem *> range=
+            std_lite::equal_range(begin, end, m_cache_item,
+                                  phrase_less_than_with_tones<phrase_length>);
+
+        return convert(keys, range.m_first, range.m_second, ranges);
+    }
 
     /* add/remove index method */
     int add_index(/* in */ const ChewingKey keys[],

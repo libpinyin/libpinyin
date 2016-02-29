@@ -20,8 +20,6 @@
  */
 
 #include "chewing_large_table2.h"
-#include "pinyin_phrase2.h"
-#include "pinyin_phrase3.h"
 #include "pinyin_parser2.h"
 
 
