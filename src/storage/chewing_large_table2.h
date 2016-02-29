@@ -112,11 +112,11 @@ public:
         const IndexItem * begin = (IndexItem *) m_chunk.begin();
         const IndexItem * end = (IndexItem *) m_chunk.end();
 
-        std_lite::pair<const IndexItem *, const IndexItem *> range=
+        std_lite::pair<const IndexItem *, const IndexItem *> range =
             std_lite::equal_range(begin, end, m_cache_item,
                                   phrase_less_than_with_tones<phrase_length>);
 
-        return convert(keys, range.m_first, range.m_second, ranges);
+        return convert(keys, range.first, range.second, ranges);
     }
 
     /* add/remove index method */
