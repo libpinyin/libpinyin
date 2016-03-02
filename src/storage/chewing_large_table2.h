@@ -121,7 +121,30 @@ public:
 
     /* add/remove index method */
     int add_index(/* in */ const ChewingKey keys[],
-                  /* in */ phrase_token_t token);
+                  /* in */ phrase_token_t token) {
+        const IndexItem * begin = (IndexItem *) m_chunk.begin();
+        const IndexItem * end = (IndexItem *) m_chunk.end();
+
+        const IndexItem add_elem(keys, token);
+
+        std_lite::pair<const IndexItem *, const IndexItem *> range =
+            std_lite::equal_range(begin, end, add_elem,
+                                  phrase_exact_less_than2<phrase_length>);
+
+        const IndexItem * cur_elem;
+        for (cur_elem = range.first;
+             cur_elem != range.second; ++cur_elem) {
+            if (cur_elem->m_token == token)
+                return ERROR_INSERT_ITEM_EXISTS;
+            if (cur_elem->m_token > token)
+                break;
+        }
+
+        int offset = (cur_elem - begin) * sizeof(IndexItem);
+        m_chunk.insert_content(offset, &add_elem, sizeof(IndexItem));
+        return ERROR_OK;
+    }
+
     int remove_index(/* in */ const ChewingKey keys[],
                      /* in */ phrase_token_t token);
 
