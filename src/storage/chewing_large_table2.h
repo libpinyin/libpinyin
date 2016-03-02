@@ -172,7 +172,12 @@ public:
     }
 
     /* get length method */
-    int get_length() const;
+    int get_length() const {
+        const IndexItem * begin = (IndexItem *) m_chunk.begin();
+        const IndexItem * end = (IndexItem *) m_chunk.end();
+
+        return end - begin;
+    }
 
     /* mask out method */
     bool mask_out(phrase_token_t mask, phrase_token_t value);

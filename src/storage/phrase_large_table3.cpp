@@ -94,7 +94,7 @@ int PhraseTableEntry::get_length() const {
     const phrase_token_t * begin = (phrase_token_t *) m_chunk.begin();
     const phrase_token_t * end = (phrase_token_t *) m_chunk.end();
 
-    return begin - end;
+    return end - begin;
 }
 
 /* mask out method */
