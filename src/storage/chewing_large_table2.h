@@ -180,7 +180,26 @@ public:
     }
 
     /* mask out method */
-    bool mask_out(phrase_token_t mask, phrase_token_t value);
+    bool mask_out(phrase_token_t mask, phrase_token_t value) {
+        const IndexItem * begin = (IndexItem *) m_chunk.begin();
+        const IndexItem * end = (IndexItem *) m_chunk.end();
+
+        const IndexItem * cur_elem;
+        for (cur_elem = begin; cur_elem != end; ++cur_elem) {
+            /* not match. */
+            if ((cur_elem->m_token & mask) != value)
+                continue;
+
+            int offset = (cur_elem - begin) * sizeof(IndexItem);
+            m_chunk.remove_content(offset, sizeof(IndexItem));
+
+            /* update chunk end. */
+            end = (IndexItem *) m_chunk.end();
+            --cur_elem;
+        }
+
+        return true;
+    }
 
 };
 
