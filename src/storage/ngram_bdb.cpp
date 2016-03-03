@@ -70,29 +70,8 @@ bool Bigram::load_db(const char * dbfile){
     if ( ret != 0 )
         return false;
 
-    DBC * cursorp = NULL;
-    DBT key, data;
-
-    /* Get a cursor */
-    tmp_db->cursor(tmp_db, NULL, &cursorp, 0);
-
-    if (NULL == cursorp)
+    if ( !copy_bdb(tmp_db, m_db) )
         return false;
-
-    /* Initialize our DBTs. */
-    memset(&key, 0, sizeof(DBT));
-    memset(&data, 0, sizeof(DBT));
-
-    /* Iterate over the database, retrieving each record in turn. */
-    while ((ret = cursorp->c_get(cursorp, &key, &data, DB_NEXT)) == 0) {
-        int ret = m_db->put(m_db, NULL, &key, &data, 0);
-        assert(ret == 0);
-    }
-    assert (ret == DB_NOTFOUND);
-
-    /* Cursors must be closed */
-    if ( cursorp != NULL )
-        cursorp->c_close(cursorp);
 
     if ( tmp_db != NULL )
         tmp_db->close(tmp_db, 0);
@@ -118,28 +97,8 @@ bool Bigram::save_db(const char * dbfile){
     if ( ret != 0 )
         return false;
 
-    DBC * cursorp = NULL;
-    DBT key, data;
-    /* Get a cursor */
-    m_db->cursor(m_db, NULL, &cursorp, 0);
-
-    if (NULL == cursorp)
+    if ( !copy_bdb(m_db, tmp_db) )
         return false;
-
-    /* Initialize our DBTs. */
-    memset(&key, 0, sizeof(DBT));
-    memset(&data, 0, sizeof(DBT));
-
-    /* Iterate over the database, retrieving each record in turn. */
-    while ((ret = cursorp->c_get(cursorp, &key, &data, DB_NEXT)) == 0) {
-        int ret = tmp_db->put(tmp_db, NULL, &key, &data, 0);
-        assert(ret == 0);
-    }
-    assert (ret == DB_NOTFOUND);
-
-    /* Cursors must be closed */
-    if ( cursorp != NULL )
-        cursorp->c_close(cursorp);
 
     if ( tmp_db != NULL ) {
         tmp_db->sync(m_db, 0);
