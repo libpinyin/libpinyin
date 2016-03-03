@@ -25,6 +25,8 @@
 #include <assert.h>
 #include <db.h>
 
+namespace pinyin{
+
 inline u_int32_t attach_option(guint32 flags) {
     u_int32_t db_flags = 0;
 
@@ -38,4 +40,35 @@ inline u_int32_t attach_option(guint32 flags) {
     return db_flags;
 }
 
+
+inline bool copy_bdb(DB * srcdb, DB * destdb) {
+    int ret = 0;
+
+    DBC * cursorp = NULL;
+    DBT key, data;
+    /* Get a cursor */
+    srcdb->cursor(srcdb, NULL, &cursorp, 0);
+
+    if (NULL == cursorp)
+        return false;
+
+    /* Initialize our DBTs. */
+    memset(&key, 0, sizeof(DBT));
+    memset(&data, 0, sizeof(DBT));
+
+    /* Iterate over the database, retrieving each record in turn. */
+    while ((ret = cursorp->c_get(cursorp, &key, &data, DB_NEXT)) == 0) {
+        ret = destdb->put(destdb, NULL, &key, &data, 0);
+        assert(0 == ret);
+    }
+    assert(DB_NOTFOUND == ret);
+
+    /* Cursors must be closed */
+    if ( cursorp != NULL )
+        cursorp->c_close(cursorp);
+
+    return true;
+}
+
+};
 #endif
