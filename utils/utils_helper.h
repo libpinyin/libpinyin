@@ -70,7 +70,7 @@
     } while(false);
 
 
-static bool load_phrase_index(const pinyin_table_info_t * phrase_files,
+inline bool load_phrase_index(const pinyin_table_info_t * phrase_files,
                               FacadePhraseIndex * phrase_index) {
     MemoryChunk * chunk = NULL;
     for (size_t i = 0; i < PHRASE_INDEX_LIBRARY_COUNT; ++i) {
@@ -94,7 +94,7 @@ static bool load_phrase_index(const pinyin_table_info_t * phrase_files,
     return true;
 }
 
-static bool save_phrase_index(const pinyin_table_info_t * phrase_files,
+inline bool save_phrase_index(const pinyin_table_info_t * phrase_files,
                               FacadePhraseIndex * phrase_index) {
     MemoryChunk * new_chunk = NULL;
     for (size_t i = 0; i < PHRASE_INDEX_LIBRARY_COUNT; ++i) {
@@ -119,7 +119,7 @@ static bool save_phrase_index(const pinyin_table_info_t * phrase_files,
     return true;
 }
 
-static bool save_dictionary(const pinyin_table_info_t * phrase_files,
+inline bool save_dictionary(const pinyin_table_info_t * phrase_files,
                             FacadePhraseIndex * phrase_index) {
     MemoryChunk * new_chunk = NULL;
     for (size_t i = 0; i < PHRASE_INDEX_LIBRARY_COUNT; ++i) {

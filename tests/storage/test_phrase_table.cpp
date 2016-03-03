@@ -62,7 +62,7 @@ int main(int argc, char * argv[]){
             phrase_index.clear_tokens(tokens);
             retval = largetable.search(i, new_phrase, tokens);
             if (retval & SEARCH_CONTINUED)
-                printf("return continued information with length:%d\n", i);
+                printf("return continued information with length:%ld\n", i);
         }
 
         phrase_index.clear_tokens(tokens);

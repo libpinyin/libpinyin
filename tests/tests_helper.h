@@ -22,7 +22,7 @@
 #ifndef TESTS_HELPER_H
 #define TESTS_HELPER_H
 
-static bool load_phrase_index(const pinyin_table_info_t * phrase_files,
+inline bool load_phrase_index(const pinyin_table_info_t * phrase_files,
                               FacadePhraseIndex * phrase_index){
     MemoryChunk * chunk = NULL;
     for (size_t i = 0; i < PHRASE_INDEX_LIBRARY_COUNT; ++i) {
@@ -49,7 +49,7 @@ static bool load_phrase_index(const pinyin_table_info_t * phrase_files,
     return true;
 }
 
-static bool load_phrase_table(const pinyin_table_info_t * phrase_files,
+inline bool load_phrase_table(const pinyin_table_info_t * phrase_files,
                               ChewingLargeTable * chewing_table,
                               PhraseLargeTable2 * phrase_table,
                               FacadePhraseIndex * phrase_index){
