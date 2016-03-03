@@ -50,26 +50,6 @@ void Bigram::reset(){
     }
 }
 
-class CopyVisitor : public DB::Visitor {
-private:
-    BasicDB * m_db;
-public:
-    CopyVisitor(BasicDB * db) {
-        m_db = db;
-    }
-
-    virtual const char* visit_full(const char* kbuf, size_t ksiz,
-                                   const char* vbuf, size_t vsiz, size_t* sp) {
-        m_db->set(kbuf, ksiz, vbuf, vsiz);
-        return NOP;
-    }
-
-    virtual const char* visit_empty(const char* kbuf, size_t ksiz, size_t* sp) {
-        /* assume no empty record. */
-        assert (FALSE);
-        return NOP;
-    }
-};
 
 /* Use ProtoHashDB for load_db/save_db methods. */
 bool Bigram::load_db(const char * dbfile){

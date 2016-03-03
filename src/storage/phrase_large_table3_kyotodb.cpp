@@ -67,33 +67,6 @@ bool PhraseLargeTable3::attach(const char * dbfile, guint32 flags) {
     return m_db->open(dbfile, mode);
 }
 
-
-/* Use DB::visitor. */
-
-/* Kyoto Cabinet requires non-NULL pointer for zero length value. */
-static const char * empty_vbuf = (char *)UINTPTR_MAX;
-
-/* Use CopyVisitor2 to avoid linking problems. */
-class CopyVisitor2 : public DB::Visitor {
-private:
-    BasicDB * m_db;
-public:
-    CopyVisitor2(BasicDB * db) {
-        m_db = db;
-    }
-
-    virtual const char* visit_full(const char* kbuf, size_t ksiz,
-                                   const char* vbuf, size_t vsiz, size_t* sp) {
-        m_db->set(kbuf, ksiz, vbuf, vsiz);
-        return NOP;
-    }
-
-    virtual const char* visit_empty(const char* kbuf, size_t ksiz, size_t* sp) {
-        m_db->set(kbuf, ksiz, empty_vbuf, 0);
-        return NOP;
-    }
-};
-
 /* load_db/store_db method */
 /* use in-memory DBM here, for better performance. */
 bool PhraseLargeTable3::load_db(const char * filename) {
@@ -110,7 +83,7 @@ bool PhraseLargeTable3::load_db(const char * filename) {
     if (!tmp_db->open(filename, BasicDB::OREADER))
         return false;
 
-    CopyVisitor2 visitor(m_db);
+    CopyVisitor visitor(m_db);
     tmp_db->iterate(&visitor, false);
 
     tmp_db->close();
@@ -130,7 +103,7 @@ bool PhraseLargeTable3::store_db(const char * new_filename){
     if (!tmp_db->open(new_filename, BasicDB::OWRITER|BasicDB::OCREATE))
         return false;
 
-    CopyVisitor2 visitor(tmp_db);
+    CopyVisitor visitor(tmp_db);
     m_db->iterate(&visitor, false);
 
     tmp_db->synchronize();
