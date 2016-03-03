@@ -22,6 +22,20 @@
 #ifndef BDB_UTILS_H
 #define BDB_UTILS_H
 
+#include <assert.h>
 #include <db.h>
+
+inline u_int32_t attach_option(guint32 flags) {
+    u_int32_t db_flags = 0;
+
+    if (flags & ATTACH_READONLY)
+        db_flags |= DB_RDONLY;
+    if (flags & ATTACH_READWRITE)
+        assert(!(flags & ATTACH_READONLY));
+    if (flags & ATTACH_CREATE)
+        db_flags |= DB_CREATE;
+
+    return db_flags;
+}
 
 #endif
