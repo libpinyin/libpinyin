@@ -45,6 +45,31 @@ inline uint32_t attach_options(guint32 flags) {
     return mode;
 }
 
+/* Use DB::visitor. */
+
+/* Kyoto Cabinet requires non-NULL pointer for zero length value. */
+static const char * empty_vbuf = (char *)UINTPTR_MAX;
+
+class CopyVisitor : public DB::Visitor {
+private:
+    BasicDB * m_db;
+public:
+    CopyVisitor(BasicDB * db) {
+        m_db = db;
+    }
+
+    virtual const char* visit_full(const char* kbuf, size_t ksiz,
+                                   const char* vbuf, size_t vsiz, size_t* sp) {
+        m_db->set(kbuf, ksiz, vbuf, vsiz);
+        return NOP;
+    }
+
+    virtual const char* visit_empty(const char* kbuf, size_t ksiz, size_t* sp) {
+        m_db->set(kbuf, ksiz, empty_vbuf, 0);
+        return NOP;
+    }
+};
+
 };
 
 #endif
