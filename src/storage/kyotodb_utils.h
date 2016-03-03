@@ -26,6 +26,25 @@
 #include <kchashdb.h>
 #include <kcprotodb.h>
 
+using namespace kyotocabinet;
 
+namespace pinyin{
+
+inline uint32_t attach_options(guint32 flags) {
+    uint32_t mode = 0;
+
+    if (flags & ATTACH_READONLY)
+        mode |= BasicDB::OREADER;
+    if (flags & ATTACH_READWRITE) {
+        assert( !( flags & ATTACH_READONLY ) );
+        mode |= BasicDB::OREADER | BasicDB::OWRITER;
+    }
+    if (flags & ATTACH_CREATE)
+        mode |= BasicDB::OCREATE;
+
+    return mode;
+}
+
+};
 
 #endif
