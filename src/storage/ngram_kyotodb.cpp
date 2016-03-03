@@ -24,6 +24,7 @@
 #include <errno.h>
 #include <kchashdb.h>
 #include <kcprotodb.h>
+#include "kyotodb_utils.h"
 
 
 /* Use DB::visitor to get_all_items. */
@@ -117,16 +118,7 @@ bool Bigram::save_db(const char * dbfile){
 
 bool Bigram::attach(const char * dbfile, guint32 flags){
     reset();
-    uint32_t mode = 0;
-
-    if (flags & ATTACH_READONLY)
-        mode |= BasicDB::OREADER;
-    if (flags & ATTACH_READWRITE) {
-        assert( !( flags & ATTACH_READONLY ) );
-        mode |= BasicDB::OREADER | BasicDB::OWRITER;
-    }
-    if (flags & ATTACH_CREATE)
-        mode |= BasicDB::OCREATE;
+    uint32_t mode = attach_options(flags);
 
     if (!dbfile)
         return false;

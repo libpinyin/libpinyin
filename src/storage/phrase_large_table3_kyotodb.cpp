@@ -23,6 +23,7 @@
 #include "phrase_large_table3.h"
 #include <kchashdb.h>
 #include <kcprotodb.h>
+#include "kyotodb_utils.h"
 
 
 using namespace kyotocabinet;
@@ -55,16 +56,7 @@ void PhraseLargeTable3::reset() {
 /* attach method */
 bool PhraseLargeTable3::attach(const char * dbfile, guint32 flags) {
     reset();
-    uint32_t mode = 0;
-
-    if (flags & ATTACH_READONLY)
-        mode |= BasicDB::OREADER;
-    if (flags & ATTACH_READWRITE) {
-        assert( !( flags & ATTACH_READONLY ) );
-        mode |= BasicDB::OREADER | BasicDB::OWRITER;
-    }
-    if (flags & ATTACH_CREATE)
-        mode |= BasicDB::OCREATE;
+    uint32_t mode = attach_options(flags);
 
     if (!dbfile)
         return false;
