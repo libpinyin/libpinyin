@@ -21,7 +21,7 @@
 
 #include "phrase_large_table3.h"
 #include <errno.h>
-
+#include "bdb_utils.h"
 
 namespace pinyin{
 

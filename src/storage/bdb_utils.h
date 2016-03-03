@@ -27,7 +27,7 @@
 
 namespace pinyin{
 
-inline u_int32_t attach_option(guint32 flags) {
+inline u_int32_t attach_options(guint32 flags) {
     u_int32_t db_flags = 0;
 
     if (flags & ATTACH_READONLY)
