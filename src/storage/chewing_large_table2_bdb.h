@@ -37,10 +37,21 @@ private:
     DB * m_db;
 
 protected:
-    /* Array of ChewingTableEntry. */
+    /* Array of ChewingTableEntry,
+       all elements are always available. */
     GPtrArray * m_entries;
 
+    void init_entries();
+
     void reset();
+
+protected:
+    template<size_t phrase_length>
+    int search_internal(/* in */ const ChewingKey keys[],
+                        /* out */ PhraseIndexRanges ranges) const;
+
+    int search_internal(int phrase_length, /* in */ const ChewingKey keys[],
+                        /* out */ PhraseIndexRanges ranges) const;
 
 public:
     ChewingLargeTable2();
