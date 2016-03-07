@@ -80,7 +80,8 @@ libstorage_la_SOURCES   = phrase_index.cpp \
 
 if BERKELEYDB
 libstorage_la_SOURCES   += ngram_bdb.cpp \
-			   phrase_large_table3_bdb.cpp
+			   phrase_large_table3_bdb.cpp \
+			   chewing_large_table2_bdb.cpp
 endif
 
 if KYOTOCABINET
