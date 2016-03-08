@@ -32,7 +32,7 @@ template<size_t phrase_length>
 class ChewingTableEntry;
 
 class ChewingLargeTable2{
-private:
+protected:
     /* member variables. */
     DB * m_db;
 
@@ -40,6 +40,9 @@ protected:
     /* Array of ChewingTableEntry,
        all elements are always available. */
     GPtrArray * m_entries;
+
+    /* The cache index of ChewingKey. */
+    ChewingKey m_cache_index[MAX_PHRASE_LENGTH];
 
     void init_entries();
 
@@ -73,7 +76,7 @@ public:
 
     /* search method */
     int search(int phrase_length, /* in */ const ChewingKey keys[],
-               /* out */ PhraseIndexRanges ranges) const;
+               /* out */ PhraseIndexRanges ranges);
 
     /* add/remove index method */
     int add_index(int phrase_length, /* in */ const ChewingKey keys[],

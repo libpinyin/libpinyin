@@ -59,9 +59,9 @@ public:
     /* convert method. */
     /* compress consecutive tokens */
     int convert(const ChewingKey keys[],
-     IndexItem * begin, IndexItem * end,
-     PhraseIndexRanges ranges) const {
-        IndexItem * iter = NULL;
+     const IndexItem * begin, const IndexItem * end,
+     PhraseIndexRanges ranges) {
+        const IndexItem * iter = NULL;
         PhraseIndexRange cursor;
         GArray * head, * cursor_head = NULL;
 
@@ -104,9 +104,7 @@ public:
 
     /* search method */
     int search(/* in */ const ChewingKey keys[],
-               /* out */ PhraseIndexRanges ranges) const {
-        int result = SEARCH_NONE;
-
+               /* out */ PhraseIndexRanges ranges) {
         compute_chewing_index(keys, m_cache_item.m_keys, phrase_length);
 
         const IndexItem * begin = (IndexItem *) m_chunk.begin();
