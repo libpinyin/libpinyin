@@ -50,10 +50,13 @@ protected:
 
 protected:
     template<size_t phrase_length>
-    int search_internal(/* in */ const ChewingKey keys[],
+    int search_internal(/* in */ const ChewingKey index[],
+                        /* in */ const ChewingKey keys[],
                         /* out */ PhraseIndexRanges ranges) const;
 
-    int search_internal(int phrase_length, /* in */ const ChewingKey keys[],
+    int search_internal(int phrase_length,
+                        /* in */ const ChewingKey index[],
+                        /* in */ const ChewingKey keys[],
                         /* out */ PhraseIndexRanges ranges) const;
 
 public:

@@ -216,7 +216,8 @@ bool ChewingLargeTable2::store_db(const char * new_filename) {
 }
 
 template<size_t phrase_length>
-int ChewingLargeTable2::search_internal(/* in */ const ChewingKey keys[],
+int ChewingLargeTable2::search_internal(/* in */ const ChewingKey index[],
+                                        /* in */ const ChewingKey keys[],
                                         /* out */ PhraseIndexRanges ranges) const {
     int result = SEARCH_NONE;
 
@@ -230,7 +231,7 @@ int ChewingLargeTable2::search_internal(/* in */ const ChewingKey keys[],
 
     DBT db_key;
     memset(&db_key, 0, sizeof(DBT));
-    db_key.data = (void *) keys;
+    db_key.data = (void *) index;
     db_key.size = phrase_length * sizeof(ChewingKey);
 
     DBT db_data;
@@ -249,13 +250,13 @@ int ChewingLargeTable2::search_internal(/* in */ const ChewingKey keys[],
     return result;
 }
 
-
 int ChewingLargeTable2::search_internal(int phrase_length,
+                                        /* in */ const ChewingKey index[],
                                         /* in */ const ChewingKey keys[],
                                         /* out */ PhraseIndexRanges ranges) const {
 #define CASE(len) case len:                                     \
     {                                                           \
-        return search_internal<len>(keys, ranges);    \
+        return search_internal<len>(index, keys, ranges);        \
     }
 
     switch(phrase_length) {
@@ -292,10 +293,10 @@ int ChewingLargeTable2::search(int phrase_length,
 
     if (contains_incomplete_pinyin(keys, phrase_length)) {
         compute_incomplete_chewing_index(keys, index, phrase_length);
-        return search_internal(phrase_length, index, ranges);
+        return search_internal(phrase_length, index, keys, ranges);
     } else {
         compute_chewing_index(keys, index, phrase_length);
-        return search_internal(phrase_length, index, ranges);
+        return search_internal(phrase_length, index, keys, ranges);
     }
 
     return SEARCH_NONE;
