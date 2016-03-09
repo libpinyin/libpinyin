@@ -287,9 +287,7 @@ int ChewingLargeTable2::search(int phrase_length,
                                /* in */ const ChewingKey keys[],
                                /* out */ PhraseIndexRanges ranges) const {
     ChewingKey index[MAX_PHRASE_LENGTH];
-
-    if (NULL == m_db)
-        return SEARCH_NONE;
+    assert(NULL != m_db);
 
     if (contains_incomplete_pinyin(keys, phrase_length)) {
         compute_incomplete_chewing_index(keys, index, phrase_length);
@@ -300,6 +298,132 @@ int ChewingLargeTable2::search(int phrase_length,
     }
 
     return SEARCH_NONE;
+}
+
+template<size_t phrase_length>
+int ChewingLargeTable2::add_index_internal(/* in */ const ChewingKey index[],
+                                           /* in */ const ChewingKey keys[],
+                                           /* in */ phrase_token_t token) {
+    ChewingTableEntry<phrase_length> * entry =
+        (ChewingTableEntry<phrase_length> *)
+        g_ptr_array_index(m_entries, phrase_length);
+    assert(NULL != entry);
+
+    /* load chewing table entry. */
+    DBT db_key;
+    memset(&db_key, 0, sizeof(DBT));
+    db_key.data = (void *) index;
+    db_key.size = phrase_length * sizeof(ChewingKey);
+
+    DBT db_data;
+    memset(&db_data, 0, sizeof(DBT));
+    int ret = m_db->get(m_db, NULL, &db_key, &db_data, 0);
+
+    if (ret != 0) {
+        /* new entry. */
+        ChewingTableEntry<phrase_length> new_entry;
+        new_entry.add_index(keys, token);
+
+        memset(&db_data, 0, sizeof(DBT));
+        db_data.data = new_entry.m_chunk.begin();
+        db_data.size = new_entry.m_chunk.size();
+        ret = m_db->put(m_db, NULL, &db_key, &db_data, 0);
+        if (ret != 0)
+            return ERROR_FILE_CORRUPTION;
+
+        /* recursively add keys for continued information. */
+        for (size_t len = phrase_length - 1; len > 0; --len) {
+            memset(&db_key, 0, sizeof(DBT));
+            db_key.data = (void *) index;
+            db_key.size = len * sizeof(ChewingKey);
+
+            memset(&db_data, 0, sizeof(DBT));
+
+            ret = m_db->get(m_db, NULL, &db_key, &db_data, 0);
+            /* found entry. */
+            if (0 == ret)
+                return ERROR_OK;
+
+            /* new entry with empty content. */
+            memset(&db_data, 0, sizeof(DBT));
+
+            ret = m_db->put(m_db, NULL, &db_key, &db_data, 0);
+            if (ret != 0)
+                return ERROR_FILE_CORRUPTION;
+        }
+
+        return ERROR_OK;
+    }
+
+    /* already have keys. */
+    entry->m_chunk.set_chunk(db_data.data, db_data.size, NULL);
+    int result = entry->add_index(keys, token);
+
+    /* store the entry. */
+    memset(&db_data, 0, sizeof(DBT));
+    db_data.data = entry->m_chunk.begin();
+    db_data.size = entry->m_chunk.size();
+    ret = m_db->put(m_db, NULL, &db_key, &db_data, 0);
+    if (ret != 0)
+        return ERROR_FILE_CORRUPTION;
+
+    return result;
+}
+
+
+int ChewingLargeTable2::add_index_internal(int phrase_length,
+                                           /* in */ const ChewingKey index[],
+                                           /* in */ const ChewingKey keys[],
+                                           /* in */ phrase_token_t token) {
+#define CASE(len) case len:                                     \
+    {                                                           \
+        return add_index_internal<len>(index, keys, token);     \
+    }
+
+    switch(phrase_length) {
+            CASE(1);
+            CASE(2);
+            CASE(3);
+            CASE(4);
+            CASE(5);
+            CASE(6);
+            CASE(7);
+            CASE(8);
+            CASE(9);
+            CASE(10);
+            CASE(11);
+            CASE(12);
+            CASE(13);
+            CASE(14);
+            CASE(15);
+            CASE(16);
+        default:
+            assert(false);
+    }
+
+#undef CASE
+
+    return ERROR_FILE_CORRUPTION;
+}
+
+/* add/remove index method */
+int ChewingLargeTable2::add_index(int phrase_length,
+                                  /* in */ const ChewingKey keys[],
+                                  /* in */ phrase_token_t token) {
+    ChewingKey index[MAX_PHRASE_LENGTH];
+    assert(NULL != m_db);
+    int result = ERROR_OK;
+
+    /* for in-complete chewing index */
+    compute_incomplete_chewing_index(keys, index, phrase_length);
+    result = add_index_internal(phrase_length, index, keys, token);
+    if (ERROR_OK != result)
+        return result;
+
+    /* for chewing index */
+    compute_chewing_index(keys, index, phrase_length);
+    result = add_index_internal(phrase_length, index, keys, token);
+    return result;
 }
 
 };
