@@ -48,9 +48,6 @@ protected:
 protected:
     MemoryChunk m_chunk;
 
-    /* The cache item of IndexItem. */
-    IndexItem m_cache_item;
-
 private:
     /* Disallow used outside. */
     ChewingTableEntry() {}
@@ -60,7 +57,7 @@ public:
     /* compress consecutive tokens */
     int convert(const ChewingKey keys[],
      const IndexItem * begin, const IndexItem * end,
-     PhraseIndexRanges ranges) {
+     PhraseIndexRanges ranges) const {
         const IndexItem * iter = NULL;
         PhraseIndexRange cursor;
         GArray * head, * cursor_head = NULL;
@@ -104,14 +101,15 @@ public:
 
     /* search method */
     int search(/* in */ const ChewingKey keys[],
-               /* out */ PhraseIndexRanges ranges) {
-        compute_chewing_index(keys, m_cache_item.m_keys, phrase_length);
+               /* out */ PhraseIndexRanges ranges) const {
+        IndexItem item;
+        compute_chewing_index(keys, item.m_keys, phrase_length);
 
         const IndexItem * begin = (IndexItem *) m_chunk.begin();
         const IndexItem * end = (IndexItem *) m_chunk.end();
 
         std_lite::pair<const IndexItem *, const IndexItem *> range =
-            std_lite::equal_range(begin, end, m_cache_item,
+            std_lite::equal_range(begin, end, item,
                                   phrase_less_than_with_tones<phrase_length>);
 
         return convert(keys, range.first, range.second, ranges);

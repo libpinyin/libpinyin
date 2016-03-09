@@ -287,13 +287,15 @@ int ChewingLargeTable2::search_internal(int phrase_length,
 /* search method */
 int ChewingLargeTable2::search(int phrase_length,
                                /* in */ const ChewingKey keys[],
-                               /* out */ PhraseIndexRanges ranges) {
+                               /* out */ PhraseIndexRanges ranges) const {
+    ChewingKey index[MAX_PHRASE_LENGTH];
+
     if (contains_incomplete_pinyin(keys, phrase_length)) {
-        compute_incomplete_chewing_index(keys, m_cache_index, phrase_length);
-        return search_internal(phrase_length, m_cache_index, ranges);
+        compute_incomplete_chewing_index(keys, index, phrase_length);
+        return search_internal(phrase_length, index, ranges);
     } else {
-        compute_chewing_index(keys, m_cache_index, phrase_length);
-        return search_internal(phrase_length, m_cache_index, ranges);
+        compute_chewing_index(keys, index, phrase_length);
+        return search_internal(phrase_length, index, ranges);
     }
 
     return SEARCH_NONE;

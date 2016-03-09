@@ -76,7 +76,7 @@ public:
 
     /* search method */
     int search(int phrase_length, /* in */ const ChewingKey keys[],
-               /* out */ PhraseIndexRanges ranges);
+               /* out */ PhraseIndexRanges ranges) const;
 
     /* add/remove index method */
     int add_index(int phrase_length, /* in */ const ChewingKey keys[],
