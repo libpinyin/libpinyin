@@ -41,9 +41,6 @@ protected:
        all elements are always available. */
     GPtrArray * m_entries;
 
-    /* The cache index of ChewingKey. */
-    ChewingKey m_cache_index[MAX_PHRASE_LENGTH];
-
     void init_entries();
 
     void reset();

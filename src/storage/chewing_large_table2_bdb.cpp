@@ -221,9 +221,6 @@ int ChewingLargeTable2::search_internal(/* in */ const ChewingKey index[],
                                         /* out */ PhraseIndexRanges ranges) const {
     int result = SEARCH_NONE;
 
-    if (NULL == m_db)
-        return result;
-
     ChewingTableEntry<phrase_length> * entry =
         (ChewingTableEntry<phrase_length> *)
         g_ptr_array_index(m_entries, phrase_length);
@@ -290,6 +287,9 @@ int ChewingLargeTable2::search(int phrase_length,
                                /* in */ const ChewingKey keys[],
                                /* out */ PhraseIndexRanges ranges) const {
     ChewingKey index[MAX_PHRASE_LENGTH];
+
+    if (NULL == m_db)
+        return SEARCH_NONE;
 
     if (contains_incomplete_pinyin(keys, phrase_length)) {
         compute_incomplete_chewing_index(keys, index, phrase_length);
