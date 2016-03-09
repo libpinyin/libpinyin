@@ -417,12 +417,14 @@ int ChewingLargeTable2::add_index(int phrase_length,
     /* for in-complete chewing index */
     compute_incomplete_chewing_index(keys, index, phrase_length);
     result = add_index_internal(phrase_length, index, keys, token);
+    assert(ERROR_OK == result || ERROR_INSERT_ITEM_EXISTS == result);
     if (ERROR_OK != result)
         return result;
 
     /* for chewing index */
     compute_chewing_index(keys, index, phrase_length);
     result = add_index_internal(phrase_length, index, keys, token);
+    assert(ERROR_OK == result || ERROR_INSERT_ITEM_EXISTS == result);
     return result;
 }
 
