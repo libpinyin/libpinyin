@@ -257,24 +257,24 @@ int ChewingLargeTable2::search_internal(int phrase_length,
     }
 
     switch(phrase_length) {
-            CASE(1);
-            CASE(2);
-            CASE(3);
-            CASE(4);
-            CASE(5);
-            CASE(6);
-            CASE(7);
-            CASE(8);
-            CASE(9);
-            CASE(10);
-            CASE(11);
-            CASE(12);
-            CASE(13);
-            CASE(14);
-            CASE(15);
-            CASE(16);
-        default:
-            assert(false);
+        CASE(1);
+        CASE(2);
+        CASE(3);
+        CASE(4);
+        CASE(5);
+        CASE(6);
+        CASE(7);
+        CASE(8);
+        CASE(9);
+        CASE(10);
+        CASE(11);
+        CASE(12);
+        CASE(13);
+        CASE(14);
+        CASE(15);
+        CASE(16);
+    default:
+        assert(false);
     }
 
 #undef CASE
@@ -381,24 +381,24 @@ int ChewingLargeTable2::add_index_internal(int phrase_length,
     }
 
     switch(phrase_length) {
-            CASE(1);
-            CASE(2);
-            CASE(3);
-            CASE(4);
-            CASE(5);
-            CASE(6);
-            CASE(7);
-            CASE(8);
-            CASE(9);
-            CASE(10);
-            CASE(11);
-            CASE(12);
-            CASE(13);
-            CASE(14);
-            CASE(15);
-            CASE(16);
-        default:
-            assert(false);
+        CASE(1);
+        CASE(2);
+        CASE(3);
+        CASE(4);
+        CASE(5);
+        CASE(6);
+        CASE(7);
+        CASE(8);
+        CASE(9);
+        CASE(10);
+        CASE(11);
+        CASE(12);
+        CASE(13);
+        CASE(14);
+        CASE(15);
+        CASE(16);
+    default:
+        assert(false);
     }
 
 #undef CASE
