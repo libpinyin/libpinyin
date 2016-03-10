@@ -66,6 +66,17 @@ protected:
                            /* in */ const ChewingKey keys[],
                            /* in */ phrase_token_t token);
 
+    template<size_t phrase_length>
+    int remove_index_internal(/* in */ const ChewingKey index[],
+                              /* in */ const ChewingKey keys[],
+                              /* in */ phrase_token_t token);
+
+    int remove_index_internal(int phrase_length,
+                              /* in */ const ChewingKey index[],
+                              /* in */ const ChewingKey keys[],
+                              /* in */ phrase_token_t token);
+
+
 public:
     ChewingLargeTable2();
 

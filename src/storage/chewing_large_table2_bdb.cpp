@@ -428,4 +428,98 @@ int ChewingLargeTable2::add_index(int phrase_length,
     return result;
 }
 
+template<size_t phrase_length>
+int ChewingLargeTable2::remove_index_internal(/* in */ const ChewingKey index[],
+                                              /* in */ const ChewingKey keys[],
+                                              /* in */ phrase_token_t token) {
+    ChewingTableEntry<phrase_length> * entry =
+        (ChewingTableEntry<phrase_length> *)
+        g_ptr_array_index(m_entries, phrase_length);
+    assert(NULL != entry);
+
+    DBT db_key;
+    memset(&db_key, 0, sizeof(DBT));
+    db_key.data = (void *) index;
+    db_key.size = phrase_length * sizeof(ChewingKey);
+
+    DBT db_data;
+    memset(&db_data, 0, sizeof(DBT));
+    int ret = m_db->get(m_db, NULL, &db_key, &db_data, 0);
+    if (ret != 0)
+        return ERROR_REMOVE_ITEM_DONOT_EXISTS;
+
+    entry->m_chunk.set_chunk(db_data.data, db_data.size, NULL);
+
+    int result = entry->remove_index(keys, token);
+    if (ERROR_OK != result)
+        return result;
+
+    /* removed the token. */
+    memset(&db_data, 0, sizeof(DBT));
+    db_data.data = entry->m_chunk.begin();
+    db_data.size = entry->m_chunk.size();
+
+    ret = m_db->put(m_db, NULL, &db_key, &db_data, 0);
+    if (ret != 0)
+        return ERROR_FILE_CORRUPTION;
+
+    return ERROR_OK;
+}
+
+int ChewingLargeTable2::remove_index_internal(int phrase_length,
+                                              /* in */ const ChewingKey index[],
+                                              /* in */ const ChewingKey keys[],
+                                              /* in */ phrase_token_t token) {
+#define CASE(len) case len:                                     \
+    {                                                           \
+        return remove_index_internal<len>(index, keys, token);  \
+    }
+
+    switch(phrase_length) {
+        CASE(1);
+        CASE(2);
+        CASE(3);
+        CASE(4);
+        CASE(5);
+        CASE(6);
+        CASE(7);
+        CASE(8);
+        CASE(9);
+        CASE(10);
+        CASE(11);
+        CASE(12);
+        CASE(13);
+        CASE(14);
+        CASE(15);
+        CASE(16);
+    default:
+        assert(false);
+    }
+
+#undef CASE
+
+    return ERROR_FILE_CORRUPTION;
+}
+
+int ChewingLargeTable2::remove_index(int phrase_length,
+                                     /* in */ const ChewingKey keys[],
+                                     /* in */ phrase_token_t token) {
+    ChewingKey index[MAX_PHRASE_LENGTH];
+    assert(NULL != m_db);
+    int result = ERROR_OK;
+
+    /* for in-complete chewing index */
+    compute_incomplete_chewing_index(keys, index, phrase_length);
+    result = remove_index_internal(phrase_length, index, keys, token);
+    assert(ERROR_OK == result || ERROR_REMOVE_ITEM_DONOT_EXISTS == result);
+    if (ERROR_OK != result)
+        return result;
+
+    /* for chewing index */
+    compute_chewing_index(keys, index, phrase_length);
+    result = remove_index_internal(phrase_length, index, keys, token);
+    assert(ERROR_OK == result || ERROR_REMOVE_ITEM_DONOT_EXISTS == result);
+    return result;
+}
+
 };
