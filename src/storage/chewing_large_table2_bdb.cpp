@@ -522,4 +522,95 @@ int ChewingLargeTable2::remove_index(int phrase_length,
     return result;
 }
 
+/* mask out method */
+/* assume it is in-memory dbm. */
+bool ChewingLargeTable2::mask_out(phrase_token_t mask,
+                                  phrase_token_t value) {
+    /* use copy and sweep algorithm here. */
+    DB * tmp_db = NULL;
+
+    int ret = db_create(&tmp_db, NULL, 0);
+    assert(0 == ret);
+
+    if (NULL == tmp_db)
+        return false;
+
+    /* create in memory db. */
+    ret = tmp_db->open(tmp_db, NULL, NULL, NULL,
+                       DB_BTREE, DB_CREATE, 0600);
+    if (ret != 0)
+        return false;
+
+    DBC * cursorp = NULL;
+    DBT db_key, db_data;
+
+    /* Get a cursor */
+    m_db->cursor(m_db, NULL, &cursorp, 0);
+
+    if (NULL == cursorp)
+        return false;
+
+    /* Initialize our DBTs. */
+    memset(&db_key, 0, sizeof(DBT));
+    memset(&db_data, 0, sizeof(DBT));
+
+    /* Iterate over the database, retrieving each record in turn. */
+    while((ret = cursorp->c_get(cursorp, &db_key, &db_data, DB_NEXT)) == 0) {
+        int phrase_length = db_key.size / sizeof(ChewingKey);
+
+#define CASE(len) case len:                                             \
+        {                                                               \
+            ChewingTableEntry<len> * entry =                            \
+                (ChewingTableEntry<len> *)                              \
+                g_ptr_array_index(m_entries, phrase_length);            \
+            assert(NULL != entry);                                      \
+                                                                        \
+            entry->m_chunk.set_chunk(db_data.data, db_data.size, NULL); \
+                                                                        \
+            entry->mask_out(mask, value);                               \
+                                                                        \
+            memset(&db_data, 0, sizeof(DBT));                           \
+            db_data.data = entry->m_chunk.begin();                      \
+            db_data.size = entry->m_chunk.size();                       \
+            int ret = tmp_db->put(tmp_db, NULL, &db_key, &db_data, 0);  \
+            assert(ret == 0);                                           \
+        }
+
+        switch(phrase_length) {
+            CASE(1);
+            CASE(2);
+            CASE(3);
+            CASE(4);
+            CASE(5);
+            CASE(6);
+            CASE(7);
+            CASE(8);
+            CASE(9);
+            CASE(10);
+            CASE(11);
+            CASE(12);
+            CASE(13);
+            CASE(14);
+            CASE(15);
+            CASE(16);
+        default:
+            assert(false);
+        }
+
+#undef CASE
+
+    }
+    assert(ret == DB_NOTFOUND);
+
+    /* Cursors must be closed */
+    if (cursorp != NULL)
+        cursorp->c_close(cursorp);
+
+    m_db->sync(m_db, 0);
+    m_db->close(m_db, 0);
+
+    m_db = tmp_db;
+    return true;
+}
+
 };
