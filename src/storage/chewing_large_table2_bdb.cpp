@@ -215,7 +215,7 @@ bool ChewingLargeTable2::store_db(const char * new_filename) {
     return true;
 }
 
-template<size_t phrase_length>
+template<int phrase_length>
 int ChewingLargeTable2::search_internal(/* in */ const ChewingKey index[],
                                         /* in */ const ChewingKey keys[],
                                         /* out */ PhraseIndexRanges ranges) const {
@@ -300,7 +300,7 @@ int ChewingLargeTable2::search(int phrase_length,
     return SEARCH_NONE;
 }
 
-template<size_t phrase_length>
+template<int phrase_length>
 int ChewingLargeTable2::add_index_internal(/* in */ const ChewingKey index[],
                                            /* in */ const ChewingKey keys[],
                                            /* in */ phrase_token_t token) {
@@ -428,7 +428,7 @@ int ChewingLargeTable2::add_index(int phrase_length,
     return result;
 }
 
-template<size_t phrase_length>
+template<int phrase_length>
 int ChewingLargeTable2::remove_index_internal(/* in */ const ChewingKey index[],
                                               /* in */ const ChewingKey keys[],
                                               /* in */ phrase_token_t token) {

@@ -28,7 +28,7 @@
 
 namespace pinyin{
 
-template<size_t phrase_length>
+template<int phrase_length>
 class ChewingTableEntry;
 
 class ChewingLargeTable2{
@@ -46,7 +46,7 @@ protected:
     void reset();
 
 protected:
-    template<size_t phrase_length>
+    template<int phrase_length>
     int search_internal(/* in */ const ChewingKey index[],
                         /* in */ const ChewingKey keys[],
                         /* out */ PhraseIndexRanges ranges) const;
@@ -56,7 +56,7 @@ protected:
                         /* in */ const ChewingKey keys[],
                         /* out */ PhraseIndexRanges ranges) const;
 
-    template<size_t phrase_length>
+    template<int phrase_length>
     int add_index_internal(/* in */ const ChewingKey index[],
                            /* in */ const ChewingKey keys[],
                            /* in */ phrase_token_t token);
@@ -66,7 +66,7 @@ protected:
                            /* in */ const ChewingKey keys[],
                            /* in */ phrase_token_t token);
 
-    template<size_t phrase_length>
+    template<int phrase_length>
     int remove_index_internal(/* in */ const ChewingKey index[],
                               /* in */ const ChewingKey keys[],
                               /* in */ phrase_token_t token);
