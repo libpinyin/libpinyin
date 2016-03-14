@@ -79,6 +79,50 @@ void ChewingLargeTable2::init_entries() {
 #undef CASE
 }
 
+void ChewingLargeTable2::fini_entries() {
+    assert(NULL != m_entries);
+
+    assert(MAX_PHRASE_LENGTH + 1 == m_entries->len);
+
+    for (size_t i = 1; i < m_entries->len; i++) {
+
+#define CASE(len) case len:                         \
+        {                                           \
+            ChewingTableEntry<len> * entry =        \
+                (ChewingTableEntry<len> *)          \
+                g_ptr_array_index(m_entries, len);  \
+            delete entry;                           \
+        }
+
+        switch(i) {
+            CASE(1);
+            CASE(2);
+            CASE(3);
+            CASE(4);
+            CASE(5);
+            CASE(6);
+            CASE(7);
+            CASE(8);
+            CASE(9);
+            CASE(10);
+            CASE(11);
+            CASE(12);
+            CASE(13);
+            CASE(14);
+            CASE(15);
+            CASE(16);
+        default:
+            assert(false);
+        }
+
+#undef CASE
+
+    }
+
+    g_ptr_array_free(m_entries, TRUE);
+    m_entries = NULL;
+}
+
 void ChewingLargeTable2::reset() {
     if (m_db) {
         m_db->sync(m_db, 0);
@@ -86,45 +130,7 @@ void ChewingLargeTable2::reset() {
         m_db = NULL;
     }
 
-#define CASE(len) case len:                     \
-    {                                           \
-        ChewingTableEntry<len> * entry =        \
-            (ChewingTableEntry<len> *)          \
-            g_ptr_array_index(m_entries, len);  \
-        delete entry;                           \
-    }
-
-    if (m_entries) {
-        assert(MAX_PHRASE_LENGTH + 1 == m_entries->len);
-
-        for (size_t i = 1; i < m_entries->len; i++) {
-            switch(i) {
-                CASE(1);
-                CASE(2);
-                CASE(3);
-                CASE(4);
-                CASE(5);
-                CASE(6);
-                CASE(7);
-                CASE(8);
-                CASE(9);
-                CASE(10);
-                CASE(11);
-                CASE(12);
-                CASE(13);
-                CASE(14);
-                CASE(15);
-                CASE(16);
-            default:
-                assert(false);
-            }
-        }
-
-        g_ptr_array_free(m_entries, TRUE);
-        m_entries = NULL;
-    }
-
-#undef CASE
+    fini_entries();
 }
 
 /* attach method */

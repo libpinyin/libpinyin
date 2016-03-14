@@ -43,6 +43,8 @@ protected:
 
     void init_entries();
 
+    void fini_entries();
+
     void reset();
 
 protected:
