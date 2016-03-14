@@ -41,6 +41,10 @@ protected:
     /* Array of ChewingTableEntry. */
     GPtrArray * m_entries;
 
+    void init_entries();
+
+    void fini_entries();
+
     void reset();
 
 public:
