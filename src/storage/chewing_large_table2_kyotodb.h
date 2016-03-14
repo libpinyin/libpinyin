@@ -29,7 +29,7 @@
 
 namespace pinyin{
 
-template<size_t phrase_length>
+template<int phrase_length>
 class ChewingTableEntry;
 
 class ChewingLargeTable2{

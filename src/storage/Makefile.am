@@ -86,5 +86,6 @@ endif
 
 if KYOTOCABINET
 libstorage_la_SOURCES   += ngram_kyotodb.cpp \
-			   phrase_large_table3_kyotodb.cpp
+			   phrase_large_table3_kyotodb.cpp \
+			   chewing_large_table2_kyotodb.cpp
 endif
