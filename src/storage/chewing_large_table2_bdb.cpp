@@ -204,23 +204,6 @@ int ChewingLargeTable2::search_internal(int phrase_length,
     return SEARCH_NONE;
 }
 
-/* search method */
-int ChewingLargeTable2::search(int phrase_length,
-                               /* in */ const ChewingKey keys[],
-                               /* out */ PhraseIndexRanges ranges) const {
-    ChewingKey index[MAX_PHRASE_LENGTH];
-    assert(NULL != m_db);
-
-    if (contains_incomplete_pinyin(keys, phrase_length)) {
-        compute_incomplete_chewing_index(keys, index, phrase_length);
-        return search_internal(phrase_length, index, keys, ranges);
-    } else {
-        compute_chewing_index(keys, index, phrase_length);
-        return search_internal(phrase_length, index, keys, ranges);
-    }
-
-    return SEARCH_NONE;
-}
 
 template<int phrase_length>
 int ChewingLargeTable2::add_index_internal(/* in */ const ChewingKey index[],
@@ -328,27 +311,6 @@ int ChewingLargeTable2::add_index_internal(int phrase_length,
     return ERROR_FILE_CORRUPTION;
 }
 
-/* add/remove index method */
-int ChewingLargeTable2::add_index(int phrase_length,
-                                  /* in */ const ChewingKey keys[],
-                                  /* in */ phrase_token_t token) {
-    ChewingKey index[MAX_PHRASE_LENGTH];
-    assert(NULL != m_db);
-    int result = ERROR_OK;
-
-    /* for in-complete chewing index */
-    compute_incomplete_chewing_index(keys, index, phrase_length);
-    result = add_index_internal(phrase_length, index, keys, token);
-    assert(ERROR_OK == result || ERROR_INSERT_ITEM_EXISTS == result);
-    if (ERROR_OK != result)
-        return result;
-
-    /* for chewing index */
-    compute_chewing_index(keys, index, phrase_length);
-    result = add_index_internal(phrase_length, index, keys, token);
-    assert(ERROR_OK == result || ERROR_INSERT_ITEM_EXISTS == result);
-    return result;
-}
 
 template<int phrase_length>
 int ChewingLargeTable2::remove_index_internal(/* in */ const ChewingKey index[],
@@ -421,27 +383,6 @@ int ChewingLargeTable2::remove_index_internal(int phrase_length,
 #undef CASE
 
     return ERROR_FILE_CORRUPTION;
-}
-
-int ChewingLargeTable2::remove_index(int phrase_length,
-                                     /* in */ const ChewingKey keys[],
-                                     /* in */ phrase_token_t token) {
-    ChewingKey index[MAX_PHRASE_LENGTH];
-    assert(NULL != m_db);
-    int result = ERROR_OK;
-
-    /* for in-complete chewing index */
-    compute_incomplete_chewing_index(keys, index, phrase_length);
-    result = remove_index_internal(phrase_length, index, keys, token);
-    assert(ERROR_OK == result || ERROR_REMOVE_ITEM_DONOT_EXISTS == result);
-    if (ERROR_OK != result)
-        return result;
-
-    /* for chewing index */
-    compute_chewing_index(keys, index, phrase_length);
-    result = remove_index_internal(phrase_length, index, keys, token);
-    assert(ERROR_OK == result || ERROR_REMOVE_ITEM_DONOT_EXISTS == result);
-    return result;
 }
 
 /* mask out method */
