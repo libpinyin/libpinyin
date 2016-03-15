@@ -196,9 +196,9 @@ int PhraseLengthIndexLevel2::search(int phrase_length,
                                     /* in */ const ucs4_t phrase[],
                                     /* out */ PhraseTokens tokens) const {
     int result = SEARCH_NONE;
-    if(m_phrase_array_indexes->len < phrase_length)
+    if ((int) m_phrase_array_indexes->len < phrase_length)
         return result;
-    if (m_phrase_array_indexes->len > phrase_length)
+    if ((int) m_phrase_array_indexes->len > phrase_length)
         result |= SEARCH_CONTINUED;
 
 #define CASE(len) case len:                                             \
@@ -319,7 +319,7 @@ int PhraseLengthIndexLevel2::add_index(int phrase_length,
     if (phrase_length >= MAX_PHRASE_LENGTH)
         return ERROR_PHRASE_TOO_LONG;
 
-    if (m_phrase_array_indexes->len < phrase_length)
+    if ((int) m_phrase_array_indexes->len < phrase_length)
         g_array_set_size(m_phrase_array_indexes, phrase_length);
 
 #define CASE(len) case len:                                             \
@@ -361,7 +361,7 @@ int PhraseLengthIndexLevel2::remove_index(int phrase_length,
     if (phrase_length >= MAX_PHRASE_LENGTH)
         return ERROR_PHRASE_TOO_LONG;
 
-    if (m_phrase_array_indexes->len < phrase_length)
+    if ((int) m_phrase_array_indexes->len < phrase_length)
         return ERROR_REMOVE_ITEM_DONOT_EXISTS;
 
 #define CASE(len) case len:                                             \
