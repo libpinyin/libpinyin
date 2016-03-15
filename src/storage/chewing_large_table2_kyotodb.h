@@ -47,6 +47,37 @@ protected:
 
     void reset();
 
+protected:
+    template<int phrase_length>
+    int search_internal(/* in */ const ChewingKey index[],
+                        /* in */ const ChewingKey keys[],
+                        /* out */ PhraseIndexRanges ranges) const;
+
+    int search_internal(int phrase_length,
+                        /* in */ const ChewingKey index[],
+                        /* in */ const ChewingKey keys[],
+                        /* out */ PhraseIndexRanges ranges) const;
+
+    template<int phrase_length>
+    int add_index_internal(/* in */ const ChewingKey index[],
+                           /* in */ const ChewingKey keys[],
+                           /* in */ phrase_token_t token);
+
+    int add_index_internal(int phrase_length,
+                           /* in */ const ChewingKey index[],
+                           /* in */ const ChewingKey keys[],
+                           /* in */ phrase_token_t token);
+
+    template<int phrase_length>
+    int remove_index_internal(/* in */ const ChewingKey index[],
+                              /* in */ const ChewingKey keys[],
+                              /* in */ phrase_token_t token);
+
+    int remove_index_internal(int phrase_length,
+                              /* in */ const ChewingKey index[],
+                              /* in */ const ChewingKey keys[],
+                              /* in */ phrase_token_t token);
+
 public:
     ChewingLargeTable2();
 
