@@ -175,7 +175,7 @@ int ChewingLargeTable2::search_internal(int phrase_length,
                                         /* out */ PhraseIndexRanges ranges) const {
 #define CASE(len) case len:                                     \
     {                                                           \
-        return search_internal<len>(index, keys, ranges);        \
+        return search_internal<len>(index, keys, ranges);       \
     }
 
     switch(phrase_length) {
