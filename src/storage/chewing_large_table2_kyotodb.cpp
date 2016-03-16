@@ -274,4 +274,75 @@ int ChewingLargeTable2::add_index_internal(int phrase_length,
     return ERROR_FILE_CORRUPTION;
 }
 
+template<int phrase_length>
+int ChewingLargeTable2::remove_index_internal(/* in */ const ChewingKey index[],
+                                              /* in */ const ChewingKey keys[],
+                                              /* in */ phrase_token_t token) {
+    ChewingTableEntry<phrase_length> * entry =
+        (ChewingTableEntry<phrase_length> *)
+        g_ptr_array_index(m_entries, phrase_length);
+    assert(NULL != entry);
+
+    const char * kbuf = (char *) index;
+    const size_t ksiz = phrase_length * sizeof(ChewingKey);
+    char * vbuf = NULL;
+    int32_t vsiz = m_db->check(kbuf, ksiz);
+    if (vsiz < (signed) sizeof(phrase_token_t))
+        return ERROR_REMOVE_ITEM_DONOT_EXISTS;
+
+    /* contains at least one index item. */
+    entry->m_chunk.set_size(vsiz);
+    /* m_chunk may re-allocate here. */
+    vbuf = (char *) entry->m_chunk.begin();
+    assert(vsiz == m_db->get(kbuf, ksiz, vbuf, vsiz));
+
+    int result = entry->remove_index(keys, token);
+    if (ERROR_OK != result)
+        return result;
+
+    /* for safety. */
+    vbuf = (char *) entry->m_chunk.begin();
+    vsiz = entry->m_chunk.size();
+
+    if (!m_db->set(kbuf, ksiz, vbuf, vsiz))
+        return ERROR_FILE_CORRUPTION;
+
+    return ERROR_OK;
+}
+
+int ChewingLargeTable2::remove_index_internal(int phrase_length,
+                                              /* in */ const ChewingKey index[],
+                                              /* in */ const ChewingKey keys[],
+                                              /* in */ phrase_token_t token) {
+#define CASE(len) case len:                                     \
+    {                                                           \
+        return remove_index_internal<len>(index, keys, token);  \
+    }
+
+    switch(phrase_length) {
+        CASE(1);
+        CASE(2);
+        CASE(3);
+        CASE(4);
+        CASE(5);
+        CASE(6);
+        CASE(7);
+        CASE(8);
+        CASE(9);
+        CASE(10);
+        CASE(11);
+        CASE(12);
+        CASE(13);
+        CASE(14);
+        CASE(15);
+        CASE(16);
+    default:
+        assert(false);
+    }
+
+#undef CASE
+
+    return ERROR_FILE_CORRUPTION;
+}
+
 };

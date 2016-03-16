@@ -215,7 +215,7 @@ int PhraseLargeTable3::remove_index(int phrase_length,
     const size_t ksiz = phrase_length * sizeof(ucs4_t);
     char * vbuf = NULL;
     int32_t vsiz = m_db->check(kbuf, ksiz);
-    if (vsiz < (signed) sizeof(ucs4_t))
+    if (vsiz < (signed) sizeof(phrase_token_t))
         return ERROR_REMOVE_ITEM_DONOT_EXISTS;
 
     /* contains at least one token. */
