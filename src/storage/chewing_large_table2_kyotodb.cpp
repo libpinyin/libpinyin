@@ -176,4 +176,102 @@ int ChewingLargeTable2::search_internal(int phrase_length,
     return SEARCH_NONE;
 }
 
+template<int phrase_length>
+int ChewingLargeTable2::add_index_internal(/* in */ const ChewingKey index[],
+                                           /* in */ const ChewingKey keys[],
+                                           /* in */ phrase_token_t token) {
+    ChewingTableEntry<phrase_length> * entry =
+        (ChewingTableEntry<phrase_length> *)
+        g_ptr_array_index(m_entries, phrase_length);
+    assert(NULL != entry);
+
+    bool retval = false;
+
+    /* load chewing table entry. */
+    const char * kbuf = (char *) index;
+    size_t ksiz = phrase_length * sizeof(ChewingKey);
+    char * vbuf = NULL;
+    int32_t vsiz = m_db->check(kbuf, ksiz);
+    if (-1 == vsiz) {
+        /* new entry. */
+        ChewingTableEntry<phrase_length> new_entry;
+        new_entry.add_index(keys, token);
+
+        vbuf = (char *) new_entry.m_chunk.begin();
+        vsiz = new_entry.m_chunk.size();
+        retval = m_db->set(kbuf, ksiz, vbuf, vsiz);
+        if (!retval)
+            return ERROR_FILE_CORRUPTION;
+
+        /* recursively add keys for continued information. */
+        for (size_t len = phrase_length - 1; len > 0; --len) {
+            ksiz = len * sizeof(ChewingKey);
+
+            vsiz = m_db->check(kbuf, ksiz);
+            /* found entry. */
+            if (-1 != vsiz)
+                return ERROR_OK;
+
+            /* new entry with empty content. */
+            retval = m_db->set(kbuf, ksiz, empty_vbuf, 0);
+            if (!retval)
+                return ERROR_FILE_CORRUPTION;
+        }
+
+        return ERROR_OK;
+    }
+
+    /* already have keys. */
+    entry->m_chunk.set_size(vsiz);
+    /* m_chunk may re-allocate here. */
+    vbuf = (char *) entry->m_chunk.begin();
+    assert(vsiz = m_db->get(kbuf, ksiz, vbuf, vsiz));
+
+    int result = entry->add_index(keys, token);
+
+    /* store the entry. */
+    vbuf = (char *) entry->m_chunk.begin();
+    vsiz = entry->m_chunk.size();
+    retval = m_db->set(kbuf, ksiz, vbuf, vsiz);
+    if (!retval)
+        return ERROR_FILE_CORRUPTION;
+
+    return result;
+}
+
+int ChewingLargeTable2::add_index_internal(int phrase_length,
+                                           /* in */ const ChewingKey index[],
+                                           /* in */ const ChewingKey keys[],
+                                           /* in */ phrase_token_t token) {
+#define CASE(len) case len:                                     \
+    {                                                           \
+        return add_index_internal<len>(index, keys, token);     \
+    }
+
+    switch(phrase_length) {
+        CASE(1);
+        CASE(2);
+        CASE(3);
+        CASE(4);
+        CASE(5);
+        CASE(6);
+        CASE(7);
+        CASE(8);
+        CASE(9);
+        CASE(10);
+        CASE(11);
+        CASE(12);
+        CASE(13);
+        CASE(14);
+        CASE(15);
+        CASE(16);
+    default:
+        assert(false);
+    }
+
+#undef CASE
+
+    return ERROR_FILE_CORRUPTION;
+}
+
 };
