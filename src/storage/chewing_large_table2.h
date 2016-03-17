@@ -38,10 +38,13 @@
 
 namespace pinyin{
 
+class MaskOutVisitor2;
+
 /* As this is a template class, the code will be in the header file. */
 template<int phrase_length>
 class ChewingTableEntry{
     friend class ChewingLargeTable2;
+    friend class MaskOutVisitor2;
 protected:
     typedef PinyinIndexItem2<phrase_length> IndexItem;
 

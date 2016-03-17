@@ -231,6 +231,7 @@ int PhraseLargeTable3::remove_index(int phrase_length,
     /* for safety. */
     vbuf = (char *) m_entry->m_chunk.begin();
     vsiz = m_entry->m_chunk.size();
+
     if (!m_db->set(kbuf, ksiz, vbuf, vsiz))
         return ERROR_FILE_CORRUPTION;
 

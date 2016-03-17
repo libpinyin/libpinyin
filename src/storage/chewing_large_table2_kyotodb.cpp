@@ -345,4 +345,93 @@ int ChewingLargeTable2::remove_index_internal(int phrase_length,
     return ERROR_FILE_CORRUPTION;
 }
 
+/* use MaskOutVisitor2 to avoid linking problem. */
+class MaskOutVisitor2 : public DB::Visitor {
+    BasicDB * m_db;
+    GPtrArray * m_entries;
+
+    phrase_token_t m_mask;
+    phrase_token_t m_value;
+public:
+    MaskOutVisitor2(BasicDB * db, GPtrArray * entries,
+                    phrase_token_t mask, phrase_token_t value) {
+        m_db = db; m_entries = entries;
+        m_mask = mask; m_value = value;
+    }
+
+    virtual const char* visit_full(const char* kbuf, size_t ksiz,
+                                   const char* vbuf, size_t vsiz, size_t* sp) {
+
+        int phrase_length = ksiz / sizeof(ChewingKey);
+
+#define CASE(len) case len:                                     \
+        {                                                       \
+            ChewingTableEntry<len> * entry =                    \
+                (ChewingTableEntry<len> *)                      \
+                g_ptr_array_index(m_entries, phrase_length);    \
+            assert(NULL != entry);                              \
+                                                                \
+            entry->m_chunk.set_content(0, vbuf, vsiz);          \
+            entry->mask_out(m_mask, m_value);                   \
+                                                                \
+            vbuf = (char *) entry->m_chunk.begin();             \
+            vsiz = entry->m_chunk.size();                       \
+                                                                \
+            assert(m_db->set(kbuf, ksiz, vbuf, vsiz));          \
+            return NOP;                                         \
+        }
+
+        switch(phrase_length) {
+            CASE(1);
+            CASE(2);
+            CASE(3);
+            CASE(4);
+            CASE(5);
+            CASE(6);
+            CASE(7);
+            CASE(8);
+            CASE(9);
+            CASE(10);
+            CASE(11);
+            CASE(12);
+            CASE(13);
+            CASE(14);
+            CASE(15);
+            CASE(16);
+        default:
+            assert(false);
+        }
+
+#undef CASE
+
+        assert(false);
+        return NOP;
+    }
+
+    virtual const char* visit_empty(const char* kbuf, size_t ksiz, size_t* sp) {
+        m_db->set(kbuf, ksiz, empty_vbuf, 0);
+        return NOP;
+    }
+};
+
+/* mask out method */
+/* assume it is in-memory dbm. */
+bool ChewingLargeTable2::mask_out(phrase_token_t mask,
+                                  phrase_token_t value) {
+    /* use copy and sweep algorithm here. */
+    BasicDB * tmp_db = new ProtoTreeDB;
+    if (!tmp_db->open("-", BasicDB::OREADER|BasicDB::OWRITER|BasicDB::OCREATE))
+        return false;
+
+    MaskOutVisitor2 visitor(tmp_db, m_entries, mask, value);
+    m_db->iterate(&visitor, false);
+
+    reset();
+
+    m_db = tmp_db;
+    init_entries();
+
+    return true;
+}
+
 };
