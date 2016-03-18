@@ -45,9 +45,11 @@ int main(int argc, char * argv[]) {
     if (!load_phrase_table(phrase_files, &largetable, NULL, &phrase_index))
         exit(ENOENT);
 
+#if 0
     MemoryChunk * new_chunk = new MemoryChunk;
     largetable.store(new_chunk);
     largetable.load(new_chunk);
+#endif
 
     char* linebuf = NULL; size_t size = 0; ssize_t read;
     while ((read = getline(&linebuf, &size, stdin)) != -1) {
@@ -70,21 +72,31 @@ int main(int argc, char * argv[]) {
         }
 
         guint32 start = record_time();
+        size_t i = 0;
         PhraseIndexRanges ranges;
         memset(ranges, 0, sizeof(PhraseIndexRanges));
 
         phrase_index.prepare_ranges(ranges);
 
-        for (size_t i = 0; i < bench_times; ++i) {
+        for (i = 0; i < bench_times; ++i) {
             phrase_index.clear_ranges(ranges);
             largetable.search(keys->len, (ChewingKey *)keys->data, ranges);
         }
         print_time(start, bench_times);
 
+        /* test search continued information. */
+        int retval = SEARCH_NONE;
+        for (i = 1; i < keys->len; ++i) {
+            phrase_index.clear_ranges(ranges);
+            retval = largetable.search(i, (ChewingKey *)keys->data, ranges);
+            if (retval & SEARCH_CONTINUED)
+                printf("return continued information with length:%ld\n", i);
+        }
+
         phrase_index.clear_ranges(ranges);
         largetable.search(keys->len, (ChewingKey *)keys->data, ranges);
 
-        for (size_t i = 0; i < PHRASE_INDEX_LIBRARY_COUNT; ++i) {
+        for (i = 0; i < PHRASE_INDEX_LIBRARY_COUNT; ++i) {
             GArray * & range = ranges[i];
             if (!range)
                 continue;
