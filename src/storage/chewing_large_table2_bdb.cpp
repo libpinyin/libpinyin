@@ -437,6 +437,7 @@ bool ChewingLargeTable2::mask_out(phrase_token_t mask,
             db_data.size = entry->m_chunk.size();                       \
             int ret = tmp_db->put(tmp_db, NULL, &db_key, &db_data, 0);  \
             assert(ret == 0);                                           \
+            break;                                                      \
         }
 
         switch(phrase_length) {

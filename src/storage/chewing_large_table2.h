@@ -106,7 +106,11 @@ public:
     int search(/* in */ const ChewingKey keys[],
                /* out */ PhraseIndexRanges ranges) const {
         IndexItem item;
-        compute_chewing_index(keys, item.m_keys, phrase_length);
+        if (contains_incomplete_pinyin(keys, phrase_length)) {
+            compute_incomplete_chewing_index(keys, item.m_keys, phrase_length);
+        } else {
+            compute_chewing_index(keys, item.m_keys, phrase_length);
+        }
 
         const IndexItem * begin = (IndexItem *) m_chunk.begin();
         const IndexItem * end = (IndexItem *) m_chunk.end();

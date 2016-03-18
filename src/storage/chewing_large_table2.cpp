@@ -35,6 +35,7 @@ void ChewingLargeTable2::init_entries() {
         ChewingTableEntry<len> * entry =            \
             new ChewingTableEntry<len>;             \
         g_ptr_array_index(m_entries, len) = entry;  \
+        break;                                      \
     }
 
     for (size_t i = 1; i < m_entries->len; i++) {
@@ -76,6 +77,7 @@ void ChewingLargeTable2::fini_entries() {
                 (ChewingTableEntry<len> *)          \
                 g_ptr_array_index(m_entries, len);  \
             delete entry;                           \
+            break;                                  \
         }
 
         switch(i) {

@@ -33,6 +33,7 @@ ChewingLargeTable2::ChewingLargeTable2() {
     m_db = new ProtoTreeDB;
     assert(m_db->open("-", BasicDB::OREADER|BasicDB::OWRITER|BasicDB::OCREATE));
 
+    m_entries = NULL;
     init_entries();
 }
 
@@ -225,7 +226,7 @@ int ChewingLargeTable2::add_index_internal(/* in */ const ChewingKey index[],
     entry->m_chunk.set_size(vsiz);
     /* m_chunk may re-allocate here. */
     vbuf = (char *) entry->m_chunk.begin();
-    assert(vsiz = m_db->get(kbuf, ksiz, vbuf, vsiz));
+    assert(vsiz == m_db->get(kbuf, ksiz, vbuf, vsiz));
 
     int result = entry->add_index(keys, token);
 
