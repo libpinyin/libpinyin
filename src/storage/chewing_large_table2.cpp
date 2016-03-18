@@ -62,6 +62,7 @@ void ChewingLargeTable2::init_entries() {
     }
 
 #undef CASE
+
 }
 
 void ChewingLargeTable2::fini_entries() {
@@ -69,17 +70,16 @@ void ChewingLargeTable2::fini_entries() {
 
     assert(MAX_PHRASE_LENGTH + 1 == m_entries->len);
 
+#define CASE(len) case len:                     \
+    {                                           \
+        ChewingTableEntry<len> * entry =        \
+            (ChewingTableEntry<len> *)          \
+            g_ptr_array_index(m_entries, len);  \
+        delete entry;                           \
+        break;                                  \
+    }
+
     for (size_t i = 1; i < m_entries->len; i++) {
-
-#define CASE(len) case len:                         \
-        {                                           \
-            ChewingTableEntry<len> * entry =        \
-                (ChewingTableEntry<len> *)          \
-                g_ptr_array_index(m_entries, len);  \
-            delete entry;                           \
-            break;                                  \
-        }
-
         switch(i) {
             CASE(1);
             CASE(2);
@@ -100,10 +100,9 @@ void ChewingLargeTable2::fini_entries() {
         default:
             assert(false);
         }
+    }
 
 #undef CASE
-
-    }
 
     g_ptr_array_free(m_entries, TRUE);
     m_entries = NULL;
