@@ -26,6 +26,9 @@
 #include "chewing_key.h"
 #include <assert.h>
 
+/* All compare function should be symmetric for the lhs and rhs operands.
+   URL: http://en.cppreference.com/w/cpp/algorithm/equal_range . */
+
 namespace pinyin{
 
 inline int pinyin_exact_compare2(const ChewingKey * key_lhs,
