@@ -40,9 +40,7 @@ int main( int argc, char * argv[]){
         USE_TONE | USE_RESPLIT_TABLE | PINYIN_CORRECT_ALL | PINYIN_AMB_ALL;
     FacadeChewingTable largetable;
 
-    MemoryChunk * chunk = new MemoryChunk;
-    chunk->load("../../data/pinyin_index.bin");
-    largetable.load(options, chunk, NULL);
+    largetable.load(options, "../../data/pinyin_index.bin", NULL);
 
     const pinyin_table_info_t * phrase_files =
         system_table_info.get_default_tables();

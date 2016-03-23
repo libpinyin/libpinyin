@@ -63,9 +63,7 @@ int main(int argc, char * argv[]){
 
     /* init phrase table */
     FacadePhraseTable2 phrase_table;
-    MemoryChunk * chunk = new MemoryChunk;
-    chunk->load("../../data/phrase_index.bin");
-    phrase_table.load(chunk, NULL);
+    phrase_table.load("../../data/phrase_index.bin", NULL);
 
     const pinyin_table_info_t * phrase_files =
         system_table_info.get_default_tables();
