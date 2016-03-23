@@ -127,14 +127,7 @@ int main(int argc, char * argv[]){
     pinyin_option_t options = USE_TONE;
     FacadeChewingTable largetable;
 
-    MemoryChunk * chunk = new MemoryChunk;
-    chunk->load(SYSTEM_PINYIN_INDEX);
-    largetable.load(options, chunk, NULL);
-
-    FacadePhraseTable2 phrase_table;
-    chunk = new MemoryChunk;
-    chunk->load(SYSTEM_PHRASE_INDEX);
-    phrase_table.load(chunk, NULL);
+    largetable.load(options, SYSTEM_PINYIN_INDEX, NULL);
 
     FacadePhraseIndex phrase_index;
 

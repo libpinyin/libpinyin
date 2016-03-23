@@ -238,9 +238,7 @@ int main(int argc, char * argv[]){
 
     /* init phrase table */
     FacadePhraseTable2 phrase_table;
-    MemoryChunk * chunk = new MemoryChunk;
-    chunk->load(SYSTEM_PHRASE_INDEX);
-    phrase_table.load(chunk, NULL);
+    phrase_table.load(SYSTEM_PHRASE_INDEX, NULL);
 
     /* init phrase index */
     FacadePhraseIndex phrase_index;
