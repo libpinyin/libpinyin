@@ -74,40 +74,78 @@ public:
 
     /**
      * FacadePhraseTable2::load:
-     * @system: the memory chunk of the system phrase table.
-     * @user: the memory chunk of the user phrase table.
+     * @system_filename: the file name of the system phrase table.
+     * @user_filename: the file name of the user phrase table.
      * @returns: whether the load operation is successful.
      *
-     * Load the system or user phrase table from the memory chunks.
+     * Load the system or user phrase table from the files.
      *
      */
-    bool load(MemoryChunk * system, MemoryChunk * user) {
+    bool load(const char * system_filename, const char * user_filename) {
         reset();
 
+        MemoryChunk * chunk = NULL;
+
         bool result = false;
-        if (system) {
+
+        /* load system phrase table */
+        if (system_filename) {
+            chunk = new MemoryChunk;
+
+#ifdef LIBPINYIN_USE_MMAP
+            if (!chunk->mmap(system_filename)) {
+                fprintf(stderr, "mmap %s failed!\n", system_filename);
+                return false;
+            }
+#else
+            if (!chunk->load(system_filename)) {
+                fprintf(stderr, "open %s failed!\n", system_filename);
+                return false;
+            }
+#endif
+
             m_system_phrase_table = new PhraseLargeTable2;
-            result = m_system_phrase_table->load(system) || result;
+            result = m_system_phrase_table->load(chunk) || result;
+            chunk = NULL;
         }
-        if (user) {
+
+        /* load user phrase table */
+        if (user_filename) {
+            chunk = new MemoryChunk;
+
+            if (!chunk->load(user_filename)) {
+                /* hack here: use local Phrase Table to create empty memory chunk. */
+                PhraseLargeTable2 table;
+                table.store(chunk);
+            }
+
             m_user_phrase_table = new PhraseLargeTable2;
-            result = m_user_phrase_table->load(user) || result;
+            result = m_user_phrase_table->load(chunk) || result;
         }
+
         return result;
     }
 
     /**
      * FacadePhraseTable2::store:
-     * @new_user: the memory chunk to store the user phrase table.
+     * @new_user_filename: the file name to store the user phrase table.
      * @returns: whether the store operation is successful.
      *
-     * Store the user phrase table to the memory chunk.
+     * Store the user phrase table to the file.
      *
      */
-    bool store(MemoryChunk * new_user) {
+    bool store(const char * new_user_filename) {
         if (NULL == m_user_phrase_table)
             return false;
-        return m_user_phrase_table->store(new_user);
+
+        /* save user phrase table */
+        MemoryChunk * chunk = new MemoryChunk;
+        bool retval = m_user_phrase_table->store(chunk);
+        assert(retval);
+
+        retval = chunk->save(new_user_filename);
+        delete chunk;
+        return retval;
     }
 
     /**
