@@ -312,72 +312,27 @@ pinyin_context_t * pinyin_init(const char * systemdir, const char * userdir){
     /* load chewing table. */
     context->m_pinyin_table = new FacadeChewingTable;
 
-    /* load system chewing table. */
-    MemoryChunk * chunk = new MemoryChunk;
-    filename = g_build_filename
+    gchar * system_filename = g_build_filename
         (context->m_system_dir, SYSTEM_PINYIN_INDEX, NULL);
-
-#ifdef LIBPINYIN_USE_MMAP
-    if (!chunk->mmap(filename)) {
-        fprintf(stderr, "mmap %s failed!\n", filename);
-        return NULL;
-    }
-#else
-    if (!chunk->load(filename)) {
-        fprintf(stderr, "open %s failed!\n", filename);
-        return NULL;
-    }
-#endif
-
-    g_free(filename);
-
-    /* load user chewing table */
-    MemoryChunk * userchunk = new MemoryChunk;
-    filename = g_build_filename
+    gchar * user_filename = g_build_filename
         (context->m_user_dir, USER_PINYIN_INDEX, NULL);
-    if (!userchunk->load(filename)) {
-        /* hack here: use local Chewing Table to create empty memory chunk. */
-        ChewingLargeTable table(context->m_options);
-        table.store(userchunk);
-    }
-    g_free(filename);
+    context->m_pinyin_table->load(context->m_options, system_filename,
+                                  user_filename);
+    g_free(user_filename);
+    g_free(system_filename);
 
-    context->m_pinyin_table->load(context->m_options, chunk, userchunk);
 
     /* load phrase table */
     context->m_phrase_table = new FacadePhraseTable2;
 
-    /* load system phrase table */
-    chunk = new MemoryChunk;
-    filename = g_build_filename
+    system_filename = g_build_filename
         (context->m_system_dir, SYSTEM_PHRASE_INDEX, NULL);
-
-#ifdef LIBPINYIN_USE_MMAP
-    if (!chunk->mmap(filename)) {
-        fprintf(stderr, "mmap %s failed!\n", filename);
-        return NULL;
-    }
-#else
-    if (!chunk->load(filename)) {
-        fprintf(stderr, "open %s failed!\n", filename);
-        return NULL;
-    }
-#endif
-
-    g_free(filename);
-
-    /* load user phrase table */
-    userchunk = new MemoryChunk;
-    filename = g_build_filename
+    user_filename = g_build_filename
         (context->m_user_dir, USER_PHRASE_INDEX, NULL);
-    if (!userchunk->load(filename)) {
-        /* hack here: use local Phrase Table to create empty memory chunk. */
-        PhraseLargeTable2 table;
-        table.store(userchunk);
-    }
-    g_free(filename);
+    context->m_phrase_table->load(system_filename, user_filename);
+    g_free(user_filename);
+    g_free(system_filename);
 
-    context->m_phrase_table->load(chunk, userchunk);
 
     context->m_phrase_index = new FacadePhraseIndex;
 
@@ -424,50 +379,19 @@ pinyin_context_t * pinyin_init(const char * systemdir, const char * userdir){
     /* load addon chewing table. */
     context->m_addon_pinyin_table = new FacadeChewingTable;
 
-    /* load addon system chewing table. */
-    chunk = new MemoryChunk;
-    filename = g_build_filename
+    system_filename = g_build_filename
         (context->m_system_dir, ADDON_SYSTEM_PINYIN_INDEX, NULL);
-
-#ifdef LIBPINYIN_USE_MMAP
-    if (!chunk->mmap(filename)) {
-        fprintf(stderr, "mmap %s failed!\n", filename);
-        return NULL;
-    }
-#else
-    if (!chunk->load(filename)) {
-        fprintf(stderr, "open %s failed!\n", filename);
-        return NULL;
-    }
-#endif
-
-    g_free(filename);
-
-    context->m_addon_pinyin_table->load(context->m_options, chunk, NULL);
+    context->m_addon_pinyin_table->load(context->m_options,
+                                        system_filename, NULL);
+    g_free(system_filename);
 
     /* load addon phrase table */
     context->m_addon_phrase_table = new FacadePhraseTable2;
 
-    /* load addon system phrase table */
-    chunk = new MemoryChunk;
-    filename = g_build_filename
+    system_filename = g_build_filename
         (context->m_system_dir, ADDON_SYSTEM_PHRASE_INDEX, NULL);
-
-#ifdef LIBPINYIN_USE_MMAP
-    if (!chunk->mmap(filename)) {
-        fprintf(stderr, "mmap %s failed!\n", filename);
-        return NULL;
-    }
-#else
-    if (!chunk->load(filename)) {
-        fprintf(stderr, "open %s failed!\n", filename);
-        return NULL;
-    }
-#endif
-
-    g_free(filename);
-
-    context->m_addon_phrase_table->load(chunk, NULL);
+    context->m_addon_phrase_table->load(system_filename, NULL);
+    g_free(system_filename);
 
     context->m_addon_phrase_index = new FacadePhraseIndex;
 
@@ -894,10 +818,7 @@ bool pinyin_save(pinyin_context_t * context){
     gchar * filename = g_build_filename
         (context->m_user_dir, USER_PINYIN_INDEX, NULL);
 
-    MemoryChunk * chunk = new MemoryChunk;
-    context->m_pinyin_table->store(chunk);
-    chunk->save(tmpfilename);
-    delete chunk;
+    context->m_pinyin_table->store(tmpfilename);
 
     int result = rename(tmpfilename, filename);
     if (0 != result)
@@ -914,10 +835,7 @@ bool pinyin_save(pinyin_context_t * context){
     filename = g_build_filename
         (context->m_user_dir, USER_PHRASE_INDEX, NULL);
 
-    chunk = new MemoryChunk;
-    context->m_phrase_table->store(chunk);
-    chunk->save(tmpfilename);
-    delete chunk;
+    context->m_phrase_table->store(tmpfilename);
 
     result = rename(tmpfilename, filename);
     if (0 != result)
