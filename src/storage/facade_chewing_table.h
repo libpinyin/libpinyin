@@ -92,41 +92,79 @@ public:
     /**
      * FacadeChewingTable::load:
      * @options: the pinyin options.
-     * @system: the memory chunk of the system chewing table.
-     * @user: the memory chunk of the user chewing table.
+     * @system_filename: the file name of the system chewing table.
+     * @user_filename: the file name of the user chewing table.
      * @returns: whether the load operation is successful.
      *
-     * Load the system or user chewing table from the memory chunks.
+     * Load the system or user chewing table from the files.
      *
      */
-    bool load(pinyin_option_t options, MemoryChunk * system,
-              MemoryChunk * user){
+    bool load(pinyin_option_t options, const char * system_filename,
+              const char * user_filename){
         reset();
 
+        MemoryChunk * chunk = NULL;
+
         bool result = false;
-        if (system) {
+
+        /* load system chewing table. */
+        if (system_filename) {
+            chunk = new MemoryChunk;
+
+#ifdef LIBPINYIN_USE_MMAP
+            if (!chunk->mmap(system_filename)) {
+                fprintf(stderr, "mmap %s failed!\n", system_filename);
+                return false;
+            }
+#else
+            if (!chunk->load(system_filename)) {
+                fprintf(stderr, "open %s failed!\n", system_filename);
+                return false;
+            }
+#endif
+
             m_system_chewing_table = new ChewingLargeTable(options);
-            result = m_system_chewing_table->load(system) || result;
+            result = m_system_chewing_table->load(chunk) || result;
+            chunk = NULL;
         }
-        if (user) {
+
+        /* load user chewing table */
+        if (user_filename) {
+            chunk = new MemoryChunk;
+
+            if (!chunk->load(user_filename)) {
+                /* hack here: use local Chewing Table to create empty memory chunk. */
+                ChewingLargeTable table(options);
+                table.store(chunk);
+            }
+
             m_user_chewing_table = new ChewingLargeTable(options);
-            result = m_user_chewing_table->load(user) || result;
+            result = m_user_chewing_table->load(chunk) || result;
         }
+
         return result;
     }
 
     /**
      * FacadeChewingTable::store:
-     * @new_user: the memory chunk to store the user chewing table.
+     * @new_user_filename: the file name to store the user chewing table.
      * @returns: whether the store operation is successful.
      *
-     * Store the user chewing table to the memory chunk.
+     * Store the user chewing table to the file.
      *
      */
-    bool store(MemoryChunk * new_user) {
+    bool store(const char * new_user_filename) {
         if (NULL == m_user_chewing_table)
             return false;
-        return m_user_chewing_table->store(new_user);
+
+        /* save user chewing table */
+        MemoryChunk * chunk = new MemoryChunk;
+        bool retval = m_user_chewing_table->store(chunk);
+        assert(retval);
+
+        retval = chunk->save(new_user_filename);
+        delete chunk;
+        return retval;
     }
 
     /**
