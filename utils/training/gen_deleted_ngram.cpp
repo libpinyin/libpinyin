@@ -60,7 +60,7 @@ int main(int argc, char * argv[]){
     }
 
     /* load phrase table. */
-    PhraseLargeTable2 phrase_table;
+    PhraseLargeTable3 phrase_table;
     MemoryChunk * new_chunk = new MemoryChunk;
     new_chunk->load(SYSTEM_PHRASE_INDEX);
     phrase_table.load(new_chunk);

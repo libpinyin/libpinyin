@@ -77,7 +77,7 @@ public:
 bool backtrace(GArray * steps, glong phrase_len, GArray * strings);
 
 /* Note: do not free phrase, as it is used by strings (array of segment). */
-bool segment(FacadePhraseTable2 * phrase_table,
+bool segment(FacadePhraseTable3 * phrase_table,
              FacadePhraseIndex * phrase_index,
              GArray * current_ucs4,
              GArray * strings /* Array of SegmentStep. */){
@@ -160,7 +160,7 @@ bool backtrace(GArray * steps, glong phrase_len, GArray * strings){
     return true;
 }
 
-bool deal_with_segmentable(FacadePhraseTable2 * phrase_table,
+bool deal_with_segmentable(FacadePhraseTable3 * phrase_table,
                            FacadePhraseIndex * phrase_index,
                            GArray * current_ucs4,
                            FILE * output){
@@ -237,7 +237,7 @@ int main(int argc, char * argv[]){
     }
 
     /* init phrase table */
-    FacadePhraseTable2 phrase_table;
+    FacadePhraseTable3 phrase_table;
     phrase_table.load(SYSTEM_PHRASE_INDEX, NULL);
 
     /* init phrase index */

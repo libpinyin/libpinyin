@@ -69,7 +69,7 @@ gint calculate_sequence_length(TokenInfoVector tokeninfos) {
  *   if not, just output the first token;
  * pop the first token or sequence.
  */
-bool merge_sequence(FacadePhraseTable2 * phrase_table,
+bool merge_sequence(FacadePhraseTable3 * phrase_table,
                     FacadePhraseIndex * phrase_index,
                     UnicodeCharVector unichars,
                     TokenInfoVector tokeninfos) {
@@ -141,7 +141,7 @@ bool pop_first_token(UnicodeCharVector unichars,
     return true;
 }
 
-bool feed_line(FacadePhraseTable2 * phrase_table,
+bool feed_line(FacadePhraseTable3 * phrase_table,
                FacadePhraseIndex * phrase_index,
                UnicodeCharVector unichars,
                TokenInfoVector tokeninfos,
@@ -237,7 +237,7 @@ int main(int argc, char * argv[]){
     }
 
     /* init phrase table */
-    FacadePhraseTable2 phrase_table;
+    FacadePhraseTable3 phrase_table;
     phrase_table.load(SYSTEM_PHRASE_INDEX, NULL);
 
     /* init phrase index */
