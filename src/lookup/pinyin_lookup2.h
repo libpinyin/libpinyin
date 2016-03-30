@@ -92,7 +92,7 @@ protected:
     ChewingKeyVector m_keys;
 
     pinyin_option_t m_options;
-    FacadeChewingTable * m_pinyin_table;
+    FacadeChewingTable2 * m_pinyin_table;
     FacadePhraseIndex * m_phrase_index;
     Bigram * m_system_bigram;
     Bigram * m_user_bigram;
@@ -131,7 +131,7 @@ public:
      */
     PinyinLookup2(const gfloat lambda,
                   pinyin_option_t options,
-                  FacadeChewingTable * pinyin_table,
+                  FacadeChewingTable2 * pinyin_table,
                   FacadePhraseIndex * phrase_index,
                   Bigram * system_bigram,
                   Bigram * user_bigram);

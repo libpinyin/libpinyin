@@ -42,7 +42,7 @@ struct _pinyin_context_t{
     ZhuyinParser2 * m_chewing_parser;
 
     /* default tables. */
-    FacadeChewingTable * m_pinyin_table;
+    FacadeChewingTable2 * m_pinyin_table;
     FacadePhraseTable3 * m_phrase_table;
     FacadePhraseIndex * m_phrase_index;
     Bigram * m_system_bigram;
@@ -53,7 +53,7 @@ struct _pinyin_context_t{
     PhraseLookup * m_phrase_lookup;
 
     /* addon tables. */
-    FacadeChewingTable * m_addon_pinyin_table;
+    FacadeChewingTable2 * m_addon_pinyin_table;
     FacadePhraseTable3 * m_addon_phrase_table;
     FacadePhraseIndex * m_addon_phrase_index;
 
@@ -310,14 +310,13 @@ pinyin_context_t * pinyin_init(const char * systemdir, const char * userdir){
     context->m_chewing_parser = new ZhuyinSimpleParser2;
 
     /* load chewing table. */
-    context->m_pinyin_table = new FacadeChewingTable;
+    context->m_pinyin_table = new FacadeChewingTable2;
 
     gchar * system_filename = g_build_filename
         (context->m_system_dir, SYSTEM_PINYIN_INDEX, NULL);
     gchar * user_filename = g_build_filename
         (context->m_user_dir, USER_PINYIN_INDEX, NULL);
-    context->m_pinyin_table->load(context->m_options, system_filename,
-                                  user_filename);
+    context->m_pinyin_table->load(system_filename, user_filename);
     g_free(user_filename);
     g_free(system_filename);
 
@@ -377,12 +376,11 @@ pinyin_context_t * pinyin_init(const char * systemdir, const char * userdir){
          context->m_system_bigram, context->m_user_bigram);
 
     /* load addon chewing table. */
-    context->m_addon_pinyin_table = new FacadeChewingTable;
+    context->m_addon_pinyin_table = new FacadeChewingTable2;
 
     system_filename = g_build_filename
         (context->m_system_dir, ADDON_SYSTEM_PINYIN_INDEX, NULL);
-    context->m_addon_pinyin_table->load(context->m_options,
-                                        system_filename, NULL);
+    context->m_addon_pinyin_table->load(system_filename, NULL);
     g_free(system_filename);
 
     /* load addon phrase table */
@@ -480,7 +478,7 @@ bool pinyin_iterator_add_phrase(import_iterator_t * iter,
 
     pinyin_context_t * & context = iter->m_context;
     FacadePhraseTable3 * & phrase_table = context->m_phrase_table;
-    FacadeChewingTable * & pinyin_table = context->m_pinyin_table;
+    FacadeChewingTable2 * & pinyin_table = context->m_pinyin_table;
     FacadePhraseIndex * & phrase_index = context->m_phrase_index;
 
     bool result = false;
@@ -1011,7 +1009,9 @@ bool pinyin_mask_out(pinyin_context_t * context,
 bool pinyin_set_options(pinyin_context_t * context,
                         pinyin_option_t options){
     context->m_options = options;
+#if 0
     context->m_pinyin_table->set_options(context->m_options);
+#endif
     context->m_pinyin_lookup->set_options(context->m_options);
     return true;
 }

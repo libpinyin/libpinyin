@@ -36,7 +36,6 @@
 #include "chewing_large_table2.h"
 #include "phrase_large_table2.h"
 #include "phrase_large_table3.h"
-#include "facade_chewing_table.h"
 #include "facade_chewing_table2.h"
 #include "facade_phrase_table3.h"
 #include "phrase_index.h"

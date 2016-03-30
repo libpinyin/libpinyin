@@ -20,7 +20,7 @@
  */
 
 #include <math.h>
-#include "facade_chewing_table.h"
+#include "facade_chewing_table2.h"
 #include "pinyin_lookup2.h"
 #include "stl_lite.h"
 
@@ -187,7 +187,7 @@ static void clear_steps(GPtrArray * steps_index, GPtrArray * steps_content){
 
 PinyinLookup2::PinyinLookup2(const gfloat lambda,
                              pinyin_option_t options,
-                             FacadeChewingTable * pinyin_table,
+                             FacadeChewingTable2 * pinyin_table,
                              FacadePhraseIndex * phrase_index,
                              Bigram * system_bigram,
                              Bigram * user_bigram)
