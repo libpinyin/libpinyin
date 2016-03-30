@@ -37,9 +37,12 @@ bool generate_binary_files(const char * pinyin_table_filename,
                            const pinyin_table_info_t * phrase_files) {
     /* generate pinyin index*/
     pinyin_option_t options = USE_TONE;
-    ChewingLargeTable chewing_table(options);
+    ChewingLargeTable2 pinyin_table;
+    pinyin_table.attach(pinyin_table_filename, ATTACH_READWRITE|ATTACH_CREATE);
+
     PhraseLargeTable3 phrase_table;
     phrase_table.attach(phrase_table_filename, ATTACH_READWRITE|ATTACH_CREATE);
+
     /* generate phrase index */
     FacadePhraseIndex phrase_index;
 
@@ -61,7 +64,7 @@ bool generate_binary_files(const char * pinyin_table_filename,
             exit(ENOENT);
         }
 
-        chewing_table.load_text(tablefile);
+        pinyin_table.load_text(tablefile);
         fseek(tablefile, 0L, SEEK_SET);
         phrase_table.load_text(tablefile);
         fseek(tablefile, 0L, SEEK_SET);
@@ -69,11 +72,6 @@ bool generate_binary_files(const char * pinyin_table_filename,
         fclose(tablefile);
         g_free(filename);
     }
-
-    MemoryChunk * new_chunk = new MemoryChunk;
-    chewing_table.store(new_chunk);
-    new_chunk->save(pinyin_table_filename);
-    chewing_table.load(new_chunk);
 
     phrase_index.compact();
 
