@@ -288,7 +288,6 @@ void gen_phrase_file(const char * outputfile, int phrase_index){
                     (chewing_and_freqs, chewing_and_freq_item, n);
 
                 ChewingKeyVector keys = chewing_and_freq->keys;
-                ChewingKeyRestVector key_rests = chewing_and_freq->key_rests;
 
                 GArray * pinyins = g_array_new(TRUE, FALSE, sizeof(gchar *));
                 gchar * pinyin = NULL;
@@ -296,8 +295,6 @@ void gen_phrase_file(const char * outputfile, int phrase_index){
                 size_t k;
                 for (k = 0; k < keys->len; ++k) {
                     ChewingKey key = g_array_index(keys, ChewingKey, k);
-                    ChewingKeyRest key_rest = g_array_index
-                        (key_rests, ChewingKeyRest, k);
 
                     //assert (CHEWING_ZERO_TONE != key.m_tone);
                     pinyin = key.get_pinyin_string();

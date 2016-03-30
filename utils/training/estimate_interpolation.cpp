@@ -45,7 +45,7 @@ parameter_t compute_interpolation(SingleGram * deleted_bigram,
 	BigramPhraseWithCountArray array = g_array_new(FALSE, FALSE, sizeof(BigramPhraseItemWithCount));
 	deleted_bigram->retrieve_all(array);
 
-	for ( int i = 0; i < array->len; ++i){
+	for (size_t i = 0; i < array->len; ++i){
 	    BigramPhraseItemWithCount * item = &g_array_index(array, BigramPhraseItemWithCount, i);
 	    //get the phrase token
 	    phrase_token_t token = item->m_token;
@@ -117,7 +117,7 @@ int main(int argc, char * argv[]){
     parameter_t lambda_sum = 0;
     int lambda_count = 0;
 
-    for ( int i = 0; i < deleted_items->len; ++i ){
+    for (size_t i = 0; i < deleted_items->len; ++i ){
 	phrase_token_t * token = &g_array_index(deleted_items, phrase_token_t, i);
 	SingleGram * single_gram = NULL;
 	bigram.load(*token, single_gram);

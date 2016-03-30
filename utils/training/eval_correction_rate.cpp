@@ -160,7 +160,6 @@ int main(int argc, char * argv[]){
     char* linebuf = NULL; size_t size = 0;
     TokenVector tokens = g_array_new(FALSE, TRUE, sizeof(phrase_token_t));
 
-    phrase_token_t token = null_token;
     while( getline(&linebuf, &size, evals_file) ) {
         if ( feof(evals_file) )
             break;

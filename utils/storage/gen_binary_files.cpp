@@ -36,7 +36,6 @@ bool generate_binary_files(const char * pinyin_table_filename,
                            const char * phrase_table_filename,
                            const pinyin_table_info_t * phrase_files) {
     /* generate pinyin index*/
-    pinyin_option_t options = USE_TONE;
     ChewingLargeTable2 pinyin_table;
     pinyin_table.attach(pinyin_table_filename, ATTACH_READWRITE|ATTACH_CREATE);
 

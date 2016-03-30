@@ -56,7 +56,7 @@ bool prune_k_mixture_model(KMixtureModelMagicHeader * magic_header,
         phrase_token_t token = item->m_token;
         parameter_t remained_poss = 1; parameter_t one_poss = 0;
         bool errors = false;
-        for ( size_t k = 0; k < g_prune_k; ++k){
+        for (ssize_t k = 0; k < g_prune_k; ++k){
             one_poss = compute_Pr_G_3_with_count
                 (k, magic_header->m_N, item->m_item.m_WC,
                  magic_header->m_N - item->m_item.m_N_n_0,
