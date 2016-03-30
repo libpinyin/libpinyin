@@ -38,8 +38,8 @@ bool generate_binary_files(const char * pinyin_table_filename,
     /* generate pinyin index*/
     pinyin_option_t options = USE_TONE;
     ChewingLargeTable chewing_table(options);
-    PhraseLargeTable2 phrase_table;
-
+    PhraseLargeTable3 phrase_table;
+    phrase_table.attach(phrase_table_filename, ATTACH_READWRITE|ATTACH_CREATE);
     /* generate phrase index */
     FacadePhraseIndex phrase_index;
 
@@ -74,11 +74,6 @@ bool generate_binary_files(const char * pinyin_table_filename,
     chewing_table.store(new_chunk);
     new_chunk->save(pinyin_table_filename);
     chewing_table.load(new_chunk);
-    
-    new_chunk = new MemoryChunk;
-    phrase_table.store(new_chunk);
-    new_chunk->save(phrase_table_filename);
-    phrase_table.load(new_chunk);
 
     phrase_index.compact();
 

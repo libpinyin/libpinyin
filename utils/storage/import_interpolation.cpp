@@ -53,10 +53,10 @@ static size_t len = 0;
 
 bool parse_headline();
 
-bool parse_unigram(FILE * input, PhraseLargeTable2 * phrase_table,
+bool parse_unigram(FILE * input, PhraseLargeTable3 * phrase_table,
                    FacadePhraseIndex * phrase_index);
 
-bool parse_bigram(FILE * input, PhraseLargeTable2 * phrase_table,
+bool parse_bigram(FILE * input, PhraseLargeTable3 * phrase_table,
                   FacadePhraseIndex * phrase_index,
                   Bigram * bigram);
 
@@ -91,7 +91,7 @@ bool parse_headline(){
     return true;
 }
 
-bool parse_body(FILE * input, PhraseLargeTable2 * phrase_table,
+bool parse_body(FILE * input, PhraseLargeTable3 * phrase_table,
                 FacadePhraseIndex * phrase_index,
                 Bigram * bigram){
     taglib_push_state();
@@ -124,7 +124,7 @@ bool parse_body(FILE * input, PhraseLargeTable2 * phrase_table,
     return true;
 }
 
-bool parse_unigram(FILE * input, PhraseLargeTable2 * phrase_table,
+bool parse_unigram(FILE * input, PhraseLargeTable3 * phrase_table,
                    FacadePhraseIndex * phrase_index){
     taglib_push_state();
 
@@ -158,7 +158,7 @@ bool parse_unigram(FILE * input, PhraseLargeTable2 * phrase_table,
     return true;
 }
 
-bool parse_bigram(FILE * input, PhraseLargeTable2 * phrase_table,
+bool parse_bigram(FILE * input, PhraseLargeTable3 * phrase_table,
                   FacadePhraseIndex * phrase_index,
                   Bigram * bigram){
     taglib_push_state();
@@ -260,15 +260,13 @@ int main(int argc, char * argv[]){
     }
     g_free(filename);
 
-    PhraseLargeTable2 phrase_table;
+    PhraseLargeTable3 phrase_table;
 
-    MemoryChunk * chunk = new MemoryChunk;
-    retval = chunk->load(SYSTEM_PHRASE_INDEX);
+    retval = phrase_table.attach(SYSTEM_PHRASE_INDEX, ATTACH_READONLY);
     if (!retval) {
-        fprintf(stderr, "open phrase_index.bin failed!\n");
+        fprintf(stderr, "open %s failed!\n", SYSTEM_PHRASE_INDEX);
         exit(ENOENT);
     }
-    phrase_table.load(chunk);
 
     FacadePhraseIndex phrase_index;
 

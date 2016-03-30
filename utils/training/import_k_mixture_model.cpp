@@ -52,11 +52,11 @@ static size_t len = 0;
 
 bool parse_headline(KMixtureModelBigram * bigram);
 
-bool parse_unigram(FILE * input, PhraseLargeTable2 * phrase_table,
+bool parse_unigram(FILE * input, PhraseLargeTable3 * phrase_table,
                    FacadePhraseIndex * phrase_index,
                    KMixtureModelBigram * bigram);
 
-bool parse_bigram(FILE * input, PhraseLargeTable2 * phrase_table,
+bool parse_bigram(FILE * input, PhraseLargeTable3 * phrase_table,
                   FacadePhraseIndex * phrase_index,
                   KMixtureModelBigram * bigram);
 
@@ -103,7 +103,7 @@ bool parse_headline(KMixtureModelBigram * bigram){
     return true;
 }
 
-bool parse_body(FILE * input, PhraseLargeTable2 * phrase_table,
+bool parse_body(FILE * input, PhraseLargeTable3 * phrase_table,
                 FacadePhraseIndex * phrase_index,
                 KMixtureModelBigram * bigram){
     taglib_push_state();
@@ -136,7 +136,7 @@ bool parse_body(FILE * input, PhraseLargeTable2 * phrase_table,
     return true;
 }
 
-bool parse_unigram(FILE * input, PhraseLargeTable2 * phrase_table,
+bool parse_unigram(FILE * input, PhraseLargeTable3 * phrase_table,
                    FacadePhraseIndex * phrase_index,
                    KMixtureModelBigram * bigram){
     taglib_push_state();
@@ -176,7 +176,7 @@ bool parse_unigram(FILE * input, PhraseLargeTable2 * phrase_table,
     return true;
 }
 
-bool parse_bigram(FILE * input, PhraseLargeTable2 * phrase_table,
+bool parse_bigram(FILE * input, PhraseLargeTable3 * phrase_table,
                   FacadePhraseIndex * phrase_index,
                   KMixtureModelBigram * bigram){
     taglib_push_state();
@@ -281,10 +281,8 @@ int main(int argc, char * argv[]){
         exit(ENOENT);
     }
 
-    PhraseLargeTable2 phrase_table;
-    MemoryChunk * chunk = new MemoryChunk;
-    chunk->load(SYSTEM_PHRASE_INDEX);
-    phrase_table.load(chunk);
+    PhraseLargeTable3 phrase_table;
+    phrase_table.attach(SYSTEM_PHRASE_INDEX, ATTACH_READONLY);
 
     FacadePhraseIndex phrase_index;
 

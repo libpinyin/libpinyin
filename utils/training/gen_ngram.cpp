@@ -60,12 +60,6 @@ int main(int argc, char * argv[]){
         exit(ENOENT);
     }
 
-    PhraseLargeTable2 phrase_table;
-    /* init phrase table */
-    MemoryChunk * chunk = new MemoryChunk;
-    chunk->load(SYSTEM_PHRASE_INDEX);
-    phrase_table.load(chunk);
-
     FacadePhraseIndex phrase_index;
 
     const pinyin_table_info_t * phrase_files =

@@ -57,7 +57,7 @@ static GOptionEntry entries[] =
 };
 
 
-bool read_document(PhraseLargeTable2 * phrase_table,
+bool read_document(PhraseLargeTable3 * phrase_table,
                    FacadePhraseIndex * phrase_index,
                    FILE * document,
                    HashofDocument hash_of_document,
@@ -337,10 +337,8 @@ int main(int argc, char * argv[]){
         exit(ENOENT);
     }
 
-    PhraseLargeTable2 phrase_table;
-    MemoryChunk * chunk = new MemoryChunk;
-    chunk->load(SYSTEM_PHRASE_INDEX);
-    phrase_table.load(chunk);
+    PhraseLargeTable3 phrase_table;
+    phrase_table.attach(SYSTEM_PHRASE_INDEX, ATTACH_READONLY);
 
     FacadePhraseIndex phrase_index;
 
