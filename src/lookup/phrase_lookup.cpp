@@ -23,7 +23,6 @@
 #include "stl_lite.h"
 #include "novel_types.h"
 #include "phrase_index.h"
-#include "facade_phrase_table2.h"
 #include "facade_phrase_table3.h"
 #include "phrase_lookup.h"
 
@@ -92,7 +91,7 @@ static void clear_steps(GPtrArray * steps_index,
 }
 
 PhraseLookup::PhraseLookup(const gfloat lambda,
-                           FacadePhraseTable2 * phrase_table,
+                           FacadePhraseTable3 * phrase_table,
                            FacadePhraseIndex * phrase_index,
                            Bigram * system_bigram,
                            Bigram * user_bigram)

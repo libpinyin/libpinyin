@@ -43,7 +43,7 @@ struct _pinyin_context_t{
 
     /* default tables. */
     FacadeChewingTable * m_pinyin_table;
-    FacadePhraseTable2 * m_phrase_table;
+    FacadePhraseTable3 * m_phrase_table;
     FacadePhraseIndex * m_phrase_index;
     Bigram * m_system_bigram;
     Bigram * m_user_bigram;
@@ -54,7 +54,7 @@ struct _pinyin_context_t{
 
     /* addon tables. */
     FacadeChewingTable * m_addon_pinyin_table;
-    FacadePhraseTable2 * m_addon_phrase_table;
+    FacadePhraseTable3 * m_addon_phrase_table;
     FacadePhraseIndex * m_addon_phrase_index;
 
     char * m_system_dir;
@@ -323,7 +323,7 @@ pinyin_context_t * pinyin_init(const char * systemdir, const char * userdir){
 
 
     /* load phrase table */
-    context->m_phrase_table = new FacadePhraseTable2;
+    context->m_phrase_table = new FacadePhraseTable3;
 
     system_filename = g_build_filename
         (context->m_system_dir, SYSTEM_PHRASE_INDEX, NULL);
@@ -386,7 +386,7 @@ pinyin_context_t * pinyin_init(const char * systemdir, const char * userdir){
     g_free(system_filename);
 
     /* load addon phrase table */
-    context->m_addon_phrase_table = new FacadePhraseTable2;
+    context->m_addon_phrase_table = new FacadePhraseTable3;
 
     system_filename = g_build_filename
         (context->m_system_dir, ADDON_SYSTEM_PHRASE_INDEX, NULL);
@@ -479,7 +479,7 @@ bool pinyin_iterator_add_phrase(import_iterator_t * iter,
         count = default_count;
 
     pinyin_context_t * & context = iter->m_context;
-    FacadePhraseTable2 * & phrase_table = context->m_phrase_table;
+    FacadePhraseTable3 * & phrase_table = context->m_phrase_table;
     FacadeChewingTable * & pinyin_table = context->m_pinyin_table;
     FacadePhraseIndex * & phrase_index = context->m_phrase_index;
 

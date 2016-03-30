@@ -4,7 +4,7 @@
 #include <assert.h>
 #include "novel_types.h"
 #include "phrase_index.h"
-#include "phrase_large_table2.h"
+#include "phrase_large_table3.h"
 #include "tag_utility.h"
 
 namespace pinyin{
@@ -332,7 +332,7 @@ static phrase_token_t taglib_special_string_to_token(const char * string){
     return 0;
 }
 
-phrase_token_t taglib_string_to_token(PhraseLargeTable2 * phrase_table,
+phrase_token_t taglib_string_to_token(PhraseLargeTable3 * phrase_table,
                                       FacadePhraseIndex * phrase_index,
                                       const char * string){
     phrase_token_t token = null_token;

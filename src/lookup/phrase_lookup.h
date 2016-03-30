@@ -50,7 +50,7 @@ private:
     SingleGram m_merged_single_gram;
 protected:
     //saved varibles
-    FacadePhraseTable2 * m_phrase_table;
+    FacadePhraseTable3 * m_phrase_table;
     FacadePhraseIndex * m_phrase_index;
     Bigram * m_system_bigram;
     Bigram * m_user_bigram;
@@ -91,7 +91,7 @@ public:
      *
      */
     PhraseLookup(const gfloat lambda,
-                 FacadePhraseTable2 * phrase_table,
+                 FacadePhraseTable3 * phrase_table,
                  FacadePhraseIndex * phrase_index,
                  Bigram * system_bigram,
                  Bigram * user_bigram);
