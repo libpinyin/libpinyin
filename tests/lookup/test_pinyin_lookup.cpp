@@ -38,9 +38,9 @@ int main( int argc, char * argv[]){
 
     pinyin_option_t options =
         USE_TONE | USE_RESPLIT_TABLE | PINYIN_CORRECT_ALL | PINYIN_AMB_ALL;
-    FacadeChewingTable largetable;
+    FacadeChewingTable2 largetable;
 
-    largetable.load(options, "../../data/pinyin_index.bin", NULL);
+    largetable.load("../../data/pinyin_index.bin", NULL);
 
     const pinyin_table_info_t * phrase_files =
         system_table_info.get_default_tables();

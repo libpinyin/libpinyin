@@ -50,8 +50,8 @@ inline bool load_phrase_index(const pinyin_table_info_t * phrase_files,
 }
 
 inline bool load_phrase_table(const pinyin_table_info_t * phrase_files,
-                              ChewingLargeTable * chewing_table,
-                              PhraseLargeTable2 * phrase_table,
+                              ChewingLargeTable2 * chewing_table,
+                              PhraseLargeTable3 * phrase_table,
                               FacadePhraseIndex * phrase_index){
     for (size_t i = 0; i < PHRASE_INDEX_LIBRARY_COUNT; ++i) {
         const pinyin_table_info_t * table_info = phrase_files + i;

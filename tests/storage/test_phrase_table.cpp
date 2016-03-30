@@ -14,7 +14,7 @@ int main(int argc, char * argv[]){
         exit(ENOENT);
     }
 
-    PhraseLargeTable2 largetable;
+    PhraseLargeTable3 largetable;
     FacadePhraseIndex phrase_index;
 
     const pinyin_table_info_t * phrase_files =

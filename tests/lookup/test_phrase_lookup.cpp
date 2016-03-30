@@ -62,7 +62,7 @@ int main(int argc, char * argv[]){
     }
 
     /* init phrase table */
-    FacadePhraseTable2 phrase_table;
+    FacadePhraseTable3 phrase_table;
     phrase_table.load("../../data/phrase_index.bin", NULL);
 
     const pinyin_table_info_t * phrase_files =

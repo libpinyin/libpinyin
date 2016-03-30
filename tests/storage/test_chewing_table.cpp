@@ -36,7 +36,7 @@ int main(int argc, char * argv[]) {
     }
 
     pinyin_option_t options = USE_TONE | PINYIN_INCOMPLETE;
-    ChewingLargeTable largetable(options);
+    ChewingLargeTable2 largetable;
     FacadePhraseIndex phrase_index;
 
     const pinyin_table_info_t * phrase_files =
