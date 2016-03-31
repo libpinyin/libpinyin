@@ -264,6 +264,8 @@ bool PinyinLookup2::get_best_match(TokenVector prefixes,
             if (CONSTRAINT_NOSEARCH == next_constraint->m_type)
                 break;
 
+            m_phrase_index->clear_ranges(ranges);
+
             ChewingKey * pinyin_keys = (ChewingKey *)m_keys->data;
             /* do one pinyin table search. */
             int result = m_pinyin_table->search(len, pinyin_keys + i, ranges);

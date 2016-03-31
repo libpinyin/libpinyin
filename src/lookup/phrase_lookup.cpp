@@ -136,6 +136,8 @@ bool PhraseLookup::get_best_match(int sentence_length, ucs4_t sentence[],
     for ( int i = 0; i < nstep - 1; ++i ){
         for ( int m = i + 1; m < nstep; ++m ){
 
+            m_phrase_index->clear_tokens(tokens);
+
             /* do one phrase table search. */
             int result = m_phrase_table->search(m - i, sentence + i, tokens);
 
