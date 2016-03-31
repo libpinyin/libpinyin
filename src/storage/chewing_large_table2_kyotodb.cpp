@@ -52,13 +52,14 @@ void ChewingLargeTable2::reset() {
 bool ChewingLargeTable2::attach(const char * dbfile, guint32 flags) {
     reset();
 
+    init_entries();
+
     uint32_t mode = attach_options(flags);
 
     if (!dbfile)
         return false;
 
     m_db = new TreeDB;
-    init_entries();
 
     return m_db->open(dbfile, mode);
 }
@@ -67,6 +68,8 @@ bool ChewingLargeTable2::attach(const char * dbfile, guint32 flags) {
 /* use in-memory DBM here, for better performance. */
 bool ChewingLargeTable2::load_db(const char * filename) {
     reset();
+
+    init_entries();
 
     /* create in-memory db. */
     m_db = new ProtoTreeDB;
@@ -84,8 +87,6 @@ bool ChewingLargeTable2::load_db(const char * filename) {
 
     tmp_db->close();
     delete tmp_db;
-
-    init_entries();
 
     return true;
 }

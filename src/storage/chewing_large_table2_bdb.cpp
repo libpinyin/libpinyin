@@ -53,6 +53,8 @@ void ChewingLargeTable2::reset() {
 bool ChewingLargeTable2::attach(const char * dbfile, guint32 flags) {
     reset();
 
+    init_entries();
+
     u_int32_t db_flags = attach_options(flags);
 
     if (!dbfile)
@@ -66,14 +68,14 @@ bool ChewingLargeTable2::attach(const char * dbfile, guint32 flags) {
     if (ret != 0)
         return false;
 
-    init_entries();
-
     return true;
 }
 
 /* load/store method */
 bool ChewingLargeTable2::load_db(const char * filename) {
     reset();
+
+    init_entries();
 
     /* create in-memory db. */
     int ret = db_create(&m_db, NULL, 0);
@@ -102,8 +104,6 @@ bool ChewingLargeTable2::load_db(const char * filename) {
 
     if (tmp_db != NULL)
         tmp_db->close(tmp_db, 0);
-
-    init_entries();
 
     return true;
 }
