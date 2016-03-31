@@ -55,13 +55,15 @@ void PhraseLargeTable3::reset() {
 /* attach method */
 bool PhraseLargeTable3::attach(const char * dbfile, guint32 flags) {
     reset();
+
+    m_entry = new PhraseTableEntry;
+
     uint32_t mode = attach_options(flags);
 
     if (!dbfile)
         return false;
 
     m_db = new TreeDB;
-    m_entry = new PhraseTableEntry;
 
     return m_db->open(dbfile, mode);
 }
@@ -70,6 +72,8 @@ bool PhraseLargeTable3::attach(const char * dbfile, guint32 flags) {
 /* use in-memory DBM here, for better performance. */
 bool PhraseLargeTable3::load_db(const char * filename) {
     reset();
+
+    m_entry = new PhraseTableEntry;
 
     /* create in-memory db. */
     m_db = new ProtoTreeDB;
@@ -87,8 +91,6 @@ bool PhraseLargeTable3::load_db(const char * filename) {
 
     tmp_db->close();
     delete tmp_db;
-
-    m_entry = new PhraseTableEntry;
 
     return true;
 }

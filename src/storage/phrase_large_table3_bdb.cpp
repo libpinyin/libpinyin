@@ -55,6 +55,8 @@ void PhraseLargeTable3::reset() {
 bool PhraseLargeTable3::attach(const char * dbfile, guint32 flags) {
     reset();
 
+    m_entry = new PhraseTableEntry;
+
     u_int32_t db_flags = attach_options(flags);
 
     if (!dbfile)
@@ -68,14 +70,14 @@ bool PhraseLargeTable3::attach(const char * dbfile, guint32 flags) {
     if (ret != 0)
         return false;
 
-    m_entry = new PhraseTableEntry;
-
     return true;
 }
 
 /* load/store method */
 bool PhraseLargeTable3::load_db(const char * filename) {
     reset();
+
+    m_entry = new PhraseTableEntry;
 
     /* create in-memory db. */
     int ret = db_create(&m_db, NULL, 0);
@@ -104,8 +106,6 @@ bool PhraseLargeTable3::load_db(const char * filename) {
 
     if (tmp_db != NULL)
         tmp_db->close(tmp_db, 0);
-
-    m_entry = new PhraseTableEntry;
 
     return true;
 }
