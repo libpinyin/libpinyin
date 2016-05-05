@@ -22,8 +22,46 @@
 #ifndef PHONETIC_KEY_MATRIX_H
 #define PHONETIC_KEY_MATRIX_H
 
+namespace pinyin {
+
 template<struct Item>
 class PhoneticTable {
+protected:
+    /* Pointer Array of Array of Item. */
+    GPtrArray * m_table_content;
+
+public:
+    bool clear_all();
+
+    /* when call this function,
+       reserve one extra slot for the end slot. */
+    bool set_size(size_t size);
+
+    /* Array of Item. */
+    bool get_items(size_t index, GArray * items);
+
+    bool append(size_t index, Item item);
+
+};
+
+class PhoneticKeyMatrix {
+protected:
+    PhoneticTable<ChewingKey> m_keys;
+    PhoneticTable<ChewingKeyRest> m_key_rests;
+
+public:
+    bool clear_all();
+
+    /* reserve one extra slot, same as PhoneticTable. */
+    bool set_size(size_t size);
+
+    /* Array of keys and key rests. */
+    bool get_column(size_t index, GArray * keys, GArray * key_rests);
+
+    bool append(size_t index, ChewingKey & key, ChewingKeyRest & key_rest);
+
+};
+
 };
 
 #endif
