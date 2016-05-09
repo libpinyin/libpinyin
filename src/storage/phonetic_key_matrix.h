@@ -67,7 +67,7 @@ public:
         return true;
     }
 
-    bool append(size_t index, Item item) {
+    bool append(size_t index, Item & item) {
         if (index >= m_table_content->len)
             return false;
 
@@ -83,15 +83,25 @@ protected:
     PhoneticTable<ChewingKeyRest> m_key_rests;
 
 public:
-    bool clear_all();
+    bool clear_all() {
+        return m_keys.clear_all() && m_key_rests.clear_all();
+    }
 
     /* reserve one extra slot, same as PhoneticTable. */
-    bool set_size(size_t size);
+    bool set_size(size_t size) {
+        return m_keys.set_size(size) && m_key_rests.set_size(size);
+    }
 
     /* Array of keys and key rests. */
-    bool get_items(size_t index, GArray * keys, GArray * key_rests);
+    bool get_items(size_t index, GArray * keys, GArray * key_rests) {
+        return m_keys.get_items(index, keys) &&
+            m_key_rests.get_items(index, key_rests);
+    }
 
-    bool append(size_t index, ChewingKey & key, ChewingKeyRest & key_rest);
+    bool append(size_t index, ChewingKey & key, ChewingKeyRest & key_rest) {
+        return m_keys.append(index, key) &&
+            m_key_rests.append(index, key_rest);
+    }
 
 };
 
