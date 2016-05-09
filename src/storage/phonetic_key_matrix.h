@@ -22,9 +22,11 @@
 #ifndef PHONETIC_KEY_MATRIX_H
 #define PHONETIC_KEY_MATRIX_H
 
+#include "chewing_key.h"
+
 namespace pinyin {
 
-template<struct Item>
+template<typename Item>
 class PhoneticTable {
 protected:
     /* Pointer Array of Array of Item. */
@@ -33,7 +35,8 @@ protected:
 public:
     bool clear_all() {
         for (size_t i = 0; i < m_table_content->len; ++i) {
-            GArray * column = g_ptr_array_index(m_table_content, i);
+            GArray * column = (GArray *)
+                g_ptr_array_index(m_table_content, i);
             g_array_free(column, TRUE);
         }
 
@@ -62,7 +65,8 @@ public:
         if (index >= m_table_content->len)
             return false;
 
-        GArray * column = g_ptr_array_index(m_table_content, index);
+        GArray * column = (GArray *)
+            g_ptr_array_index(m_table_content, index);
         g_array_append_vals(items, column->data, column->len);
         return true;
     }
@@ -71,7 +75,8 @@ public:
         if (index >= m_table_content->len)
             return false;
 
-        GArray * column = g_ptr_array_index(m_table_content, index);
+        GArray * column = (GArray *)
+            g_ptr_array_index(m_table_content, index);
         g_array_append_val(column, item);
     }
 
