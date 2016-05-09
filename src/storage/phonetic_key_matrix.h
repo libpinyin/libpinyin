@@ -31,16 +31,49 @@ protected:
     GPtrArray * m_table_content;
 
 public:
-    bool clear_all();
+    bool clear_all() {
+        for (size_t i = 0; i < m_table_content->len; ++i) {
+            GArray * column = g_ptr_array_index(m_table_content, i);
+            g_array_free(column, TRUE);
+        }
+
+        g_ptr_array_set_size(m_table_content, 0);
+        return true;
+    }
 
     /* when call this function,
        reserve one extra slot for the end slot. */
-    bool set_size(size_t size);
+    bool set_size(size_t size) {
+        clear_all();
+
+        g_ptr_array_set_size(m_table_content, size);
+        for (size_t i = 0; i < m_table_content->len; ++i) {
+            g_ptr_array_index(m_table_content, i) =
+                g_array_new(TRUE, TRUE, sizeof(Item));
+        }
+
+        return true;
+    }
 
     /* Array of Item. */
-    bool get_items(size_t index, GArray * items);
+    bool get_items(size_t index, GArray * items) {
+        g_array_set_size(items, 0);
 
-    bool append(size_t index, Item item);
+        if (index >= m_table_content->len)
+            return false;
+
+        GArray * column = g_ptr_array_index(m_table_content, index);
+        g_array_append_vals(items, column->data, column->len);
+        return true;
+    }
+
+    bool append(size_t index, Item item) {
+        if (index >= m_table_content->len)
+            return false;
+
+        GArray * column = g_ptr_array_index(m_table_content, index);
+        g_array_append_val(column, item);
+    }
 
 };
 
@@ -56,7 +89,7 @@ public:
     bool set_size(size_t size);
 
     /* Array of keys and key rests. */
-    bool get_column(size_t index, GArray * keys, GArray * key_rests);
+    bool get_items(size_t index, GArray * keys, GArray * key_rests);
 
     bool append(size_t index, ChewingKey & key, ChewingKeyRest & key_rest);
 
