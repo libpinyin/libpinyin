@@ -72,13 +72,14 @@ public:
         return true;
     }
 
-    bool append(size_t index, Item & item) {
+    bool append(size_t index, const Item & item) {
         if (index >= m_table_content->len)
             return false;
 
         GArray * column = (GArray *)
             g_ptr_array_index(m_table_content, index);
         g_array_append_val(column, item);
+        return true;
     }
 
 };
@@ -104,7 +105,8 @@ public:
             m_key_rests.get_items(index, key_rests);
     }
 
-    bool append(size_t index, ChewingKey & key, ChewingKeyRest & key_rest) {
+    bool append(size_t index, const ChewingKey & key,
+                const ChewingKeyRest & key_rest) {
         return m_keys.append(index, key) &&
             m_key_rests.append(index, key_rest);
     }

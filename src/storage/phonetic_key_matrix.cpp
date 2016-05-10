@@ -65,5 +65,6 @@ bool fill_phonetic_key_matrix_from_chewing_keys(PhoneticKeyMatrix * matrix,
     zero_key_rest.m_raw_begin = length - 1;
     zero_key_rest.m_raw_end = length;
     matrix->append(length - 1, zero_key, zero_key_rest);
+    return true;
 }
 
