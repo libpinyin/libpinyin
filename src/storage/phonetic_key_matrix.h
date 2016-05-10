@@ -112,8 +112,8 @@ public:
 };
 
 bool fill_phonetic_key_matrix_from_chewing_keys(PhoneticKeyMatrix * matrix,
-                                                ChewingKeyVector * keys,
-                                                ChewingKeyRestVector * key_rests);
+                                                ChewingKeyVector keys,
+                                                ChewingKeyRestVector key_rests);
 
 };
 

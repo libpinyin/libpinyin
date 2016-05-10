@@ -20,8 +20,50 @@
  */
 
 #include "phonetic_key_matrix.h"
+#include <assert.h>
 
 bool fill_phonetic_key_matrix_from_chewing_keys(PhoneticKeyMatrix * matrix,
-                                                ChewingKeyVector * keys,
-                                                ChewingKeyRestVector * key_rests);
+                                                ChewingKeyVector keys,
+                                                ChewingKeyRestVector key_rests) {
+    assert(keys->len == key_rests->len);
+
+    ChewingKey * key = NULL;
+    ChewingKeyRest * key_rest = NULL;
+
+    /* last key rest. */
+    key_rest = &g_array_index(key_rests, ChewingKeyRest, key_rests->len - 1);
+
+    /* one extra slot for the last key. */
+    size_t length = key_rest->m_raw_end + 1;
+    matrix->set_size(length);
+
+    /* fill keys and key rests. */
+    size_t i;
+    for (i = 0; i < keys->len; ++i) {
+        key = &g_array_index(keys, ChewingKey, i);
+        key_rest = &g_array_index(key_rests, ChewingKeyRest, i);
+        matrix->append(key_rest->m_raw_begin, *key, *key_rest);
+    }
+
+    /* fill zero keys for "'". */
+    ChewingKeyRest * next_key_rest = NULL;
+    const ChewingKey zero_key;
+    ChewingKeyRest zero_key_rest;
+    for (i = 0; i < key_rests->len - 1; ++i) {
+        key_rest = &g_array_index(key_rests, ChewingKeyRest, i);
+        next_key_rest = &g_array_index(key_rests, ChewingKeyRest, i + 1);
+
+        for (size_t fill = key_rest->m_raw_end;
+             fill < next_key_rest->m_raw_begin; ++fill) {
+            zero_key_rest.m_raw_begin = fill;
+            zero_key_rest.m_raw_end = fill + 1;
+            matrix->append(fill, zero_key, zero_key_rest);
+        }
+    }
+
+    /* fill zero keys for the last key. */
+    zero_key_rest.m_raw_begin = length - 1;
+    zero_key_rest.m_raw_end = length;
+    matrix->append(length - 1, zero_key, zero_key_rest);
+}
 
