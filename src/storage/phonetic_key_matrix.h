@@ -22,6 +22,7 @@
 #ifndef PHONETIC_KEY_MATRIX_H
 #define PHONETIC_KEY_MATRIX_H
 
+#include "novel_types.h"
 #include "chewing_key.h"
 
 namespace pinyin {
@@ -109,6 +110,10 @@ public:
     }
 
 };
+
+bool fill_phonetic_key_matrix_from_chewing_keys(PhoneticKeyMatrix * matrix,
+                                                ChewingKeyVector * keys,
+                                                ChewingKeyRestVector * key_rests);
 
 };
 

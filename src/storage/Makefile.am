@@ -75,6 +75,7 @@ libstorage_la_SOURCES   = phrase_index.cpp \
 			   chewing_key.cpp \
 			   pinyin_parser2.cpp \
 			   zhuyin_parser2.cpp \
+			   phonetic_key_matrix.cpp \
 			   chewing_large_table.cpp \
 			   chewing_large_table2.cpp \
 			   table_info.cpp
