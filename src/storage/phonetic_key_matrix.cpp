@@ -79,10 +79,9 @@ bool dump_phonetic_key_matrix(PhoneticKeyMatrix * matrix) {
 
     for (size_t index = 0; index < length; ++index) {
         matrix->get_items(index, keys, key_rests);
+        assert(keys->len == key_rests->len);
 
         printf("Column:%ld:\n", index);
-
-        assert(keys->len == key_rests->len);
 
         for (size_t i = 0; i < keys->len; ++i) {
             ChewingKey * key = &g_array_index(keys, ChewingKey, i);

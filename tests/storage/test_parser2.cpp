@@ -26,8 +26,7 @@
 #include <assert.h>
 #include <stdlib.h>
 #include <string.h>
-#include "pinyin_parser2.h"
-#include "zhuyin_parser2.h"
+#include "pinyin_internal.h"
 
 
 static const gchar * parsername = "";
