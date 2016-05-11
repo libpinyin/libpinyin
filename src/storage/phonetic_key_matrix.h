@@ -35,6 +35,17 @@ protected:
     GPtrArray * m_table_content;
 
 public:
+    PhoneticTable() {
+        m_table_content = g_ptr_array_new();
+    }
+
+    ~PhoneticTable() {
+        clear_all();
+
+        g_ptr_array_free(m_table_content, TRUE);
+        m_table_content = NULL;
+    }
+
     bool clear_all() {
         for (size_t i = 0; i < m_table_content->len; ++i) {
             GArray * column = (GArray *)
@@ -46,7 +57,7 @@ public:
         return true;
     }
 
-    bool size() {
+    size_t size() {
         return m_table_content->len;
     }
 
@@ -99,7 +110,7 @@ public:
         return m_keys.clear_all() && m_key_rests.clear_all();
     }
 
-    bool size() {
+    size_t size() {
         assert(m_keys.size() == m_key_rests.size());
         return m_keys.size();
     }

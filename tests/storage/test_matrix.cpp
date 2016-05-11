@@ -23,6 +23,7 @@
 #include <stdlib.h>
 #include "pinyin_internal.h"
 
+size_t bench_times = 1000;
 
 using namespace pinyin;
 
@@ -30,7 +31,7 @@ int main(int argc, char * argv[]) {
     pinyin_option_t options = PINYIN_CORRECT_ALL;
     options |= PINYIN_INCOMPLETE;
 
-    PhoneticParser2 * parser = FullPinyinParser2();
+    PhoneticParser2 * parser = new FullPinyinParser2();
     ChewingKeyVector keys = g_array_new(FALSE, FALSE, sizeof(ChewingKey));
     ChewingKeyRestVector key_rests =
         g_array_new(FALSE, FALSE, sizeof(ChewingKeyRest));

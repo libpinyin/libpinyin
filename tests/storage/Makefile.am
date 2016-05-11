@@ -34,6 +34,7 @@ noinst_PROGRAMS		= test_phrase_index \
 			  test_ngram \
 			  test_flexible_ngram \
 			  test_parser2 \
+			  test_matrix \
 			  test_chewing_table \
 			  test_table_info
 
@@ -44,11 +45,13 @@ test_phrase_index_logger_SOURCES = test_phrase_index_logger.cpp
 
 test_phrase_table_SOURCES = test_phrase_table.cpp
 
-test_ngram_SOURCES	= test_ngram.cpp
+test_ngram_SOURCES = test_ngram.cpp
 
-test_flexible_ngram_SOURCES	= test_flexible_ngram.cpp
+test_flexible_ngram_SOURCES = test_flexible_ngram.cpp
 
-test_parser2_SOURCES    = test_parser2.cpp
+test_parser2_SOURCES = test_parser2.cpp
+
+test_matrix_SOURCES = test_matrix.cpp
 
 test_chewing_table_SOURCES    = test_chewing_table.cpp
 
