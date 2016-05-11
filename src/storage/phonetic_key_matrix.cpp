@@ -21,6 +21,9 @@
 
 #include "phonetic_key_matrix.h"
 #include <assert.h>
+#include <stdio.h>
+
+namespace pinyin{
 
 bool fill_phonetic_key_matrix_from_chewing_keys(PhoneticKeyMatrix * matrix,
                                                 ChewingKeyVector keys,
@@ -68,3 +71,35 @@ bool fill_phonetic_key_matrix_from_chewing_keys(PhoneticKeyMatrix * matrix,
     return true;
 }
 
+bool dump_phonetic_key_matrix(PhoneticKeyMatrix * matrix) {
+    size_t length = matrix->size();
+
+    GArray * keys = g_array_new(TRUE, TRUE, sizeof(ChewingKey));
+    GArray * key_rests = g_array_new(TRUE, TRUE, sizeof(ChewingKeyRest));
+
+    for (size_t index = 0; index < length; ++index) {
+        matrix->get_items(index, keys, key_rests);
+
+        printf("Column:%ld:\n", index);
+
+        assert(keys->len == key_rests->len);
+
+        for (size_t i = 0; i < keys->len; ++i) {
+            ChewingKey * key = &g_array_index(keys, ChewingKey, i);
+            ChewingKeyRest * key_rest = &g_array_index(key_rests,
+                                                       ChewingKeyRest, i);
+
+            gchar * pinyin = key->get_pinyin_string();
+            printf("ChewingKey:%s\n", pinyin);
+            printf("ChewingKeyRest:%hd\t%hd\n",
+                   key_rest->m_raw_begin, key_rest->m_raw_end);
+            g_free(pinyin);
+        }
+    }
+
+    g_array_free(keys, TRUE);
+    g_array_free(key_rests, TRUE);
+    return true;
+}
+
+};

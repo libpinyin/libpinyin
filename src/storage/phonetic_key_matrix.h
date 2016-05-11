@@ -22,6 +22,7 @@
 #ifndef PHONETIC_KEY_MATRIX_H
 #define PHONETIC_KEY_MATRIX_H
 
+#include <assert.h>
 #include "novel_types.h"
 #include "chewing_key.h"
 
@@ -43,6 +44,10 @@ public:
 
         g_ptr_array_set_size(m_table_content, 0);
         return true;
+    }
+
+    bool size() {
+        return m_table_content->len;
     }
 
     /* when call this function,
@@ -94,6 +99,11 @@ public:
         return m_keys.clear_all() && m_key_rests.clear_all();
     }
 
+    bool size() {
+        assert(m_keys.size() == m_key_rests.size());
+        return m_keys.size();
+    }
+
     /* reserve one extra slot, same as PhoneticTable. */
     bool set_size(size_t size) {
         return m_keys.set_size(size) && m_key_rests.set_size(size);
@@ -116,6 +126,8 @@ public:
 bool fill_phonetic_key_matrix_from_chewing_keys(PhoneticKeyMatrix * matrix,
                                                 ChewingKeyVector keys,
                                                 ChewingKeyRestVector key_rests);
+
+bool dump_phonetic_key_matrix(PhoneticKeyMatrix * matrix);
 
 };
 
