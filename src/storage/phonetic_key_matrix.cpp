@@ -88,17 +88,18 @@ bool fuzzy_syllable_step(pinyin_option_t options,
 
         size_t i = 0;
         for (i = 0; i < keys->len; ++i) {
-            ChewingKey key = g_array_index(keys, ChewingKey, i);
-            ChewingKeyRest key_rest = g_array_index(key_rests,
-                                                    ChewingKeyRest, i);
+            const ChewingKey key = g_array_index(keys, ChewingKey, i);
+            const ChewingKeyRest key_rest = g_array_index(key_rests,
+                                                          ChewingKeyRest, i);
 
-#define MATCH(AMBIGUITY, ORIGIN, ANOTHER) do {                  \
-                if (options & AMBIGUITY) {                      \
-                    if (ORIGIN == key.m_initial) {              \
-                        key.m_initial = ANOTHER;                \
-                        matrix->append(index, key, key_rest);   \
-                    }                                           \
-                }                                               \
+#define MATCH(AMBIGUITY, ORIGIN, ANOTHER) do {                      \
+                if (options & AMBIGUITY) {                          \
+                    if (ORIGIN == key.m_initial) {                  \
+                        ChewingKey newkey = key;                    \
+                        newkey.m_initial = ANOTHER;                 \
+                        matrix->append(index, newkey, key_rest);    \
+                    }                                               \
+                }                                                   \
             } while (0)
 
 
@@ -127,17 +128,18 @@ bool fuzzy_syllable_step(pinyin_option_t options,
         assert(0 != keys->len);
 
         for (i = 0; i < keys->len; ++i) {
-            ChewingKey key = g_array_index(keys, ChewingKey, i);
-            ChewingKeyRest key_rest = g_array_index(key_rests,
-                                                    ChewingKeyRest, i);
+            const ChewingKey key = g_array_index(keys, ChewingKey, i);
+            const ChewingKeyRest key_rest = g_array_index(key_rests,
+                                                          ChewingKeyRest, i);
 
-#define MATCH(AMBIGUITY, ORIGIN, ANOTHER) do {                  \
-                if (options & AMBIGUITY) {                      \
-                    if (ORIGIN == key.m_final) {                \
-                        key.m_final = ANOTHER;                 \
-                        matrix->append(index, key, key_rest);   \
-                    }                                           \
-                }                                               \
+#define MATCH(AMBIGUITY, ORIGIN, ANOTHER) do {                     \
+                if (options & AMBIGUITY) {                         \
+                    if (ORIGIN == key.m_final) {                   \
+                        ChewingKey newkey = key;                   \
+                        newkey.m_final = ANOTHER;                  \
+                        matrix->append(index, newkey, key_rest);   \
+                    }                                              \
+                }                                                  \
             } while (0)
 
 

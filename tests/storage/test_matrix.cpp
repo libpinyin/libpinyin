@@ -29,6 +29,7 @@ using namespace pinyin;
 
 int main(int argc, char * argv[]) {
     pinyin_option_t options = PINYIN_CORRECT_ALL;
+    options |= PINYIN_AMB_ALL;
     options |= PINYIN_INCOMPLETE;
 
     PhoneticParser2 * parser = new FullPinyinParser2();
@@ -57,6 +58,8 @@ int main(int argc, char * argv[]) {
 
             fill_phonetic_key_matrix_from_chewing_keys
                 (&matrix, keys, key_rests);
+
+            fuzzy_syllable_step(options, &matrix);
         }
         print_time(start_time, bench_times);
 
