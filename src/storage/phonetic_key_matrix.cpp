@@ -20,6 +20,7 @@
  */
 
 #include "phonetic_key_matrix.h"
+#include "pinyin_custom2.h"
 #include <assert.h>
 #include <stdio.h>
 
@@ -30,8 +31,8 @@ bool fill_phonetic_key_matrix_from_chewing_keys(PhoneticKeyMatrix * matrix,
                                                 ChewingKeyRestVector key_rests) {
     assert(keys->len == key_rests->len);
 
-    ChewingKey * key = NULL;
-    ChewingKeyRest * key_rest = NULL;
+    const ChewingKey * key = NULL;
+    const ChewingKeyRest * key_rest = NULL;
 
     /* last key rest. */
     key_rest = &g_array_index(key_rests, ChewingKeyRest, key_rests->len - 1);
@@ -71,6 +72,92 @@ bool fill_phonetic_key_matrix_from_chewing_keys(PhoneticKeyMatrix * matrix,
     return true;
 }
 
+bool fuzzy_syllable_step(pinyin_option_t options,
+                         PhoneticKeyMatrix * matrix) {
+    size_t length = matrix->size();
+
+    GArray * keys = g_array_new(TRUE, TRUE, sizeof(ChewingKey));
+    GArray * key_rests = g_array_new(TRUE, TRUE, sizeof(ChewingKeyRest));
+
+    for (size_t index = 0; index < length; ++index) {
+        /* for pinyin initials. */
+        matrix->get_items(index, keys, key_rests);
+        assert(keys->len == key_rests->len);
+        if (0 == keys->len)
+            continue;
+
+        size_t i = 0;
+        for (i = 0; i < keys->len; ++i) {
+            ChewingKey key = g_array_index(keys, ChewingKey, i);
+            ChewingKeyRest key_rest = g_array_index(key_rests,
+                                                    ChewingKeyRest, i);
+
+#define MATCH(AMBIGUITY, ORIGIN, ANOTHER) do {                  \
+                if (options & AMBIGUITY) {                      \
+                    if (ORIGIN == key.m_initial) {              \
+                        key.m_initial = ANOTHER;                \
+                        matrix->append(index, key, key_rest);   \
+                    }                                           \
+                }                                               \
+            } while (0)
+
+
+            MATCH(PINYIN_AMB_C_CH, CHEWING_C, CHEWING_CH);
+            MATCH(PINYIN_AMB_C_CH, CHEWING_CH, CHEWING_C);
+            MATCH(PINYIN_AMB_Z_ZH, CHEWING_Z, CHEWING_ZH);
+            MATCH(PINYIN_AMB_Z_ZH, CHEWING_ZH, CHEWING_Z);
+            MATCH(PINYIN_AMB_S_SH, CHEWING_S, CHEWING_SH);
+            MATCH(PINYIN_AMB_S_SH, CHEWING_SH, CHEWING_S);
+            MATCH(PINYIN_AMB_L_R, CHEWING_L, CHEWING_R);
+            MATCH(PINYIN_AMB_L_R, CHEWING_R, CHEWING_L);
+            MATCH(PINYIN_AMB_L_N, CHEWING_L, CHEWING_N);
+            MATCH(PINYIN_AMB_L_N, CHEWING_N, CHEWING_L);
+            MATCH(PINYIN_AMB_F_H, CHEWING_F, CHEWING_H);
+            MATCH(PINYIN_AMB_F_H, CHEWING_H, CHEWING_F);
+            MATCH(PINYIN_AMB_G_K, CHEWING_G, CHEWING_K);
+            MATCH(PINYIN_AMB_G_K, CHEWING_K, CHEWING_G);
+
+#undef MATCH
+
+        }
+
+        /* for pinyin finals. */
+        matrix->get_items(index, keys, key_rests);
+        assert(keys->len == key_rests->len);
+        assert(0 != keys->len);
+
+        for (i = 0; i < keys->len; ++i) {
+            ChewingKey key = g_array_index(keys, ChewingKey, i);
+            ChewingKeyRest key_rest = g_array_index(key_rests,
+                                                    ChewingKeyRest, i);
+
+#define MATCH(AMBIGUITY, ORIGIN, ANOTHER) do {                  \
+                if (options & AMBIGUITY) {                      \
+                    if (ORIGIN == key.m_final) {                \
+                        key.m_final = ANOTHER;                 \
+                        matrix->append(index, key, key_rest);   \
+                    }                                           \
+                }                                               \
+            } while (0)
+
+
+            MATCH(PINYIN_AMB_AN_ANG, CHEWING_AN, CHEWING_ANG);
+            MATCH(PINYIN_AMB_AN_ANG, CHEWING_ANG, CHEWING_AN);
+            MATCH(PINYIN_AMB_EN_ENG, CHEWING_EN, CHEWING_ENG);
+            MATCH(PINYIN_AMB_EN_ENG, CHEWING_ENG, CHEWING_EN);
+            MATCH(PINYIN_AMB_IN_ING, PINYIN_IN, PINYIN_ING);
+            MATCH(PINYIN_AMB_IN_ING, PINYIN_ING, PINYIN_IN);
+
+#undef MATCH
+
+        }
+    }
+
+    g_array_free(keys, TRUE);
+    g_array_free(key_rests, TRUE);
+    return true;
+}
+
 bool dump_phonetic_key_matrix(PhoneticKeyMatrix * matrix) {
     size_t length = matrix->size();
 
@@ -80,18 +167,20 @@ bool dump_phonetic_key_matrix(PhoneticKeyMatrix * matrix) {
     for (size_t index = 0; index < length; ++index) {
         matrix->get_items(index, keys, key_rests);
         assert(keys->len == key_rests->len);
+        if (0 == keys->len)
+            continue;
 
         printf("Column:%ld:\n", index);
 
         for (size_t i = 0; i < keys->len; ++i) {
-            ChewingKey * key = &g_array_index(keys, ChewingKey, i);
-            ChewingKeyRest * key_rest = &g_array_index(key_rests,
-                                                       ChewingKeyRest, i);
+            ChewingKey key = g_array_index(keys, ChewingKey, i);
+            ChewingKeyRest key_rest = g_array_index(key_rests,
+                                                    ChewingKeyRest, i);
 
-            gchar * pinyin = key->get_pinyin_string();
+            gchar * pinyin = key.get_pinyin_string();
             printf("ChewingKey:%s\n", pinyin);
             printf("ChewingKeyRest:%hd\t%hd\n",
-                   key_rest->m_raw_begin, key_rest->m_raw_end);
+                   key_rest.m_raw_begin, key_rest.m_raw_end);
             g_free(pinyin);
         }
     }

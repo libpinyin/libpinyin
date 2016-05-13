@@ -134,9 +134,23 @@ public:
 
 };
 
+/**
+ * fill_phonetic_key_matrix_from_chewing_keys:
+ * Convert ChewingKeyVector and ChewingKeyRestVector
+ * to PhoneticKeyMatrix.
+ */
 bool fill_phonetic_key_matrix_from_chewing_keys(PhoneticKeyMatrix * matrix,
                                                 ChewingKeyVector keys,
                                                 ChewingKeyRestVector key_rests);
+
+/**
+ * fuzzy_syllable_step:
+ * For "an" <=> "ang", fill the fuzzy pinyins into the matrix.
+ * Supported nearly in all pinyin parsers.
+ * At most 3 * 2 entries will be added.
+ */
+bool fuzzy_syllable_step(pinyin_option_t options,
+                         PhoneticKeyMatrix * matrix);
 
 bool dump_phonetic_key_matrix(PhoneticKeyMatrix * matrix);
 
