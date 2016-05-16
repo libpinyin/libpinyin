@@ -458,13 +458,11 @@ bool FullPinyinParser2::post_process2(pinyin_option_t options,
 
             /* do re-split */
             size_t len = strlen(item->m_new_keys[0]);
-
             *cur_key = item->m_new_structs[0];
             cur_rest->m_raw_end = cur_rest->m_raw_begin + len;
 
             next_rest->m_raw_begin = cur_rest->m_raw_end;
             len = strlen(item->m_new_keys[1]);
-
             *next_key = item->m_new_structs[1];
         }
 
