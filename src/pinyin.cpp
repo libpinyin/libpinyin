@@ -1770,13 +1770,9 @@ static bool _try_divided_table(pinyin_instance_t * instance,
 
         ChewingKey divided_keys[2];
         const char * pinyin = item->m_new_keys[0];
-        assert(context->m_full_pinyin_parser->
-               parse_one_key(options, divided_keys[0],
-                             pinyin, strlen(pinyin)));
+        divided_keys[0] = item->m_new_structs[0];
         pinyin = item->m_new_keys[1];
-        assert(context->m_full_pinyin_parser->
-               parse_one_key(options, divided_keys[1],
-                             pinyin, strlen(pinyin)));
+        divided_keys[1] = item->m_new_structs[1];
 
         gchar * new_pinyins = g_strdup_printf
             ("%s'%s", item->m_new_keys[0], item->m_new_keys[1]);
@@ -1891,13 +1887,9 @@ static bool _try_resplit_table(pinyin_instance_t * instance,
         pinyins[0] = item_by_orig->m_new_keys[0];
         pinyins[1] = item_by_orig->m_new_keys[1];
 
-        assert(context->m_full_pinyin_parser->
-               parse_one_key(options, resplit_keys[0],
-                             pinyins[0], strlen(pinyins[0])));
+        resplit_keys[0] = item_by_orig->m_new_structs[0];
+        resplit_keys[1] = item_by_orig->m_new_structs[1];
 
-        assert(context->m_full_pinyin_parser->
-               parse_one_key(options, resplit_keys[1],
-                             pinyins[1], strlen(pinyins[1])));
         tosearch = true;
     }
 
@@ -1905,13 +1897,9 @@ static bool _try_resplit_table(pinyin_instance_t * instance,
         pinyins[0] = item_by_new->m_orig_keys[0];
         pinyins[1] = item_by_new->m_orig_keys[1];
 
-        assert(context->m_full_pinyin_parser->
-               parse_one_key(options, resplit_keys[0],
-                             pinyins[0], strlen(pinyins[0])));
+        resplit_keys[0] = item_by_new->m_orig_structs[0];
+        resplit_keys[1] = item_by_new->m_orig_structs[1];
 
-        assert(context->m_full_pinyin_parser->
-               parse_one_key(options, resplit_keys[1],
-                             pinyins[1], strlen(pinyins[1])));
         tosearch = true;
     }
 

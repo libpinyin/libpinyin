@@ -53,15 +53,19 @@ typedef struct {
 
 typedef struct {
     const char * m_orig_key;
+    ChewingKey m_orig_struct;
     guint32      m_orig_freq;
     const char * m_new_keys[2];
+    ChewingKey m_new_structs[2];
     guint32      m_new_freq;
 } divided_table_item_t;
 
 typedef struct {
     const char * m_orig_keys[2];
+    ChewingKey m_orig_structs[2];
     guint32      m_orig_freq;
     const char * m_new_keys[2];
+    ChewingKey m_new_structs[2];
     guint32      m_new_freq;
 } resplit_table_item_t;
 
