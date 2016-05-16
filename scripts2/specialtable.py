@@ -25,6 +25,7 @@ import sys
 import math
 import operator
 from fullpinyin import PINYIN_LIST, SHENGMU_LIST, YUNMU_LIST
+from fullpinyintable import content_table
 
 pinyin_list = sorted(PINYIN_LIST)
 shengmu_list = sorted(SHENGMU_LIST)
@@ -125,6 +126,13 @@ def sort_all():
     resplit_list = sorted(resplit_list, key=operator.itemgetter(0, 1))
 
 
+def get_chewing_key(pinyin):
+    # item[4] is chewing key, item[0] is pinyin
+    for item in content_table:
+        if pinyin == item[0]:
+            return item[4]
+
+
 def gen_divided_table():
     entries = []
     for (pinyin_key, orig_freq, first_key, second_key, new_freq) \
@@ -133,8 +141,10 @@ def gen_divided_table():
         if orig_freq >= new_freq:
             assert orig_freq > 0, "Expected orig_freq > 0 here."
 
-        entry = '{{"{0}", {1}, {{"{2}", "{3}"}}, {4}}}'.format \
-            (pinyin_key, orig_freq, first_key, second_key, new_freq)
+        entry = '{{"{0}", {1}, {2}, {{"{3}", "{4}"}}, {{{5}, {6}}}, {7}}}'.format \
+            (pinyin_key, get_chewing_key(pinyin_key), orig_freq, \
+             first_key, second_key, \
+             get_chewing_key(first_key), get_chewing_key(second_key), new_freq)
         entries.append(entry)
     return ',\n'.join(entries)
 
@@ -147,9 +157,13 @@ def gen_resplit_table():
         if orig_freq >= new_freq:
             assert orig_freq > 0, "Expected orig_freq > 0 here."
 
-        entry = '{{{{"{0}", "{1}"}}, {2}, {{"{3}", "{4}"}}, {5}}}'.format \
-            (orig_first_key, orig_second_key, orig_freq,\
-                 new_first_key, new_second_key, new_freq)
+        entry = '{{{{"{0}", "{1}"}}, {{{2}, {3}}}, {4}, {{"{5}", "{6}"}}, {{{7}, {8}}}, {9}}}'.format \
+            (orig_first_key, orig_second_key, \
+             get_chewing_key(orig_first_key), \
+             get_chewing_key(orig_second_key), orig_freq,\
+             new_first_key, new_second_key, \
+             get_chewing_key(new_first_key), \
+             get_chewing_key(new_second_key), new_freq)
         entries.append(entry)
     return ',\n'.join(entries)
 
