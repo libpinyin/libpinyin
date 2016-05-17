@@ -144,6 +144,15 @@ bool fill_phonetic_key_matrix_from_chewing_keys(PhoneticKeyMatrix * matrix,
                                                 ChewingKeyRestVector key_rests);
 
 /**
+ * inner_split_step:
+ * For "xian" => "xi'an", add "xi'an" to the matrix for matched "xian".
+ * Currently only support this feature in Hanyu Pinyin.
+ */
+bool inner_split_step(pinyin_option_t options,
+                      PhoneticKeyMatrix * matrix);
+
+
+/**
  * fuzzy_syllable_step:
  * For "an" <=> "ang", fill the fuzzy pinyins into the matrix.
  * Supported nearly in all pinyin parsers.

@@ -72,6 +72,7 @@ bool fill_phonetic_key_matrix_from_chewing_keys(PhoneticKeyMatrix * matrix,
     return true;
 }
 
+
 bool fuzzy_syllable_step(pinyin_option_t options,
                          PhoneticKeyMatrix * matrix) {
     size_t length = matrix->size();
@@ -159,6 +160,7 @@ bool fuzzy_syllable_step(pinyin_option_t options,
     g_array_free(key_rests, TRUE);
     return true;
 }
+
 
 bool dump_phonetic_key_matrix(PhoneticKeyMatrix * matrix) {
     size_t length = matrix->size();

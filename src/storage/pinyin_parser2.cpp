@@ -32,6 +32,7 @@
 #include "chewing_key.h"
 #include "pinyin_parser_table.h"
 #include "double_pinyin_table.h"
+#include "phonetic_key_matrix.h"
 
 
 using namespace pinyin;
@@ -898,4 +899,59 @@ int PinyinDirectParser2::parse(pinyin_option_t options,
     }
 
     return parsed_len;
+}
+
+
+/* need to use the pinyin_parser_table header. */
+bool inner_split_step(pinyin_option_t options,
+                      PhoneticKeyMatrix * matrix) {
+    size_t length = matrix->size();
+
+    GArray * keys = g_array_new(TRUE, TRUE, sizeof(ChewingKey));
+    GArray * key_rests = g_array_new(TRUE, TRUE, sizeof(ChewingKeyRest));
+
+    for (size_t index = 0; index < length; ++index) {
+        matrix->get_items(index, keys, key_rests);
+        assert(keys->len == key_rests->len);
+        if (0 ==  keys->len)
+            continue;
+
+        for (size_t i = 0; i < keys->len; ++i) {
+            const ChewingKey key = g_array_index(keys, ChewingKey, i);
+            const ChewingKeyRest key_rest = g_array_index(key_rests,
+                                                          ChewingKeyRest, i);
+
+            /* lookup divided table */
+            size_t k;
+            const divided_table_item_t * item = NULL;
+            for (k = 0; k < G_N_ELEMENTS(divided_table); ++k) {
+                item = divided_table + k;
+
+                if (key == item->m_orig_struct)
+                    break;
+            }
+
+            /* found the match */
+            if (k < G_N_ELEMENTS(divided_table)) {
+                /* divide the key */
+                item = divided_table + k;
+
+                size_t midindex = index + strlen(item->m_new_keys[0]);
+
+                ChewingKey newkey = item->m_new_structs[0];
+                ChewingKeyRest newkeyrest = key_rest;
+                newkeyrest.m_raw_end = midindex;
+                matrix->append(index, newkey, newkeyrest);
+
+                newkey = item->m_new_structs[1];
+                newkeyrest = key_rest;
+                newkeyrest.m_raw_begin = midindex;
+                matrix->append(midindex, newkey, newkeyrest);
+            }
+        }
+    }
+
+    g_array_free(keys, TRUE);
+    g_array_free(key_rests, TRUE);
+    return true;
 }
