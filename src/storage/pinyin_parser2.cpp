@@ -901,6 +901,82 @@ int PinyinDirectParser2::parse(pinyin_option_t options,
     return parsed_len;
 }
 
+/* need to use the pinyin_parser_table header. */
+bool resplit_step(pinyin_option_t options,
+                  PhoneticKeyMatrix * matrix) {
+    size_t length = matrix->size();
+
+    GArray * keys = g_array_new(TRUE, TRUE, sizeof(ChewingKey));
+    GArray * key_rests = g_array_new(TRUE, TRUE, sizeof(ChewingKeyRest));
+
+    GArray * next_keys = g_array_new(TRUE, TRUE, sizeof(ChewingKey));
+    GArray * next_key_rests = g_array_new(TRUE, TRUE, sizeof(ChewingKeyRest));
+
+    /* skip the last column */
+    for (size_t index = 0; index < length - 1; ++index) {
+        matrix->get_items(index, keys, key_rests);
+        assert(keys->len == key_rests->len);
+        if (0 == keys->len)
+            continue;
+
+        for (size_t i = 0; i < keys->len; ++i) {
+            const ChewingKey key = g_array_index(keys, ChewingKey, i);
+            const ChewingKeyRest key_rest = g_array_index(key_rests,
+                                                      ChewingKeyRest, i);
+
+            size_t midindex = key_rest.m_raw_end;
+            matrix->get_items(midindex, next_keys, next_key_rests);
+            assert(next_keys->len == next_key_rests->len);
+            if (0 == next_keys->len)
+                continue;
+
+            for (size_t j = 0; j < next_keys->len; ++j) {
+                const ChewingKey next_key = g_array_index
+                    (next_keys, ChewingKey, j);
+                const ChewingKeyRest next_key_rest = g_array_index
+                    (next_key_rests, ChewingKeyRest, j);
+
+                /* lookup resplit table */
+                size_t k;
+                const resplit_table_item_t * item = NULL;
+                for (k = 0; k < G_N_ELEMENTS(resplit_table); ++k) {
+                    item = resplit_table + k;
+
+                    /* "'" is filled by zero key of ChewingKey. */
+                    if (key == item->m_orig_structs[0] &&
+                        next_key == item->m_orig_structs[1])
+                        break;
+                }
+
+                /* found the match */
+                if (k < G_N_ELEMENTS(resplit_table)) {
+                    /* resplit the key */
+                    item = resplit_table + k;
+
+                    size_t newindex = index + strlen(item->m_new_keys[0]);
+
+                    ChewingKey newkey = item->m_new_structs[0];
+                    ChewingKeyRest newkeyrest = key_rest;
+                    newkeyrest.m_raw_end = newindex;
+                    matrix->append(index, newkey, newkeyrest);
+
+                    newkey = item->m_new_structs[1];
+                    newkeyrest = next_key_rest;
+                    newkeyrest.m_raw_begin = newindex;
+                    matrix->append(newindex, newkey, newkeyrest);
+                }
+            }
+        }
+    }
+
+    g_array_free(next_keys, TRUE);
+    g_array_free(next_key_rests, TRUE);
+
+    g_array_free(keys, TRUE);
+    g_array_free(key_rests, TRUE);
+    return true;
+}
+
 
 /* need to use the pinyin_parser_table header. */
 bool inner_split_step(pinyin_option_t options,
@@ -936,17 +1012,17 @@ bool inner_split_step(pinyin_option_t options,
                 /* divide the key */
                 item = divided_table + k;
 
-                size_t midindex = index + strlen(item->m_new_keys[0]);
+                size_t newindex = index + strlen(item->m_new_keys[0]);
 
                 ChewingKey newkey = item->m_new_structs[0];
                 ChewingKeyRest newkeyrest = key_rest;
-                newkeyrest.m_raw_end = midindex;
+                newkeyrest.m_raw_end = newindex;
                 matrix->append(index, newkey, newkeyrest);
 
                 newkey = item->m_new_structs[1];
                 newkeyrest = key_rest;
-                newkeyrest.m_raw_begin = midindex;
-                matrix->append(midindex, newkey, newkeyrest);
+                newkeyrest.m_raw_begin = newindex;
+                matrix->append(newindex, newkey, newkeyrest);
             }
         }
     }

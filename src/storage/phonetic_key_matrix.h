@@ -144,6 +144,14 @@ bool fill_phonetic_key_matrix_from_chewing_keys(PhoneticKeyMatrix * matrix,
                                                 ChewingKeyRestVector key_rests);
 
 /**
+ * resplit_step:
+ * For "fa'nan" => "fan'an", add "fan'an" to the matrix for matched "fa'nan".
+ * Currently only support this feature in Hanyu Pinyin.
+ */
+bool resplit_step(pinyin_option_t options,
+                  PhoneticKeyMatrix * matrix);
+
+/**
  * inner_split_step:
  * For "xian" => "xi'an", add "xi'an" to the matrix for matched "xian".
  * Currently only support this feature in Hanyu Pinyin.
