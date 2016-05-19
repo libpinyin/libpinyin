@@ -250,13 +250,19 @@ int search_matrix(FacadeChewingTable2 * table,
     GArray * key_rests = g_array_new(TRUE, TRUE, sizeof(ChewingKeyRest));
 
     matrix->get_items(start, keys, key_rests);
-    const size_t len = keys->len;
+    const size_t start_len = keys->len;
+
+    matrix->get_items(end, keys, key_rests);
+    const size_t end_len = keys->len;
 
     g_array_free(keys, TRUE);
     g_array_free(key_rests, TRUE);
 
+    if (0 == start_len)
+        return SEARCH_NONE;
+
     /* for empty column simply return SEARCH_CONTINUED. */
-    if (0 == len)
+    if (0 == end_len)
         return SEARCH_CONTINUED;
 
     GArray * cached_keys = g_array_new(TRUE, TRUE, sizeof(ChewingKey));
