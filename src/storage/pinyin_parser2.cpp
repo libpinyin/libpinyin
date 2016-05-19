@@ -35,7 +35,7 @@
 #include "phonetic_key_matrix.h"
 
 
-using namespace pinyin;
+namespace pinyin{
 
 static bool check_pinyin_options(pinyin_option_t options, const pinyin_index_item_t * item) {
     guint32 flags = item->m_flags;
@@ -1016,4 +1016,6 @@ bool inner_split_step(pinyin_option_t options,
     g_array_free(keys, TRUE);
     g_array_free(key_rests, TRUE);
     return true;
+}
+
 }

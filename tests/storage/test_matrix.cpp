@@ -59,6 +59,10 @@ int main(int argc, char * argv[]) {
             fill_phonetic_key_matrix_from_chewing_keys
                 (&matrix, keys, key_rests);
 
+            resplit_step(options, &matrix);
+
+            inner_split_step(options, &matrix);
+
             fuzzy_syllable_step(options, &matrix);
         }
         print_time(start_time, bench_times);
