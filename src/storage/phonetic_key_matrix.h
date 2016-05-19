@@ -123,8 +123,11 @@ public:
 
     /* Array of keys and key rests. */
     bool get_items(size_t index, GArray * keys, GArray * key_rests) {
-        return m_keys.get_items(index, keys) &&
+        bool result = m_keys.get_items(index, keys) &&
             m_key_rests.get_items(index, key_rests);
+
+        assert(keys->len == key_rests->len);
+        return result;
     }
 
     bool append(size_t index, const ChewingKey & key,

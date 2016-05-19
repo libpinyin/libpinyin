@@ -83,7 +83,6 @@ bool fuzzy_syllable_step(pinyin_option_t options,
     for (size_t index = 0; index < length; ++index) {
         /* for pinyin initials. */
         matrix->get_items(index, keys, key_rests);
-        assert(keys->len == key_rests->len);
         if (0 == keys->len)
             continue;
 
@@ -125,7 +124,6 @@ bool fuzzy_syllable_step(pinyin_option_t options,
 
         /* for pinyin finals. */
         matrix->get_items(index, keys, key_rests);
-        assert(keys->len == key_rests->len);
         assert(0 != keys->len);
 
         for (i = 0; i < keys->len; ++i) {
@@ -170,7 +168,6 @@ bool dump_phonetic_key_matrix(PhoneticKeyMatrix * matrix) {
 
     for (size_t index = 0; index < length; ++index) {
         matrix->get_items(index, keys, key_rests);
-        assert(keys->len == key_rests->len);
         if (0 == keys->len)
             continue;
 
@@ -218,7 +215,6 @@ int search_matrix_recur(GArray * cached_keys,
     GArray * key_rests = g_array_new(TRUE, TRUE, sizeof(ChewingKeyRest));
 
     matrix->get_items(start, keys, key_rests);
-    assert(keys->len == key_rests->len);
     /* assume pinyin parsers will filter invalid keys. */
     assert(0 != keys->len);
 
@@ -254,7 +250,6 @@ int search_matrix(FacadeChewingTable2 * table,
     GArray * key_rests = g_array_new(TRUE, TRUE, sizeof(ChewingKeyRest));
 
     matrix->get_items(start, keys, key_rests);
-    assert(keys->len == key_rests->len);
     const size_t len = keys->len;
 
     g_array_free(keys, TRUE);

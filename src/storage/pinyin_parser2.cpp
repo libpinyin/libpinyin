@@ -898,7 +898,6 @@ bool resplit_step(pinyin_option_t options,
     /* skip the last column */
     for (size_t index = 0; index < length - 1; ++index) {
         matrix->get_items(index, keys, key_rests);
-        assert(keys->len == key_rests->len);
         if (0 == keys->len)
             continue;
 
@@ -974,7 +973,6 @@ bool inner_split_step(pinyin_option_t options,
 
     for (size_t index = 0; index < length; ++index) {
         matrix->get_items(index, keys, key_rests);
-        assert(keys->len == key_rests->len);
         if (0 ==  keys->len)
             continue;
 
