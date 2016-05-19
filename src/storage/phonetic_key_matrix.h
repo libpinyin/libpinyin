@@ -99,6 +99,25 @@ public:
         return true;
     }
 
+    size_t get_column_size(size_t index) {
+        assert(index < m_table_content->len);
+
+        GArray * column = (GArray *)
+            g_ptr_array_index(m_table_content, index);
+        return column->len;
+    }
+
+    bool get_item(size_t index, size_t row, Item & item) {
+        assert(index < m_table_content->len);
+
+        GArray * column = (GArray *)
+            g_ptr_array_index(m_table_content, index);
+        assert(row < column->len);
+
+        item = g_array_index(column, Item, row);
+        return true;
+    }
+
 };
 
 class PhoneticKeyMatrix {
@@ -134,6 +153,18 @@ public:
                 const ChewingKeyRest & key_rest) {
         return m_keys.append(index, key) &&
             m_key_rests.append(index, key_rest);
+    }
+
+    size_t get_column_size(size_t index) {
+        const size_t size = m_keys.get_column_size(index);
+        assert(size == m_key_rests.get_column_size(index));
+        return size;
+    }
+
+    bool get_item(size_t index, size_t row,
+                  ChewingKey & key, ChewingKeyRest & key_rest) {
+        return m_keys.get_item(index, row, key) &&
+            m_key_rests.get_item(index, row, key_rest);
     }
 
 };

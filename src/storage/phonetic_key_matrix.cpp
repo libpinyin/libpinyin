@@ -211,28 +211,21 @@ int search_matrix_recur(GArray * cached_keys,
     }
 
     int result = SEARCH_NONE;
-    GArray * keys = g_array_new(TRUE, TRUE, sizeof(ChewingKey));
-    GArray * key_rests = g_array_new(TRUE, TRUE, sizeof(ChewingKeyRest));
 
-    matrix->get_items(start, keys, key_rests);
+    const size_t size = matrix->get_column_size(start);
     /* assume pinyin parsers will filter invalid keys. */
-    assert(0 != keys->len);
+    assert(0 != size);
 
-    for (size_t i = 0; i < keys->len; ++i) {
-        const ChewingKey key = g_array_index(keys, ChewingKey, i);
-        const ChewingKeyRest key_rest = g_array_index(key_rests,
-                                                      ChewingKeyRest, i);
+    for (size_t i = 0; i < size; ++i) {
+        ChewingKey key; ChewingKeyRest key_rest;
+        matrix->get_item(start, i, key, key_rest);
 
         size_t newstart = key_rest.m_raw_end;
 
         const ChewingKey zero_key;
         if (zero_key == key) {
-            /* assume only one key here. */
-            assert(1 == keys->len);
-
-            g_array_free(keys, TRUE);
-            g_array_free(key_rests, TRUE);
-
+            /* assume only one key here for "'" or the last key. */
+            assert(1 == size);
             return search_matrix_recur(cached_keys, table, matrix,
                                        newstart, end, ranges, longest);
         }
@@ -248,8 +241,6 @@ int search_matrix_recur(GArray * cached_keys,
         g_array_set_size(cached_keys, cached_keys->len - 1);
     }
 
-    g_array_free(keys, TRUE);
-    g_array_free(key_rests, TRUE);
     return true;
 }
 
@@ -259,21 +250,11 @@ int search_matrix(FacadeChewingTable2 * table,
                   PhraseIndexRanges ranges) {
     assert(end < matrix->size());
 
-    GArray * keys = g_array_new(TRUE, TRUE, sizeof(ChewingKey));
-    GArray * key_rests = g_array_new(TRUE, TRUE, sizeof(ChewingKeyRest));
-
-    matrix->get_items(start, keys, key_rests);
-    const size_t start_len = keys->len;
-
-    matrix->get_items(end, keys, key_rests);
-    const size_t end_len = keys->len;
-
-    g_array_free(keys, TRUE);
-    g_array_free(key_rests, TRUE);
-
+    const size_t start_len = matrix->get_column_size(start);
     if (0 == start_len)
         return SEARCH_NONE;
 
+    const size_t end_len = matrix->get_column_size(end);
     /* for empty column simply return SEARCH_CONTINUED. */
     if (0 == end_len)
         return SEARCH_CONTINUED;
