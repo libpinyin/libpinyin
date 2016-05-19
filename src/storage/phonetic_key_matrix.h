@@ -25,6 +25,7 @@
 #include <assert.h>
 #include "novel_types.h"
 #include "chewing_key.h"
+#include "facade_chewing_table2.h"
 
 namespace pinyin {
 
@@ -171,6 +172,10 @@ bool fuzzy_syllable_step(pinyin_option_t options,
 
 bool dump_phonetic_key_matrix(PhoneticKeyMatrix * matrix);
 
+int search_matrix(FacadeChewingTable2 * table,
+                  PhoneticKeyMatrix * matrix,
+                  size_t start, size_t end,
+                  PhraseIndexRanges ranges);
 };
 
 #endif

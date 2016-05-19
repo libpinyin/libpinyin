@@ -194,4 +194,89 @@ bool dump_phonetic_key_matrix(PhoneticKeyMatrix * matrix) {
     return true;
 }
 
+int search_matrix_recur(GArray * cached_keys,
+                        FacadeChewingTable2 * table,
+                        PhoneticKeyMatrix * matrix,
+                        size_t start, size_t end,
+                        PhraseIndexRanges ranges,
+                        size_t & longest) {
+    if (start > end)
+        return SEARCH_NONE;
+
+    /* only do chewing table search with 'start' and 'end'. */
+    if (start == end) {
+        /* exceed the maximum phrase length.  */
+        if (cached_keys->len > MAX_PHRASE_LENGTH)
+            return SEARCH_NONE;
+
+        return table->search(cached_keys->len,
+                             (ChewingKey *)cached_keys->data, ranges);
+    }
+
+    int result = SEARCH_NONE;
+    GArray * keys = g_array_new(TRUE, TRUE, sizeof(ChewingKey));
+    GArray * key_rests = g_array_new(TRUE, TRUE, sizeof(ChewingKeyRest));
+
+    matrix->get_items(start, keys, key_rests);
+    assert(keys->len == key_rests->len);
+    /* assume pinyin parsers will filter invalid keys. */
+    assert(0 != keys->len);
+
+    for (size_t i = 0; i < keys->len; ++i) {
+        const ChewingKey key = g_array_index(keys, ChewingKey, i);
+        const ChewingKeyRest key_rest = g_array_index(key_rests,
+                                                      ChewingKeyRest, i);
+
+        /* push value */
+        g_array_append_val(cached_keys, key);
+        size_t newstart = key_rest.m_raw_end;
+        longest = std_lite::max(longest, newstart);
+
+        result |= search_matrix_recur(cached_keys, table, matrix,
+                                      newstart, end, ranges, longest);
+
+        /* pop value */
+        g_array_set_size(cached_keys, cached_keys->len - 1);
+    }
+
+    g_array_free(keys, TRUE);
+    g_array_free(key_rests, TRUE);
+    return true;
+}
+
+int search_matrix(FacadeChewingTable2 * table,
+                  PhoneticKeyMatrix * matrix,
+                  size_t start, size_t end,
+                  PhraseIndexRanges ranges) {
+    assert(end < matrix->size());
+
+    GArray * keys = g_array_new(TRUE, TRUE, sizeof(ChewingKey));
+    GArray * key_rests = g_array_new(TRUE, TRUE, sizeof(ChewingKeyRest));
+
+    matrix->get_items(start, keys, key_rests);
+    assert(keys->len == key_rests->len);
+    const size_t len = keys->len;
+
+    g_array_free(keys, TRUE);
+    g_array_free(key_rests, TRUE);
+
+    /* for empty column simply return SEARCH_CONTINUED. */
+    if (0 == len)
+        return SEARCH_CONTINUED;
+
+    GArray * cached_keys = g_array_new(TRUE, TRUE, sizeof(ChewingKey));
+
+    size_t longest = 0;
+    int result = search_matrix_recur(cached_keys, table, matrix,
+                                     start, end, ranges, longest);
+
+    /* if any recur search return SEARCH_CONTINUED or longest > end,
+       then return SEARCH_CONTINUED. */
+    if (longest > end)
+        result |= SEARCH_CONTINUED;
+
+    g_array_free(cached_keys, TRUE);
+    return result;
+}
+
 };
