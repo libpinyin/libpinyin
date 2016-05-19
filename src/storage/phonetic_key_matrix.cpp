@@ -223,9 +223,22 @@ int search_matrix_recur(GArray * cached_keys,
         const ChewingKeyRest key_rest = g_array_index(key_rests,
                                                       ChewingKeyRest, i);
 
+        size_t newstart = key_rest.m_raw_end;
+
+        const ChewingKey zero_key;
+        if (zero_key == key) {
+            /* assume only one key here. */
+            assert(1 == keys->len);
+
+            g_array_free(keys, TRUE);
+            g_array_free(key_rests, TRUE);
+
+            return search_matrix_recur(cached_keys, table, matrix,
+                                       newstart, end, ranges, longest);
+        }
+
         /* push value */
         g_array_append_val(cached_keys, key);
-        size_t newstart = key_rest.m_raw_end;
         longest = std_lite::max(longest, newstart);
 
         result |= search_matrix_recur(cached_keys, table, matrix,
