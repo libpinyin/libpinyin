@@ -302,29 +302,6 @@ int FullPinyinParser2::parse (pinyin_option_t options, ChewingKeyVector & keys,
                     value.m_num_keys == nextstep->m_num_keys) {
 
 #if 0
-                    /* prefer the complete pinyin with shengmu
-                     * over without shengmu,
-                     * ex: "kaneiji" -> "ka'nei'ji".
-                     */
-                    if ((value.m_key.m_initial != CHEWING_ZERO_INITIAL &&
-                         !(value.m_key.m_middle == CHEWING_ZERO_MIDDLE &&
-                           value.m_key.m_final == CHEWING_ZERO_FINAL)) &&
-                        nextstep->m_key.m_initial == CHEWING_ZERO_INITIAL)
-                        *nextstep = value;
-
-                    /* prefer the complete pinyin 'er'
-                     * over the in-complete pinyin 'r',
-                     * ex: "xierqi" -> "xi'er'qi."
-                     */
-                    if ((value.m_key.m_initial == CHEWING_ZERO_INITIAL &&
-                        value.m_key.m_middle == CHEWING_ZERO_MIDDLE &&
-                        value.m_key.m_final == CHEWING_ER) &&
-                        (nextstep->m_key.m_initial == CHEWING_R &&
-                         nextstep->m_key.m_middle == CHEWING_ZERO_MIDDLE &&
-                         nextstep->m_key.m_final == CHEWING_ZERO_FINAL))
-                        *nextstep = value;
-#endif
-
                     /* prefer the 'a' at the end of clause,
                      * ex: "zheyanga$" -> "zhe'yang'a$".
                      */
@@ -335,6 +312,7 @@ int FullPinyinParser2::parse (pinyin_option_t options, ChewingKeyVector & keys,
                          value.m_key.m_middle == CHEWING_ZERO_MIDDLE &&
                          value.m_key.m_final == CHEWING_A))
                         *nextstep = value;
+#endif
                 }
             }
         }
@@ -343,10 +321,12 @@ int FullPinyinParser2::parse (pinyin_option_t options, ChewingKeyVector & keys,
     /* final step for back tracing. */
     gint16 parsed_len = final_step(step_len, keys, key_rests);
 
+#if 0
     /* post processing for re-split table. */
     if (options & USE_RESPLIT_TABLE) {
         post_process2(options, keys, key_rests, str, len);
     }
+#endif
 
     g_free(input);
     return parsed_len;
@@ -409,6 +389,7 @@ bool FullPinyinParser2::set_scheme(FullPinyinScheme scheme){
     return true;
 }
 
+#if 0
 bool FullPinyinParser2::post_process2(pinyin_option_t options,
                                       ChewingKeyVector & keys,
                                       ChewingKeyRestVector & key_rests,
@@ -589,6 +570,8 @@ const resplit_table_item_t * FullPinyinParser2::retrieve_resplit_item_by_resplit
 
     return NULL;
 }
+
+#endif
 
 #define IS_KEY(x)   (('a' <= x && x <= 'z') || x == ';')
 
@@ -941,6 +924,9 @@ bool resplit_step(pinyin_option_t options,
                 const resplit_table_item_t * item = NULL;
                 for (k = 0; k < G_N_ELEMENTS(resplit_table); ++k) {
                     item = resplit_table + k;
+
+                    /* As no resplit table used in the FullPinyinParser2,
+                       only one-way match is needed, this is simpler. */
 
                     /* "'" is filled by zero key of ChewingKey. */
                     if (key == item->m_orig_structs[0] &&

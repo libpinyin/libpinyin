@@ -1726,7 +1726,7 @@ bool pinyin_guess_candidates(pinyin_instance_t * instance,
     return true;
 }
 
-
+#if 0
 static bool _try_divided_table(pinyin_instance_t * instance,
                                PhraseIndexRanges ranges,
                                size_t offset,
@@ -1946,6 +1946,7 @@ static bool _try_resplit_table(pinyin_instance_t * instance,
 
     return found;
 }
+#endif
 
 bool pinyin_guess_full_pinyin_candidates(pinyin_instance_t * instance,
                                          size_t offset){
@@ -1989,6 +1990,7 @@ bool pinyin_guess_full_pinyin_candidates(pinyin_instance_t * instance,
 
     GArray * items = g_array_new(FALSE, FALSE, sizeof(lookup_candidate_t));
 
+#if 0
     if (1 == pinyin_len) {
         /* because there is only one pinyin left,
          *  the following for-loop will not produce 2 character candidates.
@@ -2022,11 +2024,13 @@ bool pinyin_guess_full_pinyin_candidates(pinyin_instance_t * instance,
             }
         }
     }
+#endif
 
     for (i = pinyin_len; i >= 1; --i) {
         bool found = false;
         g_array_set_size(items, 0);
 
+#if 0
         if (2 == i) {
             /* handle fuzzy pinyin segment here. */
             if (options & USE_DIVIDED_TABLE) {
@@ -2038,6 +2042,7 @@ bool pinyin_guess_full_pinyin_candidates(pinyin_instance_t * instance,
                     found;
             }
         }
+#endif
 
         ChewingKey * keys = &g_array_index
             (pinyin_keys, ChewingKey, offset);
