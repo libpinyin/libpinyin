@@ -22,15 +22,32 @@
 #include "timer.h"
 #include <stdlib.h>
 #include "pinyin_internal.h"
+#include "tests_helper.h"
 
 size_t bench_times = 1000;
 
 using namespace pinyin;
 
 int main(int argc, char * argv[]) {
-    pinyin_option_t options = PINYIN_CORRECT_ALL;
-    options |= PINYIN_AMB_ALL;
-    options |= PINYIN_INCOMPLETE;
+    SystemTableInfo2 system_table_info;
+
+    bool retval = system_table_info.load("../../data/table.conf");
+    if (!retval) {
+        fprintf(stderr, "load table.conf failed.\n");
+        exit(ENOENT);
+    }
+
+    pinyin_option_t options = PINYIN_CORRECT_ALL | PINYIN_AMB_ALL | PINYIN_INCOMPLETE;
+
+    FacadeChewingTable2 largetable;
+    largetable.load("../../data/pinyin_index.bin", NULL);
+
+    const pinyin_table_info_t * phrase_files =
+        system_table_info.get_default_tables();
+
+    FacadePhraseIndex phrase_index;
+    if (!load_phrase_index(phrase_files, &phrase_index))
+        exit(ENOENT);
 
     PhoneticParser2 * parser = new FullPinyinParser2();
     ChewingKeyVector keys = g_array_new(FALSE, FALSE, sizeof(ChewingKey));
@@ -70,6 +87,30 @@ int main(int argc, char * argv[]) {
         printf("parsed %d chars, %d keys.\n", len, keys->len);
 
         dump_phonetic_key_matrix(&matrix);
+
+        PhraseIndexRanges ranges;
+        memset(ranges, 0, sizeof(PhraseIndexRanges));
+
+        phrase_index.prepare_ranges(ranges);
+
+        for (size_t i = 0; i < matrix.size(); ++i) {
+            for (size_t j = i + 1; j < matrix.size(); ++j) {
+                phrase_index.clear_ranges(ranges);
+
+                printf("search index: start %ld\t end %ld\n", i, j);
+                int retval = search_matrix(&largetable, &matrix, i, j, ranges);
+
+#if 0
+                if (retval & SEARCH_OK)
+                    dump_ranges(&phrase_index, ranges);
+#endif
+
+                if (!(retval & SEARCH_CONTINUED))
+                    break;
+            }
+        }
+
+        phrase_index.destroy_ranges(ranges);
     }
 
     if (linebuf)
