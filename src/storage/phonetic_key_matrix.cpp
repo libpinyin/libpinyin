@@ -92,14 +92,15 @@ bool fuzzy_syllable_step(pinyin_option_t options,
             const ChewingKeyRest key_rest = g_array_index(key_rests,
                                                           ChewingKeyRest, i);
 
-#define MATCH(AMBIGUITY, ORIGIN, ANOTHER) do {                      \
-                if (options & AMBIGUITY) {                          \
-                    if (ORIGIN == key.m_initial) {                  \
-                        ChewingKey newkey = key;                    \
-                        newkey.m_initial = ANOTHER;                 \
-                        matrix->append(index, newkey, key_rest);    \
-                    }                                               \
-                }                                                   \
+#define MATCH(AMBIGUITY, ORIGIN, ANOTHER) do {                          \
+                if (options & AMBIGUITY) {                              \
+                    if (ORIGIN == key.m_initial) {                      \
+                        ChewingKey newkey = key;                        \
+                        newkey.m_initial = ANOTHER;                     \
+                        if (0 != newkey.get_table_index())              \
+                            matrix->append(index, newkey, key_rest);    \
+                    }                                                   \
+                }                                                       \
             } while (0)
 
 
@@ -241,7 +242,7 @@ int search_matrix_recur(GArray * cached_keys,
         g_array_set_size(cached_keys, cached_keys->len - 1);
     }
 
-    return true;
+    return result;
 }
 
 int search_matrix(FacadeChewingTable2 * table,
