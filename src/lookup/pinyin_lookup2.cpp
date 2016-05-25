@@ -34,7 +34,7 @@ const gfloat PinyinLookup2::unigram_lambda = 1 - lambda;
 /* internal definition */
 static const size_t nbeam = 32;
 
-static bool dump_max_value(GPtrArray * values){
+bool dump_max_value(GPtrArray * values){
     if (0 == values->len)
         return false;
 
@@ -54,7 +54,7 @@ static bool dump_max_value(GPtrArray * values){
     return true;
 }
 
-static bool dump_all_values(GPtrArray * values) {
+bool dump_all_values(GPtrArray * values) {
     if (0 == values->len)
         return false;
 
@@ -203,8 +203,10 @@ PinyinLookup2::PinyinLookup2(const gfloat lambda,
     m_steps_index = g_ptr_array_new();
     m_steps_content = g_ptr_array_new();
 
+    m_cached_keys = g_array_new(TRUE, TRUE, sizeof(ChewingKey));
+
     /* the member variables below are saved in get_best_match call. */
-    m_keys = NULL;
+    m_matrix = NULL;
     m_constraints = NULL;
 }
 
@@ -212,6 +214,7 @@ PinyinLookup2::~PinyinLookup2(){
     clear_steps(m_steps_index, m_steps_content);
     g_ptr_array_free(m_steps_index, TRUE);
     g_ptr_array_free(m_steps_content, TRUE);
+    g_array_free(m_cached_keys, TRUE);
 }
 
 
@@ -254,8 +257,6 @@ bool PinyinLookup2::get_best_match(TokenVector prefixes,
             continue;
 
         for ( int m = i + 1; m < nstep; ++m ){
-            const int len = m - i;
-
             lookup_constraint_t * next_constraint = &g_array_index
                 (m_constraints, lookup_constraint_t, m);
 
@@ -268,14 +269,14 @@ bool PinyinLookup2::get_best_match(TokenVector prefixes,
             int retval = search_matrix(m_pinyin_table, m_matrix,
                                        i, m, ranges);
 
-            if (result & SEARCH_OK) {
+            if (retval & SEARCH_OK) {
                 /* assume topresults always contains items. */
                 search_bigram2(topresults, i, m, ranges),
                     search_unigram2(topresults, i, m, ranges);
             }
 
             /* no longer pinyin */
-            if (!(result & SEARCH_CONTINUED))
+            if (!(retval & SEARCH_CONTINUED))
                 break;
         }
     }
@@ -404,8 +405,8 @@ bool PinyinLookup2::unigram_gen_next_step(int start, int end,
     if ( elem_poss < DBL_EPSILON )
         return false;
 
-    ChewingKey * pinyin_keys = ((ChewingKey *)m_keys->data) + nstep;
-    gfloat pinyin_poss = m_cache_phrase_item.get_pronunciation_possibility(m_options, pinyin_keys);
+    gfloat pinyin_poss = compute_pronunciation_possibility
+        (m_options, m_matrix, start, end, m_cached_keys, m_cache_phrase_item);
     if (pinyin_poss < FLT_EPSILON )
         return false;
 
@@ -432,8 +433,8 @@ bool PinyinLookup2::bigram_gen_next_step(int start, int end,
     if ( bigram_poss < FLT_EPSILON && unigram_poss < DBL_EPSILON )
         return false;
 
-    ChewingKey * pinyin_keys = ((ChewingKey *)m_keys->data) + nstep;
-    gfloat pinyin_poss = m_cache_phrase_item.get_pronunciation_possibility(m_options, pinyin_keys);
+    gfloat pinyin_poss = compute_pronunciation_possibility
+        (m_options, m_matrix, start, end, m_cached_keys, m_cache_phrase_item);
     if ( pinyin_poss < FLT_EPSILON )
         return false;
 
