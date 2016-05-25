@@ -207,6 +207,13 @@ int search_matrix_recur(GArray * cached_keys,
         if (cached_keys->len > MAX_PHRASE_LENGTH)
             return SEARCH_NONE;
 
+        /* only "'" here. */
+        if (0 == cached_keys->len)
+            return SEARCH_CONTINUED;
+
+#if 0
+        printf("search table:%d\n", cached_keys->len);
+#endif
         return table->search(cached_keys->len,
                              (ChewingKey *)cached_keys->data, ranges);
     }
