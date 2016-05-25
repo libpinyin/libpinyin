@@ -391,7 +391,7 @@ bool PinyinLookup2::search_bigram2(GPtrArray * topresults,
 }
 
 
-bool PinyinLookup2::unigram_gen_next_step(int nstep,
+bool PinyinLookup2::unigram_gen_next_step(int start, int end,
                                           lookup_value_t * cur_step,
                                           phrase_token_t token) {
 
@@ -411,38 +411,40 @@ bool PinyinLookup2::unigram_gen_next_step(int nstep,
 
     lookup_value_t next_step;
     next_step.m_handles[0] = cur_step->m_handles[1]; next_step.m_handles[1] = token;
+    next_step.m_length = cur_step->m_length + phrase_length;
     next_step.m_poss = cur_step->m_poss + log(elem_poss * pinyin_poss * unigram_lambda);
-    next_step.m_last_step = nstep;
+    next_step.m_last_step = start;
 
-    return save_next_step(nstep + phrase_length, cur_step, &next_step);
+    return save_next_step(end, cur_step, &next_step);
 }
 
-bool PinyinLookup2::bigram_gen_next_step(int nstep,
+bool PinyinLookup2::bigram_gen_next_step(int start, int end,
                                          lookup_value_t * cur_step,
                                          phrase_token_t token,
                                          gfloat bigram_poss) {
 
     if (m_phrase_index->get_phrase_item(token, m_cache_phrase_item))
-	return false;
+        return false;
 
     size_t phrase_length = m_cache_phrase_item.get_phrase_length();
     gdouble unigram_poss = m_cache_phrase_item.get_unigram_frequency() /
         (gdouble) m_phrase_index->get_phrase_index_total_freq();
     if ( bigram_poss < FLT_EPSILON && unigram_poss < DBL_EPSILON )
-	return false;
+        return false;
 
     ChewingKey * pinyin_keys = ((ChewingKey *)m_keys->data) + nstep;
     gfloat pinyin_poss = m_cache_phrase_item.get_pronunciation_possibility(m_options, pinyin_keys);
     if ( pinyin_poss < FLT_EPSILON )
-	return false;
+        return false;
 
     lookup_value_t next_step;
     next_step.m_handles[0] = cur_step->m_handles[1]; next_step.m_handles[1] = token;
+    next_step.m_length = cur_step->m_length + phrase_length;
     next_step.m_poss = cur_step->m_poss +
-	log((bigram_lambda * bigram_poss + unigram_lambda * unigram_poss) * pinyin_poss);
-    next_step.m_last_step = nstep;
+        log((bigram_lambda * bigram_poss + unigram_lambda * unigram_poss) * pinyin_poss);
+    next_step.m_last_step = start;
 
-    return save_next_step(nstep + phrase_length, cur_step, &next_step);
+    return save_next_step(end, cur_step, &next_step);
 }
 
 bool PinyinLookup2::save_next_step(int next_step_pos,
@@ -468,10 +470,13 @@ bool PinyinLookup2::save_next_step(int next_step_pos,
         lookup_value_t * orig_next_value = &g_array_index
             (next_lookup_content, lookup_value_t, step_index);
 
-        if ( orig_next_value->m_poss < next_step->m_poss) {
+        if (orig_next_value->m_length > next_step->m_length ||
+            (orig_next_value->m_length == next_step->m_length &&
+             orig_next_value->m_poss < next_step->m_poss)) {
             /* found better result. */
             orig_next_value->m_handles[0] = next_step->m_handles[0];
             assert(orig_next_value->m_handles[1] == next_step->m_handles[1]);
+            orig_next_value->m_length = next_step->m_length;
             orig_next_value->m_poss = next_step->m_poss;
             orig_next_value->m_last_step = next_step->m_last_step;
             return true;
@@ -486,46 +491,48 @@ bool PinyinLookup2::final_step(MatchResults & results){
     /* reset results */
     g_array_set_size(results, m_steps_content->len - 1);
     for (size_t i = 0; i < results->len; ++i){
-	phrase_token_t * token = &g_array_index(results, phrase_token_t, i);
-	*token = null_token;
+        phrase_token_t * token = &g_array_index(results, phrase_token_t, i);
+        *token = null_token;
     }
 
     /* find max element */
     size_t last_step_pos = m_steps_content->len - 1;
     GArray * last_step_array = (GArray *)g_ptr_array_index(m_steps_content, last_step_pos);
     if ( last_step_array->len == 0 )
-	return false;
+        return false;
 
     lookup_value_t * max_value = &g_array_index(last_step_array, lookup_value_t, 0);
     for ( size_t i = 1; i < last_step_array->len; ++i){
-	lookup_value_t * cur_value = &g_array_index(last_step_array, lookup_value_t, i);
-	if ( cur_value->m_poss > max_value->m_poss )
-	    max_value = cur_value;
+        lookup_value_t * cur_value = &g_array_index(last_step_array, lookup_value_t, i);
+        if (cur_value->m_length < max_value->m_length ||
+            (cur_value->m_length == max_value->m_length &&
+             cur_value->m_poss > max_value->m_poss))
+            max_value = cur_value;
     }
 
     /* backtracing */
     while( true ){
-	int cur_step_pos = max_value->m_last_step;
-	if ( -1 == cur_step_pos )
-	    break;
+        int cur_step_pos = max_value->m_last_step;
+        if ( -1 == cur_step_pos )
+            break;
 
-	phrase_token_t * token = &g_array_index
+        phrase_token_t * token = &g_array_index
             (results, phrase_token_t, cur_step_pos);
-	*token = max_value->m_handles[1];
+        *token = max_value->m_handles[1];
 
-	phrase_token_t last_token = max_value->m_handles[0];
-	LookupStepIndex lookup_step_index = (LookupStepIndex)
+        phrase_token_t last_token = max_value->m_handles[0];
+        LookupStepIndex lookup_step_index = (LookupStepIndex)
             g_ptr_array_index(m_steps_index, cur_step_pos);
 
-	gpointer key = NULL, value = NULL;
-	gboolean result = g_hash_table_lookup_extended
+        gpointer key = NULL, value = NULL;
+        gboolean result = g_hash_table_lookup_extended
             (lookup_step_index, GUINT_TO_POINTER(last_token), &key, &value);
-	if (!result)
-	    return false;
+        if (!result)
+            return false;
 
-	LookupStepContent lookup_step_content = (LookupStepContent)
+        LookupStepContent lookup_step_content = (LookupStepContent)
             g_ptr_array_index(m_steps_content, cur_step_pos);
-	max_value = &g_array_index
+        max_value = &g_array_index
             (lookup_step_content, lookup_value_t, GPOINTER_TO_UINT(value));
     }
 
