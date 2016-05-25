@@ -20,9 +20,9 @@
  */
 
 #include "phonetic_key_matrix.h"
-#include "pinyin_custom2.h"
 #include <assert.h>
 #include <stdio.h>
+#include "pinyin_custom2.h"
 
 namespace pinyin{
 
@@ -222,13 +222,13 @@ int search_matrix_recur(GArray * cached_keys,
 
     const size_t size = matrix->get_column_size(start);
     /* assume pinyin parsers will filter invalid keys. */
-    assert(0 != size);
+    assert(size > 0);
 
     for (size_t i = 0; i < size; ++i) {
         ChewingKey key; ChewingKeyRest key_rest;
         matrix->get_item(start, i, key, key_rest);
 
-        size_t newstart = key_rest.m_raw_end;
+        const size_t newstart = key_rest.m_raw_end;
 
         const ChewingKey zero_key;
         if (zero_key == key) {
@@ -280,6 +280,74 @@ int search_matrix(FacadeChewingTable2 * table,
 
     g_array_free(cached_keys, TRUE);
     return result;
+}
+
+gfloat compute_pronunciation_possibility_recur(pinyin_option_t options,
+                                               PhoneticKeyMatrix * matrix,
+                                               size_t start, size_t end,
+                                               GArray * cached_keys,
+                                               PhraseItem & item){
+    if (start > end)
+        return 0.;
+
+    const size_t phrase_length = item.get_phrase_length();
+    if (phrase_length < cached_keys->len)
+        return 0.;
+
+    /* only do compute with 'start' and 'end'. */
+    if (start == end) {
+        if (phrase_length != cached_keys->len)
+            return 0.;
+
+        return item.get_pronunciation_possibility
+            (options, (ChewingKey *)cached_keys->data);
+    }
+
+    gfloat result = 0.;
+
+    const size_t size = matrix->get_column_size(start);
+    /* assume pinyin parsers will filter invalid keys. */
+    assert(size > 0);
+
+    for (size_t i = 0; i < size; ++i) {
+        ChewingKey key; ChewingKeyRest key_rest;
+        matrix->get_item(start, i, key, key_rest);
+
+        const size_t newstart = key_rest.m_raw_end;
+
+        const ChewingKey zero_key;
+        if (zero_key == key) {
+            /* assume only one key here for "'" or the last key. */
+            assert(1 == size);
+            return compute_pronunciation_possibility_recur
+                (options, matrix, newstart, end, cached_keys, item);
+        }
+
+        /* push value */
+        g_array_append_val(cached_keys, key);
+
+        result += compute_pronunciation_possibility_recur
+            (options, matrix, newstart, end, cached_keys, item);
+
+        /* pop value */
+        g_array_set_size(cached_keys, cached_keys->len - 1);
+    }
+
+    return result;
+}
+
+gfloat compute_pronunciation_possibility(pinyin_option_t options,
+                                         PhoneticKeyMatrix * matrix,
+                                         size_t start, size_t end,
+                                         GArray * cached_keys,
+                                         PhraseItem & item){
+    assert(end < matrix->size());
+
+    assert(matrix->get_column_size(start) > 0);
+    assert(matrix->get_column_size(end) > 0);
+
+    return compute_pronunciation_possibility_recur
+        (options, matrix, start, end, cached_keys, item);
 }
 
 };

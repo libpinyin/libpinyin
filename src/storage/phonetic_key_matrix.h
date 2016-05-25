@@ -26,6 +26,7 @@
 #include "novel_types.h"
 #include "chewing_key.h"
 #include "facade_chewing_table2.h"
+#include "phrase_index.h"
 
 namespace pinyin {
 
@@ -210,6 +211,12 @@ int search_matrix(FacadeChewingTable2 * table,
                   PhoneticKeyMatrix * matrix,
                   size_t start, size_t end,
                   PhraseIndexRanges ranges);
+
+gfloat compute_pronunciation_possibility(pinyin_option_t options,
+                                         PhoneticKeyMatrix * matrix,
+                                         size_t start, size_t end,
+                                         GArray * cached_keys,
+                                         PhraseItem & item);
 };
 
 #endif
