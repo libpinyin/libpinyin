@@ -66,8 +66,11 @@ struct lookup_constraint_t{
      */
 
     union{
-	phrase_token_t m_token;
-	guint32 m_constraint_step; /* index of m_token */
+        struct{
+            phrase_token_t m_token; /* the word */
+            guint32 m_end; /* the index of next word */
+        };
+        guint32 m_constraint_step; /* index of m_token */
     };
 };
 
@@ -89,7 +92,7 @@ private:
 protected:
     /* saved varibles */
     CandidateConstraints m_constraints;
-    ChewingKeyVector m_keys;
+    PhoneticKeyMatrix * m_matrix;
 
     pinyin_option_t m_options;
     FacadeChewingTable2 * m_pinyin_table;
@@ -160,7 +163,7 @@ public:
     /**
      * PinyinLookup2::get_best_match:
      * @prefixes: the phrase tokens before the guessed sentence.
-     * @keys: the pinyin keys of the guessed sentence.
+     * @matrix: the matrix of the pinyin keys.
      * @constraints: the constraints on the guessed sentence.
      * @results: the guessed sentence in the form of the phrase tokens.
      * @returns: whether the guess operation is successful.
@@ -168,7 +171,10 @@ public:
      * Guess the best sentence according to user inputs.
      *
      */
-    bool get_best_match(TokenVector prefixes, ChewingKeyVector keys, CandidateConstraints constraints, MatchResults & results);
+    bool get_best_match(TokenVector prefixes,
+                        PhoneticKeyMatrix * matrix,
+                        CandidateConstraints constraints,
+                        MatchResults & results);
 
     /**
      * PinyinLookup2::train_result2:
