@@ -288,7 +288,8 @@ bool PinyinLookup2::get_best_match(TokenVector prefixes,
     return final_step(results);
 }
 
-bool PinyinLookup2::search_unigram2(GPtrArray * topresults, int nstep,
+bool PinyinLookup2::search_unigram2(GPtrArray * topresults,
+                                    int start, int end,
                                     PhraseIndexRanges ranges) {
 
     if (0 == topresults->len)
@@ -298,10 +299,10 @@ bool PinyinLookup2::search_unigram2(GPtrArray * topresults, int nstep,
         g_ptr_array_index(topresults, 0);
 
     lookup_constraint_t * constraint =
-        &g_array_index(m_constraints, lookup_constraint_t, nstep);
+        &g_array_index(m_constraints, lookup_constraint_t, start);
 
     if (CONSTRAINT_ONESTEP == constraint->m_type) {
-        return unigram_gen_next_step(nstep, max, constraint->m_token);
+        return unigram_gen_next_step(start, end, max, constraint->m_token);
     }
 
     bool found = false;
@@ -315,7 +316,8 @@ bool PinyinLookup2::search_unigram2(GPtrArray * topresults, int nstep,
                 PhraseIndexRange * range = &g_array_index(array, PhraseIndexRange, n);
                 for ( phrase_token_t token = range->m_range_begin;
                       token != range->m_range_end; ++token){
-                    found = unigram_gen_next_step(nstep, max, token)|| found;
+                    found = unigram_gen_next_step(start, end, max, token) ||
+                        found;
                 }
             }
         }
@@ -324,11 +326,12 @@ bool PinyinLookup2::search_unigram2(GPtrArray * topresults, int nstep,
     return found;
 }
 
-bool PinyinLookup2::search_bigram2(GPtrArray * topresults, int nstep,
+bool PinyinLookup2::search_bigram2(GPtrArray * topresults,
+                                   int start, int end,
                                    PhraseIndexRanges ranges) {
 
     lookup_constraint_t * constraint =
-        &g_array_index(m_constraints, lookup_constraint_t, nstep);
+        &g_array_index(m_constraints, lookup_constraint_t, start);
 
     bool found = false;
     BigramPhraseArray bigram_phrase_items = g_array_new
@@ -340,24 +343,24 @@ bool PinyinLookup2::search_bigram2(GPtrArray * topresults, int nstep,
 
         phrase_token_t index_token = value->m_handles[1];
 
-	SingleGram * system = NULL, * user = NULL;
-	m_system_bigram->load(index_token, system);
+        SingleGram * system = NULL, * user = NULL;
+        m_system_bigram->load(index_token, system);
         m_user_bigram->load(index_token, user);
 
         if ( !merge_single_gram(&m_merged_single_gram, system, user) )
             continue;
 
-	if ( CONSTRAINT_ONESTEP == constraint->m_type ){
-	    phrase_token_t token = constraint->m_token;
+        if ( CONSTRAINT_ONESTEP == constraint->m_type ){
+            phrase_token_t token = constraint->m_token;
 
             guint32 freq;
             if( m_merged_single_gram.get_freq(token, freq) ){
                 guint32 total_freq;
                 m_merged_single_gram.get_total_freq(total_freq);
                 gfloat bigram_poss = freq / (gfloat) total_freq;
-                found = bigram_gen_next_step(nstep, value, token, bigram_poss) || found;
+                found = bigram_gen_next_step(start, end, value, token, bigram_poss) || found;
             }
-	}
+        }
 
         if (NO_CONSTRAINT == constraint->m_type) {
             for( size_t m = 0; m < PHRASE_INDEX_LIBRARY_COUNT; ++m){
@@ -372,7 +375,7 @@ bool PinyinLookup2::search_bigram2(GPtrArray * topresults, int nstep,
                     m_merged_single_gram.search(range, bigram_phrase_items);
                     for( size_t k = 0; k < bigram_phrase_items->len; ++k) {
                         BigramPhraseItem * item = &g_array_index(bigram_phrase_items, BigramPhraseItem, k);
-                        found = bigram_gen_next_step(nstep, value, item->m_token, item->m_freq) || found;
+                        found = bigram_gen_next_step(start, end, value, item->m_token, item->m_freq) || found;
                     }
                 }
             }
@@ -393,18 +396,18 @@ bool PinyinLookup2::unigram_gen_next_step(int nstep,
                                           phrase_token_t token) {
 
     if (m_phrase_index->get_phrase_item(token, m_cache_phrase_item))
-	return false;
+        return false;
 
     size_t phrase_length = m_cache_phrase_item.get_phrase_length();
     gdouble elem_poss = m_cache_phrase_item.get_unigram_frequency() / (gdouble)
-	m_phrase_index->get_phrase_index_total_freq();
+        m_phrase_index->get_phrase_index_total_freq();
     if ( elem_poss < DBL_EPSILON )
-	return false;
+        return false;
 
     ChewingKey * pinyin_keys = ((ChewingKey *)m_keys->data) + nstep;
     gfloat pinyin_poss = m_cache_phrase_item.get_pronunciation_possibility(m_options, pinyin_keys);
     if (pinyin_poss < FLT_EPSILON )
-	return false;
+        return false;
 
     lookup_value_t next_step;
     next_step.m_handles[0] = cur_step->m_handles[1]; next_step.m_handles[1] = token;

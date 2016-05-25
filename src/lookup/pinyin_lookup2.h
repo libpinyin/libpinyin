@@ -107,13 +107,20 @@ protected:
     /* Array of LookupStepContent */
 
 
-    bool search_unigram2(GPtrArray * topresults, int nstep,
+    bool search_unigram2(GPtrArray * topresults,
+                         int start, int end,
                          PhraseIndexRanges ranges);
-    bool search_bigram2(GPtrArray * topresults, int nstep,
+    bool search_bigram2(GPtrArray * topresults,
+                        int start, int end,
                         PhraseIndexRanges ranges);
 
-    bool unigram_gen_next_step(int nstep, lookup_value_t * cur_step, phrase_token_t token);
-    bool bigram_gen_next_step(int nstep, lookup_value_t * cur_step, phrase_token_t token, gfloat bigram_poss);
+    bool unigram_gen_next_step(int start, int end,
+                               lookup_value_t * cur_step,
+                               phrase_token_t token);
+    bool bigram_gen_next_step(int start, int end,
+                              lookup_value_t * cur_step,
+                              phrase_token_t token,
+                              gfloat bigram_poss);
 
     bool save_next_step(int next_step_pos, lookup_value_t * cur_step, lookup_value_t * next_step);
 

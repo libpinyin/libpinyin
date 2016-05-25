@@ -37,13 +37,17 @@ typedef phrase_token_t lookup_key_t;
 struct lookup_value_t{
     /* previous and current tokens of the node */
     phrase_token_t m_handles[2];
+    /* the sentence length */
+    gint32 m_length;
     /* maximum possibility of current node  */
     gfloat m_poss;
     /* trace back information for final step */
     gint32 m_last_step;
 
     lookup_value_t(gfloat poss = FLT_MAX){
-        m_handles[0] = null_token; m_handles[1] = null_token;
+        m_handles[0] = null_token;
+        m_handles[1] = null_token;
+        m_length = 0;
         m_poss = poss;
         m_last_step = -1;
     }
