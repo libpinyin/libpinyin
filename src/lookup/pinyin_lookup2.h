@@ -88,7 +88,7 @@ private:
     const gfloat unigram_lambda;
 
     GArray * m_cached_keys;
-    PhraseItem m_cache_phrase_item;
+    PhraseItem m_cached_phrase_item;
     SingleGram m_merged_single_gram;
 
 protected:

@@ -308,11 +308,11 @@ bool PhraseLookup::search_bigram2(int nstep, PhraseTokens tokens){
 bool PhraseLookup::unigram_gen_next_step(int nstep, lookup_value_t * cur_value,
 phrase_token_t token){
 
-    if (m_phrase_index->get_phrase_item(token, m_cache_phrase_item))
+    if (m_phrase_index->get_phrase_item(token, m_cached_phrase_item))
         return false;
 
-    size_t phrase_length = m_cache_phrase_item.get_phrase_length();
-    gdouble elem_poss = m_cache_phrase_item.get_unigram_frequency() / (gdouble)
+    size_t phrase_length = m_cached_phrase_item.get_phrase_length();
+    gdouble elem_poss = m_cached_phrase_item.get_unigram_frequency() / (gdouble)
         m_phrase_index->get_phrase_index_total_freq();
     if ( elem_poss < DBL_EPSILON )
         return false;
@@ -327,11 +327,11 @@ phrase_token_t token){
 
 bool PhraseLookup::bigram_gen_next_step(int nstep, lookup_value_t * cur_value, phrase_token_t token, gfloat bigram_poss){
 
-    if ( m_phrase_index->get_phrase_item(token, m_cache_phrase_item))
+    if ( m_phrase_index->get_phrase_item(token, m_cached_phrase_item))
         return false;
 
-    size_t phrase_length = m_cache_phrase_item.get_phrase_length();
-    gdouble unigram_poss = m_cache_phrase_item.get_unigram_frequency() /
+    size_t phrase_length = m_cached_phrase_item.get_phrase_length();
+    gdouble unigram_poss = m_cached_phrase_item.get_unigram_frequency() /
         (gdouble) m_phrase_index->get_phrase_index_total_freq();
 
     if ( bigram_poss < FLT_EPSILON && unigram_poss < DBL_EPSILON )

@@ -46,7 +46,7 @@ private:
     const gfloat bigram_lambda;
     const gfloat unigram_lambda;
 
-    PhraseItem m_cache_phrase_item;
+    PhraseItem m_cached_phrase_item;
     SingleGram m_merged_single_gram;
 protected:
     //saved varibles

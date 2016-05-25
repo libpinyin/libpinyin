@@ -396,17 +396,17 @@ bool PinyinLookup2::unigram_gen_next_step(int start, int end,
                                           lookup_value_t * cur_step,
                                           phrase_token_t token) {
 
-    if (m_phrase_index->get_phrase_item(token, m_cache_phrase_item))
+    if (m_phrase_index->get_phrase_item(token, m_cached_phrase_item))
         return false;
 
-    size_t phrase_length = m_cache_phrase_item.get_phrase_length();
-    gdouble elem_poss = m_cache_phrase_item.get_unigram_frequency() / (gdouble)
+    size_t phrase_length = m_cached_phrase_item.get_phrase_length();
+    gdouble elem_poss = m_cached_phrase_item.get_unigram_frequency() / (gdouble)
         m_phrase_index->get_phrase_index_total_freq();
     if ( elem_poss < DBL_EPSILON )
         return false;
 
     gfloat pinyin_poss = compute_pronunciation_possibility
-        (m_options, m_matrix, start, end, m_cached_keys, m_cache_phrase_item);
+        (m_options, m_matrix, start, end, m_cached_keys, m_cached_phrase_item);
     if (pinyin_poss < FLT_EPSILON )
         return false;
 
@@ -424,17 +424,17 @@ bool PinyinLookup2::bigram_gen_next_step(int start, int end,
                                          phrase_token_t token,
                                          gfloat bigram_poss) {
 
-    if (m_phrase_index->get_phrase_item(token, m_cache_phrase_item))
+    if (m_phrase_index->get_phrase_item(token, m_cached_phrase_item))
         return false;
 
-    size_t phrase_length = m_cache_phrase_item.get_phrase_length();
-    gdouble unigram_poss = m_cache_phrase_item.get_unigram_frequency() /
+    size_t phrase_length = m_cached_phrase_item.get_phrase_length();
+    gdouble unigram_poss = m_cached_phrase_item.get_unigram_frequency() /
         (gdouble) m_phrase_index->get_phrase_index_total_freq();
     if ( bigram_poss < FLT_EPSILON && unigram_poss < DBL_EPSILON )
         return false;
 
     gfloat pinyin_poss = compute_pronunciation_possibility
-        (m_options, m_matrix, start, end, m_cached_keys, m_cache_phrase_item);
+        (m_options, m_matrix, start, end, m_cached_keys, m_cached_phrase_item);
     if ( pinyin_poss < FLT_EPSILON )
         return false;
 
@@ -610,8 +610,8 @@ bool PinyinLookup2::train_result2(ChewingKeyVector keys,
             }
 
             /* train uni-gram */
-	    m_phrase_index->get_phrase_item(*token, m_cache_phrase_item);
-	    m_cache_phrase_item.increase_pronunciation_possibility
+	    m_phrase_index->get_phrase_item(*token, m_cached_phrase_item);
+	    m_cached_phrase_item.increase_pronunciation_possibility
                 (m_options, pinyin_keys + i, seed * pinyin_factor);
 	    m_phrase_index->add_unigram_frequency
                 (*token, seed * unigram_factor);
@@ -626,10 +626,10 @@ int PinyinLookup2::add_constraint(CandidateConstraints constraints,
                                   size_t index,
                                   phrase_token_t token) {
 
-    if (m_phrase_index->get_phrase_item(token, m_cache_phrase_item))
+    if (m_phrase_index->get_phrase_item(token, m_cached_phrase_item))
 	return 0;
 
-    size_t phrase_length = m_cache_phrase_item.get_phrase_length();
+    size_t phrase_length = m_cached_phrase_item.get_phrase_length();
     if ( index + phrase_length > constraints->len )
 	return 0;
 
@@ -673,10 +673,10 @@ bool PinyinLookup2::clear_constraint(CandidateConstraints constraints,
     assert(constraint->m_type == CONSTRAINT_ONESTEP);
 
     phrase_token_t token = constraint->m_token;
-    if (m_phrase_index->get_phrase_item(token, m_cache_phrase_item))
+    if (m_phrase_index->get_phrase_item(token, m_cached_phrase_item))
 	return false;
 
-    size_t phrase_length = m_cache_phrase_item.get_phrase_length();
+    size_t phrase_length = m_cached_phrase_item.get_phrase_length();
     for ( size_t i = 0; i < phrase_length; ++i){
 	if (index + i >= constraints->len)
 	    continue;
@@ -716,8 +716,8 @@ bool PinyinLookup2::validate_constraint(CandidateConstraints constraints,
 	if ( constraint->m_type == CONSTRAINT_ONESTEP ){
 
 	    phrase_token_t token = constraint->m_token;
-	    m_phrase_index->get_phrase_item(token, m_cache_phrase_item);
-	    size_t phrase_length = m_cache_phrase_item.get_phrase_length();
+	    m_phrase_index->get_phrase_item(token, m_cached_phrase_item);
+	    size_t phrase_length = m_cached_phrase_item.get_phrase_length();
 
 	    /* clear too long constraint */
 	    if (i + phrase_length > constraints->len){
@@ -727,7 +727,7 @@ bool PinyinLookup2::validate_constraint(CandidateConstraints constraints,
 
             ChewingKey * pinyin_keys = (ChewingKey *)keys->data;
 	    /* clear invalid pinyin */
-	    gfloat pinyin_poss = m_cache_phrase_item.get_pronunciation_possibility(m_options, pinyin_keys + i);
+	    gfloat pinyin_poss = m_cached_phrase_item.get_pronunciation_possibility(m_options, pinyin_keys + i);
 	    if (pinyin_poss < FLT_EPSILON)
 		clear_constraint(constraints, i);
 	}
