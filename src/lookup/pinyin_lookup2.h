@@ -187,7 +187,7 @@ public:
 
     /**
      * PinyinLookup2::train_result2:
-     * @keys: the pinyin keys of the guessed sentence.
+     * @matrix: the matrix of the pinyin keys.
      * @constraints: the constraints on the guessed sentence.
      * @results: the guessed sentence in the form of the phrase tokens.
      * @returns: whether the train operation is successful.
@@ -195,7 +195,9 @@ public:
      * Self learning the guessed sentence based on the constraints.
      *
      */
-    bool train_result2(ChewingKeyVector keys, CandidateConstraints constraints, MatchResults results);
+    bool train_result2(PhoneticKeyMatrix * matrix,
+                       CandidateConstraints constraints,
+                       MatchResults results);
 
     /**
      * PinyinLookup2::convert_to_utf8:
@@ -217,14 +219,17 @@ public:
     /**
      * PinyinLookup2::add_constraint:
      * @constraints: the constraints on the guessed sentence.
-     * @index: the character offset in the guessed sentence.
+     * @start: the start of the phrase.
+     * @end: the end of the phrase.
      * @token: the phrase token in the candidate list chosen by user.
      * @returns: the number of the characters in the chosen token.
      *
      * Add one constraint to the constraints on the guessed sentence.
      *
      */
-    int add_constraint(CandidateConstraints constraints, size_t index, phrase_token_t token);
+    int add_constraint(CandidateConstraints constraints,
+                       size_t start, size_t end,
+                       phrase_token_t token);
 
     /**
      * PinyinLookup2::clear_constraint:
@@ -239,14 +244,15 @@ public:
 
     /**
      * PinyinLookup2::validate_constraint:
+     * @matrix: the matrix of the pinyin keys.
      * @constraints: the constraints on the guessed sentence.
-     * @keys: the pinyin keys of the guessed sentence.
      * @returns: whether the validate operation is successful.
      *
      * Validate the old constraints with the new pinyin keys.
      *
      */
-    bool validate_constraint(CandidateConstraints constraints, ChewingKeyVector keys);
+    bool validate_constraint(PhoneticKeyMatrix * matrix,
+                             CandidateConstraints constraints);
 
 };
 
