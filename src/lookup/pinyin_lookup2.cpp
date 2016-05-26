@@ -625,34 +625,31 @@ bool PinyinLookup2::train_result2(ChewingKeyVector keys,
 
 
 int PinyinLookup2::add_constraint(CandidateConstraints constraints,
-                                  size_t index,
+                                  size_t start, size_t end,
                                   phrase_token_t token) {
 
-    if (m_phrase_index->get_phrase_item(token, m_cached_phrase_item))
+    if (end > constraints->len)
         return 0;
 
-    size_t phrase_length = m_cached_phrase_item.get_phrase_length();
-    if ( index + phrase_length > constraints->len )
-        return 0;
-
-    for (size_t i = index; i < index + phrase_length; ++i){
+    for (size_t i = start; i < end; ++i){
         clear_constraint(constraints, i);
     }
 
     /* store one step constraint */
     lookup_constraint_t * constraint = &g_array_index
-        (constraints, lookup_constraint_t, index);
+        (constraints, lookup_constraint_t, start);
     constraint->m_type = CONSTRAINT_ONESTEP;
     constraint->m_token = token;
+    constraint->m_end = end;
 
     /* propagate no search constraint */
-    for (size_t i = 1; i < phrase_length; ++i){
-        constraint = &g_array_index(constraints, lookup_constraint_t, index + i);
+    for (size_t i = start + 1; i < end; ++i){
+        constraint = &g_array_index(constraints, lookup_constraint_t, i);
         constraint->m_type = CONSTRAINT_NOSEARCH;
-        constraint->m_constraint_step = index;
+        constraint->m_constraint_step = start;
     }
 
-    return phrase_length;
+    return end - start;
 }
 
 bool PinyinLookup2::clear_constraint(CandidateConstraints constraints,
@@ -675,16 +672,13 @@ bool PinyinLookup2::clear_constraint(CandidateConstraints constraints,
     assert(constraint->m_type == CONSTRAINT_ONESTEP);
 
     phrase_token_t token = constraint->m_token;
-    if (m_phrase_index->get_phrase_item(token, m_cached_phrase_item))
-        return false;
-
-    size_t phrase_length = m_cached_phrase_item.get_phrase_length();
-    for ( size_t i = 0; i < phrase_length; ++i){
-        if (index + i >= constraints->len)
+    size_t end = contraint->m_end;
+    for (size_t i = index; i < end; ++i){
+        if (i >= constraints->len)
             continue;
 
         constraint = &g_array_index
-            (constraints, lookup_constraint_t, index + i);
+            (constraints, lookup_constraint_t, i);
         constraint->m_type = NO_CONSTRAINT;
     }
 
