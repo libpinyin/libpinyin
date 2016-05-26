@@ -300,7 +300,7 @@ gfloat compute_pronunciation_possibility_recur(pinyin_option_t options,
             return 0.;
 
         return item.get_pronunciation_possibility
-            (options, (ChewingKey *)cached_keys->data);
+            (options, (ChewingKey *) cached_keys->data);
     }
 
     gfloat result = 0.;
@@ -348,6 +348,75 @@ gfloat compute_pronunciation_possibility(pinyin_option_t options,
 
     return compute_pronunciation_possibility_recur
         (options, matrix, start, end, cached_keys, item);
+}
+
+bool increase_pronunciation_possibility_recur(pinyin_option_t options,
+                                              PhoneticKeyMatrix * matrix,
+                                              size_t start, size_t end,
+                                              GArray * cached_keys,
+                                              PhraseItem & item, gint32 delta) {
+    if (start > end)
+        return false;
+
+    const size_t phrase_length = item.get_phrase_length();
+    if (phrase_length < cached_keys->len)
+        return false;
+
+    /* only increase with 'start' and 'end'. */
+    if (start == end) {
+        if (phrase_length != cached_keys->len)
+            return false;
+
+        item.increase_pronunciation_possibility
+            (options, (ChewingKey *) cached_keys->data, delta);
+        return true;
+    }
+
+    bool result = false;
+
+    const size_t size = matrix->get_column_size(start);
+    /* assume pinyin parsers will filter invalid keys. */
+    assert(size > 0);
+
+    for (size_t i = 0; i < size; ++i) {
+        ChewingKey key; ChewingKeyRest key_rest;
+        matrix->get_item(start, i, key, key_rest);
+
+        const size_t newstart = key_rest.m_raw_end;
+
+        const ChewingKey zero_key;
+        if (zero_key == key) {
+            /* assume only one key here for "'" or the last key. */
+            assert(1 == size);
+            return increase_pronunciation_possibility_recur
+                (options, matrix, newstart, end, cached_keys, item, delta);
+        }
+
+        /* push value */
+        g_array_append_val(cached_keys, key);
+
+        result = increase_pronunciation_possibility_recur
+            (options, matrix, newstart, end, cached_keys, item, delta) || result;
+
+        /* pop value */
+        g_array_set_size(cached_keys, cached_keys->len - 1);
+    }
+
+    return result;
+}
+
+bool increase_pronunciation_possibility(pinyin_option_t options,
+                                        PhoneticKeyMatrix * matrix,
+                                        size_t start, size_t end,
+                                        GArray * cached_keys,
+                                        PhraseItem & item, gint32 delta) {
+    assert(end < matrix->size());
+
+    assert(matrix->get_column_size(start) > 0);
+    assert(matrix->get_column_size(end) > 0);
+
+    return increase_pronunciation_possibility_recur
+        (options, matrix, start, end, cached_keys, item, delta);
 }
 
 };

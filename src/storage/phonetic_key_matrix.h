@@ -217,6 +217,12 @@ gfloat compute_pronunciation_possibility(pinyin_option_t options,
                                          size_t start, size_t end,
                                          GArray * cached_keys,
                                          PhraseItem & item);
+
+bool increase_pronunciation_possibility(pinyin_option_t options,
+                                        PhoneticKeyMatrix * matrix,
+                                        size_t start, size_t end,
+                                        GArray * cached_keys,
+                                        PhraseItem & item, gint32 delta);
 };
 
 #endif
