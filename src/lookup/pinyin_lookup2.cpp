@@ -360,7 +360,7 @@ bool PinyinLookup2::search_bigram2(GPtrArray * topresults,
                 guint32 total_freq;
                 m_merged_single_gram.get_total_freq(total_freq);
                 gfloat bigram_poss = freq / (gfloat) total_freq;
-                found = bigram_gen_next_step(start, contraint->m_end,
+                found = bigram_gen_next_step(start, constraint->m_end,
                                              value, token, bigram_poss) || found;
             }
         }
@@ -672,7 +672,7 @@ bool PinyinLookup2::clear_constraint(CandidateConstraints constraints,
     assert(constraint->m_type == CONSTRAINT_ONESTEP);
 
     phrase_token_t token = constraint->m_token;
-    size_t end = contraint->m_end;
+    size_t end = constraint->m_end;
     for (size_t i = index; i < end; ++i){
         if (i >= constraints->len)
             continue;
@@ -688,20 +688,21 @@ bool PinyinLookup2::clear_constraint(CandidateConstraints constraints,
 bool PinyinLookup2::validate_constraint(PhoneticKeyMatrix * matrix,
                                         CandidateConstraints constraints) {
     /* resize constraints array first */
-    size_t constraints_length = constraints->len;
+    const size_t oldlength = constraints->len;
+    const size_t newlength = matrix->size();
 
-    if ( keys->len > constraints_length ){
-        g_array_set_size(constraints, keys->len);
+    if ( newlength > oldlength ){
+        g_array_set_size(constraints, newlength);
 
         /* initialize new element */
-        for( size_t i = constraints_length; i < keys->len; ++i){
+        for( size_t i = oldlength; i < newlength; ++i){
             lookup_constraint_t * constraint = &g_array_index(constraints, lookup_constraint_t, i);
             constraint->m_type = NO_CONSTRAINT;
         }
 
-    }else if (keys->len < constraints_length ){
+    }else if (newlength < oldlength ){
         /* just shrink it */
-        g_array_set_size(constraints, keys->len);
+        g_array_set_size(constraints, newlength);
     }
 
     for (size_t i = 0; i < constraints->len; ++i){
