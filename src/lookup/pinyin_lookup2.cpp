@@ -303,7 +303,8 @@ bool PinyinLookup2::search_unigram2(GPtrArray * topresults,
         &g_array_index(m_constraints, lookup_constraint_t, start);
 
     if (CONSTRAINT_ONESTEP == constraint->m_type) {
-        return unigram_gen_next_step(start, end, max, constraint->m_token);
+        return unigram_gen_next_step(start, constraint->m_end,
+                                     max, constraint->m_token);
     }
 
     bool found = false;
@@ -359,7 +360,8 @@ bool PinyinLookup2::search_bigram2(GPtrArray * topresults,
                 guint32 total_freq;
                 m_merged_single_gram.get_total_freq(total_freq);
                 gfloat bigram_poss = freq / (gfloat) total_freq;
-                found = bigram_gen_next_step(start, end, value, token, bigram_poss) || found;
+                found = bigram_gen_next_step(start, contraint->m_end,
+                                             value, token, bigram_poss) || found;
             }
         }
 
@@ -490,7 +492,7 @@ bool PinyinLookup2::save_next_step(int next_step_pos,
 bool PinyinLookup2::final_step(MatchResults & results){
 
     /* reset results */
-    g_array_set_size(results, m_steps_content->len - 1);
+    g_array_set_size(results, m_steps_content->len);
     for (size_t i = 0; i < results->len; ++i){
         phrase_token_t * token = &g_array_index(results, phrase_token_t, i);
         *token = null_token;
