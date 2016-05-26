@@ -691,8 +691,8 @@ bool PinyinLookup2::clear_constraint(CandidateConstraints constraints,
     return true;
 }
 
-bool PinyinLookup2::validate_constraint(CandidateConstraints constraints,
-                                        ChewingKeyVector keys) {
+bool PinyinLookup2::validate_constraint(PhoneticKeyMatrix * matrix,
+                                        CandidateConstraints constraints) {
     /* resize constraints array first */
     size_t constraints_length = constraints->len;
 
@@ -710,7 +710,7 @@ bool PinyinLookup2::validate_constraint(CandidateConstraints constraints,
         g_array_set_size(constraints, keys->len);
     }
 
-    for ( size_t i = 0; i < constraints->len; ++i){
+    for (size_t i = 0; i < constraints->len; ++i){
         lookup_constraint_t * constraint = &g_array_index
             (constraints, lookup_constraint_t, i);
 
@@ -719,17 +719,18 @@ bool PinyinLookup2::validate_constraint(CandidateConstraints constraints,
 
             phrase_token_t token = constraint->m_token;
             m_phrase_index->get_phrase_item(token, m_cached_phrase_item);
-            size_t phrase_length = m_cached_phrase_item.get_phrase_length();
+            guint32 end = constraint->m_end;
 
             /* clear too long constraint */
-            if (i + phrase_length > constraints->len){
+            if (end > constraints->len){
                 clear_constraint(constraints, i);
                 continue;
             }
 
-            ChewingKey * pinyin_keys = (ChewingKey *)keys->data;
+            gfloat pinyin_poss = compute_pronunciation_possibility
+                (m_options, matrix, i, end,
+                 m_cached_keys, m_cached_phrase_item);
             /* clear invalid pinyin */
-            gfloat pinyin_poss = m_cached_phrase_item.get_pronunciation_possibility(m_options, pinyin_keys + i);
             if (pinyin_poss < FLT_EPSILON)
                 clear_constraint(constraints, i);
         }
