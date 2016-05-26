@@ -544,7 +544,7 @@ bool PinyinLookup2::final_step(MatchResults & results){
 }
 
 
-bool PinyinLookup2::train_result2(ChewingKeyVector keys,
+bool PinyinLookup2::train_result2(PhoneticKeyMatrix * matrix,
                                   CandidateConstraints constraints,
                                   MatchResults results) {
     const guint32 initial_seed = 23 * 3;
@@ -555,7 +555,6 @@ bool PinyinLookup2::train_result2(ChewingKeyVector keys,
 
     /* begin training based on constraints and results. */
     bool train_next = false;
-    ChewingKey * pinyin_keys = (ChewingKey *) keys->data;
 
     phrase_token_t last_token = sentence_start;
     /* constraints->len + 1 == results->len */
@@ -613,8 +612,9 @@ bool PinyinLookup2::train_result2(ChewingKeyVector keys,
 
             /* train uni-gram */
             m_phrase_index->get_phrase_item(*token, m_cached_phrase_item);
-            m_cached_phrase_item.increase_pronunciation_possibility
-                (m_options, pinyin_keys + i, seed * pinyin_factor);
+            increase_pronunciation_possibility
+                (m_options, matrix, i, constraint->m_end,
+                 m_cached_keys, m_cached_phrase_item, seed * pinyin_factor);
             m_phrase_index->add_unigram_frequency
                 (*token, seed * unigram_factor);
         }
