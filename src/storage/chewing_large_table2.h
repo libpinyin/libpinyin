@@ -25,7 +25,6 @@
 #include "novel_types.h"
 #include "memory_chunk.h"
 #include "chewing_key.h"
-#include "pinyin_phrase2.h"
 #include "pinyin_phrase3.h"
 
 #ifdef HAVE_BERKELEY_DB
