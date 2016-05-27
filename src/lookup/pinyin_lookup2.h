@@ -96,7 +96,6 @@ protected:
     CandidateConstraints m_constraints;
     PhoneticKeyMatrix * m_matrix;
 
-    pinyin_option_t m_options;
     FacadeChewingTable2 * m_pinyin_table;
     FacadePhraseIndex * m_phrase_index;
     Bigram * m_system_bigram;
@@ -132,7 +131,6 @@ public:
     /**
      * PinyinLookup2::PinyinLookup2:
      * @lambda: the lambda parameter for interpolation model.
-     * @options: the pinyin options.
      * @pinyin_table: the pinyin table.
      * @phrase_index: the phrase index.
      * @system_bigram: the system bi-gram.
@@ -142,7 +140,6 @@ public:
      *
      */
     PinyinLookup2(const gfloat lambda,
-                  pinyin_option_t options,
                   FacadeChewingTable2 * pinyin_table,
                   FacadePhraseIndex * phrase_index,
                   Bigram * system_bigram,
@@ -155,19 +152,6 @@ public:
      *
      */
     ~PinyinLookup2();
-
-    /**
-     * PinyinLookup2::set_options:
-     * @options: the pinyin options.
-     * @returns: whether the set operation is successful.
-     *
-     * Set the pinyin options.
-     *
-     */
-    bool set_options(pinyin_option_t options) {
-        m_options = options;
-        return true;
-    }
 
     /**
      * PinyinLookup2::get_best_match:

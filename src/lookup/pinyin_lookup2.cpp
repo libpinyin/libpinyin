@@ -186,7 +186,6 @@ static void clear_steps(GPtrArray * steps_index, GPtrArray * steps_content){
 
 
 PinyinLookup2::PinyinLookup2(const gfloat lambda,
-                             pinyin_option_t options,
                              FacadeChewingTable2 * pinyin_table,
                              FacadePhraseIndex * phrase_index,
                              Bigram * system_bigram,
@@ -194,7 +193,6 @@ PinyinLookup2::PinyinLookup2(const gfloat lambda,
     : bigram_lambda(lambda),
       unigram_lambda(1. - lambda)
 {
-    m_options = options;
     m_pinyin_table = pinyin_table;
     m_phrase_index = phrase_index;
     m_system_bigram = system_bigram;
@@ -408,7 +406,7 @@ bool PinyinLookup2::unigram_gen_next_step(int start, int end,
         return false;
 
     gfloat pinyin_poss = compute_pronunciation_possibility
-        (m_options, m_matrix, start, end, m_cached_keys, m_cached_phrase_item);
+        (m_matrix, start, end, m_cached_keys, m_cached_phrase_item);
     if (pinyin_poss < FLT_EPSILON )
         return false;
 
@@ -436,7 +434,7 @@ bool PinyinLookup2::bigram_gen_next_step(int start, int end,
         return false;
 
     gfloat pinyin_poss = compute_pronunciation_possibility
-        (m_options, m_matrix, start, end, m_cached_keys, m_cached_phrase_item);
+        (m_matrix, start, end, m_cached_keys, m_cached_phrase_item);
     if ( pinyin_poss < FLT_EPSILON )
         return false;
 
@@ -613,7 +611,7 @@ bool PinyinLookup2::train_result2(PhoneticKeyMatrix * matrix,
             /* train uni-gram */
             m_phrase_index->get_phrase_item(*token, m_cached_phrase_item);
             increase_pronunciation_possibility
-                (m_options, matrix, i, constraint->m_end,
+                (matrix, i, constraint->m_end,
                  m_cached_keys, m_cached_phrase_item, seed * pinyin_factor);
             m_phrase_index->add_unigram_frequency
                 (*token, seed * unigram_factor);
@@ -723,7 +721,7 @@ bool PinyinLookup2::validate_constraint(PhoneticKeyMatrix * matrix,
             }
 
             gfloat pinyin_poss = compute_pronunciation_possibility
-                (m_options, matrix, i, end,
+                (matrix, i, end,
                  m_cached_keys, m_cached_phrase_item);
             /* clear invalid pinyin */
             if (pinyin_poss < FLT_EPSILON)
