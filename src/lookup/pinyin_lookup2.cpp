@@ -557,15 +557,15 @@ bool PinyinLookup2::train_result2(PhoneticKeyMatrix * matrix,
     phrase_token_t last_token = sentence_start;
     /* constraints->len + 1 == results->len */
     for (size_t i = 0; i < constraints->len; ++i) {
-        phrase_token_t * token = &g_array_index(results, phrase_token_t, i);
-        if (null_token == *token)
+        phrase_token_t token = g_array_index(results, phrase_token_t, i);
+        if (null_token == token)
             continue;
 
         lookup_constraint_t * constraint = &g_array_index
             (constraints, lookup_constraint_t, i);
         if (train_next || CONSTRAINT_ONESTEP == constraint->m_type) {
             if (CONSTRAINT_ONESTEP == constraint->m_type) {
-                assert(*token == constraint->m_token);
+                assert(token == constraint->m_token);
                 train_next = true;
             } else {
                 train_next = false;
@@ -585,8 +585,8 @@ bool PinyinLookup2::train_result2(PhoneticKeyMatrix * matrix,
 
                 guint32 freq = 0;
                 /* compute train factor */
-                if (!user->get_freq(*token, freq)) {
-                    assert(user->insert_freq(*token, 0));
+                if (!user->get_freq(token, freq)) {
+                    assert(user->insert_freq(token, 0));
                     seed = initial_seed;
                 } else {
                     seed = std_lite::max(freq, initial_seed);
@@ -600,7 +600,7 @@ bool PinyinLookup2::train_result2(PhoneticKeyMatrix * matrix,
 
                 assert(user->set_total_freq(total_freq + seed));
                 /* if total_freq is not overflow, then freq won't overflow. */
-                assert(user->set_freq(*token, freq + seed));
+                assert(user->set_freq(token, freq + seed));
                 assert(m_user_bigram->store(last_token, user));
             next:
                 assert(NULL != user);
@@ -608,15 +608,25 @@ bool PinyinLookup2::train_result2(PhoneticKeyMatrix * matrix,
                     delete user;
             }
 
+            /* compute the position of next token. */
+            size_t next_pos = i + 1;
+            for (; next_pos < constraints->len; ++next_pos) {
+                phrase_token_t next_token = g_array_index
+                    (results, phrase_token_t, next_pos);
+
+                if (null_token != next_token)
+                    break;
+            }
+
             /* train uni-gram */
-            m_phrase_index->get_phrase_item(*token, m_cached_phrase_item);
+            m_phrase_index->get_phrase_item(token, m_cached_phrase_item);
             increase_pronunciation_possibility
-                (matrix, i, constraint->m_end,
+                (matrix, i, next_pos,
                  m_cached_keys, m_cached_phrase_item, seed * pinyin_factor);
             m_phrase_index->add_unigram_frequency
-                (*token, seed * unigram_factor);
+                (token, seed * unigram_factor);
         }
-        last_token = *token;
+        last_token = token;
     }
     return true;
 }
