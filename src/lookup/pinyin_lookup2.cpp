@@ -555,7 +555,7 @@ bool PinyinLookup2::train_result2(PhoneticKeyMatrix * matrix,
     bool train_next = false;
 
     phrase_token_t last_token = sentence_start;
-    /* constraints->len + 1 == results->len */
+
     for (size_t i = 0; i < constraints->len; ++i) {
         phrase_token_t token = g_array_index(results, phrase_token_t, i);
         if (null_token == token)
