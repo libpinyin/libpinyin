@@ -282,8 +282,7 @@ int search_matrix(FacadeChewingTable2 * table,
     return result;
 }
 
-gfloat compute_pronunciation_possibility_recur(pinyin_option_t options,
-                                               PhoneticKeyMatrix * matrix,
+gfloat compute_pronunciation_possibility_recur(PhoneticKeyMatrix * matrix,
                                                size_t start, size_t end,
                                                GArray * cached_keys,
                                                PhraseItem & item){
@@ -300,7 +299,7 @@ gfloat compute_pronunciation_possibility_recur(pinyin_option_t options,
             return 0.;
 
         return item.get_pronunciation_possibility
-            (options, (ChewingKey *) cached_keys->data);
+            ((ChewingKey *) cached_keys->data);
     }
 
     gfloat result = 0.;
@@ -320,14 +319,14 @@ gfloat compute_pronunciation_possibility_recur(pinyin_option_t options,
             /* assume only one key here for "'" or the last key. */
             assert(1 == size);
             return compute_pronunciation_possibility_recur
-                (options, matrix, newstart, end, cached_keys, item);
+                (matrix, newstart, end, cached_keys, item);
         }
 
         /* push value */
         g_array_append_val(cached_keys, key);
 
         result += compute_pronunciation_possibility_recur
-            (options, matrix, newstart, end, cached_keys, item);
+            (matrix, newstart, end, cached_keys, item);
 
         /* pop value */
         g_array_set_size(cached_keys, cached_keys->len - 1);
@@ -336,8 +335,7 @@ gfloat compute_pronunciation_possibility_recur(pinyin_option_t options,
     return result;
 }
 
-gfloat compute_pronunciation_possibility(pinyin_option_t options,
-                                         PhoneticKeyMatrix * matrix,
+gfloat compute_pronunciation_possibility(PhoneticKeyMatrix * matrix,
                                          size_t start, size_t end,
                                          GArray * cached_keys,
                                          PhraseItem & item){
@@ -347,11 +345,10 @@ gfloat compute_pronunciation_possibility(pinyin_option_t options,
     assert(matrix->get_column_size(end) > 0);
 
     return compute_pronunciation_possibility_recur
-        (options, matrix, start, end, cached_keys, item);
+        (matrix, start, end, cached_keys, item);
 }
 
-bool increase_pronunciation_possibility_recur(pinyin_option_t options,
-                                              PhoneticKeyMatrix * matrix,
+bool increase_pronunciation_possibility_recur(PhoneticKeyMatrix * matrix,
                                               size_t start, size_t end,
                                               GArray * cached_keys,
                                               PhraseItem & item, gint32 delta) {
@@ -368,7 +365,7 @@ bool increase_pronunciation_possibility_recur(pinyin_option_t options,
             return false;
 
         item.increase_pronunciation_possibility
-            (options, (ChewingKey *) cached_keys->data, delta);
+            ((ChewingKey *) cached_keys->data, delta);
         return true;
     }
 
@@ -389,14 +386,14 @@ bool increase_pronunciation_possibility_recur(pinyin_option_t options,
             /* assume only one key here for "'" or the last key. */
             assert(1 == size);
             return increase_pronunciation_possibility_recur
-                (options, matrix, newstart, end, cached_keys, item, delta);
+                (matrix, newstart, end, cached_keys, item, delta);
         }
 
         /* push value */
         g_array_append_val(cached_keys, key);
 
         result = increase_pronunciation_possibility_recur
-            (options, matrix, newstart, end, cached_keys, item, delta) || result;
+            (matrix, newstart, end, cached_keys, item, delta) || result;
 
         /* pop value */
         g_array_set_size(cached_keys, cached_keys->len - 1);
@@ -405,8 +402,7 @@ bool increase_pronunciation_possibility_recur(pinyin_option_t options,
     return result;
 }
 
-bool increase_pronunciation_possibility(pinyin_option_t options,
-                                        PhoneticKeyMatrix * matrix,
+bool increase_pronunciation_possibility(PhoneticKeyMatrix * matrix,
                                         size_t start, size_t end,
                                         GArray * cached_keys,
                                         PhraseItem & item, gint32 delta) {
@@ -416,7 +412,7 @@ bool increase_pronunciation_possibility(pinyin_option_t options,
     assert(matrix->get_column_size(end) > 0);
 
     return increase_pronunciation_possibility_recur
-        (options, matrix, start, end, cached_keys, item, delta);
+        (matrix, start, end, cached_keys, item, delta);
 }
 
 };

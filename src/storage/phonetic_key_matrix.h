@@ -212,14 +212,12 @@ int search_matrix(FacadeChewingTable2 * table,
                   size_t start, size_t end,
                   PhraseIndexRanges ranges);
 
-gfloat compute_pronunciation_possibility(pinyin_option_t options,
-                                         PhoneticKeyMatrix * matrix,
+gfloat compute_pronunciation_possibility(PhoneticKeyMatrix * matrix,
                                          size_t start, size_t end,
                                          GArray * cached_keys,
                                          PhraseItem & item);
 
-bool increase_pronunciation_possibility(pinyin_option_t options,
-                                        PhoneticKeyMatrix * matrix,
+bool increase_pronunciation_possibility(PhoneticKeyMatrix * matrix,
                                         size_t start, size_t end,
                                         GArray * cached_keys,
                                         PhraseItem & item, gint32 delta);
