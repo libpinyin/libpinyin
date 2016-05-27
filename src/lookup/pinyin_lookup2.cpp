@@ -617,6 +617,8 @@ bool PinyinLookup2::train_result2(PhoneticKeyMatrix * matrix,
                 if (null_token != next_token)
                     break;
             }
+            /* safe guard for last token. */
+            next_pos = std_lite::min(next_pos, constraints->len - 1);
 
             /* train uni-gram */
             m_phrase_index->get_phrase_item(token, m_cached_phrase_item);
