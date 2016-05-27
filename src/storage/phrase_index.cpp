@@ -37,7 +37,7 @@ bool PhraseItem::get_nth_pronunciation(size_t index, ChewingKey * keys,
     bool retval = m_chunk.get_content
         (offset, keys, phrase_length * sizeof(ChewingKey));
     if ( !retval )
-	return retval;
+        return retval;
     return m_chunk.get_content
         (offset + phrase_length * sizeof(ChewingKey), &freq , sizeof(guint32));
 }
@@ -71,7 +71,7 @@ bool PhraseItem::add_pronunciation(ChewingKey * keys, guint32 delta){
             (keys, (ChewingKey *)chewing_begin, phrase_length)) {
             /* found the exact match pinyin keys. */
 
-	    /* protect against total_freq overflow. */
+            /* protect against total_freq overflow. */
             if (delta > 0 && total_freq > total_freq + delta)
                 return false;
 
@@ -116,22 +116,22 @@ void PhraseItem::increase_pronunciation_possibility(ChewingKey * keys,
     guint32 total_freq = 0;
 
     for (int i = 0; i < npron; ++i) {
-	char * chewing_begin = buf_begin + offset +
-	    i * (phrase_length * sizeof(ChewingKey) + sizeof(guint32));
-	guint32 * freq = (guint32 *)(chewing_begin +
+        char * chewing_begin = buf_begin + offset +
+            i * (phrase_length * sizeof(ChewingKey) + sizeof(guint32));
+        guint32 * freq = (guint32 *)(chewing_begin +
                                      phrase_length * sizeof(ChewingKey));
-	total_freq += *freq;
+        total_freq += *freq;
 
-	if (0 == pinyin_compare_with_tones(keys, (ChewingKey *)chewing_begin,
-                                       phrase_length)) {
+        if (0 == pinyin_compare_with_tones(keys, (ChewingKey *)chewing_begin,
+                                           phrase_length)) {
 
-	    /* protect against total_freq overflow. */
-	    if (delta > 0 && total_freq > total_freq + delta)
-		return;
+            /* protect against total_freq overflow. */
+            if (delta > 0 && total_freq > total_freq + delta)
+                return;
 
-	    *freq += delta;
-	    total_freq += delta;
-	}
+            *freq += delta;
+            total_freq += delta;
+        }
     }
 }
 
@@ -144,24 +144,24 @@ int SubPhraseIndex::add_unigram_frequency(phrase_token_t token, guint32 delta){
     table_offset_t offset;
     guint32 freq;
     bool result = m_phrase_index.get_content
-	((token & PHRASE_MASK) 
-	 * sizeof(table_offset_t), &offset, sizeof(table_offset_t));
+        ((token & PHRASE_MASK) 
+         * sizeof(table_offset_t), &offset, sizeof(table_offset_t));
 
     if ( !result )
-	return ERROR_OUT_OF_RANGE;
+        return ERROR_OUT_OF_RANGE;
 
     if ( 0 == offset )
         return ERROR_NO_ITEM;
 
     result = m_phrase_content.get_content
-	(offset + sizeof(guint8) + sizeof(guint8), &freq, sizeof(guint32));
+        (offset + sizeof(guint8) + sizeof(guint8), &freq, sizeof(guint32));
 
     if ( !result )
         return ERROR_FILE_CORRUPTION;
 
     //protect total_freq overflow
     if ( delta > 0 && m_total_freq > m_total_freq + delta )
-	return ERROR_INTEGER_OVERFLOW;
+        return ERROR_INTEGER_OVERFLOW;
 
     freq += delta;
     m_total_freq += delta;
@@ -176,11 +176,11 @@ int SubPhraseIndex::get_phrase_item(phrase_token_t token, PhraseItem & item){
     guint8 n_prons;
     
     bool result = m_phrase_index.get_content
-	((token & PHRASE_MASK) 
-	 * sizeof(table_offset_t), &offset, sizeof(table_offset_t));
+        ((token & PHRASE_MASK) 
+         * sizeof(table_offset_t), &offset, sizeof(table_offset_t));
 
     if ( !result )
-	return ERROR_OUT_OF_RANGE;
+        return ERROR_OUT_OF_RANGE;
 
     if ( 0 == offset )
         return ERROR_NO_ITEM;
@@ -191,7 +191,7 @@ int SubPhraseIndex::get_phrase_item(phrase_token_t token, PhraseItem & item){
     
     result = m_phrase_content.get_content(offset+sizeof(guint8), &n_prons, sizeof(guint8));
     if ( !result ) 
-	return ERROR_FILE_CORRUPTION;
+        return ERROR_FILE_CORRUPTION;
 
     size_t length = phrase_item_header + phrase_length * sizeof ( ucs4_t ) + n_prons * ( phrase_length * sizeof (ChewingKey) + sizeof(guint32) );
     item.m_chunk.set_chunk((char *)m_phrase_content.begin() + offset, length, NULL);
@@ -201,10 +201,10 @@ int SubPhraseIndex::get_phrase_item(phrase_token_t token, PhraseItem & item){
 int SubPhraseIndex::add_phrase_item(phrase_token_t token, PhraseItem * item){
     table_offset_t offset = m_phrase_content.size();
     if ( 0 == offset )
-	offset = 8;
+        offset = 8;
     m_phrase_content.set_content(offset, item->m_chunk.begin(), item->m_chunk.size());
     m_phrase_index.set_content((token & PHRASE_MASK) 
-			       * sizeof(table_offset_t), &offset, sizeof(table_offset_t));
+                               * sizeof(table_offset_t), &offset, sizeof(table_offset_t));
     m_total_freq += item->get_unigram_frequency();
     return ERROR_OK;
 }
@@ -222,7 +222,7 @@ int SubPhraseIndex::remove_phrase_item(phrase_token_t token, PhraseItem * & item
 
     const table_offset_t zero_const = 0;
     m_phrase_index.set_content((token & PHRASE_MASK)
-			       * sizeof(table_offset_t), &zero_const, sizeof(table_offset_t));
+                               * sizeof(table_offset_t), &zero_const, sizeof(table_offset_t));
     m_total_freq -= item->get_unigram_frequency();
     return ERROR_OK;
 }
@@ -230,13 +230,13 @@ int SubPhraseIndex::remove_phrase_item(phrase_token_t token, PhraseItem * & item
 bool FacadePhraseIndex::load(guint8 phrase_index, MemoryChunk * chunk){
     SubPhraseIndex * & sub_phrases = m_sub_phrase_indices[phrase_index];
     if ( !sub_phrases ){
-	sub_phrases = new SubPhraseIndex;
+        sub_phrases = new SubPhraseIndex;
     }
 
     m_total_freq -= sub_phrases->get_phrase_index_total_freq();
     bool retval = sub_phrases->load(chunk, 0, chunk->size());
     if ( !retval )
-	return retval;
+        return retval;
     m_total_freq += sub_phrases->get_phrase_index_total_freq();
     return retval;
 }
@@ -245,7 +245,7 @@ bool FacadePhraseIndex::store(guint8 phrase_index, MemoryChunk * new_chunk){
     table_offset_t end;
     SubPhraseIndex * & sub_phrases = m_sub_phrase_indices[phrase_index];
     if ( !sub_phrases )
-	return false;
+        return false;
     
     sub_phrases->store(new_chunk, 0, end);
     return true;
@@ -254,7 +254,7 @@ bool FacadePhraseIndex::store(guint8 phrase_index, MemoryChunk * new_chunk){
 bool FacadePhraseIndex::unload(guint8 phrase_index){
     SubPhraseIndex * & sub_phrases = m_sub_phrase_indices[phrase_index];
     if ( !sub_phrases )
-	return false;
+        return false;
     m_total_freq -= sub_phrases->get_phrase_index_total_freq();
     delete sub_phrases;
     sub_phrases = NULL;
@@ -326,11 +326,11 @@ bool FacadePhraseIndex::merge_with_mask(guint8 phrase_index,
 
 
 bool SubPhraseIndex::load(MemoryChunk * chunk, 
-			  table_offset_t offset, table_offset_t end){
+                          table_offset_t offset, table_offset_t end){
     //save the memory chunk
     if ( m_chunk ){
-	delete m_chunk;
-	m_chunk = NULL;
+        delete m_chunk;
+        m_chunk = NULL;
     }
     m_chunk = chunk;
     
@@ -348,7 +348,7 @@ bool SubPhraseIndex::load(MemoryChunk * chunk,
     g_return_val_if_fail(*(buf_begin + index_two - 1) == c_separate, FALSE);
     g_return_val_if_fail(*(buf_begin + index_three - 1) == c_separate, FALSE);
     m_phrase_index.set_chunk(buf_begin + index_one, 
-			     index_two - 1 - index_one, NULL);
+                             index_two - 1 - index_one, NULL);
     m_phrase_content.set_chunk(buf_begin + index_two, 
                                index_three - 1 - index_two, NULL);
     g_return_val_if_fail( index_three <= end, FALSE);
@@ -356,7 +356,7 @@ bool SubPhraseIndex::load(MemoryChunk * chunk,
 }
 
 bool SubPhraseIndex::store(MemoryChunk * new_chunk, 
-			   table_offset_t offset, table_offset_t& end){
+                           table_offset_t offset, table_offset_t& end){
     new_chunk->set_content(offset, &m_total_freq, sizeof(guint32));
     table_offset_t index = offset + sizeof(guint32);
         
@@ -514,7 +514,7 @@ bool SubPhraseIndex::merge(PhraseIndexLogger * logger){
 bool FacadePhraseIndex::load_text(guint8 phrase_index, FILE * infile){
     SubPhraseIndex * & sub_phrases = m_sub_phrase_indices[phrase_index];
     if ( !sub_phrases ){
-	sub_phrases = new SubPhraseIndex;
+        sub_phrases = new SubPhraseIndex;
     }
 
     char pinyin[256];
@@ -532,46 +532,46 @@ bool FacadePhraseIndex::load_text(guint8 phrase_index, FILE * infile){
         if (4 != num)
             continue;
 
-	if (feof(infile))
-	    break;
+        if (feof(infile))
+            break;
 
         assert(PHRASE_INDEX_LIBRARY_INDEX(token) == phrase_index );
 
-	glong written;
-	ucs4_t * phrase_ucs4 = g_utf8_to_ucs4(phrase, -1, NULL, 
+        glong written;
+        ucs4_t * phrase_ucs4 = g_utf8_to_ucs4(phrase, -1, NULL, 
                                               &written, NULL);
 	
-	if ( 0 == cur_token ){
-	    cur_token = token;
-	    item_ptr->set_phrase_string(written, phrase_ucs4);
-	}
+        if ( 0 == cur_token ){
+            cur_token = token;
+            item_ptr->set_phrase_string(written, phrase_ucs4);
+        }
 
-	if ( cur_token != token ){
-	    add_phrase_item( cur_token, item_ptr);
-	    delete item_ptr;
-	    item_ptr = new PhraseItem;
-	    cur_token = token;
-	    item_ptr->set_phrase_string(written, phrase_ucs4);
-	}
+        if ( cur_token != token ){
+            add_phrase_item( cur_token, item_ptr);
+            delete item_ptr;
+            item_ptr = new PhraseItem;
+            cur_token = token;
+            item_ptr->set_phrase_string(written, phrase_ucs4);
+        }
 
-    pinyin_option_t options = USE_TONE;
-	PinyinDirectParser2 parser;
-	ChewingKeyVector keys = g_array_new(FALSE, FALSE, sizeof(ChewingKey));
-	ChewingKeyRestVector key_rests =
+        pinyin_option_t options = USE_TONE;
+        PinyinDirectParser2 parser;
+        ChewingKeyVector keys = g_array_new(FALSE, FALSE, sizeof(ChewingKey));
+        ChewingKeyRestVector key_rests =
             g_array_new(FALSE, FALSE, sizeof(ChewingKeyRest));
 
-	parser.parse(options, keys, key_rests, pinyin, strlen(pinyin));
+        parser.parse(options, keys, key_rests, pinyin, strlen(pinyin));
 	
-	if (item_ptr->get_phrase_length() == keys->len) {
+        if (item_ptr->get_phrase_length() == keys->len) {
             item_ptr->add_pronunciation((ChewingKey *)keys->data, freq);
         } else {
             fprintf(stderr, "FacadePhraseIndex::load_text:%s\t%s\n",
                     pinyin, phrase);
         }
 
-	g_array_free(keys, TRUE);
-	g_array_free(key_rests, TRUE);
-	g_free(phrase_ucs4);
+        g_array_free(keys, TRUE);
+        g_array_free(key_rests, TRUE);
+        g_free(phrase_ucs4);
     }
 
     add_phrase_item( cur_token, item_ptr);
