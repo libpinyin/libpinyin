@@ -717,7 +717,7 @@ bool PinyinLookup2::validate_constraint(PhoneticKeyMatrix * matrix,
             guint32 end = constraint->m_end;
 
             /* clear too long constraint */
-            if (end > constraints->len){
+            if (end >= constraints->len){
                 clear_constraint(constraints, i);
                 continue;
             }

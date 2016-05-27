@@ -27,7 +27,6 @@
 #include "novel_types.h"
 #include "chewing_key.h"
 #include "pinyin_parser2.h"
-#include "pinyin_phrase2.h"
 #include "pinyin_phrase3.h"
 #include "memory_chunk.h"
 #include "phrase_index_logger.h"
@@ -127,15 +126,13 @@ public:
 
     /**
      * PhraseItem::get_pronunciation_possibility:
-     * @options: the pinyin options.
      * @keys: the pronunciation keys.
      * @returns: the possibility of this phrase item pronounces the pinyin.
      *
      * Get the possibility of this phrase item pronounces the pinyin.
      *
      */
-    gfloat get_pronunciation_possibility(pinyin_option_t options,
-                                         ChewingKey * keys){
+    gfloat get_pronunciation_possibility(ChewingKey * keys){
 	guint8 phrase_length = get_phrase_length();
 	guint8 npron = get_n_pronunciation();
 	size_t offset = phrase_item_header + phrase_length * sizeof (ucs4_t);
@@ -147,9 +144,8 @@ public:
 	    guint32 * freq = (guint32 *)(chewing_begin +
                                          phrase_length * sizeof(ChewingKey));
 	    total_freq += *freq;
-	    if ( 0 == pinyin_compare_with_ambiguities2
-                 (options,  keys,
-                  (ChewingKey *)chewing_begin,phrase_length) ){
+	    if ( 0 == pinyin_compare_with_tones(keys, (ChewingKey *)chewing_begin,
+                                            phrase_length) ){
 		matched += *freq;
 	    }
 	}
@@ -167,16 +163,14 @@ public:
 
     /**
      * PhraseItem::increase_pronunciation_possibility:
-     * @options: the pinyin options.
      * @keys: the pronunciation keys.
      * @delta: the delta to be added to the pronunciation keys.
      *
      * Add the delta to the pronunciation of the pronunciation keys.
      *
      */
-    void increase_pronunciation_possibility(pinyin_option_t options,
-				     ChewingKey * keys,
-				     gint32 delta);
+    void increase_pronunciation_possibility(ChewingKey * keys,
+                                            gint32 delta);
 
     /**
      * PhraseItem::get_phrase_string:

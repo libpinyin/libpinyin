@@ -107,8 +107,7 @@ bool PhraseItem::set_phrase_string(guint8 phrase_length, ucs4_t * phrase){
     return true;
 }
 
-void PhraseItem::increase_pronunciation_possibility(pinyin_option_t options,
-                                                    ChewingKey * keys,
+void PhraseItem::increase_pronunciation_possibility(ChewingKey * keys,
                                                     gint32 delta){
     guint8 phrase_length = get_phrase_length();
     guint8 npron = get_n_pronunciation();
@@ -123,9 +122,8 @@ void PhraseItem::increase_pronunciation_possibility(pinyin_option_t options,
                                      phrase_length * sizeof(ChewingKey));
 	total_freq += *freq;
 
-	if (0 == pinyin_compare_with_ambiguities2
-            (options, keys,
-             (ChewingKey *)chewing_begin, phrase_length)) {
+	if (0 == pinyin_compare_with_tones(keys, (ChewingKey *)chewing_begin,
+                                       phrase_length)) {
 
 	    /* protect against total_freq overflow. */
 	    if (delta > 0 && total_freq > total_freq + delta)
