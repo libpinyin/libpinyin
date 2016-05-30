@@ -344,6 +344,7 @@ gfloat compute_pronunciation_possibility(PhoneticKeyMatrix * matrix,
     assert(matrix->get_column_size(start) > 0);
     assert(matrix->get_column_size(end) > 0);
 
+    g_array_set_size(cached_keys, 0);
     return compute_pronunciation_possibility_recur
         (matrix, start, end, cached_keys, item);
 }
@@ -411,6 +412,7 @@ bool increase_pronunciation_possibility(PhoneticKeyMatrix * matrix,
     assert(matrix->get_column_size(start) > 0);
     assert(matrix->get_column_size(end) > 0);
 
+    g_array_set_size(cached_keys, 0);
     return increase_pronunciation_possibility_recur
         (matrix, start, end, cached_keys, item, delta);
 }
