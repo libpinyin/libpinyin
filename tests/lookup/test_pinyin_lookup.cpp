@@ -37,7 +37,7 @@ int main( int argc, char * argv[]){
     }
 
     pinyin_option_t options =
-        USE_TONE | USE_RESPLIT_TABLE | PINYIN_CORRECT_ALL | PINYIN_AMB_ALL;
+        USE_TONE | PINYIN_CORRECT_ALL | PINYIN_AMB_ALL | PINYIN_INCOMPLETE;
     FacadeChewingTable2 largetable;
 
     largetable.load("../../data/pinyin_index.bin", NULL);
@@ -55,9 +55,8 @@ int main( int argc, char * argv[]){
     user_bigram.attach(NULL, ATTACH_CREATE|ATTACH_READWRITE);
 
     gfloat lambda = system_table_info.get_lambda();
-    
-    PinyinLookup2 pinyin_lookup(lambda, options,
-                                &largetable, &phrase_index,
+
+    PinyinLookup2 pinyin_lookup(lambda, &largetable, &phrase_index,
                                 &system_bigram, &user_bigram);
 
     /* prepare the prefixes for get_best_match. */
@@ -85,8 +84,22 @@ int main( int argc, char * argv[]){
             g_array_new(FALSE, FALSE, sizeof(ChewingKeyRest));
         parser.parse(options, keys, key_rests, linebuf, strlen(linebuf));
 
+        PhoneticKeyMatrix matrix;
+
         if ( 0 == keys->len ) /* invalid pinyin */
             continue;
+
+        /* fill the matrix. */
+        fill_phonetic_key_matrix_from_chewing_keys
+            (&matrix, keys, key_rests);
+
+        resplit_step(options, &matrix);
+
+        inner_split_step(options, &matrix);
+
+        fuzzy_syllable_step(options, &matrix);
+
+        dump_phonetic_key_matrix(&matrix);
 
         /* initialize constraints. */
         g_array_set_size(constraints, keys->len);
@@ -96,16 +109,18 @@ int main( int argc, char * argv[]){
         }
 
         guint32 start_time = record_time();
-        for ( size_t i = 0; i < bench_times; ++i)
-            pinyin_lookup.get_best_match(prefixes, keys, constraints, results);
+        for (size_t i = 0; i < bench_times; ++i)
+            pinyin_lookup.get_best_match(prefixes, &matrix, constraints, results);
         print_time(start_time, bench_times);
-        for ( size_t i = 0; i < results->len; ++i){
+
+        for (size_t i = 0; i < results->len; ++i){
             phrase_token_t * token = &g_array_index(results, phrase_token_t, i);
             if ( null_token == *token)
                 continue;
             printf("pos:%ld,token:%d\t", i, *token);
         }
         printf("\n");
+
         char * sentence = NULL;
         pinyin_lookup.convert_to_utf8(results, sentence);
         printf("%s\n", sentence);
