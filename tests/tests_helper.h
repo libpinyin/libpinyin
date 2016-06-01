@@ -101,10 +101,10 @@ inline bool dump_ranges(FacadePhraseIndex * phrase_index,
                    onerange->m_range_end);
 
             PhraseItem item;
-            for ( phrase_token_t token = onerange->m_range_begin;
+            for (phrase_token_t token = onerange->m_range_begin;
                   token != onerange->m_range_end; ++token){
 
-                phrase_index->get_phrase_item( token, item);
+                phrase_index->get_phrase_item(token, item);
 
                 /* get phrase string */
                 ucs4_t buffer[MAX_PHRASE_LENGTH + 1];

@@ -28,6 +28,57 @@ size_t bench_times = 1000;
 
 using namespace pinyin;
 
+bool test_pronunciation_possibility(PhoneticKeyMatrix * matrix,
+                                    size_t start, size_t end,
+                                    FacadePhraseIndex * phrase_index,
+                                    PhraseIndexRanges ranges) {
+    GArray * cached_keys = g_array_new(TRUE, TRUE, sizeof(ChewingKey));
+
+    for (size_t i = 0; i < PHRASE_INDEX_LIBRARY_COUNT; ++i) {
+        GArray * & range = ranges[i];
+        if (!range)
+            continue;
+
+        if (range->len)
+            printf("range items number:%d\n", range->len);
+
+
+        for (size_t k = 0; k < range->len; ++k) {
+            PhraseIndexRange * onerange =
+                &g_array_index(range, PhraseIndexRange, k);
+            printf("start:%d\tend:%d\n", onerange->m_range_begin,
+                   onerange->m_range_end);
+
+            PhraseItem item;
+            for (phrase_token_t token = onerange->m_range_begin;
+                  token != onerange->m_range_end; ++token){
+
+                phrase_index->get_phrase_item(token, item);
+
+                gfloat origin = compute_pronunciation_possibility
+                    (matrix, start, end, cached_keys, item);
+
+                bool increased = increase_pronunciation_possibility
+                    (matrix, start, end, cached_keys, item, 30);
+
+                gfloat updated = compute_pronunciation_possibility
+                    (matrix, start, end, cached_keys, item);
+
+                if (increased) {
+                    printf("origin:%f\t updated:%f\n", origin, updated);
+                } else {
+                    assert(origin == updated);
+                    printf("origin:%f\n", origin);
+                }
+            }
+        }
+
+    }
+
+    g_array_free(cached_keys, TRUE);
+    return true;
+}
+
 int main(int argc, char * argv[]) {
     SystemTableInfo2 system_table_info;
 
@@ -101,8 +152,11 @@ int main(int argc, char * argv[]) {
                 int retval = search_matrix(&largetable, &matrix, i, j, ranges);
 
 #if 0
-                if (retval & SEARCH_OK)
+                if (retval & SEARCH_OK) {
                     dump_ranges(&phrase_index, ranges);
+                    test_pronunciation_possibility
+                        (&matrix, i, j, &phrase_index, ranges);
+                }
 #endif
 
                 if (!(retval & SEARCH_CONTINUED))
