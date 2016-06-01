@@ -76,43 +76,43 @@ int main( int argc, char * argv[]){
             linebuf[strlen(linebuf) - 1] = '\0';
         }
 
-	if ( strcmp ( linebuf, "quit" ) == 0)
-	    break;
+        if ( strcmp ( linebuf, "quit" ) == 0)
+            break;
 	
-	FullPinyinParser2 parser;
-	ChewingKeyVector keys = g_array_new(FALSE, FALSE, sizeof(ChewingKey));
-	ChewingKeyRestVector key_rests =
+        FullPinyinParser2 parser;
+        ChewingKeyVector keys = g_array_new(FALSE, FALSE, sizeof(ChewingKey));
+        ChewingKeyRestVector key_rests =
             g_array_new(FALSE, FALSE, sizeof(ChewingKeyRest));
-	parser.parse(options, keys, key_rests, linebuf, strlen(linebuf));
+        parser.parse(options, keys, key_rests, linebuf, strlen(linebuf));
 
-	if ( 0 == keys->len ) /* invalid pinyin */
-	    continue;
+        if ( 0 == keys->len ) /* invalid pinyin */
+            continue;
 
         /* initialize constraints. */
-	g_array_set_size(constraints, keys->len);
-	for ( size_t i = 0; i < constraints->len; ++i){
-	    lookup_constraint_t * constraint = &g_array_index(constraints, lookup_constraint_t, i);
-	    constraint->m_type = NO_CONSTRAINT;
-	}
+        g_array_set_size(constraints, keys->len);
+        for ( size_t i = 0; i < constraints->len; ++i){
+            lookup_constraint_t * constraint = &g_array_index(constraints, lookup_constraint_t, i);
+            constraint->m_type = NO_CONSTRAINT;
+        }
 
-	guint32 start_time = record_time();
-	for ( size_t i = 0; i < bench_times; ++i)
-	    pinyin_lookup.get_best_match(prefixes, keys, constraints, results);
-	print_time(start_time, bench_times);
-	for ( size_t i = 0; i < results->len; ++i){
-	    phrase_token_t * token = &g_array_index(results, phrase_token_t, i);
-	    if ( null_token == *token)
-		continue;
-	    printf("pos:%ld,token:%d\t", i, *token);
-	}
-	printf("\n");
-	char * sentence = NULL;
-	pinyin_lookup.convert_to_utf8(results, sentence);
-	printf("%s\n", sentence);
+        guint32 start_time = record_time();
+        for ( size_t i = 0; i < bench_times; ++i)
+            pinyin_lookup.get_best_match(prefixes, keys, constraints, results);
+        print_time(start_time, bench_times);
+        for ( size_t i = 0; i < results->len; ++i){
+            phrase_token_t * token = &g_array_index(results, phrase_token_t, i);
+            if ( null_token == *token)
+                continue;
+            printf("pos:%ld,token:%d\t", i, *token);
+        }
+        printf("\n");
+        char * sentence = NULL;
+        pinyin_lookup.convert_to_utf8(results, sentence);
+        printf("%s\n", sentence);
 
-	g_array_free(keys, TRUE);
-	g_array_free(key_rests, TRUE);
-	g_free(sentence);
+        g_array_free(keys, TRUE);
+        g_array_free(key_rests, TRUE);
+        g_free(sentence);
     }
 
     g_array_free(prefixes, TRUE);
