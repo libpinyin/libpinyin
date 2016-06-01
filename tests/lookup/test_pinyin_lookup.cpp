@@ -102,7 +102,7 @@ int main( int argc, char * argv[]){
         dump_phonetic_key_matrix(&matrix);
 
         /* initialize constraints. */
-        g_array_set_size(constraints, keys->len);
+        g_array_set_size(constraints, matrix.size());
         for ( size_t i = 0; i < constraints->len; ++i){
             lookup_constraint_t * constraint = &g_array_index(constraints, lookup_constraint_t, i);
             constraint->m_type = NO_CONSTRAINT;
