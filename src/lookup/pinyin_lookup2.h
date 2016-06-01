@@ -224,7 +224,7 @@ public:
      * Clear one constraint in the constraints on the guessed sentence.
      *
      */
-    bool clear_constraint(CandidateConstraints constraints, int index);
+    bool clear_constraint(CandidateConstraints constraints, size_t index);
 
     /**
      * PinyinLookup2::validate_constraint:

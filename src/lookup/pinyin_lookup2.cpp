@@ -609,7 +609,7 @@ bool PinyinLookup2::train_result2(PhoneticKeyMatrix * matrix,
             }
 
             /* compute the position of next token. */
-            size_t next_pos = i + 1;
+            guint next_pos = i + 1;
             for (; next_pos < constraints->len; ++next_pos) {
                 phrase_token_t next_token = g_array_index
                     (results, phrase_token_t, next_pos);
@@ -663,7 +663,7 @@ int PinyinLookup2::add_constraint(CandidateConstraints constraints,
 }
 
 bool PinyinLookup2::clear_constraint(CandidateConstraints constraints,
-                                     int index) {
+                                     size_t index) {
     if (index < 0 || index >= constraints->len)
         return false;
 
@@ -681,7 +681,7 @@ bool PinyinLookup2::clear_constraint(CandidateConstraints constraints,
     /* now var constraint points to the one step constraint. */
     assert(constraint->m_type == CONSTRAINT_ONESTEP);
 
-    phrase_token_t token = constraint->m_token;
+    /* phrase_token_t token = constraint->m_token; */
     size_t end = constraint->m_end;
     for (size_t i = index; i < end; ++i){
         if (i >= constraints->len)
