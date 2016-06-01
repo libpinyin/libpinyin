@@ -27,8 +27,8 @@
 using namespace pinyin;
 
 /*
-const gfloat PinyinLookup2::bigram_lambda = lambda;
-const gfloat PinyinLookup2::unigram_lambda = 1 - lambda;
+  const gfloat PinyinLookup2::bigram_lambda = lambda;
+  const gfloat PinyinLookup2::unigram_lambda = 1 - lambda;
 */
 
 /* internal definition */
@@ -159,10 +159,10 @@ static bool init_steps(GPtrArray * steps_index,
     g_ptr_array_set_size(steps_content, nstep);
 
     for (int i = 0; i < nstep; ++i) {
-	/* initialize steps_index */
-	g_ptr_array_index(steps_index, i) = g_hash_table_new(g_direct_hash, g_direct_equal);
-	/* initialize steps_content */
-	g_ptr_array_index(steps_content, i) = g_array_new(FALSE, FALSE, sizeof(lookup_value_t));
+        /* initialize steps_index */
+        g_ptr_array_index(steps_index, i) = g_hash_table_new(g_direct_hash, g_direct_equal);
+        /* initialize steps_content */
+        g_ptr_array_index(steps_content, i) = g_array_new(FALSE, FALSE, sizeof(lookup_value_t));
     }
 
     return true;
@@ -171,16 +171,16 @@ static bool init_steps(GPtrArray * steps_index,
 static void clear_steps(GPtrArray * steps_index, GPtrArray * steps_content){
     /* clear steps_index */
     for ( size_t i = 0; i < steps_index->len; ++i){
-	GHashTable * table = (GHashTable *) g_ptr_array_index(steps_index, i);
-	g_hash_table_destroy(table);
-	g_ptr_array_index(steps_index, i) = NULL;
+        GHashTable * table = (GHashTable *) g_ptr_array_index(steps_index, i);
+        g_hash_table_destroy(table);
+        g_ptr_array_index(steps_index, i) = NULL;
     }
 
     /* clear steps_content */
     for ( size_t i = 0; i < steps_content->len; ++i){
-	GArray * array = (GArray *) g_ptr_array_index(steps_content, i);
-	g_array_free(array, TRUE);
-	g_ptr_array_index(steps_content, i) = NULL;
+        GArray * array = (GArray *) g_ptr_array_index(steps_content, i);
+        g_array_free(array, TRUE);
+        g_ptr_array_index(steps_content, i) = NULL;
     }
 }
 
@@ -434,7 +434,7 @@ bool PinyinLookup2::bigram_gen_next_step(int start, int end,
         return false;
 
     gfloat pinyin_poss = compute_pronunciation_possibility
-        (m_matrix, start, end, m_cached_keys, m_cached_phrase_item);
+                       (m_matrix, start, end, m_cached_keys, m_cached_phrase_item);
     if ( pinyin_poss < FLT_EPSILON )
         return false;
 
