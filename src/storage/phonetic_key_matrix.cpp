@@ -75,6 +75,9 @@ bool fill_phonetic_key_matrix_from_chewing_keys(PhoneticKeyMatrix * matrix,
 
 bool fuzzy_syllable_step(pinyin_option_t options,
                          PhoneticKeyMatrix * matrix) {
+    if (!(options & PINYIN_AMB_ALL))
+        return false;
+
     size_t length = matrix->size();
 
     GArray * keys = g_array_new(TRUE, TRUE, sizeof(ChewingKey));

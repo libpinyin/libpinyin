@@ -886,6 +886,9 @@ int PinyinDirectParser2::parse(pinyin_option_t options,
 /* need to use the pinyin_parser_table header. */
 bool resplit_step(pinyin_option_t options,
                   PhoneticKeyMatrix * matrix) {
+    if (!(options & USE_RESPLIT_TABLE))
+        return false;
+
     size_t length = matrix->size();
 
     GArray * keys = g_array_new(TRUE, TRUE, sizeof(ChewingKey));
@@ -965,6 +968,9 @@ bool resplit_step(pinyin_option_t options,
 /* need to use the pinyin_parser_table header. */
 bool inner_split_step(pinyin_option_t options,
                       PhoneticKeyMatrix * matrix) {
+    if (!(options & USE_DIVIDED_TABLE))
+        return false;
+
     size_t length = matrix->size();
 
     GArray * keys = g_array_new(TRUE, TRUE, sizeof(ChewingKey));
