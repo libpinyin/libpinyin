@@ -1008,8 +1008,8 @@ bool pinyin_set_options(pinyin_context_t * context,
     context->m_options = options;
 #if 0
     context->m_pinyin_table->set_options(context->m_options);
-#endif
     context->m_pinyin_lookup->set_options(context->m_options);
+#endif
     return true;
 }
 
@@ -1018,30 +1018,22 @@ pinyin_instance_t * pinyin_alloc_instance(pinyin_context_t * context){
     pinyin_instance_t * instance = new pinyin_instance_t;
     instance->m_context = context;
 
-    instance->m_raw_full_pinyin = NULL;
-
     instance->m_prefixes = g_array_new(FALSE, FALSE, sizeof(phrase_token_t));
-    instance->m_pinyin_keys = g_array_new(FALSE, FALSE, sizeof(ChewingKey));
-    instance->m_pinyin_key_rests =
-        g_array_new(FALSE, FALSE, sizeof(ChewingKeyRest));
 
     instance->m_parsed_len = 0;
 
     instance->m_constraints = g_array_new
-        (TRUE, FALSE, sizeof(lookup_constraint_t));
+        (TRUE, TRUE, sizeof(lookup_constraint_t));
     instance->m_match_results =
-        g_array_new(FALSE, FALSE, sizeof(phrase_token_t));
+        g_array_new(TRUE, TRUE, sizeof(phrase_token_t));
     instance->m_candidates =
-        g_array_new(FALSE, FALSE, sizeof(lookup_candidate_t));
+        g_array_new(TRUE, TRUE, sizeof(lookup_candidate_t));
 
     return instance;
 }
 
 void pinyin_free_instance(pinyin_instance_t * instance){
-    g_free(instance->m_raw_full_pinyin);
     g_array_free(instance->m_prefixes, TRUE);
-    g_array_free(instance->m_pinyin_keys, TRUE);
-    g_array_free(instance->m_pinyin_key_rests, TRUE);
     g_array_free(instance->m_constraints, TRUE);
     g_array_free(instance->m_match_results, TRUE);
     g_array_free(instance->m_candidates, TRUE);
@@ -1055,19 +1047,22 @@ pinyin_context_t * pinyin_get_context (pinyin_instance_t * instance){
 
 static bool pinyin_update_constraints(pinyin_instance_t * instance){
     pinyin_context_t * & context = instance->m_context;
-    ChewingKeyVector & pinyin_keys = instance->m_pinyin_keys;
+    PhoneticKeyMatrix & matrix = instance->m_matrix;
     CandidateConstraints & constraints = instance->m_constraints;
 
-    size_t key_len = constraints->len;
-    g_array_set_size(constraints, pinyin_keys->len);
-    for (size_t i = key_len; i < pinyin_keys->len; ++i ) {
+#if 0
+    const size_t oldlength = constraints->len;
+    const size_t newlength = matrix->size();
+    g_array_set_size(constraints, newlength);
+    for (size_t i = oldlength; i < newlength; ++i ) {
         lookup_constraint_t * constraint =
             &g_array_index(constraints, lookup_constraint_t, i);
         constraint->m_type = NO_CONSTRAINT;
     }
+#endif
 
     context->m_pinyin_lookup->validate_constraint
-        (constraints, pinyin_keys);
+        (&matrix, constraints);
 
     return true;
 }
@@ -1075,6 +1070,7 @@ static bool pinyin_update_constraints(pinyin_instance_t * instance){
 
 bool pinyin_guess_sentence(pinyin_instance_t * instance){
     pinyin_context_t * & context = instance->m_context;
+    PhoneticKeyMatrix & matrix = instance->m_matrix;
 
     g_array_set_size(instance->m_prefixes, 0);
     g_array_append_val(instance->m_prefixes, sentence_start);
@@ -1082,7 +1078,7 @@ bool pinyin_guess_sentence(pinyin_instance_t * instance){
     pinyin_update_constraints(instance);
     bool retval = context->m_pinyin_lookup->get_best_match
         (instance->m_prefixes,
-         instance->m_pinyin_keys,
+         &matrix,
          instance->m_constraints,
          instance->m_match_results);
 
@@ -1126,6 +1122,7 @@ static void _compute_prefixes(pinyin_instance_t * instance,
 bool pinyin_guess_sentence_with_prefix(pinyin_instance_t * instance,
                                        const char * prefix){
     pinyin_context_t * & context = instance->m_context;
+    PhoneticKeyMatrix & matrix = instance->m_matrix;
 
     g_array_set_size(instance->m_prefixes, 0);
     g_array_append_val(instance->m_prefixes, sentence_start);
@@ -1135,7 +1132,7 @@ bool pinyin_guess_sentence_with_prefix(pinyin_instance_t * instance,
     pinyin_update_constraints(instance);
     bool retval = context->m_pinyin_lookup->get_best_match
         (instance->m_prefixes,
-         instance->m_pinyin_keys,
+         &matrix,
          instance->m_constraints,
          instance->m_match_results);
 
@@ -1185,16 +1182,29 @@ bool pinyin_parse_full_pinyin(pinyin_instance_t * instance,
 size_t pinyin_parse_more_full_pinyins(pinyin_instance_t * instance,
                                       const char * pinyins){
     pinyin_context_t * & context = instance->m_context;
+    PhoneticKeyMatrix & matrix = instance->m_matrix;
 
-    g_free(instance->m_raw_full_pinyin);
-    instance->m_raw_full_pinyin = g_strdup(pinyins);
-    int pinyin_len = strlen(pinyins);
+    ChewingKeyVector keys = g_array_new(TRUE, TRUE, sizeof(ChewingKey));
+    ChewingKeyRestVector key_rests =
+        g_array_new(TRUE, TRUE, sizeof(ChewingKeyRest));
 
     int parsed_len = context->m_full_pinyin_parser->parse
-        ( context->m_options, instance->m_pinyin_keys,
-          instance->m_pinyin_key_rests, pinyins, pinyin_len);
+        ( context->m_options, keys,
+          key_rests, pinyins, strlen(pinyins));
 
     instance->m_parsed_len = parsed_len;
+
+    fill_phonetic_key_matrix_from_chewing_keys
+        (&matrix, keys, key_rests);
+
+    resplit_step(options, &matrix);
+
+    inner_split_step(options, &matrix);
+
+    fuzzy_syllable_step(options, &matrix);
+
+    g_array_free(key_rests, TRUE);
+    g_array_free(keys, TRUE);
     return parsed_len;
 }
 
@@ -1212,13 +1222,25 @@ bool pinyin_parse_double_pinyin(pinyin_instance_t * instance,
 size_t pinyin_parse_more_double_pinyins(pinyin_instance_t * instance,
                                         const char * pinyins){
     pinyin_context_t * & context = instance->m_context;
-    int pinyin_len = strlen(pinyins);
+    PhoneticKeyMatrix & matrix = instance->m_matrix;
+
+    ChewingKeyVector keys = g_array_new(TRUE, TRUE, sizeof(ChewingKey));
+    ChewingKeyRestVector key_rests =
+        g_array_new(TRUE, TRUE, sizeof(ChewingKeyRest));
 
     int parsed_len = context->m_double_pinyin_parser->parse
-        ( context->m_options, instance->m_pinyin_keys,
-          instance->m_pinyin_key_rests, pinyins, pinyin_len);
+        ( context->m_options, keys,
+          key_rests, pinyins, strlen(pinyins));
 
     instance->m_parsed_len = parsed_len;
+
+    fill_phonetic_key_matrix_from_chewing_keys
+        (&matrix, keys, key_rests);
+
+    fuzzy_syllable_step(options, &matrix);
+
+    g_array_free(key_rests, TRUE);
+    g_array_free(keys, TRUE);
     return parsed_len;
 }
 
@@ -1236,13 +1258,25 @@ bool pinyin_parse_chewing(pinyin_instance_t * instance,
 size_t pinyin_parse_more_chewings(pinyin_instance_t * instance,
                                   const char * chewings){
     pinyin_context_t * & context = instance->m_context;
-    int chewing_len = strlen(chewings);
+    PhoneticKeyMatrix & matrix = instance->m_matrix;
+
+    ChewingKeyVector keys = g_array_new(TRUE, TRUE, sizeof(ChewingKey));
+    ChewingKeyRestVector key_rests =
+        g_array_new(TRUE, TRUE, sizeof(ChewingKeyRest));
 
     int parsed_len = context->m_chewing_parser->parse
-        ( context->m_options, instance->m_pinyin_keys,
-          instance->m_pinyin_key_rests, chewings, chewing_len);
+        ( context->m_options, keys,
+          key_rests, chewings, strlen(chewings));
 
     instance->m_parsed_len = parsed_len;
+
+    fill_phonetic_key_matrix_from_chewing_keys
+        (&matrix, keys, key_rests);
+
+    fuzzy_syllable_step(options, &matrix);
+
+    g_array_free(key_rests, TRUE);
+    g_array_free(keys, TRUE);
     return parsed_len;
 }
 
