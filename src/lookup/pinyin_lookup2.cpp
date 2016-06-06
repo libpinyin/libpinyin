@@ -498,6 +498,7 @@ bool PinyinLookup2::final_step(MatchResults & results){
 
     /* find max element */
     size_t last_step_pos = m_steps_content->len - 1;
+    /* skip the preceding "'" characters for constraints? */
     GArray * last_step_array = (GArray *)g_ptr_array_index(m_steps_content, last_step_pos);
     if ( last_step_array->len == 0 )
         return false;

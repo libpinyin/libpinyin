@@ -43,8 +43,6 @@ typedef struct _export_iterator_t export_iterator_t;
 typedef enum _lookup_candidate_type_t{
     BEST_MATCH_CANDIDATE = 1,
     NORMAL_CANDIDATE,
-    DIVIDED_CANDIDATE,
-    RESPLIT_CANDIDATE,
     ZOMBIE_CANDIDATE,
     PREDICTED_CANDIDATE,
     ADDON_CANDIDATE,

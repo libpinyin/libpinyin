@@ -68,15 +68,11 @@ struct _pinyin_instance_t{
     /* pointer of pinyin_context_t. */
     pinyin_context_t * m_context;
 
-    /* cached user input full pinyin. */
-    gchar * m_raw_full_pinyin;
-
     /* the tokens of phrases before the user input. */
     TokenVector m_prefixes;
 
     /* cached parsed pinyin keys. */
-    ChewingKeyVector m_pinyin_keys;
-    ChewingKeyRestVector m_pinyin_key_rests;
+    PhoneticKeyMatrix m_matrix;
     size_t m_parsed_len;
 
     /* cached pinyin lookup variables. */
@@ -89,15 +85,16 @@ struct _lookup_candidate_t{
     lookup_candidate_type_t m_candidate_type;
     gchar * m_phrase_string;
     phrase_token_t m_token;
-    ChewingKeyRest m_orig_rest;
-    gchar * m_new_pinyins;
+    guint16 m_begin; /* must contain the preceding "'" character. */
+    guint16 m_end; /* must not contain the following "'" character. */
     guint32 m_freq; /* the amplifed gfloat numerical value. */
+
 public:
     _lookup_candidate_t() {
         m_candidate_type = NORMAL_CANDIDATE;
         m_phrase_string = NULL;
         m_token = null_token;
-        m_new_pinyins = NULL;
+        m_begin = 0; m_end = 0;
         m_freq = 0;
     }
 };
