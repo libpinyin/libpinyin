@@ -468,7 +468,7 @@ bool pinyin_in_chewing_keyboard(pinyin_instance_t * instance,
 /**
  * pinyin_guess_candidates:
  * @instance: the pinyin instance.
- * @offset: the offset in the pinyin keys.
+ * @offset: the lookup offset.
  * @returns: whether a list of tokens are gotten.
  *
  * Guess the candidates at the offset.
@@ -477,6 +477,7 @@ bool pinyin_in_chewing_keyboard(pinyin_instance_t * instance,
 bool pinyin_guess_candidates(pinyin_instance_t * instance,
                              size_t offset);
 
+#if 0
 /**
  * pinyin_guess_full_pinyin_candidates:
  * @instance: the pinyin instance.
@@ -488,6 +489,7 @@ bool pinyin_guess_candidates(pinyin_instance_t * instance,
  */
 bool pinyin_guess_full_pinyin_candidates(pinyin_instance_t * instance,
                                        size_t offset);
+#endif
 
 /**
  * pinyin_choose_candidate:
@@ -855,19 +857,20 @@ bool pinyin_get_pinyin_key_rest_length(pinyin_instance_t * instance,
                                        guint16 * length);
 
 /**
- * pinyin_get_pinyin_key_rest_offset:
+ * pinyin_get_pinyin_offset:
  * @instance: the pinyin instance.
- * @cursor: the cursor.
- * @offset: the offset in the pinyin array.
+ * @cursor: the user cursor.
+ * @offset: the lookup offset.
  * @returns: whether the get operation is successful.
  *
- * Get the offset in the pinyin key array.
+ * Get the lookup offset from the user cursor.
  *
  */
-bool pinyin_get_pinyin_key_rest_offset(pinyin_instance_t * instance,
-                                       guint16 cursor,
-                                       guint16 * offset);
+bool pinyin_get_pinyin_offset(pinyin_instance_t * instance,
+                              guint16 cursor,
+                              guint16 * offset);
 
+#if 0
 /**
  * pinyin_get_raw_full_pinyin:
  * @instance: the pinyin instance.
@@ -879,6 +882,7 @@ bool pinyin_get_pinyin_key_rest_offset(pinyin_instance_t * instance,
  */
 bool pinyin_get_raw_full_pinyin(pinyin_instance_t * instance,
                                 const gchar ** utf8_str);
+#endif
 
 /**
  * pinyin_get_n_phrase:

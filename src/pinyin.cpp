@@ -1404,8 +1404,8 @@ static void _append_items(PhraseIndexRanges ranges,
                 lookup_candidate_t item;
                 item.m_candidate_type = template_item->m_candidate_type;
                 item.m_token = k;
-                item.m_orig_rest = template_item->m_orig_rest;
-                item.m_new_pinyins = g_strdup(template_item->m_new_pinyins);
+                item.m_begin = template_item->m_begin;
+                item.m_end = template_item->m_end;
                 item.m_freq = template_item->m_freq;
                 g_array_append_val(items, item);
             }
@@ -1527,8 +1527,6 @@ static bool _compute_phrase_strings_of_items(pinyin_instance_t * instance,
             break;
         }
         case NORMAL_CANDIDATE:
-        case DIVIDED_CANDIDATE:
-        case RESPLIT_CANDIDATE:
         case PREDICTED_CANDIDATE:
             _token_get_phrase
                 (instance->m_context->m_phrase_index,
