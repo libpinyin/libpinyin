@@ -1182,6 +1182,7 @@ bool pinyin_parse_full_pinyin(pinyin_instance_t * instance,
 size_t pinyin_parse_more_full_pinyins(pinyin_instance_t * instance,
                                       const char * pinyins){
     pinyin_context_t * & context = instance->m_context;
+    pinyin_option_t & options = context->m_options;
     PhoneticKeyMatrix & matrix = instance->m_matrix;
 
     ChewingKeyVector keys = g_array_new(TRUE, TRUE, sizeof(ChewingKey));
@@ -1189,8 +1190,8 @@ size_t pinyin_parse_more_full_pinyins(pinyin_instance_t * instance,
         g_array_new(TRUE, TRUE, sizeof(ChewingKeyRest));
 
     int parsed_len = context->m_full_pinyin_parser->parse
-        ( context->m_options, keys,
-          key_rests, pinyins, strlen(pinyins));
+        (options, keys,
+         key_rests, pinyins, strlen(pinyins));
 
     instance->m_parsed_len = parsed_len;
 
@@ -1222,6 +1223,7 @@ bool pinyin_parse_double_pinyin(pinyin_instance_t * instance,
 size_t pinyin_parse_more_double_pinyins(pinyin_instance_t * instance,
                                         const char * pinyins){
     pinyin_context_t * & context = instance->m_context;
+    pinyin_option_t & options = context->m_options;
     PhoneticKeyMatrix & matrix = instance->m_matrix;
 
     ChewingKeyVector keys = g_array_new(TRUE, TRUE, sizeof(ChewingKey));
@@ -1229,8 +1231,8 @@ size_t pinyin_parse_more_double_pinyins(pinyin_instance_t * instance,
         g_array_new(TRUE, TRUE, sizeof(ChewingKeyRest));
 
     int parsed_len = context->m_double_pinyin_parser->parse
-        ( context->m_options, keys,
-          key_rests, pinyins, strlen(pinyins));
+        (options, keys,
+         key_rests, pinyins, strlen(pinyins));
 
     instance->m_parsed_len = parsed_len;
 
@@ -1258,6 +1260,7 @@ bool pinyin_parse_chewing(pinyin_instance_t * instance,
 size_t pinyin_parse_more_chewings(pinyin_instance_t * instance,
                                   const char * chewings){
     pinyin_context_t * & context = instance->m_context;
+    pinyin_option_t & options = context->m_options;
     PhoneticKeyMatrix & matrix = instance->m_matrix;
 
     ChewingKeyVector keys = g_array_new(TRUE, TRUE, sizeof(ChewingKey));
@@ -1265,8 +1268,8 @@ size_t pinyin_parse_more_chewings(pinyin_instance_t * instance,
         g_array_new(TRUE, TRUE, sizeof(ChewingKeyRest));
 
     int parsed_len = context->m_chewing_parser->parse
-        ( context->m_options, keys,
-          key_rests, chewings, strlen(chewings));
+        (options, keys,
+         key_rests, chewings, strlen(chewings));
 
     instance->m_parsed_len = parsed_len;
 
