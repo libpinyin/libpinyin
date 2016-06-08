@@ -1687,21 +1687,20 @@ bool pinyin_guess_candidates(pinyin_instance_t * instance,
     GArray * items = g_array_new(FALSE, FALSE, sizeof(lookup_candidate_t));
 
     /* offset must at the beginning of zero ChewingKey "'". */
-    ssize_t start = offset;
+    const size_t start = offset;
     ChewingKey key; ChewingKeyRest key_rest;
     const ChewingKey zero_key;
     if (start > 0) {
-        --start;
-        const size_t size = matrix.get_column_size(start);
+        const size_t index = start - 1;
+        const size_t size = matrix.get_column_size(index);
         if (1 == size) {
             /* assume only one zero ChewingKey "'" here, but no check. */
-            matrix.get_item(start, 0, key, key_rest);
+            matrix.get_item(index, 0, key, key_rest);
             assert(zero_key != key);
         }
     }
 
     /* matrix reserved one extra slot. */
-    start = offset;
     for (end = start + 1; end < matrix.size();) {
         g_array_set_size(items, 0);
 
