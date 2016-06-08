@@ -1752,18 +1752,16 @@ bool pinyin_guess_candidates(pinyin_instance_t * instance,
            to avoid duplicates of candidates. */
         ++end;
         for (; end < matrix.size(); ++end) {
-            const size_t size = matrix.get_column_size(end);
+            const size_t index = end - 1;
+            const size_t size = matrix.get_column_size(index);
 
             /* assume only one zero ChewingKey "'" here, but no check. */
             if (1 != size)
                 break;
-            matrix.get_item(end, 0, key, key_rest);
+            matrix.get_item(index, 0, key, key_rest);
 
-            if (zero_key != key) {
-                /* non-zero ChewingKey has at least length of one. */
-                ++end;
+            if (zero_key != key)
                 break;
-            }
         }
     }
 
