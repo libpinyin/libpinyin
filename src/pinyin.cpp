@@ -1086,9 +1086,8 @@ bool pinyin_guess_sentence(pinyin_instance_t * instance){
 }
 
 static void _compute_prefixes(pinyin_instance_t * instance,
-                            const char * prefix){
+                              const char * prefix){
     pinyin_context_t * & context = instance->m_context;
-
     FacadePhraseIndex * & phrase_index = context->m_phrase_index;
 
     glong len_str = 0;
@@ -1340,6 +1339,9 @@ static gint compare_item_with_frequency(gconstpointer lhs,
 
 static phrase_token_t _get_previous_token(pinyin_instance_t * instance,
                                           size_t offset) {
+    pinyin_context_t * context = instance->m_context;
+    TokenVector prefixes = instance->m_prefixes;
+
     phrase_token_t prev_token = null_token;
     ssize_t i;
 
@@ -1348,10 +1350,7 @@ static phrase_token_t _get_previous_token(pinyin_instance_t * instance,
         prev_token = sentence_start;
         size_t prev_token_len = 0;
 
-        pinyin_context_t * context = instance->m_context;
-        TokenVector prefixes = instance->m_prefixes;
         PhraseItem item;
-
         for (size_t i = 0; i < prefixes->len; ++i) {
             phrase_token_t token = g_array_index(prefixes, phrase_token_t, i);
             if (sentence_start == token)
@@ -1509,7 +1508,6 @@ static bool _prepend_sentence_candidate(pinyin_instance_t * instance,
 }
 
 static bool _compute_phrase_strings_of_items(pinyin_instance_t * instance,
-                                             size_t offset,
                                              CandidateVector candidates) {
     /* populate m_phrase_string in lookup_candidate_t. */
 
@@ -1521,9 +1519,7 @@ static bool _compute_phrase_strings_of_items(pinyin_instance_t * instance,
         case BEST_MATCH_CANDIDATE: {
             gchar * sentence = NULL;
             pinyin_get_sentence(instance, &sentence);
-            candidate->m_phrase_string = g_strdup
-                (g_utf8_offset_to_pointer(sentence, offset));
-            g_free(sentence);
+            candidate->m_phrase_string = sentence;
             break;
         }
         case NORMAL_CANDIDATE:
@@ -1658,12 +1654,9 @@ bool pinyin_guess_candidates(pinyin_instance_t * instance,
 
     pinyin_context_t * & context = instance->m_context;
     pinyin_option_t & options = context->m_options;
-    ChewingKeyVector & pinyin_keys = instance->m_pinyin_keys;
+    PhoneticKeyMatrix & matrix = instance->m_matrix;
 
     _free_candidates(instance->m_candidates);
-
-    size_t pinyin_len = pinyin_keys->len - offset;
-    ssize_t i;
 
     /* lookup the previous token here. */
     phrase_token_t prev_token = null_token;
@@ -1693,27 +1686,45 @@ bool pinyin_guess_candidates(pinyin_instance_t * instance,
 
     GArray * items = g_array_new(FALSE, FALSE, sizeof(lookup_candidate_t));
 
-    for (i = pinyin_len; i >= 1; --i) {
+    /* offset must at the beginning of zero ChewingKey "'". */
+    ssize_t start = offset;
+    ChewingKey key; ChewingKeyRest key_rest;
+    const ChewingKey zero_key;
+    if (start > 0) {
+        --start;
+        const size_t size = matrix.get_column_size(start);
+        if (1 == size) {
+            /* assume only one zero ChewingKey "'" here, but no check. */
+            matrix.get_item(start, 0, key, key_rest);
+            assert(zero_key != key);
+        }
+    }
+
+    /* matrix reserved one extra slot. */
+    start = offset;
+    for (end = start + 1; end < matrix.size();) {
         g_array_set_size(items, 0);
 
-        ChewingKey * keys = &g_array_index
-            (pinyin_keys, ChewingKey, offset);
-
         /* do pinyin search. */
-        int retval = context->m_pinyin_table->search
-            (i, keys, ranges);
+        context->m_phrase_index->clear_ranges(ranges);
+        int retval = search_matrix(context->m_pinyin_table, &matrix,
+                                   start, end, ranges);
 
-        retval = context->m_addon_pinyin_table->search
-            (i, keys, addon_ranges) || retval;
+        context->m_addon_phrase_index->clear_ranges(addon_ranges);
+        retval = search_matrix(context->m_addon_pinyin_table, &matrix,
+                               start, end, addon_ranges) | retval;
 
         if ( !(retval & SEARCH_OK) )
             continue;
 
         lookup_candidate_t template_item;
+        template_item.m_begin = start; template_item.m_end = end;
         _append_items(ranges, &template_item, items);
 
         lookup_candidate_t addon_template_item;
         addon_template_item.m_candidate_type = ADDON_CANDIDATE;
+        addon_template_item.m_begin = start;
+        addon_template_item.m_end = end;
         _append_items(addon_ranges, &addon_template_item, items);
 
 #if 0
@@ -1734,10 +1745,26 @@ bool pinyin_guess_candidates(pinyin_instance_t * instance,
             g_array_append_val(instance->m_candidates, *item);
         }
 
-#if 0
-        if (!(retval & SEARCH_CONTINUED))
+        if ( !(retval & SEARCH_CONTINUED) )
             break;
-#endif
+
+        /* skip the consecutive zero ChewingKey "'",
+           to avoid duplicates of candidates. */
+        ++end;
+        for (; end < matrix.size(); ++end) {
+            const size_t size = matrix.get_column_size(end);
+
+            /* assume only one zero ChewingKey "'" here, but no check. */
+            if (1 != size)
+                break;
+            matrix.get_item(end, 0, key, key_rest);
+
+            if (zero_key != key) {
+                /* non-zero ChewingKey has at least length of one. */
+                ++end;
+                break;
+            }
+        }
     }
 
     g_array_free(items, TRUE);
@@ -1751,7 +1778,7 @@ bool pinyin_guess_candidates(pinyin_instance_t * instance,
 
     _prepend_sentence_candidate(instance, instance->m_candidates);
 
-    _compute_phrase_strings_of_items(instance, offset, instance->m_candidates);
+    _compute_phrase_strings_of_items(instance, instance->m_candidates);
 
     _remove_duplicated_items_by_phrase_string(instance, instance->m_candidates);
 
@@ -1978,7 +2005,6 @@ static bool _try_resplit_table(pinyin_instance_t * instance,
 
     return found;
 }
-#endif
 
 bool pinyin_guess_full_pinyin_candidates(pinyin_instance_t * instance,
                                          size_t offset){
@@ -2137,6 +2163,7 @@ bool pinyin_guess_full_pinyin_candidates(pinyin_instance_t * instance,
 
     return true;
 }
+#endif
 
 bool pinyin_guess_predicted_candidates(pinyin_instance_t * instance,
                                        const char * prefix) {
@@ -2144,7 +2171,7 @@ bool pinyin_guess_predicted_candidates(pinyin_instance_t * instance,
 
     pinyin_context_t * & context = instance->m_context;
     FacadePhraseIndex * & phrase_index = context->m_phrase_index;
-    GArray * & prefixes = instance->m_prefixes;
+    TokenVector prefixes = instance->m_prefixes;
 
     _free_candidates(instance->m_candidates);
 
@@ -2308,7 +2335,6 @@ bool pinyin_choose_predicted_candidate(pinyin_instance_t * instance,
 
     pinyin_context_t * & context = instance->m_context;
     FacadePhraseIndex * & phrase_index = context->m_phrase_index;
-    GArray * & prefixes = instance->m_prefixes;
 
     /* train uni-gram */
     phrase_token_t token = candidate->m_token;
