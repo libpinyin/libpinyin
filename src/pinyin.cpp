@@ -1536,7 +1536,7 @@ static bool _compute_phrase_strings_of_items(pinyin_instance_t * instance,
                  &(candidate->m_phrase_string));
             break;
         case ZOMBIE_CANDIDATE:
-            break;
+            assert(FALSE);
         }
     }
 
@@ -2249,7 +2249,8 @@ int pinyin_choose_candidate(pinyin_instance_t * instance,
                             lookup_candidate_t * candidate){
     assert(PREDICTED_CANDIDATE != candidate->m_candidate_type);
 
-    pinyin_context_t * & context = instance->m_context;
+    pinyin_context_t * context = instance->m_context;
+    PhoneticKeyMatrix & matrix = instance->m_matrix;
 
     if (BEST_MATCH_CANDIDATE == candidate->m_candidate_type)
         return instance->m_pinyin_keys->len;
@@ -2285,6 +2286,7 @@ int pinyin_choose_candidate(pinyin_instance_t * instance,
         candidate->m_token = token;
     }
 
+#if 0
     if (DIVIDED_CANDIDATE == candidate->m_candidate_type ||
         RESPLIT_CANDIDATE == candidate->m_candidate_type) {
         /* update full pinyin. */
@@ -2307,18 +2309,20 @@ int pinyin_choose_candidate(pinyin_instance_t * instance,
 
         /* Note: there may be some un-parsable input here. */
     }
+#endif
 
     /* sync m_constraints to the length of m_pinyin_keys. */
     bool retval = context->m_pinyin_lookup->validate_constraint
-        (instance->m_constraints, instance->m_pinyin_keys);
+        (&matrix, instance->m_constraints);
 
     phrase_token_t token = candidate->m_token;
     guint8 len = context->m_pinyin_lookup->add_constraint
-        (instance->m_constraints, offset, token);
+        (instance->m_constraints,
+         candidate->m_begin, candidate->m_end, token);
 
     /* safe guard: validate the m_constraints again. */
     retval = context->m_pinyin_lookup->validate_constraint
-        (instance->m_constraints, instance->m_pinyin_keys) && len;
+        (&matrix, instance->m_constraints) && len;
 
     return offset + len;
 }
@@ -2593,6 +2597,7 @@ bool pinyin_get_candidate_string(pinyin_instance_t * instance,
     return true;
 }
 
+#if 0
 bool pinyin_get_n_pinyin(pinyin_instance_t * instance,
                          guint * num) {
     *num = 0;
@@ -2604,6 +2609,7 @@ bool pinyin_get_n_pinyin(pinyin_instance_t * instance,
     *num = instance->m_pinyin_keys->len;
     return true;
 }
+#endif
 
 bool pinyin_get_pinyin_key(pinyin_instance_t * instance,
                            guint index,
@@ -2685,11 +2691,13 @@ bool pinyin_get_pinyin_key_rest_offset(pinyin_instance_t * instance,
     return true;
 }
 
+#if 0
 bool pinyin_get_raw_full_pinyin(pinyin_instance_t * instance,
                                 const gchar ** utf8_str) {
     *utf8_str = instance->m_raw_full_pinyin;
     return true;
 }
+#endif
 
 bool pinyin_get_n_phrase(pinyin_instance_t * instance,
                          guint * num) {

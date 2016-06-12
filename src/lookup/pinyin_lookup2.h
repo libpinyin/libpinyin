@@ -206,7 +206,7 @@ public:
      * @start: the start of the phrase.
      * @end: the end of the phrase.
      * @token: the phrase token in the candidate list chosen by user.
-     * @returns: the number of the characters in the chosen token.
+     * @returns: the number of the pinyin characters in the chosen constraint.
      *
      * Add one constraint to the constraints on the guessed sentence.
      *
