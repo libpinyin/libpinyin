@@ -1649,6 +1649,26 @@ static bool _free_candidates(CandidateVector candidates) {
     return true;
 }
 
+/* offset must at the beginning of zero ChewingKey "'". */
+static bool _check_offset(PhoneticKeyMatrix & matrix, size_t offset) {
+    const size_t start = offset;
+
+    ChewingKey key; ChewingKeyRest key_rest;
+    const ChewingKey zero_key;
+
+    if (start > 0) {
+        const size_t index = start - 1;
+        const size_t size = matrix.get_column_size(index);
+        if (1 == size) {
+            /* assume only one zero ChewingKey "'" here, but no check. */
+            matrix.get_item(index, 0, key, key_rest);
+            assert(zero_key != key);
+        }
+    }
+
+    return true;
+}
+
 bool pinyin_guess_candidates(pinyin_instance_t * instance,
                              size_t offset) {
 
@@ -1686,21 +1706,10 @@ bool pinyin_guess_candidates(pinyin_instance_t * instance,
 
     GArray * items = g_array_new(FALSE, FALSE, sizeof(lookup_candidate_t));
 
-    /* offset must at the beginning of zero ChewingKey "'". */
-    const size_t start = offset;
-    ChewingKey key; ChewingKeyRest key_rest;
-    const ChewingKey zero_key;
-    if (start > 0) {
-        const size_t index = start - 1;
-        const size_t size = matrix.get_column_size(index);
-        if (1 == size) {
-            /* assume only one zero ChewingKey "'" here, but no check. */
-            matrix.get_item(index, 0, key, key_rest);
-            assert(zero_key != key);
-        }
-    }
+    _check_offset(matrix, offset);
 
     /* matrix reserved one extra slot. */
+    const size_t start = offset;
     for (end = start + 1; end < matrix.size();) {
         g_array_set_size(items, 0);
 
@@ -2611,33 +2620,68 @@ bool pinyin_get_n_pinyin(pinyin_instance_t * instance,
 }
 #endif
 
-bool pinyin_get_pinyin_key(pinyin_instance_t * instance,
-                           guint index,
-                           ChewingKey ** key) {
-    ChewingKeyVector & pinyin_keys = instance->m_pinyin_keys;
+/* skip the beginning of zero ChewingKey "'". */
+static size_t _compute_pinyin_start(PhoneticKeyMatrix & matrix,
+                                    size_t offset) {
+    size_t start = offset;
+    ChewingKey key; ChewingKeyRest key_rest;
+    const ChewingKey zero_key;
+    for (; start < matrix.size() - 1; ++start) {
+        size_t size = matrix.get_column_size(start);
+        if (1 != size)
+            break;
 
+        matrix.get_item(start, 0, key, key_rest);
+        if (zero_key != key)
+            break;
+    }
+
+    return start;
+}
+
+bool pinyin_get_pinyin_key(pinyin_instance_t * instance,
+                           size_t offset,
+                           ChewingKey ** ppkey) {
+    PhoneticKeyMatrix & matrix = instance->m_matrix;
     *key = NULL;
 
-    if (index >= pinyin_keys->len)
+    if (offset >= matrix.size() - 1)
         return false;
 
-    *key = &g_array_index(pinyin_keys, ChewingKey, index);
+    if (0 == matrix.get_column_size(offset))
+        return false;
 
+    _check_offset(matrix, offset);
+    offset = _compute_pinyin_start(matrix, offset);
+
+    static ChewingKey key;
+    ChewingKeyRest key_rest;
+    matrix.get_item(offset, 0, key, key_rest);
+
+    *ppkey = &key;
     return true;
 }
 
 bool pinyin_get_pinyin_key_rest(pinyin_instance_t * instance,
-                                guint index,
-                                ChewingKeyRest ** key_rest) {
-    ChewingKeyRestVector & pinyin_key_rests = instance->m_pinyin_key_rests;
-
+                                size_t offset,
+                                ChewingKeyRest ** ppkey_rest) {
+    PhoneticKeyMatrix & matrix = instance->m_matrix;
     *key_rest = NULL;
 
-    if (index >= pinyin_key_rests->len)
+    if (offset >= matrix.size() - 1)
         return false;
 
-    *key_rest = &g_array_index(pinyin_key_rests, ChewingKeyRest, index);
+    if (0 == matrix.get_column_size(offset))
+        return false;
 
+    _check_offset(matrix, offset);
+    offset = _compute_pinyin_start(matrix, offset);
+
+    ChewingKey key;
+    static ChewingKeyRest key_rest;
+    matrix.get_item(offset, 0, key, key_rest);
+
+    *ppkey_rest = &key_rest;
     return true;
 }
 

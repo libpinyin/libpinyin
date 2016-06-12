@@ -802,7 +802,7 @@ bool pinyin_get_n_pinyin(pinyin_instance_t * instance,
 /**
  * pinyin_get_pinyin_key:
  * @instance: the pinyin instance.
- * @index: the index of the pinyin key.
+ * @offset: the offset of the pinyin key.
  * @key: the retrieved pinyin key.
  * @returns: whether the get operation is successful.
  *
@@ -810,13 +810,13 @@ bool pinyin_get_n_pinyin(pinyin_instance_t * instance,
  *
  */
 bool pinyin_get_pinyin_key(pinyin_instance_t * instance,
-                           guint index,
+                           size_t offset,
                            ChewingKey ** key);
 
 /**
  * pinyin_get_pinyin_key_rest:
  * @instance: the pinyin index.
- * @index: the index of the pinyin key rest.
+ * @offset: the offset of the pinyin key rest.
  * @key_rest: the retrieved pinyin key rest.
  * @returns: whether the get operation is successful.
  *
@@ -824,7 +824,7 @@ bool pinyin_get_pinyin_key(pinyin_instance_t * instance,
  *
  */
 bool pinyin_get_pinyin_key_rest(pinyin_instance_t * instance,
-                                guint index,
+                                size_t offset,
                                 ChewingKeyRest ** key_rest);
 
 /**
