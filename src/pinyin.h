@@ -867,8 +867,16 @@ bool pinyin_get_pinyin_key_rest_length(pinyin_instance_t * instance,
  *
  */
 bool pinyin_get_pinyin_offset(pinyin_instance_t * instance,
-                              guint16 cursor,
-                              guint16 * offset);
+                              size_t cursor,
+                              size_t * offset);
+
+bool pinyin_get_left_character_offset(pinyin_instance_t * instance,
+                                      size_t offset,
+                                      size_t * left);
+
+bool pinyin_get_right_character_offset(pinyin_instance_t * instance,
+                                       size_t offset,
+                                       size_t * right);
 
 #if 0
 /**

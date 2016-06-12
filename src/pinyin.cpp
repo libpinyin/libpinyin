@@ -2704,36 +2704,108 @@ bool pinyin_get_pinyin_key_rest_length(pinyin_instance_t * instance,
     return true;
 }
 
-bool pinyin_get_pinyin_key_rest_offset(pinyin_instance_t * instance,
-                                       guint16 cursor,
-                                       guint16 * offset) {
-    guint len = 0;
-    assert (instance->m_pinyin_keys->len ==
-            instance->m_pinyin_key_rests->len);
-    len = instance->m_pinyin_key_rests->len;
+/* find the first zero ChewingKey "'". */
+static size_t _compute_zero_start(PhoneticKeyMatrix & matrix, size_t offset) {
+    ChewingKey key; ChewingKeyRest key_rest;
+    const ChewingKey zero_key;
 
-    ChewingKeyRestVector & pinyin_key_rests =
-        instance->m_pinyin_key_rests;
+    size_t index = offset - 1;
+    for (; index > 0; --index) {
+        const size_t size = matrix.get_column_size(index);
 
-    guint inner_cursor = len;
+        if (1 != size)
+            break;
 
-    guint16 prev_end = 0, cur_end;
-    for (size_t i = 0; i < len; ++i) {
-        ChewingKeyRest *pos = NULL;
-        pos = &g_array_index(pinyin_key_rests, ChewingKeyRest, i);
-        cur_end = pos->m_raw_end;
-
-        if (prev_end <= cursor && cursor < cur_end)
-            inner_cursor = i;
-
-        prev_end = cur_end;
+        matrix.get_item(index, 0, key, key_rest);
+        if (zero_key == key)
+            offset = index;
     }
 
-    assert (inner_cursor >= 0);
-    *offset = inner_cursor;
+    return offset;
+}
 
+bool pinyin_get_pinyin_offset(pinyin_instance_t * instance,
+                              size_t cursor,
+                              size_t * poffset) {
+    PhoneticKeyMatrix & matrix = instance->m_matrix;
+    size_t offset = cursor;
+
+    /* find the first ChewingKey. */
+    for (; offset > 0; --offset) {
+        const size_t size = matrix.get_column_size(offset);
+
+        if (size > 0)
+            break;
+    }
+
+    offset = _compute_zero_start(matrix, offset);
+    _check_offset(matrix, offset);
+
+    *poffset = offset;
     return true;
 }
+
+bool pinyin_get_left_character_offset(pinyin_instance_t * instance,
+                                      size_t offset,
+                                      size_t * pleft) {
+    PhoneticKeyMatrix & matrix = instance->m_matrix;
+    _check_offset(matrix, offset);
+
+    /* find the ChewingKey ends at offset. */
+    size_t left = offset - 1;
+    ChewingKey key; ChewingKeyRest key_rest;
+    for (; left > 0; --left) {
+        const size_t size = matrix.get_column_size(left);
+
+        size_t i = 0;
+        for (; i < size; ++i) {
+            matrix.get_item(left, i, key, key_rest);
+
+            if (offset == key_rest.m_raw_end)
+                break;
+        }
+
+        if (i < size)
+            break;
+    }
+
+    left = _compute_zero_start(matrix, left);
+    _check_offset(matrix, left);
+
+    *pleft = left;
+    return true;
+}
+
+bool pinyin_get_right_character_offset(pinyin_instance_t * instance,
+                                       size_t offset,
+                                       size_t * pright) {
+    PhoneticKeyMatrix & matrix = instance->m_matrix;
+    _check_offset(matrix, offset);
+
+    /* find the first non-zero ChewingKey. */
+    size_t right = offset;
+    for (size_t index = right; index < matrix.size(); ++index) {
+        const size_t size = matrix.get_column_size(index);
+
+        if (1 != size)
+            break;
+
+        matrix.get_item(index, 0, key, key_rest);
+        if (zero_key == key)
+            right = index + 1;
+    }
+
+    if (0 == matrix.get_column_size(right))
+        return false;
+
+    matrix.get_item(right, 0, key, key_rest);
+    right = key_rest.m_raw_end;
+    _check_offset(matrix, right);
+
+    *pright = right;
+    return true;
+}
+
 
 #if 0
 bool pinyin_get_raw_full_pinyin(pinyin_instance_t * instance,
