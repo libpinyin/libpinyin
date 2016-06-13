@@ -870,10 +870,30 @@ bool pinyin_get_pinyin_offset(pinyin_instance_t * instance,
                               size_t cursor,
                               size_t * offset);
 
+/**
+ * pinyin_get_left_character_offset:
+ * @instance: the pinyin instance.
+ * @offset: the lookup offset.
+ * @left: the left offset.
+ * @returns: whether the get operation is successful.
+ *
+ * Get the left offset from the lookup offset.
+ *
+ */
 bool pinyin_get_left_character_offset(pinyin_instance_t * instance,
                                       size_t offset,
                                       size_t * left);
 
+/**
+ * pinyin_get_right_character_offset:
+ * @instance: the pinyin instance.
+ * @offset: the lookup offset.
+ * @right: the right offset.
+ * @returns: whether the get operation is successful.
+ *
+ * Get the right offset from the lookup offset.
+ *
+ */
 bool pinyin_get_right_character_offset(pinyin_instance_t * instance,
                                        size_t offset,
                                        size_t * right);

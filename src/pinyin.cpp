@@ -363,7 +363,7 @@ pinyin_context_t * pinyin_init(const char * systemdir, const char * userdir){
     gfloat lambda = context->m_system_table_info.get_lambda();
 
     context->m_pinyin_lookup = new PinyinLookup2
-        ( lambda, context->m_options,
+        ( lambda,
           context->m_pinyin_table, context->m_phrase_index,
           context->m_system_bigram, context->m_user_bigram);
 
@@ -1627,7 +1627,6 @@ static bool _remove_duplicated_items_by_phrase_string
 
         if (ZOMBIE_CANDIDATE == candidate->m_candidate_type) {
             g_free(candidate->m_phrase_string);
-            g_free(candidate->m_new_pinyins);
             g_array_remove_index(candidates, i);
             i--;
         }
@@ -1642,7 +1641,6 @@ static bool _free_candidates(CandidateVector candidates) {
         lookup_candidate_t * candidate = &g_array_index
             (candidates, lookup_candidate_t, i);
         g_free(candidate->m_phrase_string);
-        g_free(candidate->m_new_pinyins);
     }
     g_array_set_size(candidates, 0);
 
@@ -1710,7 +1708,7 @@ bool pinyin_guess_candidates(pinyin_instance_t * instance,
 
     /* matrix reserved one extra slot. */
     const size_t start = offset;
-    for (end = start + 1; end < matrix.size();) {
+    for (size_t end = start + 1; end < matrix.size();) {
         g_array_set_size(items, 0);
 
         /* do pinyin search. */
@@ -1759,6 +1757,8 @@ bool pinyin_guess_candidates(pinyin_instance_t * instance,
         /* skip the consecutive zero ChewingKey "'",
            to avoid duplicates of candidates. */
         ++end;
+        ChewingKey key; ChewingKeyRest key_rest;
+        const ChewingKey zero_key;
         for (; end < matrix.size(); ++end) {
             const size_t index = end - 1;
             const size_t size = matrix.get_column_size(index);
@@ -2177,7 +2177,6 @@ bool pinyin_guess_predicted_candidates(pinyin_instance_t * instance,
 
     pinyin_context_t * & context = instance->m_context;
     FacadePhraseIndex * & phrase_index = context->m_phrase_index;
-    TokenVector prefixes = instance->m_prefixes;
 
     _free_candidates(instance->m_candidates);
 
@@ -2246,7 +2245,7 @@ bool pinyin_guess_predicted_candidates(pinyin_instance_t * instance,
         delete user_gram;
 
     /* post process to remove duplicated candidates */
-    _compute_phrase_strings_of_items(instance, 0, instance->m_candidates);
+    _compute_phrase_strings_of_items(instance, instance->m_candidates);
 
     _remove_duplicated_items_by_phrase_string(instance, instance->m_candidates);
 
@@ -2262,7 +2261,7 @@ int pinyin_choose_candidate(pinyin_instance_t * instance,
     PhoneticKeyMatrix & matrix = instance->m_matrix;
 
     if (BEST_MATCH_CANDIDATE == candidate->m_candidate_type)
-        return instance->m_pinyin_keys->len;
+        return matrix.size() - 1;
 
     if (ADDON_CANDIDATE == candidate->m_candidate_type) {
         PhraseItem item;
@@ -2410,24 +2409,22 @@ bool pinyin_train(pinyin_instance_t * instance){
     if (!instance->m_context->m_user_dir)
         return false;
 
-    pinyin_context_t * & context = instance->m_context;
+    pinyin_context_t * context = instance->m_context;
+    PhoneticKeyMatrix & matrix = instance->m_matrix;
+
     context->m_modified = true;
 
     bool retval = context->m_pinyin_lookup->train_result2
-        (instance->m_pinyin_keys, instance->m_constraints,
+        (&matrix, instance->m_constraints,
          instance->m_match_results);
 
     return retval;
 }
 
 bool pinyin_reset(pinyin_instance_t * instance){
-    g_free(instance->m_raw_full_pinyin);
-    instance->m_raw_full_pinyin = NULL;
     instance->m_parsed_len = 0;
 
     g_array_set_size(instance->m_prefixes, 0);
-    g_array_set_size(instance->m_pinyin_keys, 0);
-    g_array_set_size(instance->m_pinyin_key_rests, 0);
     g_array_set_size(instance->m_constraints, 0);
     g_array_set_size(instance->m_match_results, 0);
     _free_candidates(instance->m_candidates);
@@ -2643,7 +2640,7 @@ bool pinyin_get_pinyin_key(pinyin_instance_t * instance,
                            size_t offset,
                            ChewingKey ** ppkey) {
     PhoneticKeyMatrix & matrix = instance->m_matrix;
-    *key = NULL;
+    *ppkey = NULL;
 
     if (offset >= matrix.size() - 1)
         return false;
@@ -2666,7 +2663,7 @@ bool pinyin_get_pinyin_key_rest(pinyin_instance_t * instance,
                                 size_t offset,
                                 ChewingKeyRest ** ppkey_rest) {
     PhoneticKeyMatrix & matrix = instance->m_matrix;
-    *key_rest = NULL;
+    *ppkey_rest = NULL;
 
     if (offset >= matrix.size() - 1)
         return false;
@@ -2752,7 +2749,8 @@ bool pinyin_get_left_character_offset(pinyin_instance_t * instance,
     _check_offset(matrix, offset);
 
     /* find the ChewingKey ends at offset. */
-    size_t left = offset - 1;
+    size_t left = offset > 0 ? offset - 1 : 0;
+
     ChewingKey key; ChewingKeyRest key_rest;
     for (; left > 0; --left) {
         const size_t size = matrix.get_column_size(left);
@@ -2784,7 +2782,10 @@ bool pinyin_get_right_character_offset(pinyin_instance_t * instance,
 
     /* find the first non-zero ChewingKey. */
     size_t right = offset;
-    for (size_t index = right; index < matrix.size(); ++index) {
+
+    ChewingKey key; ChewingKeyRest key_rest;
+    const ChewingKey zero_key;
+    for (size_t index = right; index < matrix.size() - 1; ++index) {
         const size_t size = matrix.get_column_size(index);
 
         if (1 != size)

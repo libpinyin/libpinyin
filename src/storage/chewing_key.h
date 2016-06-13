@@ -87,6 +87,10 @@ static inline bool operator == (ChewingKey lhs, ChewingKey rhs) {
     return true;
 }
 
+static inline bool operator != (ChewingKey lhs, ChewingKey rhs) {
+    return !(lhs == rhs);
+}
+
 struct _ChewingKeyRest
 {
     /* Note: the table index is removed,
