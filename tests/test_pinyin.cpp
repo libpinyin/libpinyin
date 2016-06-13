@@ -66,7 +66,7 @@ int main(int argc, char * argv[]){
 
         pinyin_parse_more_full_pinyins(instance, linebuf);
         pinyin_guess_sentence_with_prefix(instance, prefixbuf);
-        pinyin_guess_full_pinyin_candidates(instance, 0);
+        pinyin_guess_candidates(instance, 0);
 
         guint len = 0;
         pinyin_get_n_candidate(instance, &len);
