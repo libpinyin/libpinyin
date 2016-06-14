@@ -58,7 +58,8 @@ bool get_possible_pinyin(FacadePhraseIndex * phrase_index,
 }
 
 bool get_best_match(PinyinLookup2 * pinyin_lookup,
-                    ChewingKeyVector keys, TokenVector tokens){
+                    PhoneticKeyMatrix * matrix,
+                    TokenVector tokens) {
     /* prepare the prefixes for get_best_match. */
     TokenVector prefixes = g_array_new
         (FALSE, FALSE, sizeof(phrase_token_t));
@@ -67,14 +68,14 @@ bool get_best_match(PinyinLookup2 * pinyin_lookup,
     /* initialize constraints. */
     CandidateConstraints constraints = g_array_new
         (TRUE, FALSE, sizeof(lookup_constraint_t));
-    g_array_set_size(constraints, keys->len);
+    g_array_set_size(constraints, matrix->size());
     for ( size_t i = 0; i < constraints->len; ++i ) {
         lookup_constraint_t * constraint = &g_array_index
             (constraints, lookup_constraint_t, i);
         constraint->m_type = NO_CONSTRAINT;
     }
 
-    bool retval = pinyin_lookup->get_best_match(prefixes, keys, constraints, tokens);
+    bool retval = pinyin_lookup->get_best_match(prefixes, matrix, constraints, tokens);
 
     g_array_free(prefixes, TRUE);
     g_array_free(constraints, TRUE);
@@ -86,12 +87,26 @@ bool do_one_test(PinyinLookup2 * pinyin_lookup,
                  TokenVector tokens){
     bool retval = false;
 
-    ChewingKeyVector keys = g_array_new(FALSE, TRUE, sizeof(ChewingKey));
+    ChewingKeyVector keys = g_array_new(TRUE, TRUE, sizeof(ChewingKey));
+    ChewingKeyRestVector key_rests = g_array_new
+        (TRUE, TRUE, sizeof(ChewingKeyRest));
     TokenVector guessed_tokens = g_array_new
         (FALSE, TRUE, sizeof(phrase_token_t));
 
     get_possible_pinyin(phrase_index, tokens, keys);
-    get_best_match(pinyin_lookup, keys, guessed_tokens);
+
+    /* create fake key_rests */
+    g_array_set_size(key_rests, keys->len);
+    for (size_t i = 0; i < key_rests->len; ++i) {
+        ChewingKeyRest key_rest;
+        key_rest.m_raw_begin = i; key_rest.m_raw_end = i + 1;
+        g_array_index(key_rests, ChewingKeyRest, i) = key_rest;
+    }
+
+    PhoneticKeyMatrix matrix;
+    fill_phonetic_key_matrix_from_chewing_keys(&matrix, keys, key_rests);
+    get_best_match(pinyin_lookup, &matrix, guessed_tokens);
+
     /* compare the results */
     char * sentence = NULL; char * guessed_sentence = NULL;
     pinyin_lookup->convert_to_utf8(tokens, sentence);
@@ -108,7 +123,7 @@ bool do_one_test(PinyinLookup2 * pinyin_lookup,
     }
 
     g_free(sentence); g_free(guessed_sentence);
-    g_array_free(keys, TRUE);
+    g_array_free(keys, TRUE); g_array_free(key_rests, TRUE);
     g_array_free(guessed_tokens, TRUE);
     return retval;
 }
@@ -123,8 +138,6 @@ int main(int argc, char * argv[]){
         fprintf(stderr, "load table.conf failed.\n");
         exit(ENOENT);
     }
-
-    pinyin_option_t options = USE_TONE;
 
     FacadeChewingTable2 largetable;
     largetable.load(SYSTEM_PINYIN_INDEX, NULL);
@@ -144,7 +157,7 @@ int main(int argc, char * argv[]){
 
     gfloat lambda = system_table_info.get_lambda();
 
-    PinyinLookup2 pinyin_lookup(lambda, options,
+    PinyinLookup2 pinyin_lookup(lambda,
                                 &largetable, &phrase_index,
                                 &system_bigram, &user_bigram);
 
