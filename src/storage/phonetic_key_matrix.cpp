@@ -23,6 +23,7 @@
 #include <assert.h>
 #include <stdio.h>
 #include "pinyin_custom2.h"
+#include "special_table.h"
 
 namespace pinyin{
 
@@ -72,7 +73,6 @@ bool fill_phonetic_key_matrix_from_chewing_keys(PhoneticKeyMatrix * matrix,
     return true;
 }
 
-/* need to use the pinyin_parser_table header. */
 bool resplit_step(pinyin_option_t options,
                   PhoneticKeyMatrix * matrix) {
     if (!(options & USE_RESPLIT_TABLE))
@@ -153,8 +153,6 @@ bool resplit_step(pinyin_option_t options,
     return true;
 }
 
-
-/* need to use the pinyin_parser_table header. */
 bool inner_split_step(pinyin_option_t options,
                       PhoneticKeyMatrix * matrix) {
     if (!(options & USE_DIVIDED_TABLE))
