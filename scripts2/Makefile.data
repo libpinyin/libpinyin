@@ -7,6 +7,7 @@ pinyins.txt:
 
 update-header: pinyins.txt
 	python3 generateheader.py templates/pinyin_parser_table.h.in > ../src/storage/pinyin_parser_table.h
+	python3 generateheader.py templates/special_table.h.in > ../src/storage/special_table.h
 	python3 generateheader.py templates/double_pinyin_table.h.in > ../src/storage/double_pinyin_table.h
 	python3 generateheader.py templates/zhuyin_table.h.in > ../src/storage/zhuyin_table.h
 	python3 generateheader.py templates/chewing_enum.h.in > ../src/storage/chewing_enum.h

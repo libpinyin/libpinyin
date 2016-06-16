@@ -31,14 +31,6 @@ const content_table_item_t content_table[] = {
 @CONTENT_TABLE@
 };
 
-const divided_table_item_t divided_table[] = {
-@DIVIDED_TABLE@
-};
-
-const resplit_table_item_t resplit_table[] = {
-@RESPLIT_TABLE@
-};
-
 const gint chewing_key_table[CHEWING_NUMBER_OF_INITIALS *
                              CHEWING_NUMBER_OF_MIDDLES *
                              CHEWING_NUMBER_OF_FINALS] = {

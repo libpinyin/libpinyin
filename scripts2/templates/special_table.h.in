@@ -1,0 +1,16 @@
+#ifndef SPECIAL_TABLE_H
+#define SPECIAL_TABLE_H
+
+namespace pinyin{
+
+const divided_table_item_t divided_table[] = {
+@DIVIDED_TABLE@
+};
+
+const resplit_table_item_t resplit_table[] = {
+@RESPLIT_TABLE@
+};
+
+};
+
+#endif
