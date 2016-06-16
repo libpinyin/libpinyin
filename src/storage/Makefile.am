@@ -44,6 +44,7 @@ noinst_HEADERS		= chewing_enum.h \
 			  flexible_ngram_kyotodb.h \
 			  tag_utility.h \
 			  pinyin_parser_table.h \
+			  special_table.h \
 			  double_pinyin_table.h \
 			  zhuyin_table.h \
 			  pinyin_phrase2.h \
