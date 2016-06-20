@@ -106,6 +106,7 @@ bool segment(FacadePhraseTable3 * phrase_table,
             ucs4_t * cur_phrase = phrase + i;
 
             phrase_token_t token = null_token;
+            phrase_index->clear_tokens(tokens);
             int result = phrase_table->search(len, cur_phrase, tokens);
             int num = get_first_token(tokens, token);
 

@@ -1717,8 +1717,10 @@ bool pinyin_guess_candidates(pinyin_instance_t * instance,
         retval = search_matrix(context->m_addon_pinyin_table, &matrix,
                                start, end, addon_ranges) | retval;
 
-        if ( !(retval & SEARCH_OK) )
+        if ( !(retval & SEARCH_OK) ) {
+            ++end;
             continue;
+        }
 
         lookup_candidate_t template_item;
         template_item.m_begin = start; template_item.m_end = end;
