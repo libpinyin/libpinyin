@@ -27,9 +27,9 @@
 
 namespace pinyin{
 
-bool fill_phonetic_key_matrix_from_chewing_keys(PhoneticKeyMatrix * matrix,
-                                                ChewingKeyVector keys,
-                                                ChewingKeyRestVector key_rests) {
+bool fill_matrix(PhoneticKeyMatrix * matrix,
+                 ChewingKeyVector keys,
+                 ChewingKeyRestVector key_rests) {
     assert(keys->len == key_rests->len);
 
     const ChewingKey * key = NULL;
@@ -299,7 +299,7 @@ bool fuzzy_syllable_step(pinyin_option_t options,
 }
 
 
-bool dump_phonetic_key_matrix(PhoneticKeyMatrix * matrix) {
+bool dump_matrix(PhoneticKeyMatrix * matrix) {
     size_t length = matrix->size();
 
     GArray * keys = g_array_new(TRUE, TRUE, sizeof(ChewingKey));

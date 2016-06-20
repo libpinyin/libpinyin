@@ -124,8 +124,7 @@ int main(int argc, char * argv[]) {
             len = parser->parse(options, keys, key_rests,
                                 linebuf, strlen(linebuf));
 
-            fill_phonetic_key_matrix_from_chewing_keys
-                (&matrix, keys, key_rests);
+            fill_matrix(&matrix, keys, key_rests);
 
             resplit_step(options, &matrix);
 
@@ -137,7 +136,7 @@ int main(int argc, char * argv[]) {
 
         printf("parsed %d chars, %d keys.\n", len, keys->len);
 
-        dump_phonetic_key_matrix(&matrix);
+        dump_matrix(&matrix);
 
         PhraseIndexRanges ranges;
         memset(ranges, 0, sizeof(PhraseIndexRanges));

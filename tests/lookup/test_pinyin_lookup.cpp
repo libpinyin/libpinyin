@@ -90,8 +90,7 @@ int main( int argc, char * argv[]){
             continue;
 
         /* fill the matrix. */
-        fill_phonetic_key_matrix_from_chewing_keys
-            (&matrix, keys, key_rests);
+        fill_matrix(&matrix, keys, key_rests);
 
         resplit_step(options, &matrix);
 
@@ -99,7 +98,7 @@ int main( int argc, char * argv[]){
 
         fuzzy_syllable_step(options, &matrix);
 
-        dump_phonetic_key_matrix(&matrix);
+        dump_matrix(&matrix);
 
         /* initialize constraints. */
         g_array_set_size(constraints, matrix.size());

@@ -171,13 +171,13 @@ public:
 };
 
 /**
- * fill_phonetic_key_matrix_from_chewing_keys:
+ * fill_matrix:
  * Convert ChewingKeyVector and ChewingKeyRestVector
  * to PhoneticKeyMatrix.
  */
-bool fill_phonetic_key_matrix_from_chewing_keys(PhoneticKeyMatrix * matrix,
-                                                ChewingKeyVector keys,
-                                                ChewingKeyRestVector key_rests);
+bool fill_matrix(PhoneticKeyMatrix * matrix,
+                 ChewingKeyVector keys,
+                 ChewingKeyRestVector key_rests);
 
 /**
  * resplit_step:
@@ -205,7 +205,7 @@ bool inner_split_step(pinyin_option_t options,
 bool fuzzy_syllable_step(pinyin_option_t options,
                          PhoneticKeyMatrix * matrix);
 
-bool dump_phonetic_key_matrix(PhoneticKeyMatrix * matrix);
+bool dump_matrix(PhoneticKeyMatrix * matrix);
 
 int search_matrix(FacadeChewingTable2 * table,
                   PhoneticKeyMatrix * matrix,

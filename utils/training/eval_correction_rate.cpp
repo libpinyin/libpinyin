@@ -104,7 +104,7 @@ bool do_one_test(PinyinLookup2 * pinyin_lookup,
     }
 
     PhoneticKeyMatrix matrix;
-    fill_phonetic_key_matrix_from_chewing_keys(&matrix, keys, key_rests);
+    fill_matrix(&matrix, keys, key_rests);
     get_best_match(pinyin_lookup, &matrix, guessed_tokens);
 
     /* compare the results */
