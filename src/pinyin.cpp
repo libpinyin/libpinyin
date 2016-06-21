@@ -85,6 +85,7 @@ struct _lookup_candidate_t{
     lookup_candidate_type_t m_candidate_type;
     gchar * m_phrase_string;
     phrase_token_t m_token;
+    guint8 m_phrase_length;
     guint16 m_begin; /* must contain the preceding "'" character. */
     guint16 m_end; /* must not contain the following "'" character. */
     guint32 m_freq; /* the amplifed gfloat numerical value. */
@@ -94,6 +95,7 @@ public:
         m_candidate_type = NORMAL_CANDIDATE;
         m_phrase_string = NULL;
         m_token = null_token;
+        m_phrase_length = 0;
         m_begin = 0; m_end = 0;
         m_freq = 0;
     }
@@ -1323,10 +1325,16 @@ static gint compare_item_with_token(gconstpointer lhs,
 }
 #endif
 
-static gint compare_item_with_frequency(gconstpointer lhs,
-                                        gconstpointer rhs) {
+static gint compare_item_with_length_and_frequency(gconstpointer lhs,
+                                                   gconstpointer rhs) {
     lookup_candidate_t * item_lhs = (lookup_candidate_t *)lhs;
     lookup_candidate_t * item_rhs = (lookup_candidate_t *)rhs;
+
+    guint8 len_lhs = item_lhs->m_phrase_length;
+    guint8 len_rhs = item_rhs->m_phrase_length;
+
+    if (len_lhs != len_rhs)
+        return -(len_lhs - len_rhs); /* in descendant order */
 
     guint32 freq_lhs = item_lhs->m_freq;
     guint32 freq_rhs = item_rhs->m_freq;
@@ -1409,24 +1417,6 @@ static void _append_items(PhraseIndexRanges ranges,
     }
 }
 
-#if 0
-static void _remove_duplicated_items(CandidateVector items) {
-    /* remove the duplicated items. */
-    phrase_token_t last_token = null_token, saved_token;
-    for (size_t n = 0; n < items->len; ++n) {
-        lookup_candidate_t * item = &g_array_index
-            (items, lookup_candidate_t, n);
-
-        saved_token = item->m_token;
-        if (last_token == saved_token) {
-            g_array_remove_index(items, n);
-            n--;
-        }
-        last_token = saved_token;
-    }
-}
-#endif
-
 static void _compute_frequency_of_items(pinyin_context_t * context,
                                         phrase_token_t prev_token,
                                         SingleGram * merged_gram,
@@ -1500,6 +1490,40 @@ static bool _prepend_sentence_candidate(pinyin_instance_t * instance,
     lookup_candidate_t candidate;
     candidate.m_candidate_type = BEST_MATCH_CANDIDATE;
     g_array_prepend_val(candidates, candidate);
+
+    return true;
+}
+
+static bool _compute_phrase_length(pinyin_context_t * context,
+                                   CandidateVector candidates) {
+    FacadePhraseIndex * phrase_index = context->m_phrase_index;
+    FacadePhraseIndex * addon_phrase_index = context->m_addon_phrase_index;
+
+    /* populate m_phrase_length in lookup_candidate_t. */
+    PhraseItem item;
+
+    for(size_t i = 0; i < candidates->len; ++i) {
+        lookup_candidate_t * candidate = &g_array_index
+            (candidates, lookup_candidate_t, i);
+
+        switch(candidate->m_candidate_type) {
+        case BEST_MATCH_CANDIDATE:
+            assert(FALSE);
+        case NORMAL_CANDIDATE:
+        case PREDICTED_CANDIDATE: {
+            phrase_index->get_phrase_item(candidate->m_token, item);
+            candidate->m_phrase_length = item.get_phrase_length();
+            break;
+        }
+        case ADDON_CANDIDATE: {
+            addon_phrase_index->get_phrase_item(candidate->m_token, item);
+            candidate->m_phrase_length = item.get_phrase_length();
+            break;
+        }
+        case ZOMBIE_CANDIDATE:
+            assert(FALSE);
+        }
+    }
 
     return true;
 }
@@ -1670,8 +1694,9 @@ bool pinyin_guess_candidates(pinyin_instance_t * instance,
     pinyin_context_t * & context = instance->m_context;
     pinyin_option_t & options = context->m_options;
     PhoneticKeyMatrix & matrix = instance->m_matrix;
+    CandidateVector candidates = instance->m_candidates;
 
-    _free_candidates(instance->m_candidates);
+    _free_candidates(candidates);
 
     /* lookup the previous token here. */
     phrase_token_t prev_token = null_token;
@@ -1699,15 +1724,11 @@ bool pinyin_guess_candidates(pinyin_instance_t * instance,
     memset(addon_ranges, 0, sizeof(addon_ranges));
     context->m_addon_phrase_index->prepare_ranges(addon_ranges);
 
-    GArray * items = g_array_new(FALSE, FALSE, sizeof(lookup_candidate_t));
-
     _check_offset(matrix, offset);
 
     /* matrix reserved one extra slot. */
     const size_t start = offset;
     for (size_t end = start + 1; end < matrix.size();) {
-        g_array_set_size(items, 0);
-
         /* do pinyin search. */
         context->m_phrase_index->clear_ranges(ranges);
         int retval = search_matrix(context->m_pinyin_table, &matrix,
@@ -1724,31 +1745,13 @@ bool pinyin_guess_candidates(pinyin_instance_t * instance,
 
         lookup_candidate_t template_item;
         template_item.m_begin = start; template_item.m_end = end;
-        _append_items(ranges, &template_item, items);
+        _append_items(ranges, &template_item, candidates);
 
         lookup_candidate_t addon_template_item;
         addon_template_item.m_candidate_type = ADDON_CANDIDATE;
         addon_template_item.m_begin = start;
         addon_template_item.m_end = end;
-        _append_items(addon_ranges, &addon_template_item, items);
-
-#if 0
-        g_array_sort(items, compare_item_with_token);
-
-        _remove_duplicated_items(items);
-#endif
-
-        _compute_frequency_of_items(context, prev_token, &merged_gram, items);
-
-        /* sort the candidates of the same length by frequency. */
-        g_array_sort(items, compare_item_with_frequency);
-
-        /* transfer back items to tokens, and save it into candidates */
-        for (size_t k = 0; k < items->len; ++k) {
-            lookup_candidate_t * item = &g_array_index
-                (items, lookup_candidate_t, k);
-            g_array_append_val(instance->m_candidates, *item);
-        }
+        _append_items(addon_ranges, &addon_template_item, candidates);
 
         if ( !(retval & SEARCH_CONTINUED) )
             break;
@@ -1772,12 +1775,20 @@ bool pinyin_guess_candidates(pinyin_instance_t * instance,
         }
     }
 
-    g_array_free(items, TRUE);
     context->m_phrase_index->destroy_ranges(ranges);
     if (system_gram)
         delete system_gram;
     if (user_gram)
         delete user_gram;
+
+    /* post process to sort the candidates */
+
+    _compute_phrase_length(context, instance->m_candidates);
+
+    _compute_frequency_of_items(context, prev_token, &merged_gram, candidates);
+
+    /* sort the candidates by length and frequency. */
+    g_array_sort(candidates, compare_item_with_length_and_frequency);
 
     /* post process to remove duplicated candidates */
 
@@ -2174,10 +2185,11 @@ bool pinyin_guess_predicted_candidates(pinyin_instance_t * instance,
                                        const char * prefix) {
     const guint32 filter = 256;
 
-    pinyin_context_t * & context = instance->m_context;
-    FacadePhraseIndex * & phrase_index = context->m_phrase_index;
+    pinyin_context_t * context = instance->m_context;
+    FacadePhraseIndex * phrase_index = context->m_phrase_index;
+    CandidateVector candidates = instance->m_candidates;
 
-    _free_candidates(instance->m_candidates);
+    _free_candidates(candidates);
 
     _compute_prefixes(instance, prefix);
 
@@ -2191,8 +2203,6 @@ bool pinyin_guess_predicted_candidates(pinyin_instance_t * instance,
     context->m_system_bigram->load(prev_token, system_gram);
     context->m_user_bigram->load(prev_token, user_gram);
     merge_single_gram(&merged_gram, system_gram, user_gram);
-
-    GArray * items = g_array_new(FALSE, FALSE, sizeof(lookup_candidate_t));
 
     /* retrieve all items. */
     BigramPhraseWithCountArray tokens = g_array_new
@@ -2221,29 +2231,27 @@ bool pinyin_guess_predicted_candidates(pinyin_instance_t * instance,
             lookup_candidate_t item;
             item.m_candidate_type = PREDICTED_CANDIDATE;
             item.m_token = phrase_item->m_token;
-            g_array_append_val(items, item);
+            g_array_append_val(candidates, item);
         }
 
-        _compute_frequency_of_items(context, prev_token, &merged_gram, items);
-
-        /* sort the candidates of the same length by frequency. */
-        g_array_sort(items, compare_item_with_frequency);
-
-        /* transfer back items to tokens, and save it into candidates */
-        for (size_t k = 0; k < items->len; ++k) {
-            lookup_candidate_t * item = &g_array_index
-                (items, lookup_candidate_t, k);
-            g_array_append_val(instance->m_candidates, *item);
-        }
     }
 
-    g_array_free(items, TRUE);
     if (system_gram)
         delete system_gram;
     if (user_gram)
         delete user_gram;
 
+    /* post process to sort the candidates */
+
+    _compute_phrase_length(context, candidates);
+
+    _compute_frequency_of_items(context, prev_token, &merged_gram, candidates);
+
+    /* sort the candidates by length and frequency. */
+    g_array_sort(candidates, compare_item_with_length_and_frequency);
+
     /* post process to remove duplicated candidates */
+
     _compute_phrase_strings_of_items(instance, instance->m_candidates);
 
     _remove_duplicated_items_by_phrase_string(instance, instance->m_candidates);
