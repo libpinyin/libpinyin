@@ -36,7 +36,6 @@ LIBPINYIN {
         pinyin_get_parsed_input_length;
         pinyin_in_chewing_keyboard;
         pinyin_guess_candidates;
-        pinyin_guess_full_pinyin_candidates;
         pinyin_choose_candidate;
         pinyin_choose_predicted_candidate;
         pinyin_clear_constraint;
@@ -63,8 +62,9 @@ LIBPINYIN {
         pinyin_get_pinyin_key_rest;
         pinyin_get_pinyin_key_rest_positions;
         pinyin_get_pinyin_key_rest_length;
-        pinyin_get_pinyin_key_rest_offset;
-        pinyin_get_raw_full_pinyin;
+        pinyin_get_pinyin_offset;
+        pinyin_get_left_character_offset;
+        pinyin_get_right_character_offset;
         pinyin_get_n_phrase;
         pinyin_get_phrase_token;
 

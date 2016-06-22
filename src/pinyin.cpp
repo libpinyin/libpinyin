@@ -1783,7 +1783,7 @@ bool pinyin_guess_candidates(pinyin_instance_t * instance,
 
     /* post process to sort the candidates */
 
-    _compute_phrase_length(context, instance->m_candidates);
+    _compute_phrase_length(context, candidates);
 
     _compute_frequency_of_items(context, prev_token, &merged_gram, candidates);
 
