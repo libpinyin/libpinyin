@@ -22,7 +22,7 @@
 #include "phrase_index.h"
 #include "pinyin_custom2.h"
 
-using namespace pinyin;
+namespace pinyin{
 
 bool PhraseItem::set_n_pronunciation(guint8 n_prouns){
     m_chunk.set_content(sizeof(guint8), &n_prouns, sizeof(guint8));
@@ -703,8 +703,6 @@ bool FacadePhraseIndex::mask_out(guint8 phrase_index,
 
     return retval;
 }
-
-namespace pinyin{
 
 
 static bool _peek_header(PhraseIndexLogger * logger,
