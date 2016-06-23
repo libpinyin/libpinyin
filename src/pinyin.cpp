@@ -2814,6 +2814,23 @@ bool pinyin_get_right_character_offset(pinyin_instance_t * instance,
     return true;
 }
 
+bool pinyin_get_character_offset(pinyin_instance_t * instance,
+                                 size_t offset,
+                                 size_t * plength) {
+    PhoneticKeyMatrix & matrix = instance->m_matrix;
+    MatchResults results = instance->m_match_results;
+    _check_offset(matrix, offset);
+
+    size_t length = 0;
+    for (size_t i = 0; i < offset; ++i) {
+        phrase_token_t token = g_array_index(results, phrase_token_t, i);
+        if (null_token != token)
+            ++length;
+    }
+
+    *plength = length;
+    return true;
+}
 
 #if 0
 bool pinyin_get_raw_full_pinyin(pinyin_instance_t * instance,
