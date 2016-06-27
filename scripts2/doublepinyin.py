@@ -213,7 +213,6 @@ XHE_SHUANGPIN_SHENGMU_DICT = {
     "m" : "m", "n" : "n", "o" : "'", "p" : "p", "q" : "q",
     "r" : "r", "s" : "s", "t" : "t", "u" : "sh", "v" : "zh",
     "w" : "w", "x" : "x", "y" : "y", "z" : "z",
-    "a" : "'", "e" : "'"
 }
 
 XHE_SHUANGPIN_YUNMU_DICT = {

@@ -337,11 +337,11 @@ const double_pinyin_scheme_fallback_item_t double_pinyin_pyjj_fallback[] = {
 };
 
 const double_pinyin_scheme_shengmu_item_t double_pinyin_xhe_sheng[] = {
-{"'"  } /* A */,
+{NULL } /* A */,
 {"b"  } /* B */,
 {"c"  } /* C */,
 {"d"  } /* D */,
-{"'"  } /* E */,
+{NULL } /* E */,
 {"f"  } /* F */,
 {"g"  } /* G */,
 {"h"  } /* H */,
