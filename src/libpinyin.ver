@@ -67,6 +67,9 @@ LIBPINYIN {
         pinyin_get_right_character_offset;
         pinyin_get_n_phrase;
         pinyin_get_phrase_token;
+        pinyin_get_full_pinyin_auxiliary_text;
+        pinyin_get_double_pinyin_auxiliary_text;
+        pinyin_get_chewing_auxiliary_text;
 
     local:
 	*;
