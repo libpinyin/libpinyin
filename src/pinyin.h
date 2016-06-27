@@ -952,6 +952,22 @@ bool pinyin_get_phrase_token(pinyin_instance_t * instance,
                              guint index,
                              phrase_token_t * token);
 
+
+bool pinyin_get_full_pinyin_auxiliary_text(pinyin_instance_t * instance,
+                                           const char * input,
+                                           size_t cursor,
+                                           gchar ** aux_text);
+
+bool pinyin_get_double_pinyin_auxiliary_text(pinyin_instance_t * instance,
+                                             const char * input,
+                                             size_t cursor,
+                                             gchar ** aux_text);
+
+bool pinyin_get_chewing_auxiliary_text(pinyin_instance_t * instance,
+                                       const char * input,
+                                       size_t cursor,
+                                       gchar ** aux_text);
+
 /* hack here. */
 typedef ChewingKey PinyinKey;
 typedef ChewingKeyRest PinyinKeyPos;

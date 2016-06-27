@@ -2861,6 +2861,153 @@ bool pinyin_get_phrase_token(pinyin_instance_t * instance,
     return true;
 }
 
+static gchar * _get_aux_text_prefix(pinyin_instance_t * instance,
+                                    const char * input,
+                                    size_t cursor,
+                                    pinyin_option_t options) {
+    PhoneticKeyMatrix & matrix = instance->m_matrix;
+    gchar * prefix = g_strdup("");
+
+    assert(cursor < matrix.size());
+    size_t offset = 0;
+    ChewingKey key; ChewingKeyRest key_rest;
+    while (offset < matrix.size()) {
+        offset = _compute_pinyin_start(matrix, offset);
+
+        /* at the end of user input */
+        if (matrix.size() - 1 == offset)
+            break;
+
+        assert(matrix.get_column_size(offset) >= 1);
+        matrix.get_item(offset, 0, key, key_rest);
+
+        if (cursor > key_rest.m_raw_end)
+            break;
+
+        gchar * str = NULL;
+        if (IS_PINYIN == options)
+            str = key.get_pinyin_string();
+        else if (IS_ZHUYIN == options)
+            str = key.get_zhuyin_string();
+        else
+            assert(FALSE);
+
+        gchar * newprefix = g_strconcat(prefix, str, NULL);
+
+        g_free(str);
+        g_free(prefix);
+        prefix = newprefix;
+
+        offset = key_rest.m_raw_end;
+    }
+
+    return prefix;
+}
+
+static gchar * _get_aux_text_postfix(pinyin_instance_t * instance,
+                                     const char * input,
+                                     size_t cursor,
+                                     pinyin_option_t options) {
+    PhoneticKeyMatrix & matrix = instance->m_matrix;
+    gchar * postfix = g_strdup("");
+
+    assert(cursor < matrix.size());
+    size_t offset = 0;
+    ChewingKey key; ChewingKeyRest key_rest;
+    while (offset < matrix.size()) {
+        offset = _compute_pinyin_start(matrix, offset);
+
+        /* at the end of user input */
+        if (matrix.size() - 1 == offset)
+            break;
+
+        assert(matrix.get_column_size(offset) >= 1);
+        matrix.get_item(offset, 0, key, key_rest);
+
+        if (cursor <= key_rest.m_raw_end)
+            continue;
+
+        gchar * str = NULL;
+        if (IS_PINYIN == options)
+            str = key.get_pinyin_string();
+        else if (IS_ZHUYIN == options)
+            str = key.get_zhuyin_string();
+        else
+            assert(FALSE);
+
+        gchar * newpostfix = g_strconcat(postfix, str, NULL);
+
+        g_free(str);
+        g_free(postfix);
+        postfix = newpostfix;
+
+        offset = key_rest.m_raw_end;
+    }
+
+    return postfix;
+}
+
+bool pinyin_get_full_pinyin_auxiliary_text(pinyin_instance_t * instance,
+                                           const char * input,
+                                           size_t cursor,
+                                           gchar ** aux_text) {
+    PhoneticKeyMatrix & matrix = instance->m_matrix;
+    gchar * prefix = _get_aux_text_prefix
+        (instance, input, cursor, IS_PINYIN);
+    gchar * postfix = _get_aux_text_postfix
+        (instance, input, cursor, IS_PINYIN);
+
+    gchar * middle = NULL;
+    assert(cursor < matrix.size());
+    size_t offset = 0;
+    ChewingKey key; ChewingKeyRest key_rest;
+    while(offset < matrix.size()) {
+        size_t newoffset = _compute_pinyin_start(matrix, offset);
+
+        /* at the end of user input */
+        if (matrix.size() - 1 == newoffset) {
+            middle = g_strdup("|");
+            break;
+        }
+
+        assert(matrix.get_column_size(offset) >= 1);
+        matrix.get_item(offset, 0, key, key_rest);
+
+        gchar * str = key.get_pinyin_string();
+        /* at the start of pinyin key */
+        if (offset <= cursor && cursor < newoffset) {
+            middle = g_strconcat("|", str, NULL);
+            break;
+        }
+
+        /* at the middle of pinyin key */
+        const size_t begin = key_rest.m_raw_begin;
+        const size_t end = key_rest.m_raw_end;
+        const size_t len = cursor - begin;
+        if (begin <= cursor && cursor < end) {
+            gchar * pinyin = key.get_pinyin_string();
+            gchar * left = g_strndup(pinyin, len);
+            gchar * right = g_strdup(pinyin + len);
+            middle = g_strconcat(left, "|", right, NULL);
+            g_free(left);
+            g_free(right);
+            g_free(pinyin);
+            break;
+        }
+
+        g_free(str);
+
+        offset = key_rest.m_raw_end;
+    }
+
+    gchar * auxtext = g_strconcat(prefix, middle, postfix, NULL);
+    g_free(prefix);
+    g_free(middle);
+    g_free(postfix);
+
+    *aux_text = auxtext;
+    return true;
+}
 
 /**
  *  Note: prefix is the text before the pre-edit string.
