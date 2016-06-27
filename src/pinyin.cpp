@@ -3034,9 +3034,15 @@ bool pinyin_get_double_pinyin_auxiliary_text(pinyin_instance_t * instance,
         assert(matrix.get_column_size(offset) >= 1);
         matrix.get_item(offset, 0, key, key_rest);
 
+        const size_t begin = key_rest.m_raw_begin;
+        const size_t end = key_rest.m_raw_end;
+        if (!(begin <= cursor && cursor < end)) {
+            offset = key_rest.m_raw_end;
+            continue;
+        }
+
         gchar * shengmu = key.get_shengmu_string();
         gchar * yunmu = key.get_yunmu_string();
-        const size_t begin = key_rest.m_raw_begin;
         const size_t len = cursor - begin;
         switch(len) {
         case 0:
@@ -3060,6 +3066,61 @@ bool pinyin_get_double_pinyin_auxiliary_text(pinyin_instance_t * instance,
 
         g_free(shengmu);
         g_free(yunmu);
+
+        offset = key_rest.m_raw_end;
+    }
+
+    gchar * auxtext = g_strconcat(prefix, middle, postfix, NULL);
+    g_free(prefix);
+    g_free(middle);
+    g_free(postfix);
+
+    *aux_text = auxtext;
+    return true;
+}
+
+bool pinyin_get_chewing_auxiliary_text(pinyin_instance_t * instance,
+                                       const char * input,
+                                       size_t cursor,
+                                       gchar ** aux_text) {
+    PhoneticKeyMatrix & matrix = instance->m_matrix;
+    gchar * prefix = _get_aux_text_prefix
+        (instance, input, cursor, IS_ZHUYIN);
+    gchar * postfix = _get_aux_text_postfix
+        (instance, input, cursor, IS_ZHUYIN);
+
+    gchar * middle = NULL;
+    /* no "'" support in zhuyin */
+    assert(cursor < matrix.size());
+    size_t offset = 0;
+    ChewingKey key; ChewingKeyRest key_rest;
+    while(offset < matrix.size()) {
+        /* at the end of user input */
+        if (matrix.size() - 1 == offset) {
+            middle = g_strdup("|");
+            break;
+        }
+
+        assert(matrix.get_column_size(offset) >= 1);
+        matrix.get_item(offset, 0, key, key_rest);
+
+        const size_t begin = key_rest.m_raw_begin;
+        const size_t end = key_rest.m_raw_end;
+        if (!(begin <= cursor && cursor < end)) {
+            offset = key_rest.m_raw_end;
+            continue;
+        }
+
+        gchar * zhuyin = key.get_zhuyin_string();
+        const size_t len = cursor - begin;
+        gchar * left = g_utf8_substring(zhuyin, 0, len);
+        gchar * right = g_utf8_substring(zhuyin, len, end);
+
+        middle = g_strconcat(left, "|", right, NULL);
+
+        g_free(left);
+        g_free(right);
+        g_free(zhuyin);
 
         offset = key_rest.m_raw_end;
     }
