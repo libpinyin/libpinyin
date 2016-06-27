@@ -3009,6 +3009,70 @@ bool pinyin_get_full_pinyin_auxiliary_text(pinyin_instance_t * instance,
     return true;
 }
 
+bool pinyin_get_double_pinyin_auxiliary_text(pinyin_instance_t * instance,
+                                             const char * input,
+                                             size_t cursor,
+                                             gchar ** aux_text) {
+    PhoneticKeyMatrix & matrix = instance->m_matrix;
+    gchar * prefix = _get_aux_text_prefix
+        (instance, input, cursor, IS_PINYIN);
+    gchar * postfix = _get_aux_text_postfix
+        (instance, input, cursor, IS_PINYIN);
+
+    gchar * middle = NULL;
+    /* no "'" support in double pinyin. */
+    assert(cursor < matrix.size());
+    size_t offset = 0;
+    ChewingKey key; ChewingKeyRest key_rest;
+    while(offset < matrix.size()) {
+        /* at the end of user input */
+        if (matrix.size() - 1 == offset) {
+            middle = g_strdup("|");
+            break;
+        }
+
+        assert(matrix.get_column_size(offset) >= 1);
+        matrix.get_item(offset, 0, key, key_rest);
+
+        gchar * shengmu = key.get_shengmu_string();
+        gchar * yunmu = key.get_yunmu_string();
+        const size_t begin = key_rest.m_raw_begin;
+        const size_t len = cursor - begin;
+        switch(len) {
+        case 0:
+            middle = g_strconcat("|", shengmu, yunmu, NULL);
+            break;
+        case 1:
+            middle = g_strconcat(shengmu, "|", yunmu, NULL);
+            break;
+        case 2:
+            middle = g_strconcat(shengmu, yunmu, "|", NULL);
+            break;
+        default:
+            assert(FALSE);
+        }
+
+        if (CHEWING_ZERO_TONE != key.m_tone) {
+            gchar * newmiddle = g_strdup_printf("%s%d", middle, key.m_tone);
+            g_free(middle);
+            middle = newmiddle;
+        }
+
+        g_free(shengmu);
+        g_free(yunmu);
+
+        offset = key_rest.m_raw_end;
+    }
+
+    gchar * auxtext = g_strconcat(prefix, middle, postfix, NULL);
+    g_free(prefix);
+    g_free(middle);
+    g_free(postfix);
+
+    *aux_text = auxtext;
+    return true;
+}
+
 /**
  *  Note: prefix is the text before the pre-edit string.
  */
