@@ -22,9 +22,9 @@
 #ifndef PINYIN_PHRASE3_H
 #define PINYIN_PHRASE3_H
 
+#include <assert.h>
 #include "novel_types.h"
 #include "chewing_key.h"
-#include <assert.h>
 
 /* All compare function should be symmetric for the lhs and rhs operands.
    URL: http://en.cppreference.com/w/cpp/algorithm/equal_range . */
@@ -172,8 +172,10 @@ inline void compute_incomplete_chewing_index(const ChewingKey * in_keys,
                                              ChewingKey * out_keys,
                                              int phrase_length) {
     for (int i = 0; i < phrase_length; ++i) {
-        ChewingKey key;
-        key.m_initial = in_keys[i].m_initial;
+        ChewingKey key = in_keys[i];
+        key.m_middle = CHEWING_ZERO_MIDDLE;
+        key.m_final = CHEWING_ZERO_FINAL;
+        key.m_tone = CHEWING_ZERO_TONE;
         out_keys[i] = key;
     }
 }
