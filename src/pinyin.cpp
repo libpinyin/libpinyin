@@ -2819,8 +2819,6 @@ bool pinyin_get_character_offset(pinyin_instance_t * instance,
                                  size_t * poffset) {
     pinyin_context_t * context = instance->m_context;
     FacadePhraseIndex * phrase_index = context->m_phrase_index;
-
-    PhoneticKeyMatrix & matrix = instance->m_matrix;
     MatchResults results = instance->m_match_results;
 
     size_t offset = 0;

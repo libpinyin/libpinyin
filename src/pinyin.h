@@ -952,17 +952,49 @@ bool pinyin_get_phrase_token(pinyin_instance_t * instance,
                              guint index,
                              phrase_token_t * token);
 
-
+/**
+ * pinyin_get_full_pinyin_auxiliary_text:
+ * @instance: the pinyin instance.
+ * @input: the user input.
+ * @cursor: the current cursor.
+ * @aux_text: the auxiliary text.
+ * @returns: whether the get operation is successful.
+ *
+ * Get the auxiliary text for full pinyin.
+ *
+ */
 bool pinyin_get_full_pinyin_auxiliary_text(pinyin_instance_t * instance,
                                            const char * input,
                                            size_t cursor,
                                            gchar ** aux_text);
 
+/**
+ * pinyin_get_double_pinyin_auxiliary_text:
+ * @instance: the pinyin instance.
+ * @input: the user input.
+ * @cursor: the current cursor.
+ * @aux_text: the auxiliary text.
+ * @returns: whether the get operation is successful.
+ *
+ * Get the auxiliary text for double pinyin.
+ *
+ */
 bool pinyin_get_double_pinyin_auxiliary_text(pinyin_instance_t * instance,
                                              const char * input,
                                              size_t cursor,
                                              gchar ** aux_text);
 
+/**
+ * pinyin_get_chewing_auxiliary_text:
+ * @instance: the pinyin instance.
+ * @input: the user input.
+ * @cursor: the current cursor.
+ * @aux_text: the auxiliary text.
+ * @returns: whether the get operation is successful.
+ *
+ * Get the auxiliary text for chewing.
+ *
+ */
 bool pinyin_get_chewing_auxiliary_text(pinyin_instance_t * instance,
                                        const char * input,
                                        size_t cursor,
