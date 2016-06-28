@@ -2871,7 +2871,6 @@ bool pinyin_get_phrase_token(pinyin_instance_t * instance,
 }
 
 static gchar * _get_aux_text_prefix(pinyin_instance_t * instance,
-                                    const char * input,
                                     size_t cursor,
                                     pinyin_option_t options) {
     PhoneticKeyMatrix & matrix = instance->m_matrix;
@@ -2914,7 +2913,6 @@ static gchar * _get_aux_text_prefix(pinyin_instance_t * instance,
 }
 
 static gchar * _get_aux_text_postfix(pinyin_instance_t * instance,
-                                     const char * input,
                                      size_t cursor,
                                      pinyin_option_t options) {
     PhoneticKeyMatrix & matrix = instance->m_matrix;
@@ -2957,14 +2955,13 @@ static gchar * _get_aux_text_postfix(pinyin_instance_t * instance,
 }
 
 bool pinyin_get_full_pinyin_auxiliary_text(pinyin_instance_t * instance,
-                                           const char * input,
                                            size_t cursor,
                                            gchar ** aux_text) {
     PhoneticKeyMatrix & matrix = instance->m_matrix;
     gchar * prefix = _get_aux_text_prefix
-        (instance, input, cursor, IS_PINYIN);
+        (instance, cursor, IS_PINYIN);
     gchar * postfix = _get_aux_text_postfix
-        (instance, input, cursor, IS_PINYIN);
+        (instance, cursor, IS_PINYIN);
 
     gchar * middle = NULL;
     assert(cursor < matrix.size());
@@ -3019,14 +3016,13 @@ bool pinyin_get_full_pinyin_auxiliary_text(pinyin_instance_t * instance,
 }
 
 bool pinyin_get_double_pinyin_auxiliary_text(pinyin_instance_t * instance,
-                                             const char * input,
                                              size_t cursor,
                                              gchar ** aux_text) {
     PhoneticKeyMatrix & matrix = instance->m_matrix;
     gchar * prefix = _get_aux_text_prefix
-        (instance, input, cursor, IS_PINYIN);
+        (instance, cursor, IS_PINYIN);
     gchar * postfix = _get_aux_text_postfix
-        (instance, input, cursor, IS_PINYIN);
+        (instance, cursor, IS_PINYIN);
 
     gchar * middle = NULL;
     /* no "'" support in double pinyin. */
@@ -3089,14 +3085,13 @@ bool pinyin_get_double_pinyin_auxiliary_text(pinyin_instance_t * instance,
 }
 
 bool pinyin_get_chewing_auxiliary_text(pinyin_instance_t * instance,
-                                       const char * input,
                                        size_t cursor,
                                        gchar ** aux_text) {
     PhoneticKeyMatrix & matrix = instance->m_matrix;
     gchar * prefix = _get_aux_text_prefix
-        (instance, input, cursor, IS_ZHUYIN);
+        (instance, cursor, IS_ZHUYIN);
     gchar * postfix = _get_aux_text_postfix
-        (instance, input, cursor, IS_ZHUYIN);
+        (instance, cursor, IS_ZHUYIN);
 
     gchar * middle = NULL;
     /* no "'" support in zhuyin */
