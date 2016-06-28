@@ -901,16 +901,16 @@ bool pinyin_get_right_character_offset(pinyin_instance_t * instance,
 /**
  * pinyin_get_character_offset:
  * @instance: the pinyin instance.
- * @offset: the lookup offset.
- * @length: the character offset.
+ * @cursor: the lookup cursor.
+ * @offset: the character offset.
  * @returns: whether the get operation is successful.
  *
- * Get the character offset from the lookup offset.
+ * Get the character offset from the lookup cursor.
  *
  */
 bool pinyin_get_character_offset(pinyin_instance_t * instance,
-                                 size_t offset,
-                                 size_t * length);
+                                 size_t cursor,
+                                 size_t * offset);
 
 #if 0
 /**
