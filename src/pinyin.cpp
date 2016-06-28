@@ -2815,15 +2815,18 @@ bool pinyin_get_right_character_offset(pinyin_instance_t * instance,
 }
 
 bool pinyin_get_character_offset(pinyin_instance_t * instance,
-                                 size_t cursor,
-                                 size_t * poffset) {
+                                 size_t offset,
+                                 size_t * plength) {
     pinyin_context_t * context = instance->m_context;
     FacadePhraseIndex * phrase_index = context->m_phrase_index;
-    MatchResults results = instance->m_match_results;
 
-    size_t offset = 0;
+    PhoneticKeyMatrix & matrix = instance->m_matrix;
+    MatchResults results = instance->m_match_results;
+    _check_offset(matrix, offset);
+
+    size_t length = 0;
     PhraseItem item;
-    for (size_t i = 0; i < cursor; ++i) {
+    for (size_t i = 0; i < offset; ++i) {
         phrase_token_t token = g_array_index(results, phrase_token_t, i);
         if (null_token == token)
             continue;
@@ -2831,10 +2834,10 @@ bool pinyin_get_character_offset(pinyin_instance_t * instance,
         int retval = phrase_index->get_phrase_item(token, item);
         assert(ERROR_OK == retval);
         guint8 len = item.get_phrase_length();
-        offset += len;
+        length += len;
     }
 
-    *poffset = offset;
+    *plength = length;
     return true;
 }
 
