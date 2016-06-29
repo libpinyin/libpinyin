@@ -156,7 +156,7 @@ public:
             return 0;
 #endif
 
-        /* used preprocessor to avoid zero freq, in gen_chewing_table. */
+        /* used preprocessor to avoid zero freq, in gen_pinyin_table. */
         gfloat retval = matched / (gfloat) total_freq;
         return retval;
     }
