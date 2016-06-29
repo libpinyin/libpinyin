@@ -2963,7 +2963,7 @@ bool pinyin_get_full_pinyin_auxiliary_text(pinyin_instance_t * instance,
     gchar * postfix = _get_aux_text_postfix
         (instance, cursor, IS_PINYIN);
 
-    gchar * middle = NULL;
+    gchar * middle = "";
     assert(cursor < matrix.size());
     size_t offset = 0;
     ChewingKey key; ChewingKeyRest key_rest;
@@ -3024,7 +3024,7 @@ bool pinyin_get_double_pinyin_auxiliary_text(pinyin_instance_t * instance,
     gchar * postfix = _get_aux_text_postfix
         (instance, cursor, IS_PINYIN);
 
-    gchar * middle = NULL;
+    gchar * middle = "";
     /* no "'" support in double pinyin. */
     assert(cursor < matrix.size());
     size_t offset = 0;
@@ -3093,7 +3093,7 @@ bool pinyin_get_chewing_auxiliary_text(pinyin_instance_t * instance,
     gchar * postfix = _get_aux_text_postfix
         (instance, cursor, IS_ZHUYIN);
 
-    gchar * middle = NULL;
+    gchar * middle = "";
     /* no "'" support in zhuyin */
     assert(cursor < matrix.size());
     size_t offset = 0;
