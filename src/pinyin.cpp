@@ -22,6 +22,7 @@
 
 #include "pinyin.h"
 #include <stdio.h>
+#include <float.h>
 #include <unistd.h>
 #include <glib/gstdio.h>
 #include "pinyin_internal.h"
@@ -3155,14 +3156,19 @@ bool pinyin_get_chewing_auxiliary_text(pinyin_instance_t * instance,
     return true;
 }
 
-static bool _remember_phrase_recur(GArray * cached_keys,
-                                   pinyin_context_t * context,
-                                   guint8 index,
-                                   PhoneticKeyMatrix * matrix,
-                                   size_t start, size_t end,
+static bool _remember_phrase_recur(ChewingKeyVector cached_keys,
+                                   TokenVector cached_tokens,
+                                   pinyin_instance_t * instance,
+                                   size_t start,
                                    ucs4_t * phrase,
-                                   glong phrase_length,
                                    gint count) {
+    pinyin_context_t * context = instance->m_context;
+    PhoneticKeyMatrix & matrix = instance->m_matrix;
+    FacadePhraseIndex * phrase_index = context->m_phrase_index;
+    const guint8 index = USER_DICTIONARY;
+    const size_t end = matrix.size() - 1;
+    const glong phrase_length = cached_tokens->len;
+
     if (start > end)
         return false;
 
@@ -3179,15 +3185,16 @@ static bool _remember_phrase_recur(GArray * cached_keys,
                            phrase, phrase_length, count);
     }
 
-    const size_t size = matrix->get_column_size(start);
+    const size_t size = matrix.get_column_size(start);
     /* assume pinyin parsers will filter invalid keys. */
     assert(size > 0);
 
     bool result = false;
 
+    PhraseItem item;
     for (size_t i = 0; i < size; ++i) {
         ChewingKey key; ChewingKeyRest key_rest;
-        matrix->get_item(start, i, key, key_rest);
+        matrix.get_item(start, i, key, key_rest);
 
         const size_t newstart = key_rest.m_raw_end;
 
@@ -3196,16 +3203,35 @@ static bool _remember_phrase_recur(GArray * cached_keys,
             /* assume only one key here for "'" or the last key. */
             assert(1 == size);
             return _remember_phrase_recur
-                (cached_keys, context, index, matrix, newstart, end,
-                 phrase, phrase_length, count);
+                (cached_keys, cached_tokens, instance,
+                 newstart, phrase, count);
         }
+
+        /* meet in-complete pinyin */
+        if (CHEWING_ZERO_MIDDLE == key.m_middle &&
+            CHEWING_ZERO_FINAL == key.m_final) {
+            assert(CHEWING_ZERO_TONE == key.m_tone);
+            return false;
+        }
+
+        /* check pronunciation */
+        if (cached_keys->len >= phrase_length)
+            return false;
+
+        phrase_token_t token = g_array_index
+            (cached_tokens, phrase_token_t, cached_keys->len);
+        phrase_index->get_phrase_item(token, item);
+
+        gfloat pinyin_poss = item.get_pronunciation_possibility(&key);
+        if (pinyin_poss < FLT_EPSILON)
+            return false;
 
         /* push value */
         g_array_append_val(cached_keys, key);
 
         result = _remember_phrase_recur
-            (cached_keys, context, index, matrix, newstart, end,
-             phrase, phrase_length, count) || result;
+            (cached_keys, cached_tokens, instance,
+             newstart, phrase, count) || result;
 
         /* pop value */
         g_array_set_size(cached_keys, cached_keys->len - 1);
@@ -3218,6 +3244,8 @@ bool pinyin_remember_user_input(pinyin_instance_t * instance,
                                 const char * phrase,
                                 gint count) {
     pinyin_context_t * context = instance->m_context;
+    FacadePhraseIndex * phrase_index = context->m_phrase_index;
+    FacadePhraseTable3 * phrase_table = context->m_phrase_table;
     PhoneticKeyMatrix & matrix = instance->m_matrix;
     guint8 index = USER_DICTIONARY;
 
@@ -3230,13 +3258,35 @@ bool pinyin_remember_user_input(pinyin_instance_t * instance,
     if (0 == phrase_length || phrase_length >= MAX_PHRASE_LENGTH)
         return false;
 
-    size_t start = 0; size_t end = matrix.size() - 1;
-    GArray * cached_keys = g_array_new(TRUE, TRUE, sizeof(ChewingKey));
+    const size_t start = 0; const size_t end = matrix.size() - 1;
+    ChewingKeyVector cached_keys = g_array_new(TRUE, TRUE, sizeof(ChewingKey));
+
+    /* pre-compute the tokens vector from phrase. */
+    TokenVector cached_tokens = g_array_new(TRUE, TRUE, sizeof(phrase_token_t));
+
+    /* do phrase table search. */
+    PhraseTokens tokens;
+    memset(tokens, 0, sizeof(PhraseTokens));
+    phrase_index->prepare_tokens(tokens);
+    for (size_t i = 0; i < phrase_length; ++i) {
+        phrase_token_t token = null_token;
+        ucs4_t character = phrase[i];
+
+        phrase_index->clear_tokens(tokens);
+        int retval = phrase_table->search(1, &character, tokens);
+        int num = get_first_token(tokens, token);
+        /* assume always know the character. */
+        assert(num >= 1);
+        g_array_append_val(cached_tokens, token);
+    }
+    phrase_index->destroy_tokens(tokens);
+    assert(cached_tokens->len == phrase_length);
 
     bool result = _remember_phrase_recur
-        (cached_keys, context, index, &matrix, start, end,
-         ucs4_phrase, phrase_length, count);
+        (cached_keys, cached_tokens, instance,
+         start, ucs4_phrase, count);
 
+    g_array_free(cached_tokens, TRUE);
     g_array_free(cached_keys, TRUE);
     g_free(ucs4_phrase);
     return result;
