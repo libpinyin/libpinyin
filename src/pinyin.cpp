@@ -465,45 +465,23 @@ import_iterator_t * pinyin_begin_add_phrases(pinyin_context_t * context,
     return iter;
 }
 
-bool pinyin_iterator_add_phrase(import_iterator_t * iter,
-                                const char * phrase,
-                                const char * pinyin,
-                                gint count){
+static bool _add_phrase(pinyin_context_t * context,
+                        guint8 index,
+                        ChewingKeyVector keys,
+                        ucs4_t * phrase,
+                        glong phrase_length,
+                        gint count) {
     /* if -1 == count, use the default value. */
     const gint default_count = 5;
     const guint32 unigram_factor = 3;
     if (-1 == count)
         count = default_count;
 
-    pinyin_context_t * & context = iter->m_context;
-    FacadePhraseTable3 * & phrase_table = context->m_phrase_table;
-    FacadeChewingTable2 * & pinyin_table = context->m_pinyin_table;
-    FacadePhraseIndex * & phrase_index = context->m_phrase_index;
+    FacadePhraseTable3 *  phrase_table = context->m_phrase_table;
+    FacadeChewingTable2 * pinyin_table = context->m_pinyin_table;
+    FacadePhraseIndex * phrase_index = context->m_phrase_index;
 
     bool result = false;
-
-    if (NULL == phrase || NULL == pinyin)
-        return result;
-
-    /* check whether the phrase exists in phrase table */
-    glong len_phrase = 0;
-    ucs4_t * ucs4_phrase = g_utf8_to_ucs4(phrase, -1, NULL, &len_phrase, NULL);
-
-    pinyin_option_t options = PINYIN_CORRECT_ALL | USE_TONE;
-    FullPinyinParser2 parser;
-    ChewingKeyVector keys =
-        g_array_new(FALSE, FALSE, sizeof(ChewingKey));
-    ChewingKeyRestVector key_rests =
-        g_array_new(FALSE, FALSE, sizeof(ChewingKeyRest));
-
-    /* parse the pinyin. */
-    parser.parse(options, keys, key_rests, pinyin, strlen(pinyin));
-
-    if (len_phrase != keys->len)
-        return result;
-
-    if (0 == len_phrase || len_phrase >= MAX_PHRASE_LENGTH)
-        return result;
 
     phrase_token_t token = null_token;
     GArray * tokenarray = g_array_new(FALSE, FALSE, sizeof(phrase_token_t));
@@ -512,7 +490,7 @@ bool pinyin_iterator_add_phrase(import_iterator_t * iter,
     PhraseTokens tokens;
     memset(tokens, 0, sizeof(PhraseTokens));
     phrase_index->prepare_tokens(tokens);
-    int retval = phrase_table->search(len_phrase, ucs4_phrase, tokens);
+    int retval = phrase_table->search(phrase_length, phrase, tokens);
     int num = reduce_tokens(tokens, tokenarray);
     phrase_index->destroy_tokens(tokens);
 
@@ -524,9 +502,9 @@ bool pinyin_iterator_add_phrase(import_iterator_t * iter,
             continue;
         }
 
-        if (PHRASE_INDEX_LIBRARY_INDEX(candidate) == iter->m_phrase_index) {
+        if (PHRASE_INDEX_LIBRARY_INDEX(candidate) == index) {
             /* only one phrase string per sub phrase index. */
-            assert(PHRASE_INDEX_LIBRARY_INDEX(token) != iter->m_phrase_index);
+            assert(PHRASE_INDEX_LIBRARY_INDEX(token) != index);
             token = candidate;
             continue;
         }
@@ -536,15 +514,15 @@ bool pinyin_iterator_add_phrase(import_iterator_t * iter,
     PhraseItem item;
     /* check whether it exists in the same sub phrase index; */
     if (null_token != token &&
-        PHRASE_INDEX_LIBRARY_INDEX(token) == iter->m_phrase_index) {
+        PHRASE_INDEX_LIBRARY_INDEX(token) == index) {
         /* if so, remove the phrase, add the pinyin for the phrase item,
            then add it back;*/
         phrase_index->get_phrase_item(token, item);
-        assert(len_phrase == item.get_phrase_length());
+        assert(phrase_length == item.get_phrase_length());
         ucs4_t tmp_phrase[MAX_PHRASE_LENGTH];
         item.get_phrase_string(tmp_phrase);
         assert(0 == memcmp
-               (ucs4_phrase, tmp_phrase, sizeof(ucs4_t) * len_phrase));
+               (phrase, tmp_phrase, sizeof(ucs4_t) * phrase_length));
 
         PhraseItem * removed_item = NULL;
         retval = phrase_index->remove_phrase_item(token, removed_item);
@@ -561,19 +539,19 @@ bool pinyin_iterator_add_phrase(import_iterator_t * iter,
            get the maximum token,
            then add it directly with maximum token + 1; */
         PhraseIndexRange range;
-        retval = phrase_index->get_range(iter->m_phrase_index, range);
+        retval = phrase_index->get_range(index, range);
 
         if (ERROR_OK == retval) {
             token = range.m_range_end;
             if (0x00000000 == (token & PHRASE_MASK))
                 token++;
 
-            if (len_phrase == keys->len) { /* valid pinyin */
-                phrase_table->add_index(len_phrase, ucs4_phrase, token);
+            if (phrase_length == keys->len) { /* valid pinyin */
+                phrase_table->add_index(phrase_length, phrase, token);
                 pinyin_table->add_index
                     (keys->len, (ChewingKey *)(keys->data), token);
 
-                item.set_phrase_string(len_phrase, ucs4_phrase);
+                item.set_phrase_string(phrase_length, phrase);
                 item.add_pronunciation((ChewingKey *)(keys->data), count);
                 phrase_index->add_phrase_item(token, &item);
                 phrase_index->add_unigram_frequency(token,
@@ -582,6 +560,45 @@ bool pinyin_iterator_add_phrase(import_iterator_t * iter,
             }
         }
     }
+
+    return result;
+}
+
+bool pinyin_iterator_add_phrase(import_iterator_t * iter,
+                                const char * phrase,
+                                const char * pinyin,
+                                gint count){
+
+    pinyin_context_t * context = iter->m_context;
+    guint8 index = iter->m_phrase_index;
+
+    bool result = false;
+
+    if (NULL == phrase || NULL == pinyin)
+        return result;
+
+    /* check whether the phrase exists in phrase table */
+    glong phrase_length = 0;
+    ucs4_t * ucs4_phrase = g_utf8_to_ucs4(phrase, -1, NULL, &phrase_length, NULL);
+
+    pinyin_option_t options = PINYIN_CORRECT_ALL | USE_TONE;
+    FullPinyinParser2 parser;
+    ChewingKeyVector keys =
+        g_array_new(FALSE, FALSE, sizeof(ChewingKey));
+    ChewingKeyRestVector key_rests =
+        g_array_new(FALSE, FALSE, sizeof(ChewingKeyRest));
+
+    /* parse the pinyin. */
+    parser.parse(options, keys, key_rests, pinyin, strlen(pinyin));
+
+    if (phrase_length != keys->len)
+        return result;
+
+    if (0 == phrase_length || phrase_length >= MAX_PHRASE_LENGTH)
+        return result;
+
+    result = _add_phrase(context, index, keys,
+                         ucs4_phrase, phrase_length, count);
 
     g_array_free(key_rests, TRUE);
     g_array_free(keys, TRUE);
@@ -2963,7 +2980,7 @@ bool pinyin_get_full_pinyin_auxiliary_text(pinyin_instance_t * instance,
     gchar * postfix = _get_aux_text_postfix
         (instance, cursor, IS_PINYIN);
 
-    gchar * middle = "";
+    gchar * middle = NULL;
     assert(cursor < matrix.size());
     size_t offset = 0;
     ChewingKey key; ChewingKeyRest key_rest;
@@ -3024,7 +3041,7 @@ bool pinyin_get_double_pinyin_auxiliary_text(pinyin_instance_t * instance,
     gchar * postfix = _get_aux_text_postfix
         (instance, cursor, IS_PINYIN);
 
-    gchar * middle = "";
+    gchar * middle = NULL;
     /* no "'" support in double pinyin. */
     assert(cursor < matrix.size());
     size_t offset = 0;
@@ -3093,7 +3110,7 @@ bool pinyin_get_chewing_auxiliary_text(pinyin_instance_t * instance,
     gchar * postfix = _get_aux_text_postfix
         (instance, cursor, IS_ZHUYIN);
 
-    gchar * middle = "";
+    gchar * middle = NULL;
     /* no "'" support in zhuyin */
     assert(cursor < matrix.size());
     size_t offset = 0;
