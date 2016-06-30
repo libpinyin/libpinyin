@@ -483,6 +483,7 @@ static bool _add_phrase(pinyin_context_t * context,
 
     bool result = false;
 
+    /* check whether the phrase exists in phrase table */
     phrase_token_t token = null_token;
     GArray * tokenarray = g_array_new(FALSE, FALSE, sizeof(phrase_token_t));
 
@@ -577,7 +578,6 @@ bool pinyin_iterator_add_phrase(import_iterator_t * iter,
     if (NULL == phrase || NULL == pinyin)
         return result;
 
-    /* check whether the phrase exists in phrase table */
     glong phrase_length = 0;
     ucs4_t * ucs4_phrase = g_utf8_to_ucs4(phrase, -1, NULL, &phrase_length, NULL);
 

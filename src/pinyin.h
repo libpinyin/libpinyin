@@ -994,7 +994,22 @@ bool pinyin_get_chewing_auxiliary_text(pinyin_instance_t * instance,
                                        size_t cursor,
                                        gchar ** aux_text);
 
-/* hack here. */
+/**
+ * pinyin_remember_user_input:
+ * @instance: the pinyin instance.
+ * @phrase: the utf8 phrase.
+ * @count: the count of the phrase, -1 to use the default value.
+ * @returns: whether the phrase is remembered.
+ *
+ * Remember the current phrase and pinyin pair.
+ *
+ */
+bool pinyin_remember_user_input(pinyin_instance_t * instance,
+                                const char * phrase,
+                                gint count);
+
+
+/* for compatibility. */
 typedef ChewingKey PinyinKey;
 typedef ChewingKeyRest PinyinKeyPos;
 
