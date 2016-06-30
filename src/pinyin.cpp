@@ -3155,6 +3155,93 @@ bool pinyin_get_chewing_auxiliary_text(pinyin_instance_t * instance,
     return true;
 }
 
+static bool _remember_phrase_recur(GArray * cached_keys,
+                                   pinyin_context_t * context,
+                                   guint8 index,
+                                   PhoneticKeyMatrix * matrix,
+                                   size_t start, size_t end,
+                                   ucs4_t * phrase,
+                                   glong phrase_length,
+                                   gint count) {
+    if (start > end)
+        return false;
+
+    /* only do remember phrase with 'start' and 'end' */
+    if (start == end) {
+        if (cached_keys->len != phrase_length)
+            return false;
+
+        /* as cached_keys and phrase has the same length. */
+        assert(cached_keys->len > 0);
+        assert(cached_keys->len <= MAX_PHRASE_LENGTH);
+
+        return _add_phrase(context, index, cached_keys,
+                           phrase, phrase_length, count);
+    }
+
+    const size_t size = matrix->get_column_size(start);
+    /* assume pinyin parsers will filter invalid keys. */
+    assert(size > 0);
+
+    bool result = false;
+
+    for (size_t i = 0; i < size; ++i) {
+        ChewingKey key; ChewingKeyRest key_rest;
+        matrix->get_item(start, i, key, key_rest);
+
+        const size_t newstart = key_rest.m_raw_end;
+
+        const ChewingKey zero_key;
+        if (zero_key == key) {
+            /* assume only one key here for "'" or the last key. */
+            assert(1 == size);
+            return _remember_phrase_recur
+                (cached_keys, context, index, matrix, newstart, end,
+                 phrase, phrase_length, count);
+        }
+
+        /* push value */
+        g_array_append_val(cached_keys, key);
+
+        result = _remember_phrase_recur
+            (cached_keys, context, index, matrix, newstart, end,
+             phrase, phrase_length, count) || result;
+
+        /* pop value */
+        g_array_set_size(cached_keys, cached_keys->len - 1);
+    }
+
+    return result;
+}
+
+bool pinyin_remember_user_input(pinyin_instance_t * instance,
+                                const char * phrase,
+                                gint count) {
+    pinyin_context_t * context = instance->m_context;
+    PhoneticKeyMatrix & matrix = instance->m_matrix;
+    guint8 index = USER_DICTIONARY;
+
+    if (NULL == phrase)
+        return false;
+
+    glong phrase_length = 0;
+    ucs4_t * ucs4_phrase = g_utf8_to_ucs4(phrase, -1, NULL, &phrase_length, NULL);
+
+    if (0 == phrase_length || phrase_length >= MAX_PHRASE_LENGTH)
+        return false;
+
+    size_t start = 0; size_t end = matrix.size() - 1;
+    GArray * cached_keys = g_array_new(TRUE, TRUE, sizeof(ChewingKey));
+
+    bool result = _remember_phrase_recur
+        (cached_keys, context, index, &matrix, start, end,
+         ucs4_phrase, phrase_length, count);
+
+    g_array_free(cached_keys, TRUE);
+    g_free(ucs4_phrase);
+    return result;
+}
+
 /**
  *  Note: prefix is the text before the pre-edit string.
  */
