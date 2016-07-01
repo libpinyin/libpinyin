@@ -274,24 +274,8 @@ int PhraseLargeTable3::remove_index(int phrase_length,
 }
 
 /* mask out method */
-/* assume it is in-memory dbm. */
 bool PhraseLargeTable3::mask_out(phrase_token_t mask,
                                  phrase_token_t value) {
-    /* use copy and sweep algorithm here. */
-    DB * tmp_db = NULL;
-
-    int ret = db_create(&tmp_db, NULL, 0);
-    assert(0 == ret);
-
-    if (NULL == tmp_db)
-        return false;
-
-    /* create in memory db. */
-    ret = tmp_db->open(tmp_db, NULL, NULL, NULL,
-                       DB_BTREE, DB_CREATE, 0600);
-    if (ret != 0)
-        return false;
-
     PhraseTableEntry entry;
 
     DBC * cursorp = NULL;
@@ -316,7 +300,7 @@ bool PhraseLargeTable3::mask_out(phrase_token_t mask,
         memset(&db_data, 0, sizeof(DBT));
         db_data.data = entry.m_chunk.begin();
         db_data.size = entry.m_chunk.size();
-        int ret = tmp_db->put(tmp_db, NULL, &db_key, &db_data, 0);
+        int ret = cursorp->put(cursorp, &db_key, &db_data, 0);
         assert(ret == 0);
     }
     assert(ret == DB_NOTFOUND);
@@ -326,9 +310,7 @@ bool PhraseLargeTable3::mask_out(phrase_token_t mask,
         cursorp->c_close(cursorp);
 
     m_db->sync(m_db, 0);
-    m_db->close(m_db, 0);
 
-    m_db = tmp_db;
     return true;
 }
 
