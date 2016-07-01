@@ -3305,11 +3305,47 @@ bool pinyin_is_user_candidate(pinyin_instance_t * instance,
 
 bool pinyin_remove_user_candidate(pinyin_instance_t * instance,
                                   lookup_candidate_t * candidate) {
+    pinyin_context_t * context = instance->m_context;
+    FacadePhraseIndex * phrase_index = context->m_phrase_index;
+    FacadePhraseTable3 * phrase_table = context->m_phrase_table;
+    FacadeChewingTable2 * pinyin_table = context->m_pinyin_table;
+    Bigram * user_bigram = context->m_user_bigram;
+
     assert(NORMAL_CANDIDATE == candidate->m_candidate_type);
 
     phrase_token_t token = candidate->m_token;
     guint8 index = PHRASE_INDEX_LIBRARY_INDEX(token);
     assert(USER_DICTIONARY == index);
+
+    /* remove from phrase index */
+    PhraseItem * item = NULL;
+    int retval = phrase_index->remove_phrase_item(token, item);
+    assert(ERROR_OK == retval);
+
+    /* remove from phrase table */
+    const guint8 length = item->get_phrase_length();
+    ucs4_t phrase[MAX_PHRASE_LENGTH];
+    item->get_phrase_string(phrase);
+    retval = phrase_table->remove_index(length, phrase, token);
+    assert(ERROR_OK == retval);
+
+    /* remove from pinyin table */
+    const guint8 num = item->get_n_pronunciation();
+    ChewingKey keys[MAX_PHRASE_LENGTH];
+    guint32 freq = 0;
+    for (size_t i = 0; i < num; ++i) {
+        item->get_nth_pronunciation(i, keys, freq);
+        retval = pinyin_table->remove_index(length, keys, token);
+        assert(ERROR_OK == retval);
+    }
+
+    delete item;
+
+    /* remove from user bigram */
+    phrase_token_t mask = PHRASE_INDEX_LIBRARY_MASK | PHRASE_MASK;
+    user_bigram->mask_out(mask, token);
+
+    return true;
 }
 
 
