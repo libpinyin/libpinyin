@@ -2767,9 +2767,9 @@ bool pinyin_get_pinyin_offset(pinyin_instance_t * instance,
     return true;
 }
 
-bool pinyin_get_left_character_offset(pinyin_instance_t * instance,
-                                      size_t offset,
-                                      size_t * pleft) {
+bool pinyin_get_left_pinyin_offset(pinyin_instance_t * instance,
+                                   size_t offset,
+                                   size_t * pleft) {
     PhoneticKeyMatrix & matrix = instance->m_matrix;
     _check_offset(matrix, offset);
 
@@ -2799,9 +2799,9 @@ bool pinyin_get_left_character_offset(pinyin_instance_t * instance,
     return true;
 }
 
-bool pinyin_get_right_character_offset(pinyin_instance_t * instance,
-                                       size_t offset,
-                                       size_t * pright) {
+bool pinyin_get_right_pinyin_offset(pinyin_instance_t * instance,
+                                    size_t offset,
+                                    size_t * pright) {
     PhoneticKeyMatrix & matrix = instance->m_matrix;
     _check_offset(matrix, offset);
 

@@ -63,8 +63,8 @@ LIBPINYIN {
         pinyin_get_pinyin_key_rest_positions;
         pinyin_get_pinyin_key_rest_length;
         pinyin_get_pinyin_offset;
-        pinyin_get_left_character_offset;
-        pinyin_get_right_character_offset;
+        pinyin_get_left_pinyin_offset;
+        pinyin_get_right_pinyin_offset;
         pinyin_get_character_offset;
         pinyin_get_n_phrase;
         pinyin_get_phrase_token;
