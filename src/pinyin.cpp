@@ -3246,8 +3246,6 @@ bool pinyin_remember_user_input(pinyin_instance_t * instance,
     pinyin_context_t * context = instance->m_context;
     FacadePhraseIndex * phrase_index = context->m_phrase_index;
     FacadePhraseTable3 * phrase_table = context->m_phrase_table;
-    PhoneticKeyMatrix & matrix = instance->m_matrix;
-    guint8 index = USER_DICTIONARY;
 
     if (NULL == phrase)
         return false;
@@ -3258,7 +3256,7 @@ bool pinyin_remember_user_input(pinyin_instance_t * instance,
     if (0 == phrase_length || phrase_length >= MAX_PHRASE_LENGTH)
         return false;
 
-    const size_t start = 0; const size_t end = matrix.size() - 1;
+    const size_t start = 0;
     ChewingKeyVector cached_keys = g_array_new(TRUE, TRUE, sizeof(ChewingKey));
 
     /* pre-compute the tokens vector from phrase. */
@@ -3268,7 +3266,7 @@ bool pinyin_remember_user_input(pinyin_instance_t * instance,
     PhraseTokens tokens;
     memset(tokens, 0, sizeof(PhraseTokens));
     phrase_index->prepare_tokens(tokens);
-    for (size_t i = 0; i < phrase_length; ++i) {
+    for (glong i = 0; i < phrase_length; ++i) {
         phrase_token_t token = null_token;
         ucs4_t character = phrase[i];
 

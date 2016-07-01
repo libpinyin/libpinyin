@@ -16,7 +16,6 @@ LIBPINYIN {
         pinyin_iterator_has_next_phrase;
         pinyin_iterator_get_next_phrase;
         pinyin_end_get_phrases;
-        pinyin_remember_user_input;
         pinyin_fini;
         pinyin_mask_out;
         pinyin_set_options;
@@ -72,6 +71,7 @@ LIBPINYIN {
         pinyin_get_full_pinyin_auxiliary_text;
         pinyin_get_double_pinyin_auxiliary_text;
         pinyin_get_chewing_auxiliary_text;
+        pinyin_remember_user_input;
 
     local:
 	*;
