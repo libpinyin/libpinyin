@@ -379,8 +379,8 @@ public:
             vbuf = (char *) entry->m_chunk.begin();             \
             vsiz = entry->m_chunk.size();                       \
                                                                 \
-            assert(m_db->set(kbuf, ksiz, vbuf, vsiz));          \
-            return NOP;                                         \
+            *sp = vsiz;                                         \
+            return vbuf;                                        \
         }
 
         switch(phrase_length) {
@@ -411,27 +411,15 @@ public:
     }
 
     virtual const char* visit_empty(const char* kbuf, size_t ksiz, size_t* sp) {
-        m_db->set(kbuf, ksiz, empty_vbuf, 0);
         return NOP;
     }
 };
 
 /* mask out method */
-/* assume it is in-memory dbm. */
 bool ChewingLargeTable2::mask_out(phrase_token_t mask,
                                   phrase_token_t value) {
-    /* use copy and sweep algorithm here. */
-    BasicDB * tmp_db = new ProtoTreeDB;
-    if (!tmp_db->open("-", BasicDB::OREADER|BasicDB::OWRITER|BasicDB::OCREATE))
-        return false;
-
-    MaskOutVisitor2 visitor(tmp_db, m_entries, mask, value);
-    m_db->iterate(&visitor, false);
-
-    reset();
-
-    m_db = tmp_db;
-    init_entries();
+    MaskOutVisitor2 visitor(m_db, m_entries, mask, value);
+    m_db->iterate(&visitor, true);
 
     return true;
 }
