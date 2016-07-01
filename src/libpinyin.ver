@@ -72,6 +72,8 @@ LIBPINYIN {
         pinyin_get_double_pinyin_auxiliary_text;
         pinyin_get_chewing_auxiliary_text;
         pinyin_remember_user_input;
+        pinyin_is_user_candidate;
+        pinyin_remove_user_candidate;
 
     local:
 	*;

@@ -3290,6 +3290,29 @@ bool pinyin_remember_user_input(pinyin_instance_t * instance,
     return result;
 }
 
+bool pinyin_is_user_candidate(pinyin_instance_t * instance,
+                              lookup_candidate_t * candidate) {
+    if (NORMAL_CANDIDATE != candidate->m_candidate_type)
+        return false;
+
+    phrase_token_t token = candidate->m_token;
+    guint8 index = PHRASE_INDEX_LIBRARY_INDEX(token);
+    if (USER_DICTIONARY != index)
+        return false;
+
+    return true;
+}
+
+bool pinyin_remove_user_candidate(pinyin_instance_t * instance,
+                                  lookup_candidate_t * candidate) {
+    assert(NORMAL_CANDIDATE == candidate->m_candidate_type);
+
+    phrase_token_t token = candidate->m_token;
+    guint8 index = PHRASE_INDEX_LIBRARY_INDEX(token);
+    assert(USER_DICTIONARY == index);
+}
+
+
 /**
  *  Note: prefix is the text before the pre-edit string.
  */

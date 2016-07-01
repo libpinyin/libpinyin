@@ -1008,6 +1008,31 @@ bool pinyin_remember_user_input(pinyin_instance_t * instance,
                                 const char * phrase,
                                 gint count);
 
+/**
+ * pinyin_is_user_candidate:
+ * @instance: the pinyin instance.
+ * @candidate: the lookup candidate.
+ * @returns: whether the candidate is user candidate.
+ *
+ * Check whether the candidate is user candidate.
+ *
+ */
+bool pinyin_is_user_candidate(pinyin_instance_t * instance,
+                              lookup_candidate_t * candidate);
+
+/**
+ * pinyin_remove_user_candidate:
+ * @instance: the pinyin instance.
+ * @candidate: the lookup candidate.
+ * @returns: whether the remove operation is successful.
+ *
+ * Remove the user candidate from dictionary.
+ *
+ */
+bool pinyin_remove_user_candidate(pinyin_instance_t * instance,
+                                  lookup_candidate_t * candidate);
+
+
 
 /* for compatibility. */
 typedef ChewingKey PinyinKey;
