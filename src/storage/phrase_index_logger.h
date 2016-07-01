@@ -42,6 +42,7 @@
 namespace pinyin{
 
 enum LOG_TYPE{
+    LOG_INVALID_RECORD = 0,
     LOG_ADD_RECORD = 1,
     LOG_REMOVE_RECORD,
     LOG_MODIFY_RECORD,

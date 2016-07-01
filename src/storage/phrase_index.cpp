@@ -337,7 +337,7 @@ bool SubPhraseIndex::load(MemoryChunk * chunk,
     char * buf_begin = (char *)chunk->begin();
     chunk->get_content(offset, &m_total_freq, sizeof(guint32));
     offset += sizeof(guint32);
-    table_offset_t index_one, index_two, index_three;
+    table_offset_t index_one = 0, index_two = 0, index_three = 0;
     chunk->get_content(offset, &index_one, sizeof(table_offset_t));
     offset += sizeof(table_offset_t);
     chunk->get_content(offset, &index_two, sizeof(table_offset_t));
@@ -430,7 +430,8 @@ bool SubPhraseIndex::diff(SubPhraseIndex * oldone, PhraseIndexLogger * logger){
 }
 
 bool SubPhraseIndex::merge(PhraseIndexLogger * logger){
-    LOG_TYPE log_type; phrase_token_t token;
+    LOG_TYPE log_type = LOG_INVALID_RECORD;
+    phrase_token_t token = null_token;
     MemoryChunk oldchunk, newchunk;
     PhraseItem olditem, newitem, item, * tmpitem;
 
@@ -739,7 +740,8 @@ bool _compute_new_header(PhraseIndexLogger * logger,
                          phrase_token_t value,
                          guint32 & new_total_freq) {
 
-    LOG_TYPE log_type; phrase_token_t token;
+    LOG_TYPE log_type = LOG_INVALID_RECORD;
+    phrase_token_t token = null_token;
     MemoryChunk oldchunk, newchunk;
     PhraseItem olditem, newitem;
 
@@ -804,7 +806,8 @@ static bool _mask_out_records(PhraseIndexLogger * oldlogger,
                               phrase_token_t mask,
                               phrase_token_t value,
                               PhraseIndexLogger * newlogger) {
-    LOG_TYPE log_type; phrase_token_t token;
+    LOG_TYPE log_type = LOG_INVALID_RECORD;
+    phrase_token_t token = null_token;
     MemoryChunk oldchunk, newchunk;
 
     while(oldlogger->has_next_record()) {
