@@ -292,6 +292,7 @@ bool PhraseLargeTable3::mask_out(phrase_token_t mask,
     memset(&db_data, 0, sizeof(DBT));
 
     /* Iterate over the database, retrieving each record in turn. */
+    int ret = 0;
     while((ret = cursorp->c_get(cursorp, &db_key, &db_data, DB_NEXT)) == 0) {
         entry.m_chunk.set_chunk(db_data.data, db_data.size, NULL);
 
