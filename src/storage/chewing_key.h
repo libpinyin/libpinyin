@@ -45,12 +45,14 @@ struct _ChewingKey
     guint16 m_middle  : 2;
     guint16 m_final   : 5;
     guint16 m_tone    : 3;
+    guint16 m_zero_padding : 1;
 
     _ChewingKey() {
         m_initial = CHEWING_ZERO_INITIAL;
         m_middle  = CHEWING_ZERO_MIDDLE;
         m_final   = CHEWING_ZERO_FINAL;
         m_tone    = CHEWING_ZERO_TONE;
+        m_zero_padding = 0;
     }
 
     _ChewingKey(ChewingInitial initial, ChewingMiddle middle,
@@ -59,6 +61,7 @@ struct _ChewingKey
         m_middle = middle;
         m_final = final;
         m_tone = CHEWING_ZERO_TONE;
+        m_zero_padding = 0;
     }
 
 public:
