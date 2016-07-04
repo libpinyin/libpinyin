@@ -788,18 +788,6 @@ bool pinyin_get_candidate_string(pinyin_instance_t * instance,
                                  const gchar ** utf8_str);
 
 /**
- * pinyin_get_n_pinyin:
- * @instance: the pinyin instance.
- * @num: the number of the pinyins.
- * @returns: whether the get operation is successful.
- *
- * Get the number of the pinyins.
- *
- */
-bool pinyin_get_n_pinyin(pinyin_instance_t * instance,
-                         guint * num);
-
-/**
  * pinyin_get_pinyin_key:
  * @instance: the pinyin instance.
  * @offset: the offset of the pinyin key.
