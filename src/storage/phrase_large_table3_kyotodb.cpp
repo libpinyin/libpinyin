@@ -243,14 +243,12 @@ int PhraseLargeTable3::remove_index(int phrase_length,
 
 class MaskOutVisitor : public DB::Visitor {
 private:
-    BasicDB * m_db;
     phrase_token_t m_mask;
     phrase_token_t m_value;
 
     PhraseTableEntry m_entry;
 public:
-    MaskOutVisitor(BasicDB * db, phrase_token_t mask, phrase_token_t value) {
-        m_db = db;
+    MaskOutVisitor(phrase_token_t mask, phrase_token_t value) {
         m_mask = mask;
         m_value = value;
     }
@@ -274,9 +272,10 @@ public:
 /* mask out method */
 bool PhraseLargeTable3::mask_out(phrase_token_t mask,
                                  phrase_token_t value) {
-    MaskOutVisitor visitor(m_db, mask, value);
+    MaskOutVisitor visitor(mask, value);
     m_db->iterate(&visitor, true);
 
+    m_db->synchronize();
     return true;
 }
 

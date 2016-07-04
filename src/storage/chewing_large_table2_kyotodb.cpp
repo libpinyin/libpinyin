@@ -349,15 +349,14 @@ int ChewingLargeTable2::remove_index_internal(int phrase_length,
 
 /* use MaskOutVisitor2 to avoid linking problem. */
 class MaskOutVisitor2 : public DB::Visitor {
-    BasicDB * m_db;
     GPtrArray * m_entries;
 
     phrase_token_t m_mask;
     phrase_token_t m_value;
 public:
-    MaskOutVisitor2(BasicDB * db, GPtrArray * entries,
+    MaskOutVisitor2(GPtrArray * entries,
                     phrase_token_t mask, phrase_token_t value) {
-        m_db = db; m_entries = entries;
+        m_entries = entries;
         m_mask = mask; m_value = value;
     }
 
@@ -418,9 +417,10 @@ public:
 /* mask out method */
 bool ChewingLargeTable2::mask_out(phrase_token_t mask,
                                   phrase_token_t value) {
-    MaskOutVisitor2 visitor(m_db, m_entries, mask, value);
+    MaskOutVisitor2 visitor(m_entries, mask, value);
     m_db->iterate(&visitor, true);
 
+    m_db->synchronize();
     return true;
 }
 
