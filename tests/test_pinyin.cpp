@@ -64,13 +64,18 @@ int main(int argc, char * argv[]){
         if ( strcmp ( linebuf, "quit" ) == 0)
             break;
 
-        pinyin_parse_more_full_pinyins(instance, linebuf);
+        size_t len = pinyin_parse_more_full_pinyins(instance, linebuf);
         pinyin_guess_sentence_with_prefix(instance, prefixbuf);
         pinyin_guess_candidates(instance, 0);
 
-        guint len = 0;
-        pinyin_get_n_candidate(instance, &len);
-        for (size_t i = 0; i < len; ++i) {
+        gchar * aux_text = NULL;
+        pinyin_get_full_pinyin_auxiliary_text(instance, len, &aux_text);
+        printf("auxiliary text:%s\n", aux_text);
+        g_free(aux_text);
+
+        guint num = 0;
+        pinyin_get_n_candidate(instance, &num);
+        for (size_t i = 0; i < num; ++i) {
             lookup_candidate_t * candidate = NULL;
             pinyin_get_candidate(instance, i, &candidate);
 

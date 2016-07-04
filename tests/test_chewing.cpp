@@ -39,11 +39,10 @@ int main(int argc, char * argv[]){
             linebuf[strlen(linebuf) - 1] = '\0';
         }
 
-	if ( strcmp ( linebuf, "quit" ) == 0)
+        if ( strcmp ( linebuf, "quit" ) == 0)
             break;
 
-        pinyin_parse_more_chewings
-            (instance, linebuf);
+        size_t len = pinyin_parse_more_chewings(instance, linebuf);
         pinyin_guess_sentence(instance);
 
         char * sentence = NULL;
@@ -51,6 +50,11 @@ int main(int argc, char * argv[]){
         if (sentence)
             printf("%s\n", sentence);
         g_free(sentence);
+
+        gchar * aux_text = NULL;
+        pinyin_get_chewing_auxiliary_text(instance, len, &aux_text);
+        printf("auxiliary text:%s\n", aux_text);
+        g_free(aux_text);
 
         pinyin_train(instance);
         pinyin_reset(instance);
