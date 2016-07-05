@@ -2315,7 +2315,7 @@ static size_t _compute_zero_start(PhoneticKeyMatrix & matrix, size_t offset) {
     ChewingKey key; ChewingKeyRest key_rest;
     const ChewingKey zero_key;
 
-    size_t index = offset - 1;
+    ssize_t index = offset - 1;
     for (; index > 0; --index) {
         const size_t size = matrix.get_column_size(index);
 
@@ -2638,9 +2638,6 @@ bool pinyin_get_double_pinyin_auxiliary_text(pinyin_instance_t * instance,
         gchar * yunmu = key.get_yunmu_string();
         const size_t len = cursor - begin;
         switch(len) {
-        case 0:
-            middle = g_strconcat("|", shengmu, yunmu, NULL);
-            break;
         case 1:
             middle = g_strconcat(shengmu, "|", yunmu, NULL);
             break;
