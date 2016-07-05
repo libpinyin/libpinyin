@@ -2494,7 +2494,7 @@ static gchar * _get_aux_text_prefix(pinyin_instance_t * instance,
         else
             assert(FALSE);
 
-        gchar * newprefix = g_strconcat(prefix, str, NULL);
+        gchar * newprefix = g_strconcat(prefix, str, " ", NULL);
 
         g_free(str);
         g_free(prefix);
@@ -2538,7 +2538,7 @@ static gchar * _get_aux_text_postfix(pinyin_instance_t * instance,
         else
             assert(FALSE);
 
-        gchar * newpostfix = g_strconcat(postfix, str, NULL);
+        gchar * newpostfix = g_strconcat(postfix, str, " ", NULL);
 
         g_free(str);
         g_free(postfix);
@@ -2584,7 +2584,7 @@ bool pinyin_get_full_pinyin_auxiliary_text(pinyin_instance_t * instance,
             gchar * pinyin = key.get_pinyin_string();
             gchar * left = g_strndup(pinyin, len);
             gchar * right = g_strdup(pinyin + len);
-            middle = g_strconcat(left, "|", right, NULL);
+            middle = g_strconcat(left, "|", right, " ", NULL);
             g_free(left);
             g_free(right);
             g_free(pinyin);
@@ -2651,14 +2651,20 @@ bool pinyin_get_double_pinyin_auxiliary_text(pinyin_instance_t * instance,
             assert(FALSE);
         }
 
+        g_free(shengmu);
+        g_free(yunmu);
+
+        gchar * newmiddle = NULL;
+
         if (CHEWING_ZERO_TONE != key.m_tone) {
-            gchar * newmiddle = g_strdup_printf("%s%d", middle, key.m_tone);
+            newmiddle = g_strdup_printf("%s%d", middle, key.m_tone);
             g_free(middle);
             middle = newmiddle;
         }
 
-        g_free(shengmu);
-        g_free(yunmu);
+        newmiddle = g_strconcat(middle, " ", NULL);
+        g_free(middle);
+        middle = newmiddle;
 
         offset = key_rest.m_raw_end;
     }
@@ -2708,7 +2714,7 @@ bool pinyin_get_chewing_auxiliary_text(pinyin_instance_t * instance,
         gchar * left = g_utf8_substring(zhuyin, 0, len);
         gchar * right = g_utf8_substring(zhuyin, len, end);
 
-        middle = g_strconcat(left, "|", right, NULL);
+        middle = g_strconcat(left, "|", right, " ", NULL);
 
         g_free(left);
         g_free(right);
