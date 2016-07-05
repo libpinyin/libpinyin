@@ -2483,7 +2483,7 @@ static gchar * _get_aux_text_prefix(pinyin_instance_t * instance,
         assert(matrix.get_column_size(offset) >= 1);
         matrix.get_item(offset, 0, key, key_rest);
 
-        if (cursor > key_rest.m_raw_end)
+        if (cursor < key_rest.m_raw_end)
             break;
 
         gchar * str = NULL;
@@ -2525,8 +2525,10 @@ static gchar * _get_aux_text_postfix(pinyin_instance_t * instance,
         assert(matrix.get_column_size(offset) >= 1);
         matrix.get_item(offset, 0, key, key_rest);
 
-        if (cursor <= key_rest.m_raw_end)
+        if (cursor > key_rest.m_raw_begin) {
+            offset = key_rest.m_raw_end;
             continue;
+        }
 
         gchar * str = NULL;
         if (IS_PINYIN == options)
@@ -2564,27 +2566,21 @@ bool pinyin_get_full_pinyin_auxiliary_text(pinyin_instance_t * instance,
     while(offset < matrix.size()) {
         size_t newoffset = _compute_pinyin_start(matrix, offset);
 
-        /* at the end of user input */
-        if (matrix.size() - 1 == newoffset) {
+        /* at the pinyin boundary of user input */
+        if (offset <= cursor && cursor <= newoffset){
             middle = g_strdup("|");
             break;
         }
 
+        offset = newoffset;
         assert(matrix.get_column_size(offset) >= 1);
         matrix.get_item(offset, 0, key, key_rest);
-
-        gchar * str = key.get_pinyin_string();
-        /* at the start of pinyin key */
-        if (offset <= cursor && cursor < newoffset) {
-            middle = g_strconcat("|", str, NULL);
-            break;
-        }
 
         /* at the middle of pinyin key */
         const size_t begin = key_rest.m_raw_begin;
         const size_t end = key_rest.m_raw_end;
         const size_t len = cursor - begin;
-        if (begin <= cursor && cursor < end) {
+        if (begin < cursor && cursor < end) {
             gchar * pinyin = key.get_pinyin_string();
             gchar * left = g_strndup(pinyin, len);
             gchar * right = g_strdup(pinyin + len);
@@ -2594,8 +2590,6 @@ bool pinyin_get_full_pinyin_auxiliary_text(pinyin_instance_t * instance,
             g_free(pinyin);
             break;
         }
-
-        g_free(str);
 
         offset = key_rest.m_raw_end;
     }
@@ -2624,8 +2618,8 @@ bool pinyin_get_double_pinyin_auxiliary_text(pinyin_instance_t * instance,
     size_t offset = 0;
     ChewingKey key; ChewingKeyRest key_rest;
     while(offset < matrix.size()) {
-        /* at the end of user input */
-        if (matrix.size() - 1 == offset) {
+        /* at the pinyin boundary of user input */
+        if (cursor == offset) {
             middle = g_strdup("|");
             break;
         }
@@ -2635,7 +2629,7 @@ bool pinyin_get_double_pinyin_auxiliary_text(pinyin_instance_t * instance,
 
         const size_t begin = key_rest.m_raw_begin;
         const size_t end = key_rest.m_raw_end;
-        if (!(begin <= cursor && cursor < end)) {
+        if (!(begin < cursor && cursor < end)) {
             offset = key_rest.m_raw_end;
             continue;
         }
@@ -2693,8 +2687,8 @@ bool pinyin_get_chewing_auxiliary_text(pinyin_instance_t * instance,
     size_t offset = 0;
     ChewingKey key; ChewingKeyRest key_rest;
     while(offset < matrix.size()) {
-        /* at the end of user input */
-        if (matrix.size() - 1 == offset) {
+        /* at the pinyin boundary of user input */
+        if (cursor == offset) {
             middle = g_strdup("|");
             break;
         }
@@ -2704,7 +2698,7 @@ bool pinyin_get_chewing_auxiliary_text(pinyin_instance_t * instance,
 
         const size_t begin = key_rest.m_raw_begin;
         const size_t end = key_rest.m_raw_end;
-        if (!(begin <= cursor && cursor < end)) {
+        if (!(begin < cursor && cursor < end)) {
             offset = key_rest.m_raw_end;
             continue;
         }
