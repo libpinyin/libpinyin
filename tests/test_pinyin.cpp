@@ -29,7 +29,7 @@ int main(int argc, char * argv[]){
     pinyin_context_t * context =
         pinyin_init("../data", "../data");
 
-    pinyin_option_t options =
+    pinyin_option_t options = PINYIN_INCOMPLETE |
         PINYIN_CORRECT_ALL | USE_DIVIDED_TABLE | USE_RESPLIT_TABLE |
         DYNAMIC_ADJUST;
     pinyin_set_options(context, options);
@@ -68,14 +68,17 @@ int main(int argc, char * argv[]){
         pinyin_guess_sentence_with_prefix(instance, prefixbuf);
         pinyin_guess_candidates(instance, 0);
 
-        gchar * aux_text = NULL;
-        pinyin_get_full_pinyin_auxiliary_text(instance, len, &aux_text);
-        printf("auxiliary text:%s\n", aux_text);
-        g_free(aux_text);
+        size_t i = 0;
+        for (i = 0; i <= len; ++i) {
+            gchar * aux_text = NULL;
+            pinyin_get_full_pinyin_auxiliary_text(instance, i, &aux_text);
+            printf("auxiliary text:%s\n", aux_text);
+            g_free(aux_text);
+        }
 
         guint num = 0;
         pinyin_get_n_candidate(instance, &num);
-        for (size_t i = 0; i < num; ++i) {
+        for (i = 0; i < num; ++i) {
             lookup_candidate_t * candidate = NULL;
             pinyin_get_candidate(instance, i, &candidate);
 

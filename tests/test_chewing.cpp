@@ -51,10 +51,12 @@ int main(int argc, char * argv[]){
             printf("%s\n", sentence);
         g_free(sentence);
 
-        gchar * aux_text = NULL;
-        pinyin_get_chewing_auxiliary_text(instance, len, &aux_text);
-        printf("auxiliary text:%s\n", aux_text);
-        g_free(aux_text);
+        for (size_t i = 0; i <= len; ++i) {
+            gchar * aux_text = NULL;
+            pinyin_get_chewing_auxiliary_text(instance, i, &aux_text);
+            printf("auxiliary text:%s\n", aux_text);
+            g_free(aux_text);
+        }
 
         pinyin_train(instance);
         pinyin_reset(instance);
