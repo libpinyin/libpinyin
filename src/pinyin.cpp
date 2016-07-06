@@ -2032,6 +2032,7 @@ bool pinyin_train(pinyin_instance_t * instance){
 
 bool pinyin_reset(pinyin_instance_t * instance){
     instance->m_parsed_len = 0;
+    instance->m_matrix.clear_all();
 
     g_array_set_size(instance->m_prefixes, 0);
     g_array_set_size(instance->m_constraints, 0);
