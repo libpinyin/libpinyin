@@ -222,7 +222,10 @@ bool PinyinLookup2::get_best_match(TokenVector prefixes,
                                    MatchResults & results){
     m_constraints = constraints;
     m_matrix = matrix;
+
     int nstep = m_matrix->size();
+    if (0 == nstep)
+        return false;
 
     clear_steps(m_steps_index, m_steps_content);
 

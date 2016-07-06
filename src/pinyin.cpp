@@ -2555,6 +2555,11 @@ bool pinyin_get_full_pinyin_auxiliary_text(pinyin_instance_t * instance,
                                            size_t cursor,
                                            gchar ** aux_text) {
     PhoneticKeyMatrix & matrix = instance->m_matrix;
+    if (0 == matrix.size()) {
+        *aux_text = g_strdup("");
+        return false;
+    }
+
     gchar * prefix = _get_aux_text_prefix
         (instance, cursor, IS_PINYIN);
     gchar * postfix = _get_aux_text_postfix
@@ -2608,6 +2613,11 @@ bool pinyin_get_double_pinyin_auxiliary_text(pinyin_instance_t * instance,
                                              size_t cursor,
                                              gchar ** aux_text) {
     PhoneticKeyMatrix & matrix = instance->m_matrix;
+    if (0 == matrix.size()) {
+        *aux_text = g_strdup("");
+        return false;
+    }
+
     gchar * prefix = _get_aux_text_prefix
         (instance, cursor, IS_PINYIN);
     gchar * postfix = _get_aux_text_postfix
@@ -2680,6 +2690,11 @@ bool pinyin_get_chewing_auxiliary_text(pinyin_instance_t * instance,
                                        size_t cursor,
                                        gchar ** aux_text) {
     PhoneticKeyMatrix & matrix = instance->m_matrix;
+    if (0 == matrix.size()) {
+        *aux_text = g_strdup("");
+        return false;
+    }
+
     gchar * prefix = _get_aux_text_prefix
         (instance, cursor, IS_ZHUYIN);
     gchar * postfix = _get_aux_text_postfix
