@@ -2335,7 +2335,7 @@ bool pinyin_get_pinyin_offset(pinyin_instance_t * instance,
                               size_t cursor,
                               size_t * poffset) {
     PhoneticKeyMatrix & matrix = instance->m_matrix;
-    size_t offset = cursor;
+    size_t offset = std_lite::min(cursor, instance->m_parsed_len);
 
     /* find the first ChewingKey. */
     for (; offset > 0; --offset) {
@@ -2560,6 +2560,7 @@ bool pinyin_get_full_pinyin_auxiliary_text(pinyin_instance_t * instance,
         return false;
     }
 
+    cursor = std_lite::min(cursor, instance->m_parsed_len);
     gchar * prefix = _get_aux_text_prefix
         (instance, cursor, IS_PINYIN);
     gchar * postfix = _get_aux_text_postfix
@@ -2618,6 +2619,7 @@ bool pinyin_get_double_pinyin_auxiliary_text(pinyin_instance_t * instance,
         return false;
     }
 
+    cursor = std_lite::min(cursor, instance->m_parsed_len);
     gchar * prefix = _get_aux_text_prefix
         (instance, cursor, IS_PINYIN);
     gchar * postfix = _get_aux_text_postfix
@@ -2695,6 +2697,7 @@ bool pinyin_get_chewing_auxiliary_text(pinyin_instance_t * instance,
         return false;
     }
 
+    cursor = std_lite::min(cursor, instance->m_parsed_len);
     gchar * prefix = _get_aux_text_prefix
         (instance, cursor, IS_ZHUYIN);
     gchar * postfix = _get_aux_text_postfix
