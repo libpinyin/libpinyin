@@ -262,7 +262,7 @@ bool PinyinLookup2::get_best_match(TokenVector prefixes,
                 (m_constraints, lookup_constraint_t, m);
 
             if (CONSTRAINT_NOSEARCH == next_constraint->m_type)
-                break;
+                continue;
 
             m_phrase_index->clear_ranges(ranges);
 
