@@ -1705,6 +1705,9 @@ bool pinyin_guess_candidates(pinyin_instance_t * instance,
 
     _free_candidates(candidates);
 
+    if (0 == matrix.size())
+        return false;
+
     /* lookup the previous token here. */
     phrase_token_t prev_token = null_token;
 
