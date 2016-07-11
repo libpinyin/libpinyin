@@ -2868,7 +2868,7 @@ bool pinyin_remember_user_input(pinyin_instance_t * instance,
     phrase_index->prepare_tokens(tokens);
     for (glong i = 0; i < phrase_length; ++i) {
         phrase_token_t token = null_token;
-        ucs4_t character = phrase[i];
+        ucs4_t character = ucs4_phrase[i];
 
         phrase_index->clear_tokens(tokens);
         int retval = phrase_table->search(1, &character, tokens);
