@@ -301,7 +301,7 @@ bool PhraseLargeTable3::mask_out(phrase_token_t mask,
         memset(&db_data, 0, sizeof(DBT));
         db_data.data = entry.m_chunk.begin();
         db_data.size = entry.m_chunk.size();
-        int ret = cursorp->put(cursorp, &db_key, &db_data, 0);
+        int ret = cursorp->put(cursorp, &db_key, &db_data,  DB_CURRENT);
         assert(ret == 0);
     }
     assert(ret == DB_NOTFOUND);
