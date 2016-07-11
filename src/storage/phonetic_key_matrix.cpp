@@ -27,6 +27,7 @@
 
 namespace pinyin{
 
+/* zero ChewingKey for "'" symbol and last key in fill_matrix function. */
 bool fill_matrix(PhoneticKeyMatrix * matrix,
                  ChewingKeyVector keys,
                  ChewingKeyRestVector key_rests) {

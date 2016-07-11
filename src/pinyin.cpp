@@ -2334,6 +2334,8 @@ static size_t _compute_zero_start(PhoneticKeyMatrix & matrix, size_t offset) {
     return offset;
 }
 
+/* when lookup offset:
+   get the previous non-zero ChewingKey, then the first zero ChewingKey. */
 bool pinyin_get_pinyin_offset(pinyin_instance_t * instance,
                               size_t cursor,
                               size_t * poffset) {
@@ -2468,6 +2470,9 @@ bool pinyin_get_phrase_token(pinyin_instance_t * instance,
     return true;
 }
 
+/* for auxiliary text:
+   use slow string concatenation,
+   and show the first ChewingKey and ChewingKeyRest together. */
 static gchar * _get_aux_text_prefix(pinyin_instance_t * instance,
                                     size_t cursor,
                                     pinyin_option_t options) {
