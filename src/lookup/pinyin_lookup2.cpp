@@ -257,12 +257,30 @@ bool PinyinLookup2::get_best_match(TokenVector prefixes,
         if (0 == topresults->len)
             continue;
 
+        if (CONSTRAINT_ONESTEP == cur_constraint->m_type) {
+            int m = cur_constraint->m_end;
+
+            m_phrase_index->clear_ranges(ranges);
+
+            /* do one pinyin table search. */
+            int retval = search_matrix(m_pinyin_table, m_matrix,
+                                       i, m, ranges);
+
+            if (retval & SEARCH_OK) {
+                /* assume topresults always contains items. */
+                search_bigram2(topresults, i, m, ranges),
+                    search_unigram2(topresults, i, m, ranges);
+            }
+
+            continue;
+        }
+
         for ( int m = i + 1; m < nstep; ++m ){
             lookup_constraint_t * next_constraint = &g_array_index
                 (m_constraints, lookup_constraint_t, m);
 
             if (CONSTRAINT_NOSEARCH == next_constraint->m_type)
-                continue;
+                break;
 
             m_phrase_index->clear_ranges(ranges);
 
