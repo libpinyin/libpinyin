@@ -2106,8 +2106,10 @@ bool pinyin_get_pinyin_strings(pinyin_instance_t * instance,
 bool pinyin_get_pinyin_is_incomplete(pinyin_instance_t * instance,
                                      ChewingKey * key) {
     if (CHEWING_ZERO_MIDDLE == key->m_middle &&
-        CHEWING_ZERO_FINAL == key->m_final)
+        CHEWING_ZERO_FINAL == key->m_final) {
+        assert(CHEWING_ZERO_TONE == key->m_tone);
         return true;
+    }
 
     return false;
 }
