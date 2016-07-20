@@ -889,6 +889,7 @@ bool pinyin_get_right_pinyin_offset(pinyin_instance_t * instance,
 /**
  * pinyin_get_character_offset:
  * @instance: the pinyin instance.
+ * @phrase: the utf8 phrase.
  * @offset: the lookup offset.
  * @length: the character offset.
  * @returns: whether the get operation is successful.
@@ -897,6 +898,7 @@ bool pinyin_get_right_pinyin_offset(pinyin_instance_t * instance,
  *
  */
 bool pinyin_get_character_offset(pinyin_instance_t * instance,
+                                 const char * phrase,
                                  size_t offset,
                                  size_t * length);
 

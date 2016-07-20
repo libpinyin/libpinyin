@@ -2424,6 +2424,136 @@ bool pinyin_get_right_pinyin_offset(pinyin_instance_t * instance,
     return true;
 }
 
+static bool _pre_compute_tokens(pinyin_context_t * context,
+                                TokenVector cached_tokens,
+                                ucs4_t * phrase,
+                                size_t phrase_length) {
+    FacadePhraseIndex * phrase_index = context->m_phrase_index;
+    FacadePhraseTable3 * phrase_table = context->m_phrase_table;
+
+    /* do phrase table search. */
+    PhraseTokens tokens;
+    memset(tokens, 0, sizeof(PhraseTokens));
+    phrase_index->prepare_tokens(tokens);
+
+    for (size_t i = 0; i < phrase_length; ++i) {
+        phrase_token_t token = null_token;
+        ucs4_t character = phrase[i];
+
+        phrase_index->clear_tokens(tokens);
+        int retval = phrase_table->search(1, &character, tokens);
+
+        int num = get_first_token(tokens, token);
+        /* assume always know the character. */
+        assert(num >= 1);
+
+        g_array_append_val(cached_tokens, token);
+    }
+
+    phrase_index->destroy_tokens(tokens);
+
+    return true;
+}
+
+static bool _get_char_offset_recur(TokenVector cached_tokens,
+                                   pinyin_instance_t * instance,
+                                   size_t start,
+                                   size_t offset,
+                                   size_t * plength) {
+    pinyin_context_t * context = instance->m_context;
+    PhoneticKeyMatrix & matrix = instance->m_matrix;
+    FacadePhraseIndex * phrase_index = context->m_phrase_index;
+    const glong phrase_length = cached_tokens->len;
+    size_t length = *plength;
+
+    if (start > offset)
+        return true;
+
+    const size_t size = matrix.get_column_size(start);
+    /* assume pinyin parsers will filter invalid keys. */
+    assert(size > 0);
+
+    bool result = false;
+
+    PhraseItem item;
+    for (size_t i = 0; i < size; ++i) {
+        ChewingKey key; ChewingKeyRest key_rest;
+        matrix.get_item(start, i, key, key_rest);
+
+        const size_t newstart = key_rest.m_raw_end;
+
+        const ChewingKey zero_key;
+        if (zero_key == key) {
+            /* assume only one key here for "'" or the last key. */
+            assert(1 == size);
+            return _get_char_offset_recur
+                (cached_tokens, instance, newstart, offset, plength);
+        }
+
+        /* check pronunciation */
+        phrase_token_t token = g_array_index
+            (cached_tokens, phrase_token_t, length);
+        phrase_index->get_phrase_item(token, item);
+
+        gfloat pinyin_poss = item.get_pronunciation_possibility(&key);
+        if (pinyin_poss < FLT_EPSILON)
+            return false;
+
+        ++length;
+
+        result = _get_char_offset_recur
+            (cached_tokens, instance, newstart, offset, &length);
+        if (result) {
+            *plength = length;
+            return result;
+        }
+
+        --length;
+    }
+
+    return result;
+}
+
+bool pinyin_get_character_offset(pinyin_instance_t * instance,
+                                 const char * phrase,
+                                 size_t offset,
+                                 size_t * plength) {
+    pinyin_context_t * context = instance->m_context;
+    PhoneticKeyMatrix & matrix = instance->m_matrix;
+    FacadePhraseIndex * phrase_index = context->m_phrase_index;
+    FacadePhraseTable3 * phrase_table = context->m_phrase_table;
+
+    assert(offset < matrix.size());
+    _check_offset(matrix, offset);
+
+    if (NULL == phrase)
+        return false;
+
+    glong phrase_length = 0;
+    ucs4_t * ucs4_phrase = g_utf8_to_ucs4(phrase, -1, NULL, &phrase_length, NULL);
+
+    if (0 == phrase_length)
+        return false;
+
+    size_t length = 0;
+    const size_t start = 0;
+
+    /* pre-compute the tokens vector from phrase. */
+    TokenVector cached_tokens = g_array_new(TRUE, TRUE, sizeof(phrase_token_t));
+    _pre_compute_tokens(context, cached_tokens, ucs4_phrase, phrase_length);
+    assert(cached_tokens->len == phrase_length);
+
+    bool result = _get_char_offset_recur
+        (cached_tokens, instance, start, offset, &length);
+
+    g_array_free(cached_tokens, TRUE);
+    g_free(ucs4_phrase);
+
+    *plength = length;
+    return result;
+}
+
+#if 0
 bool pinyin_get_character_offset(pinyin_instance_t * instance,
                                  size_t offset,
                                  size_t * plength) {
@@ -2450,6 +2580,7 @@ bool pinyin_get_character_offset(pinyin_instance_t * instance,
     *plength = length;
     return true;
 }
+#endif
 
 bool pinyin_get_n_phrase(pinyin_instance_t * instance,
                          guint * num) {
@@ -2863,23 +2994,7 @@ bool pinyin_remember_user_input(pinyin_instance_t * instance,
 
     /* pre-compute the tokens vector from phrase. */
     TokenVector cached_tokens = g_array_new(TRUE, TRUE, sizeof(phrase_token_t));
-
-    /* do phrase table search. */
-    PhraseTokens tokens;
-    memset(tokens, 0, sizeof(PhraseTokens));
-    phrase_index->prepare_tokens(tokens);
-    for (glong i = 0; i < phrase_length; ++i) {
-        phrase_token_t token = null_token;
-        ucs4_t character = ucs4_phrase[i];
-
-        phrase_index->clear_tokens(tokens);
-        int retval = phrase_table->search(1, &character, tokens);
-        int num = get_first_token(tokens, token);
-        /* assume always know the character. */
-        assert(num >= 1);
-        g_array_append_val(cached_tokens, token);
-    }
-    phrase_index->destroy_tokens(tokens);
+    _pre_compute_tokens(context, cached_tokens, ucs4_phrase, phrase_length);
     assert(cached_tokens->len == phrase_length);
 
     bool result = _remember_phrase_recur
