@@ -2455,8 +2455,8 @@ static bool _pre_compute_tokens(pinyin_context_t * context,
     return true;
 }
 
-static bool _get_char_offset_recur(TokenVector cached_tokens,
-                                   pinyin_instance_t * instance,
+static bool _get_char_offset_recur(pinyin_instance_t * instance,
+                                   TokenVector cached_tokens,
                                    size_t start,
                                    size_t offset,
                                    size_t * plength) {
@@ -2487,7 +2487,7 @@ static bool _get_char_offset_recur(TokenVector cached_tokens,
             /* assume only one key here for "'" or the last key. */
             assert(1 == size);
             return _get_char_offset_recur
-                (cached_tokens, instance, newstart, offset, plength);
+                (instance, cached_tokens, newstart, offset, plength);
         }
 
         /* check pronunciation */
@@ -2502,7 +2502,7 @@ static bool _get_char_offset_recur(TokenVector cached_tokens,
         ++length;
 
         result = _get_char_offset_recur
-            (cached_tokens, instance, newstart, offset, &length);
+            (instance, cached_tokens, newstart, offset, &length);
         if (result) {
             *plength = length;
             return result;
@@ -2544,7 +2544,7 @@ bool pinyin_get_character_offset(pinyin_instance_t * instance,
     assert(cached_tokens->len == phrase_length);
 
     bool result = _get_char_offset_recur
-        (cached_tokens, instance, start, offset, &length);
+        (instance, cached_tokens, start, offset, &length);
 
     g_array_free(cached_tokens, TRUE);
     g_free(ucs4_phrase);
@@ -2889,9 +2889,9 @@ bool pinyin_get_chewing_auxiliary_text(pinyin_instance_t * instance,
     return true;
 }
 
-static bool _remember_phrase_recur(ChewingKeyVector cached_keys,
+static bool _remember_phrase_recur(pinyin_instance_t * instance,
+                                   ChewingKeyVector cached_keys,
                                    TokenVector cached_tokens,
-                                   pinyin_instance_t * instance,
                                    size_t start,
                                    ucs4_t * phrase,
                                    gint count) {
@@ -2936,7 +2936,7 @@ static bool _remember_phrase_recur(ChewingKeyVector cached_keys,
             /* assume only one key here for "'" or the last key. */
             assert(1 == size);
             return _remember_phrase_recur
-                (cached_keys, cached_tokens, instance,
+                (instance, cached_keys, cached_tokens,
                  newstart, phrase, count);
         }
 
@@ -2963,7 +2963,7 @@ static bool _remember_phrase_recur(ChewingKeyVector cached_keys,
         g_array_append_val(cached_keys, key);
 
         result = _remember_phrase_recur
-            (cached_keys, cached_tokens, instance,
+            (instance, cached_keys, cached_tokens,
              newstart, phrase, count) || result;
 
         /* pop value */
@@ -2998,7 +2998,7 @@ bool pinyin_remember_user_input(pinyin_instance_t * instance,
     assert(cached_tokens->len == phrase_length);
 
     bool result = _remember_phrase_recur
-        (cached_keys, cached_tokens, instance,
+        (instance, cached_keys, cached_tokens,
          start, ucs4_phrase, count);
 
     g_array_free(cached_tokens, TRUE);
