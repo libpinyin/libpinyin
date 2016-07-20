@@ -2463,7 +2463,6 @@ static bool _get_char_offset_recur(pinyin_instance_t * instance,
     pinyin_context_t * context = instance->m_context;
     PhoneticKeyMatrix & matrix = instance->m_matrix;
     FacadePhraseIndex * phrase_index = context->m_phrase_index;
-    const glong phrase_length = cached_tokens->len;
     size_t length = *plength;
 
     if (start > offset)
@@ -2520,8 +2519,6 @@ bool pinyin_get_character_offset(pinyin_instance_t * instance,
                                  size_t * plength) {
     pinyin_context_t * context = instance->m_context;
     PhoneticKeyMatrix & matrix = instance->m_matrix;
-    FacadePhraseIndex * phrase_index = context->m_phrase_index;
-    FacadePhraseTable3 * phrase_table = context->m_phrase_table;
 
     assert(offset < matrix.size());
     _check_offset(matrix, offset);
@@ -2977,8 +2974,6 @@ bool pinyin_remember_user_input(pinyin_instance_t * instance,
                                 const char * phrase,
                                 gint count) {
     pinyin_context_t * context = instance->m_context;
-    FacadePhraseIndex * phrase_index = context->m_phrase_index;
-    FacadePhraseTable3 * phrase_table = context->m_phrase_table;
 
     if (NULL == phrase)
         return false;

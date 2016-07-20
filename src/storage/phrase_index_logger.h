@@ -158,6 +158,9 @@ public:
      */
     bool next_record(LOG_TYPE & log_type, phrase_token_t & token,
                      MemoryChunk * oldone, MemoryChunk * newone){
+        log_type = LOG_INVALID_RECORD;
+        token = null_token;
+
         size_t offset = m_offset;
         m_chunk->get_content(offset, &log_type, sizeof(LOG_TYPE));
         offset += sizeof(LOG_TYPE);
