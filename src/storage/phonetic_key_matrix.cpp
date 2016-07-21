@@ -56,10 +56,18 @@ bool fill_matrix(PhoneticKeyMatrix * matrix,
         matrix->append(key_rest->m_raw_begin, *key, *key_rest);
     }
 
-    /* fill zero keys for "'". */
-    ChewingKeyRest * next_key_rest = NULL;
     const ChewingKey zero_key;
     ChewingKeyRest zero_key_rest;
+    /* fill zero keys for the last key. */
+    zero_key_rest.m_raw_begin = length - 1;
+    zero_key_rest.m_raw_end = length;
+    matrix->append(length - 1, zero_key, zero_key_rest);
+
+    /* append the last key to key_rests. */
+    g_array_append_val(key_rests, zero_key_rest);
+
+    /* fill zero keys for "'". */
+    ChewingKeyRest * next_key_rest = NULL;
     for (i = 0; i < key_rests->len - 1; ++i) {
         key_rest = &g_array_index(key_rests, ChewingKeyRest, i);
         next_key_rest = &g_array_index(key_rests, ChewingKeyRest, i + 1);
@@ -72,10 +80,8 @@ bool fill_matrix(PhoneticKeyMatrix * matrix,
         }
     }
 
-    /* fill zero keys for the last key. */
-    zero_key_rest.m_raw_begin = length - 1;
-    zero_key_rest.m_raw_end = length;
-    matrix->append(length - 1, zero_key, zero_key_rest);
+    /* remove the last key from key_rests. */
+    g_array_set_size(key_rests, key_rests->len - 1);
     return true;
 }
 
