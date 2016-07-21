@@ -30,7 +30,8 @@ namespace pinyin{
 /* zero ChewingKey for "'" symbol and last key in fill_matrix function. */
 bool fill_matrix(PhoneticKeyMatrix * matrix,
                  ChewingKeyVector keys,
-                 ChewingKeyRestVector key_rests) {
+                 ChewingKeyRestVector key_rests,
+                 size_t parsed_len) {
     matrix->clear_all();
 
     assert(keys->len == key_rests->len);
@@ -44,7 +45,7 @@ bool fill_matrix(PhoneticKeyMatrix * matrix,
     key_rest = &g_array_index(key_rests, ChewingKeyRest, key_rests->len - 1);
 
     /* one extra slot for the last key. */
-    size_t length = key_rest->m_raw_end + 1;
+    size_t length = parsed_len + 1;
     matrix->set_size(length);
 
     /* fill keys and key rests. */

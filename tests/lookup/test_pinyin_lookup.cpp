@@ -82,7 +82,8 @@ int main( int argc, char * argv[]){
         ChewingKeyVector keys = g_array_new(FALSE, FALSE, sizeof(ChewingKey));
         ChewingKeyRestVector key_rests =
             g_array_new(FALSE, FALSE, sizeof(ChewingKeyRest));
-        parser.parse(options, keys, key_rests, linebuf, strlen(linebuf));
+        int parsed_len = parser.parse(options, keys, key_rests,
+                                      linebuf, strlen(linebuf));
 
         PhoneticKeyMatrix matrix;
 
@@ -90,7 +91,7 @@ int main( int argc, char * argv[]){
             continue;
 
         /* fill the matrix. */
-        fill_matrix(&matrix, keys, key_rests);
+        fill_matrix(&matrix, keys, key_rests, parsed_len);
 
         resplit_step(options, &matrix);
 

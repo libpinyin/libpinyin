@@ -177,7 +177,8 @@ public:
  */
 bool fill_matrix(PhoneticKeyMatrix * matrix,
                  ChewingKeyVector keys,
-                 ChewingKeyRestVector key_rests);
+                 ChewingKeyRestVector key_rests,
+                 size_t parsed_len);
 
 /**
  * resplit_step:

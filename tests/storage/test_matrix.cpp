@@ -124,7 +124,7 @@ int main(int argc, char * argv[]) {
             len = parser->parse(options, keys, key_rests,
                                 linebuf, strlen(linebuf));
 
-            fill_matrix(&matrix, keys, key_rests);
+            fill_matrix(&matrix, keys, key_rests, len);
 
             resplit_step(options, &matrix);
 

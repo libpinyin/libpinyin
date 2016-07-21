@@ -1203,7 +1203,7 @@ size_t pinyin_parse_more_full_pinyins(pinyin_instance_t * instance,
 
     instance->m_parsed_len = parsed_len;
 
-    fill_matrix(&matrix, keys, key_rests);
+    fill_matrix(&matrix, keys, key_rests, parsed_len);
 
     resplit_step(options, &matrix);
 
@@ -1243,7 +1243,7 @@ size_t pinyin_parse_more_double_pinyins(pinyin_instance_t * instance,
 
     instance->m_parsed_len = parsed_len;
 
-    fill_matrix(&matrix, keys, key_rests);
+    fill_matrix(&matrix, keys, key_rests, parsed_len);
 
     fuzzy_syllable_step(options, &matrix);
 
@@ -1279,7 +1279,7 @@ size_t pinyin_parse_more_chewings(pinyin_instance_t * instance,
 
     instance->m_parsed_len = parsed_len;
 
-    fill_matrix(&matrix, keys, key_rests);
+    fill_matrix(&matrix, keys, key_rests, parsed_len);
 
     fuzzy_syllable_step(options, &matrix);
 
