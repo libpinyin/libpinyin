@@ -2444,8 +2444,11 @@ static bool _pre_compute_tokens(pinyin_context_t * context,
         int retval = phrase_table->search(1, &character, tokens);
 
         int num = get_first_token(tokens, token);
-        /* assume always know the character. */
-        assert(num >= 1);
+        /* en-counter un-known character, such as the emoji unicode. */
+        if (0 == num) {
+            phrase_index->destroy_tokens(tokens);
+            return false;
+        }
 
         g_array_append_val(cached_tokens, token);
     }
@@ -2540,7 +2543,16 @@ bool pinyin_get_character_offset(pinyin_instance_t * instance,
 
     /* pre-compute the tokens vector from phrase. */
     TokenVector cached_tokens = g_array_new(TRUE, TRUE, sizeof(phrase_token_t));
-    _pre_compute_tokens(context, cached_tokens, ucs4_phrase, phrase_length);
+
+    bool retval = _pre_compute_tokens
+        (context, cached_tokens, ucs4_phrase, phrase_length);
+
+    if (!retval) {
+        g_array_free(cached_tokens, TRUE);
+        g_free(ucs4_phrase);
+        return false;
+    }
+
     assert(cached_tokens->len == phrase_length);
 
     bool result = _get_char_offset_recur
@@ -2988,12 +3000,22 @@ bool pinyin_remember_user_input(pinyin_instance_t * instance,
         return false;
 
     const size_t start = 0;
-    ChewingKeyVector cached_keys = g_array_new(TRUE, TRUE, sizeof(ChewingKey));
 
     /* pre-compute the tokens vector from phrase. */
     TokenVector cached_tokens = g_array_new(TRUE, TRUE, sizeof(phrase_token_t));
-    _pre_compute_tokens(context, cached_tokens, ucs4_phrase, phrase_length);
+
+    bool retval = _pre_compute_tokens
+        (context, cached_tokens, ucs4_phrase, phrase_length);
+
+    if (!retval) {
+        g_array_free(cached_tokens, TRUE);
+        g_free(ucs4_phrase);
+        return false;
+    }
+
     assert(cached_tokens->len == phrase_length);
+
+    ChewingKeyVector cached_keys = g_array_new(TRUE, TRUE, sizeof(ChewingKey));
 
     bool result = _remember_phrase_recur
         (instance, cached_keys, cached_tokens,
