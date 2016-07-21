@@ -2411,6 +2411,8 @@ bool pinyin_get_right_pinyin_offset(pinyin_instance_t * instance,
         matrix.get_item(index, 0, key, key_rest);
         if (zero_key == key)
             right = index + 1;
+        else
+            break;
     }
 
     if (0 == matrix.get_column_size(right))
