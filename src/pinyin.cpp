@@ -2331,6 +2331,8 @@ static size_t _compute_zero_start(PhoneticKeyMatrix & matrix, size_t offset) {
         matrix.get_item(index, 0, key, key_rest);
         if (zero_key == key)
             offset = index;
+        else
+            break;
     }
 
     return offset;
