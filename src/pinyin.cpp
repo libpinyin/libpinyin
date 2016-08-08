@@ -2506,7 +2506,7 @@ static bool _get_char_offset_recur(pinyin_instance_t * instance,
 
         gfloat pinyin_poss = item.get_pronunciation_possibility(&key);
         if (pinyin_poss < FLT_EPSILON)
-            return false;
+            continue;
 
         ++length;
 
