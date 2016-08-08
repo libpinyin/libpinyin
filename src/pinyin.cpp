@@ -2530,6 +2530,12 @@ bool pinyin_get_character_offset(pinyin_instance_t * instance,
     pinyin_context_t * context = instance->m_context;
     PhoneticKeyMatrix & matrix = instance->m_matrix;
 
+    if (0 == matrix.size()) {
+        assert(0 == offset);
+        *plength = 0;
+        return true;
+    }
+
     assert(offset < matrix.size());
     _check_offset(matrix, offset);
 
