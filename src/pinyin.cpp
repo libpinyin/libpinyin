@@ -2488,9 +2488,6 @@ static bool _get_char_offset_recur(pinyin_instance_t * instance,
 
         const size_t newstart = key_rest.m_raw_end;
 
-        if (newstart > offset)
-            return true;
-
         const ChewingKey zero_key;
         if (zero_key == key) {
             /* assume only one key here for "'" or the last key. */
@@ -2507,6 +2504,9 @@ static bool _get_char_offset_recur(pinyin_instance_t * instance,
         gfloat pinyin_poss = item.get_pronunciation_possibility(&key);
         if (pinyin_poss < FLT_EPSILON)
             continue;
+
+        if (newstart > offset)
+            return true;
 
         ++length;
 
