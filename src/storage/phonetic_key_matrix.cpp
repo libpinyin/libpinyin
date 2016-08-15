@@ -497,8 +497,10 @@ gfloat compute_pronunciation_possibility(PhoneticKeyMatrix * matrix,
                                          PhraseItem & item){
     assert(end < matrix->size());
 
-    assert(matrix->get_column_size(start) > 0);
-    assert(matrix->get_column_size(end) > 0);
+    if(matrix->get_column_size(start) <= 0)
+        return 0.;
+    if(matrix->get_column_size(end) <= 0)
+        return 0.;
 
     g_array_set_size(cached_keys, 0);
     return compute_pronunciation_possibility_recur
