@@ -1,3 +1,10 @@
+version 1.6.0
+* bug fixes.
+
+version 1.5.91
+* change pinyin/phrase tables to use dbm.
+* enhance pinyin key representation and pinyin parsers.
+
 version 1.2.0
 * bug fixes.
 
