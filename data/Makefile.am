@@ -17,7 +17,7 @@
 
 
 tablefiles		= gb_char.table gbk_char.table \
-				merged.table \
+				opengram.table merged.table \
 				art.table culture.table economy.table \
 				geology.table history.table life.table \
 				nature.table people.table science.table \
