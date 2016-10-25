@@ -124,6 +124,36 @@ private:
         m_allocated = m_data_begin + newsize;
         return;
     }
+
+    guint32 get_check_sum(const char * data, guint32 length){
+        guint32 checksum = 0x0;
+        guint32 aligns = length & ~0x3;
+
+        /* checksum for aligned parts. */
+        guint32 index = 0;
+        for (; index < aligns; index += sizeof(guint32)) {
+            const char * p = data + index;
+
+            /* use little endian here. */
+            guint32 item = *p | *(p + 1) << 8 |
+                *(p + 2) << 16 | *(p + 3) << 24;
+
+            checksum ^= item;
+        }
+
+        /* checksum for remained parts. */
+        guint32 shift = 0;
+        for (; index < length; index++) {
+            const char * p = data + index;
+
+            guint32 item = *p << shift;
+            shift += 8;
+
+            checksum ^= item;
+        }
+
+        return checksum;
+    }
     
 public:
     /**
