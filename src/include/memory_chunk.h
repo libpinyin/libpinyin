@@ -60,14 +60,17 @@ private:
     char * m_data_end; //one data pass the end.
     char * m_allocated; //one data pass the end.
     free_func_t m_free_func;
-    
+
+    const guint32 header = sizeof(guint32) * 2;
+
 private:
     void freemem(){
         if ((free_func_t)free == m_free_func)
             free(m_data_begin);
-#ifdef HAVE_MMAP
+#ifdef LIBPINYIN_USE_MMAP
         else if ((free_func_t)munmap == m_free_func)
-            munmap(m_data_begin, capacity());
+            /* we hide the file header in mmap. */
+            munmap(m_data_begin - header, header + capacity());
 #endif
         else
             assert(FALSE);
@@ -387,15 +390,39 @@ public:
         off_t file_size = lseek(fd, 0, SEEK_END);
         lseek(fd, 0, SEEK_SET);
 
-        int data_len = file_size;
+        if (file_size < header) {
+            close(fd);
+            return false;
+        }
 
-        void* data = malloc(data_len);
+        guint32 length = 0;
+        ssize_t ret_len = read(fd, &length, sizeof(guint32));
+        assert(ret_len == sizeof(length));
+
+        guint32 checksum = 0;
+        ret_len = read(fd, &checksum, sizeof(guint32));
+        assert(ret_len == sizeof(checksum));
+
+        int data_len = file_size - header;
+        if (data_len != length) {
+            close(fd);
+            return false;
+        }
+
+        char * data = (char *) malloc(data_len);
         if ( !data ){
             close(fd);
             return false;
         }
 
         data_len = read(fd, data, data_len);
+        guint32 calc = get_check_sum(data, data_len);
+        if (checksum != calc) {
+            free(data);
+            close(fd);
+            return false;
+        }
+
         set_chunk(data, data_len, (free_func_t)free);
 
         close(fd);
@@ -422,12 +449,37 @@ public:
         off_t file_size = lseek(fd, 0, SEEK_END);
         lseek(fd, 0, SEEK_SET);
 
-        int data_len = file_size;
+        if (file_size < header) {
+            close(fd);
+            return false;
+        }
 
-        void* data = ::mmap(NULL, data_len, PROT_READ|PROT_WRITE, MAP_PRIVATE,
-                            fd, 0);
+        guint32 length = 0;
+        ssize_t ret_len = read(fd, &length, sizeof(guint32));
+        assert(ret_len == sizeof(length));
+
+        guint32 checksum = 0;
+        ret_len = read(fd, &checksum, sizeof(guint32));
+        assert(ret_len == sizeof(checksum));
+
+        int data_len = file_size - header;
+        if (data_len != length) {
+            close(fd);
+            return false;
+        }
+
+        char * data = (char *)::mmap(NULL, file_size,
+                                     PROT_READ|PROT_WRITE, MAP_PRIVATE, fd, 0);
 
         if (MAP_FAILED == data) {
+            close(fd);
+            return false;
+        }
+
+        data = data + header;
+        guint32 calc = get_check_sum(data, data_len);
+        if (checksum != calc) {
+            munmap(data - header, file_size);
             close(fd);
             return false;
         }
@@ -452,8 +504,16 @@ public:
         if ( -1 == fd )
             return false;
 
-        size_t data_len = write(fd, begin(), size());
-        if ( data_len != size()){
+        guint32 length = size();
+        ssize_t ret_len = write(fd, &length, sizeof(guint32));
+        assert(ret_len == sizeof(length));
+
+        guint32 checksum = get_check_sum(m_data_begin, size());
+        ret_len = write(fd, &checksum, sizeof(guint32));
+        assert(ret_len == sizeof(checksum));
+
+        ret_len = write(fd, begin(), size());
+        if (ret_len != size()){
             close(fd);
             return false;
         }
