@@ -58,6 +58,12 @@ int main(int argc, char * argv[]){
     assert(chunk->get_content(sizeof(int), &tmp, sizeof(int)));
     printf("%d\n", tmp);
 
+    assert(chunk->save("/tmp/test.bin"));
+    assert(chunk->load("/tmp/test.bin"));
+#ifdef LIBPINYIN_USE_MMAP
+    assert(chunk->mmap("/tmp/test.bin"));
+#endif
+
     delete chunk;
 
     return 0;
