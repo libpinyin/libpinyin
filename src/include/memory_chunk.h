@@ -403,7 +403,7 @@ public:
         ret_len = read(fd, &checksum, sizeof(guint32));
         assert(ret_len == sizeof(checksum));
 
-        int data_len = file_size - header;
+        guint32 data_len = file_size - header;
         if (data_len != length) {
             close(fd);
             return false;
@@ -462,7 +462,7 @@ public:
         ret_len = read(fd, &checksum, sizeof(guint32));
         assert(ret_len == sizeof(checksum));
 
-        int data_len = file_size - header;
+        guint32 data_len = file_size - header;
         if (data_len != length) {
             close(fd);
             return false;
@@ -513,7 +513,7 @@ public:
         assert(ret_len == sizeof(checksum));
 
         ret_len = write(fd, begin(), size());
-        if (ret_len != size()){
+        if (ret_len != (ssize_t) size()){
             close(fd);
             return false;
         }
