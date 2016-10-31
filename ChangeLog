@@ -1,3 +1,8 @@
+version 1.6.91
+* change license to GPLv3+;
+* import open-gram dictionary and remove pinyin tones;
+* add some checks when load data from file;
+
 version 1.6.0
 * bug fixes.
 
