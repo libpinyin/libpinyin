@@ -19,6 +19,10 @@
  */
 
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #include "timer.h"
 #include <string.h>
 #include "pinyin_internal.h"
