@@ -24,11 +24,11 @@ set_target_properties(
     libpinyin
     PROPERTIES
         OUTPUT_NAME
-            pinyin
+            libpinyin
         VERSION
-            0.0.0
+            10.0.0
         SOVERSION
-            0
+            10
 )
 
 install(

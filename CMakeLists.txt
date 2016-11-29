@@ -74,13 +74,15 @@ if (DB_FOUND)
   SET (HAVE_BERKELEY_DB 1)
 endif (DB_FOUND)
 
-# DBM: Kyoto Cabinet
-find_package(KyotoCabinet)
-if (KyotoCabinet_FOUND)
-  include_directories ( ${KyotoCabinet_INCLUDE_PATH} )
-  SET (LIBS ${LIBS} ${KyotoCabinet_LIBRARY})
-  SET (HAVE_KYOTO_CABINET 1)
-endif (KyotoCabinet_FOUND)
+if (NOT HAVE_BERKELEY_DB)
+  # DBM: Kyoto Cabinet
+  find_package(KyotoCabinet)
+  if (KyotoCabinet_FOUND)
+    include_directories ( ${KyotoCabinet_INCLUDE_PATH} )
+    SET (LIBS ${LIBS} ${KyotoCabinet_LIBRARY})
+    SET (HAVE_KYOTO_CABINET 1)
+  endif (KyotoCabinet_FOUND)
+endif (NOT HAVE_BERKELEY_DB)
 
 
 ######## Windows
