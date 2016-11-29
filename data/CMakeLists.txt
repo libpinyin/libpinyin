@@ -59,6 +59,8 @@ add_custom_command(
         gbk_char.bin
         phrase_index.bin
         pinyin_index.bin
+        addon_phrase_index.bin
+        addon_pinyin_index.bin
     COMMENT
         "Building binary model data..."
     COMMAND
@@ -67,6 +69,7 @@ add_custom_command(
         gen_binary_files
 	${CMAKE_SOURCE_DIR}/data/gb_char.table
 	${CMAKE_SOURCE_DIR}/data/gbk_char.table
+	${CMAKE_SOURCE_DIR}/data/table.conf
 )
 
 add_custom_command(
@@ -75,9 +78,9 @@ add_custom_command(
     COMMENT
         "Building binary bigram data..."
     COMMAND
-        ${import_interpolation_BIN} < ${CMAKE_SOURCE_DIR}/data/interpolation2.text
+        ${import_interpolation_BIN} --table-dir ${CMAKE_SOURCE_DIR}/data < ${CMAKE_SOURCE_DIR}/data/interpolation2.text
     COMMAND
-        ${gen_unigram_BIN}
+        ${gen_unigram_BIN} --table-dir ${CMAKE_SOURCE_DIR}/data
     DEPENDS
         import_interpolation
 	${CMAKE_SOURCE_DIR}/data/interpolation2.text

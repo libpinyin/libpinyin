@@ -72,6 +72,8 @@ if (DB_FOUND)
   include_directories ( ${DB_INCLUDE_DIR} )
   SET (LIBS ${LIBS} ${DB_LIBRARIES})
   SET (HAVE_BERKELEY_DB 1)
+  SET (CMAKE_CXX_LINK_EXECUTABLE
+    "${CMAKE_CXX_LINK_EXECUTABLE} ${LIBS}")
 endif (DB_FOUND)
 
 if (NOT HAVE_BERKELEY_DB)
@@ -81,6 +83,8 @@ if (NOT HAVE_BERKELEY_DB)
     include_directories ( ${KyotoCabinet_INCLUDE_PATH} )
     SET (LIBS ${LIBS} ${KyotoCabinet_LIBRARY})
     SET (HAVE_KYOTO_CABINET 1)
+    SET (CMAKE_CXX_LINK_EXECUTABLE
+      "${CMAKE_CXX_LINK_EXECUTABLE} ${LIBS}")
   endif (KyotoCabinet_FOUND)
 endif (NOT HAVE_BERKELEY_DB)
 
