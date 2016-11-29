@@ -1,25 +1,50 @@
-# - Try to find Berkeley DB
-# Once done this will define
-#
-#  BERKELEY_DB_FOUND - system has Berkeley DB
-#  BERKELEY_DB_INCLUDE_DIR - the Berkeley DB include directory
-#  BERKELEY_DB_LIBRARIES - Link these to use Berkeley DB
-#  BERKELEY_DB_DEFINITIONS - Compiler switches required for using Berkeley DB
+# -*- cmake -*-
 
-# Copyright (c) 2006, Alexander Dymo, <adymo@kdevelop.org>
-#
-# Redistribution and use is allowed according to the terms of the BSD license.
-# For details see the accompanying COPYING-CMAKE-SCRIPTS file.
+# - Find BerkeleyDB
+# Find the BerkeleyDB includes and library
+# This module defines
+#  DB_INCLUDE_DIR, where to find db.h, etc.
+#  DB_LIBRARIES, the libraries needed to use BerkeleyDB.
+#  DB_FOUND, If false, do not try to use BerkeleyDB.
+# also defined, but not for general use are
+#  DB_LIBRARY, where to find the BerkeleyDB library.
 
-FIND_PATH(BERKELEY_DB_INCLUDE_DIR db.h
-  /usr/include/db4
+FIND_PATH(DB_INCLUDE_DIR db.h
   /usr/local/include/db4
-)
+  /usr/local/include
+  /usr/include/db4
+  /usr/include
+  )
 
-FIND_LIBRARY(BERKELEY_DB_LIBRARIES NAMES db )
+SET(DB_NAMES ${DB_NAMES} db)
+FIND_LIBRARY(DB_LIBRARY
+  NAMES ${DB_NAMES}
+  PATHS /usr/lib /usr/local/lib
+  )
 
-include(FindPackageHandleStandardArgs)
-find_package_handle_standard_args(Berkeley "Could not find Berkeley DB >= 4.1" BERKELEY_DB_INCLUDE_DIR BERKELEY_DB_LIBRARIES)
-# show the BERKELEY_DB_INCLUDE_DIR and BERKELEY_DB_LIBRARIES variables only in the advanced view
-MARK_AS_ADVANCED(BERKELEY_DB_INCLUDE_DIR BERKELEY_DB_LIBRARIES )
+IF (DB_LIBRARY AND DB_INCLUDE_DIR)
+  SET(DB_LIBRARIES ${DB_LIBRARY})
+  SET(DB_FOUND "YES")
+ELSE (DB_LIBRARY AND DB_INCLUDE_DIR)
+  SET(DB_FOUND "NO")
+ENDIF (DB_LIBRARY AND DB_INCLUDE_DIR)
 
+
+IF (DB_FOUND)
+  IF (NOT DB_FIND_QUIETLY)
+    MESSAGE(STATUS "Found BerkeleyDB: ${DB_LIBRARIES}")
+  ENDIF (NOT DB_FIND_QUIETLY)
+ELSE (DB_FOUND)
+  IF (DB_FIND_REQUIRED)
+    MESSAGE(FATAL_ERROR "Could not find BerkeleyDB library")
+  ENDIF (DB_FIND_REQUIRED)
+ENDIF (DB_FOUND)
+
+# Deprecated declarations.
+SET (NATIVE_DB_INCLUDE_PATH ${DB_INCLUDE_DIR} )
+GET_FILENAME_COMPONENT (NATIVE_DB_LIB_PATH ${DB_LIBRARY} PATH)
+
+MARK_AS_ADVANCED(
+  DB_LIBRARY
+  DB_INCLUDE_DIR
+  )
