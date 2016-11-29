@@ -21,7 +21,7 @@
 #ifndef FLEXIBLE_NGRAM_KYOTODB_H
 #define FLEXIBLE_NGRAM_KYOTODB_H
 
-#include <config.h>
+#include "config.h"
 #ifdef HAVE_KYOTO_CABINET
 #include <kcdb.h>
 #include <kchashdb.h>

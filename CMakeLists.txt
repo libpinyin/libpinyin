@@ -158,6 +158,7 @@ endif (CMAKE_BUILD_TYPE MATCHES Debug)
 
 include_directories(
     ${GLIB2_INCLUDE_DIR}
+    ${PROJECT_SOURCE_DIR}/
     ${PROJECT_SOURCE_DIR}/src
     ${PROJECT_SOURCE_DIR}/src/include
     ${PROJECT_SOURCE_DIR}/src/storage

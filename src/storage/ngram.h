@@ -21,7 +21,7 @@
 #ifndef NGRAM_H
 #define NGRAM_H
 
-#include <config.h>
+#include "config.h"
 #include <glib.h>
 #include "novel_types.h"
 
