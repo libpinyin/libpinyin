@@ -58,13 +58,30 @@ check_function_exists(memset HAVE_MEMSET)
 check_function_exists(realloc HAVE_REALLOC)
 check_function_exists(setlocale HAVE_SETLOCALE)
 check_function_exists(stat HAVE_STAT)
+check_function_exists(mmap HAVE_MMAP)
 
 include(CheckTypeSize)
 check_type_size(size_t SIZE_OF_SIZE_T)
 
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 find_package(GLIB2 REQUIRED)
-find_package(BerkeleyDB REQUIRED)
+
+# DBM: BerkeleyDB
+find_package(BerkeleyDB)
+if (DB_FOUND)
+  include_directories ( ${DB_INCLUDE_DIR} )
+  SET (LIBS ${LIBS} ${DB_LIBRARIES})
+  SET (HAVE_BERKELEY_DB 1)
+endif (DB_FOUND)
+
+# DBM: Kyoto Cabinet
+find_package(KyotoCabinet)
+if (KyotoCabinet_FOUND)
+  include_directories ( ${KyotoCabinet_INCLUDE_PATH} )
+  SET (LIBS ${LIBS} ${KyotoCabinet_LIBRARY})
+  SET (HAVE_KYOTO_CABINET 1)
+endif (KyotoCabinet_FOUND)
+
 
 ######## Windows
 
@@ -115,6 +132,12 @@ configure_file(
     libpinyin.pc.in
     libpinyin.pc
     @ONLY
+)
+
+configure_file(
+  config.h.cmake
+  config.h
+  @ONLY
 )
 
 install(
