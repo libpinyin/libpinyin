@@ -101,9 +101,9 @@ AM_CONDITIONAL([BERKELEYDB], [test x"$DBM" = x"BerkeleyDB"])
 
 if test x"$DBM" = x"KyotoCabinet"; then
    # Check Kyoto Cabinet
-   PKG_CHECK_MODULES(KYOTOCABINET, [
-    kyotocabinet
-   ], [])
+   PKG_CHECK_MODULES(KYOTOCABINET, [kyotocabinet], [])
+
+   AC_SEARCH_LIBS([kcdbopen], [kyotocabinet], [], AC_MSG_ERROR([Cannot find Kyoto Cabinet library]))
 
    AC_DEFINE([HAVE_KYOTO_CABINET], [], [Have Kyoto Cabinet.])
 fi

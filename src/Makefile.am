@@ -33,7 +33,7 @@ INCLUDES                = -I$(top_srcdir)/src \
 
 libpinyinincludedir	= $(includedir)/libpinyin-@VERSION@
 
-libpinyininclude_HEADERS= pinyin.h
+libpinyininclude_HEADERS = pinyin.h
 
 noinst_HEADERS		= pinyin_internal.h
 
@@ -48,17 +48,9 @@ libpinyin_la_LIBADD	= storage/libstorage.la lookup/liblookup.la @GLIB2_LIBS@
 libpinyin_la_LDFLAGS	= -Wl,--version-script=$(srcdir)/libpinyin.ver \
 			  -version-info @LT_VERSION_INFO@
 
-if KYOTOCABINET
-libpinyin_la_LDFLAGS += @KYOTOCABINET_LIBS@
-endif
-
 libpinyin_internal_la_SOURCES	= pinyin_internal.cpp
 
 libpinyin_internal_la_LIBADD	= storage/libstorage.la lookup/liblookup.la
-
-if KYOTOCABINET
-libpinyin_internal_la_LDFLAGS = @KYOTOCABINET_LIBS@
-endif
 
 ## Note:
 ## As libpinyin internal interface will change, only provides static library
