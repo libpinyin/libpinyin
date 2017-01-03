@@ -65,12 +65,44 @@ public:
 };
 
 struct trellis_constraint_t {
+    /* the constraint type */
     constraint_type m_type;
     // expand the previous union into struct to catch some errors.
+    /* the token of the word */
     phrase_token_t m_token;
+    /* for CONSTRAINT_ONESTEP type:
+       the index of the next word.
+       for CONSTRAINT_NOSEARCH type:
+       the index of the previous onestep constraint. */
     guint32 m_constraint_step;
 };
 
+typedef phrase_token_t lookup_key_t;
+/* Key: lookup_key_t, Value: int m, index to m_steps_content[i][m] */
+typedef GHashTable * LookupStepIndex;
+ /* Array of trellis_node */
+typedef GArray * LookupStepContent;
+
+class ForwardPhoneticTrellis {
+private:
+    /* Array of LookupStepIndex */
+    GPtrArray * m_steps_index;
+    /* Array of LookupStepContent */
+    GPtrArray * m_steps_content;
+
+};
+
+class BackwardPhoneticMatrix {
+private:
+    /* Array of matrix_step */
+    GArray * m_steps_matrix;
+};
+
+class ForwardPhoneticConstraints {
+private:
+    /* Array of trellis_constraint_t */
+    GArray * m_constraints;
+};
 
 };
 
