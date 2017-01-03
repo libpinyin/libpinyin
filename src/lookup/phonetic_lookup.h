@@ -35,6 +35,15 @@ struct trellis_value_t {
     // the m_last_step and m_last_index points to this trellis.
     gint32 m_last_step;
     gint32 m_last_index;
+
+    trellis_value_t(gfloat poss = FLT_MAX){
+        m_handles[0] = null_token;
+        m_handles[1] = null_token;
+        m_sentence_length = 0;
+        m_poss = poss;
+        m_last_step = -1;
+        m_last_index = -1;
+    }
 };
 
 template <gint32 nbest>
@@ -42,8 +51,20 @@ struct trellis_node {
 private:
     gint32 m_nelem;
     trellis_value_t m_elements[nbest];
-public:
 
+public:
+    trellis_node(){
+        m_nelem = 0;
+        /* always assume non-used m_elements contains random data. */
+    }
+
+public:
+    gint32 length() { return m_nelem; }
+    const trellis_value_t * begin() { return m_elements; }
+    const trellis_value_t * end() { return m_elements + m_nelem; }
+
+    /* return true if the item is stored into m_elements. */
+    bool eval_item(const trellis_value_t * item);
 };
 
 struct matrix_value_t {
@@ -53,6 +74,13 @@ struct matrix_value_t {
     // the m_next_step and m_next_index points to this matrix.
     gint32 m_next_step;
     gint32 m_next_index;
+
+    matrix_value_t(){
+        m_cur_token = null_token;
+        m_poss = FLT_MAX;
+        m_next_step = -1;
+        m_next_index = -1;
+    }
 };
 
 template <gint32 nbest>
@@ -60,8 +88,20 @@ struct matrix_step {
 private:
     gint32 m_nelem;
     matrix_value_t m_elements[nbest];
-public:
 
+public:
+    matrix_step(){
+        m_nelem = 0;
+        /* always assume non-used m_elements contains random data. */
+    }
+
+public:
+    gint32 length() { return m_nelem; }
+    const matrix_value_t * begin() { return m_elements; }
+    const matrix_value_t * end() { return m_elements + m_nelem; }
+
+    /* return true if the item is stored into m_elements. */
+    bool eval_item(const trellis_value_t * item);
 };
 
 struct trellis_constraint_t {
@@ -75,6 +115,10 @@ struct trellis_constraint_t {
        for CONSTRAINT_NOSEARCH type:
        the index of the previous onestep constraint. */
     guint32 m_constraint_step;
+
+    trellis_constraint_t(){
+        m_type = NO_CONSTRAINT;
+    }
 };
 
 typedef phrase_token_t lookup_key_t;
