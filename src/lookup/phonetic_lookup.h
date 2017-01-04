@@ -34,6 +34,7 @@ struct trellis_value_t {
     gfloat m_poss;
     // the m_last_step and m_last_index points to this trellis.
     gint32 m_last_step;
+    // the m_last_index points to the last trellis_node.
     gint32 m_last_index;
 
     trellis_value_t(gfloat poss = FLT_MAX){
@@ -73,6 +74,7 @@ struct matrix_value_t {
     // the below information for recovering the final phrase array.
     // the m_next_step and m_next_index points to this matrix.
     gint32 m_next_step;
+    // the m_next_index points to the last matrix_step.
     gint32 m_next_index;
 
     matrix_value_t(){
@@ -107,8 +109,10 @@ public:
 struct trellis_constraint_t {
     /* the constraint type */
     constraint_type m_type;
+
     // expand the previous union into struct to catch some errors.
-    /* the token of the word */
+    /* for CONSTRAINT_ONESTEP type:
+       the token of the word. */
     phrase_token_t m_token;
     /* for CONSTRAINT_ONESTEP type:
        the index of the next word.
@@ -127,6 +131,7 @@ typedef GHashTable * LookupStepIndex;
  /* Array of trellis_node */
 typedef GArray * LookupStepContent;
 
+template <gint32 nbest>
 class ForwardPhoneticTrellis {
 private:
     /* Array of LookupStepIndex */
@@ -134,18 +139,49 @@ private:
     /* Array of LookupStepContent */
     GPtrArray * m_steps_content;
 
+public:
+    bool clear();
+    bool prepare(gint32 nstep);
+
+    /* Array of phrase_token_t */
+    bool fill_prefixes(/* in */ TokenVector prefixes);
+    /* Array of trellis_value_t */
+    bool get_candidates(/* in */ gint32 index,
+                        /* out */ GArray * candidates) const;
+    /* insert candidate */
+    bool insert_candidate(gint32 index, phrase_token_t token,
+                          const trellis_value_t * candidate);
+    /* get tail node */
+    bool get_tail(/* out */ matrix_step<nbest> * tail) const;
+    /* get candidate */
+    bool get_candidate(gint32 index, phrase_token_t token,
+                       gint32 last_index, trellis_value_t * candidate) const;
 };
 
+template <gint32 nbest>
 class BackwardPhoneticMatrix {
 private:
     /* Array of matrix_step */
     GArray * m_steps_matrix;
+
+public:
+    /* set tail node */
+    bool set_tail(const matrix_step<nbest> * tail);
+    /* back trace */
+    bool back_trace(const ForwardPhoneticTrellis * trellis);
+    /* extract results */
+    int extract(/* out */ GPtrArray * arrays);
 };
 
 class ForwardPhoneticConstraints {
 private:
     /* Array of trellis_constraint_t */
     GArray * m_constraints;
+
+public:
+    int add_constraint(size_t start, size_t end, phrase_token_t token);
+    bool clear_constraint(size_t index);
+    bool validate_constraint(PhoneticKeyMatrix * matrix);
 };
 
 };
