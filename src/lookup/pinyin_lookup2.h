@@ -86,6 +86,7 @@ private:
     const gfloat bigram_lambda;
     const gfloat unigram_lambda;
 
+    /* memory cache */
     GArray * m_cached_keys;
     PhraseItem m_cached_phrase_item;
     SingleGram m_merged_single_gram;
