@@ -182,6 +182,9 @@ private:
     /* Array of trellis_constraint_t */
     GArray * m_constraints;
 
+protected:
+    FacadePhraseIndex * m_phrase_index;
+
 #if 0
     /* pre-mature optimazition? */
     GArray * m_cached_keys;
@@ -199,10 +202,23 @@ typedef GPtrArray * NBestMatchResults;
 
 template <gint32 nbest>
 class PhoneticLookup {
-protected:
-    ForwardPhoneticTrellis m_trellis;
-    BackwardPhoneticMatrix m_matrix;
+private:
+    const gfloat bigram_lambda;
+    const gfloat unigram_lambda;
 
+protected:
+    ForwardPhoneticTrellis m_forward_trellis;
+    BackwardPhoneticMatrix m_backward_matrix;
+
+protected:
+    /* saved varibles */
+    ForwardPhoneticConstraints m_constraints;
+    PhoneticKeyMatrix * m_matrix;
+
+    FacadeChewingTable2 * m_pinyin_table;
+    FacadePhraseIndex * m_phrase_index;
+    Bigram * m_system_bigram;
+    Bigram * m_user_bigram;
 
 protected:
     bool search_unigram2(GPtrArray * topresults,
