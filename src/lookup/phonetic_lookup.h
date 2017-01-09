@@ -36,6 +36,9 @@ struct trellis_value_t {
     gint32 m_last_step;
     // the m_last_index points to the last trellis_node.
     gint32 m_last_index;
+    // the current index in this trellis_node.
+    // only initialized in the get_candidates method.
+    gint32 m_current_index;
 
     trellis_value_t(gfloat poss = FLT_MAX){
         m_handles[0] = null_token;
@@ -44,6 +47,7 @@ struct trellis_value_t {
         m_poss = poss;
         m_last_step = -1;
         m_last_index = -1;
+        m_current_index = -1;
     }
 };
 
@@ -178,10 +182,53 @@ private:
     /* Array of trellis_constraint_t */
     GArray * m_constraints;
 
+#if 0
+    /* pre-mature optimazition? */
+    GArray * m_cached_keys;
+    PhraseItem m_cached_phrase_item;
+#endif
+
 public:
     int add_constraint(size_t start, size_t end, phrase_token_t token);
     bool clear_constraint(size_t index);
     bool validate_constraint(PhoneticKeyMatrix * matrix);
+};
+
+/* Array of MatchResults */
+typedef GPtrArray * NBestMatchResults;
+
+template <gint32 nbest>
+class PhoneticLookup {
+protected:
+    ForwardPhoneticTrellis m_trellis;
+    BackwardPhoneticMatrix m_matrix;
+
+
+protected:
+    bool search_unigram2(GPtrArray * topresults,
+                         int start, int end,
+                         PhraseIndexRanges ranges);
+    bool search_bigram2(GPtrArray * topresults,
+                        int start, int end,
+                        PhraseIndexRanges ranges);
+
+    bool unigram_gen_next_step(int start, int end,
+                               lookup_value_t * cur_step,
+                               phrase_token_t token);
+    bool bigram_gen_next_step(int start, int end,
+                              lookup_value_t * cur_step,
+                              phrase_token_t token,
+                              gfloat bigram_poss);
+
+    bool save_next_step(int next_step_pos, trellis_value_t * cur_step, trellis_value_t * next_step);
+
+public:
+
+    bool get_best_match(TokenVector prefixes,
+                        PhoneticKeyMatrix * matrix,
+                        ForwardPhoneticConstraints constraints,
+                        NBestMatchResults & results);
+
 };
 
 };
