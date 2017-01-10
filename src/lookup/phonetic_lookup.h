@@ -69,7 +69,29 @@ public:
     const trellis_value_t * end() { return m_elements + m_nelem; }
 
     /* return true if the item is stored into m_elements. */
-    bool eval_item(const trellis_value_t * item);
+    bool eval_item(const trellis_value_t * item) {
+        /* still have space */
+        if (m_nelem < nbest) {
+            m_elements[m_nelem] = *item;
+            m_nelem ++;
+            return true;
+        }
+
+        /* find minium item */
+        trellis_value_t * min = m_elements;
+        for (gint32 i = 1; i < m_nelem; ++i) {
+            if (min->m_poss > m_elements[i].m_poss)
+                min = m_elements + i;
+        }
+
+        /* compare new item */
+        if (item->m_poss > min->m_poss) {
+            *min = *item;
+            return true;
+        }
+
+        return false;
+    }
 };
 
 struct matrix_value_t {
@@ -107,7 +129,29 @@ public:
     const matrix_value_t * end() { return m_elements + m_nelem; }
 
     /* return true if the item is stored into m_elements. */
-    bool eval_item(const trellis_value_t * item);
+    bool eval_item(const trellis_value_t * item) {
+        /* still have space */
+        if (m_nelem < nbest) {
+            m_elements[m_nelem] = *item;
+            m_nelem ++;
+            return true;
+        }
+
+        /* find minium item */
+        matrix_value_t * min = m_elements;
+        for (gint32 i = 1; i < m_nelem; ++i) {
+            if (min->m_poss > m_elements[i].m_poss)
+                min = m_elements + i;
+        }
+
+        /* compare new item */
+        if (item->m_poss > min->m_poss) {
+            *min = *item;
+            return true;
+        }
+
+        return false;
+    }
 };
 
 struct trellis_constraint_t {
@@ -207,8 +251,8 @@ private:
     const gfloat unigram_lambda;
 
 protected:
-    ForwardPhoneticTrellis m_forward_trellis;
-    BackwardPhoneticMatrix m_backward_matrix;
+    ForwardPhoneticTrellis<nbest> m_forward_trellis;
+    BackwardPhoneticMatrix<nbest> m_backward_matrix;
 
 protected:
     /* saved varibles */
