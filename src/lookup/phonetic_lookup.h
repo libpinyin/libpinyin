@@ -68,8 +68,13 @@ struct matrix_value_t {
     }
 };
 
+#if 1
 /* for debug purpose */
 #include "phonetic_lookup_linear.h"
+#else
+/* for optimization */
+#include "phonetic_lookup_heap.h"
+#endif
 
 struct trellis_constraint_t {
     /* the constraint type */
@@ -157,6 +162,11 @@ public:
     bool clear_constraint(size_t index);
     bool validate_constraint(PhoneticKeyMatrix * matrix);
 };
+
+/* use maximum heap to get the topest results. */
+static bool get_top_results(/* out */ GPtrArray * topresults,
+                            /* in */ GPtrArray * candidates);
+
 
 /* Array of MatchResults */
 typedef GPtrArray * NBestMatchResults;
