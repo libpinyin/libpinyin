@@ -21,7 +21,7 @@
 #ifndef PHONETIC_LOOKUP_HEAP_H
 #define PHONETIC_LOOKUP_HEAP_H
 
-static inline bool trellis_value_less_than(const trellis_value_t &lhs,
+static inline bool trellis_value_more_than(const trellis_value_t &lhs,
                                            const trellis_value_t &rhs) {
     /* min heap here */
     return lhs.m_poss > rhs.m_poss;
@@ -52,7 +52,7 @@ public:
         if (m_nelem < nbest) {
             m_elements[m_nelem] = *item;
             m_nelem ++;
-            push_heap(begin(), end(), trellis_value_less_than);
+            push_heap(begin(), end(), trellis_value_more_than);
             return true;
         }
 
@@ -61,9 +61,9 @@ public:
 
         /* compare new item */
         if (item->m_poss > min->m_poss) {
-            pop_heap(begin(), end(), trellis_value_less_than);
+            pop_heap(begin(), end(), trellis_value_more_than);
             m_elements[m_nelem - 1] = *item;
-            push_heap(begin(), end(), trellis_value_less_than);
+            push_heap(begin(), end(), trellis_value_more_than);
             return true;
         }
 
@@ -101,7 +101,7 @@ public:
 };
 
 
-static inline bool matrix_value_less_than(const matrix_value_t &lhs,
+static inline bool matrix_value_more_than(const matrix_value_t &lhs,
                                           const matrix_value_t &rhs) {
     /* min heap here */
     return lhs.m_poss > rhs.m_poss;
@@ -132,7 +132,7 @@ public:
         if (m_nelem < nbest) {
             m_elements[m_nelem] = *item;
             m_nelem ++;
-            push_heap(begin(), end(), trellis_value_less_than);
+            push_heap(begin(), end(), matrix_value_more_than);
             return true;
         }
 
@@ -141,9 +141,9 @@ public:
 
         /* compare new item */
         if (item->m_poss > min->m_poss) {
-            pop_heap(begin(), end(), trellis_value_less_than);
+            pop_heap(begin(), end(), matrix_value_more_than);
             m_elements[m_nelem - 1] = *item;
-            push_heap(begin(), end(), trellis_value_less_than);
+            push_heap(begin(), end(), matrix_value_more_than);
             return true;
         }
 
