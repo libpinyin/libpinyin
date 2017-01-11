@@ -21,13 +21,54 @@
 #ifndef PHONETIC_LOOKUP_HEAP_H
 #define PHONETIC_LOOKUP_HEAP_H
 
+static inline bool trellis_value_less_than(const trellis_value_t &lhs,
+                                           const trellis_value_t &rhs) {
+    /* min heap here */
+    return lhs.m_poss > rhs.m_poss;
+}
+
 template <gint32 nbest>
 struct trellis_node {
 private:
     gint32 m_nelem;
-    trellis_value_t m_elements[nbest+1];
+    trellis_value_t m_elements[nbest];
+
 public:
-    ... // helper methods
+    trellis_node(){
+        m_nelem = 0;
+        /* always assume non-used m_elements contains random data. */
+    }
+
+public:
+    gint32 length() { return m_nelem; }
+    const trellis_value_t * begin() { return m_elements; }
+    const trellis_value_t * end() { return m_elements + m_nelem; }
+
+    /* return true if the item is stored into m_elements. */
+    bool eval_item(const trellis_value_t * item) {
+        /* min heap here, and always push heap. */
+
+        /* still have space */
+        if (m_nelem < nbest) {
+            m_elements[m_nelem] = *item;
+            m_nelem ++;
+            push_heap(begin(), end(), trellis_value_less_than);
+            return true;
+        }
+
+        /* find minium item */
+        trellis_value_t * min = m_elements;
+
+        /* compare new item */
+        if (item->m_poss > min->m_poss) {
+            pop_heap(begin(), end(), trellis_value_less_than);
+            m_elements[m_nelem - 1] = *item;
+            push_heap(begin(), end(), trellis_value_less_than);
+            return true;
+        }
+
+        return false;
+    }
 };
 
 /* for space usage and performance. */
@@ -60,13 +101,54 @@ public:
 };
 
 
+static inline bool matrix_value_less_than(const matrix_value_t &lhs,
+                                          const matrix_value_t &rhs) {
+    /* min heap here */
+    return lhs.m_poss > rhs.m_poss;
+}
+
 template <gint32 nbest>
 struct matrix_step {
 private:
     gint32 m_nelem;
-    matrix_value_t m_elements[nbest+1];
+    matrix_value_t m_elements[nbest];
+
 public:
-    ... // helper methods
+    matrix_step(){
+        m_nelem = 0;
+        /* always assume non-used m_elements contains random data. */
+    }
+
+public:
+    gint32 length() { return m_nelem; }
+    const matrix_value_t * begin() { return m_elements; }
+    const matrix_value_t * end() { return m_elements + m_nelem; }
+
+    /* return true if the item is stored into m_elements. */
+    bool eval_item(const matrix_value_t * item) {
+        /* min heap here, and always push heap. */
+
+        /* still have space */
+        if (m_nelem < nbest) {
+            m_elements[m_nelem] = *item;
+            m_nelem ++;
+            push_heap(begin(), end(), trellis_value_less_than);
+            return true;
+        }
+
+        /* find minium item */
+        matrix_value_t * min = m_elements;
+
+        /* compare new item */
+        if (item->m_poss > min->m_poss) {
+            pop_heap(begin(), end(), trellis_value_less_than);
+            m_elements[m_nelem - 1] = *item;
+            push_heap(begin(), end(), trellis_value_less_than);
+            return true;
+        }
+
+        return false;
+    }
 };
 
 /* for space usage and performance. */
