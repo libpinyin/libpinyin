@@ -31,6 +31,7 @@ template <gint32 nbest>
 struct trellis_node {
 private:
     gint32 m_nelem;
+    /* invariant: min heap */
     trellis_value_t m_elements[nbest];
 
 public:
@@ -111,6 +112,7 @@ template <gint32 nbest>
 struct matrix_step {
 private:
     gint32 m_nelem;
+    /* invariant: min heap */
     matrix_value_t m_elements[nbest];
 
 public:

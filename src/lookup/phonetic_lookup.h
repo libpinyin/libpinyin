@@ -51,8 +51,10 @@ struct trellis_value_t {
     }
 };
 
+#if 0
 struct matrix_value_t {
     phrase_token_t m_cur_token;
+    /* just propagate the value from tail matrix step. */
     gfloat m_poss;
     // the below information for recovering the final phrase array.
     // the m_next_step and m_next_index points to this matrix.
@@ -67,6 +69,7 @@ struct matrix_value_t {
         m_next_index = -1;
     }
 };
+#endif
 
 #if 1
 /* for debug purpose */
@@ -121,13 +124,20 @@ public:
     /* insert candidate */
     bool insert_candidate(gint32 index, phrase_token_t token,
                           const trellis_value_t * candidate);
-    /* get tail node */
-    bool get_tail(/* out */ matrix_step<nbest> * tail) const;
+    /* get tails */
+    /* Array of trellis_value_t */
+    bool get_tails(/* out */ GArray * tails) const;
     /* get candidate */
     bool get_candidate(gint32 index, phrase_token_t token,
                        gint32 last_index, trellis_value_t * candidate) const;
 };
 
+template <gint32 nbest>
+bool extract_result(const ForwardPhoneticTrellis<nbest> * trellis,
+                    const trellis_value_t * tail,
+                    /* out */ MatchResults & result);
+
+#if 0
 template <gint32 nbest>
 class BackwardPhoneticMatrix {
 private:
@@ -138,10 +148,12 @@ public:
     /* set tail node */
     bool set_tail(const matrix_step<nbest> * tail);
     /* back trace */
+    /* always assume/assert matrix_step.eval_item(...) return true? */
     bool back_trace(const ForwardPhoneticTrellis * trellis);
     /* extract results */
     int extract(/* out */ GPtrArray * arrays);
 };
+#endif
 
 class ForwardPhoneticConstraints {
 private:
