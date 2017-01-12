@@ -32,10 +32,10 @@ struct trellis_value_t {
     // the character length of the final sentence.
     gint32 m_sentence_length;
     gfloat m_poss;
-    // the m_last_step and m_last_index points to this trellis.
+    // the m_last_step and m_sub_index points to this trellis.
     gint32 m_last_step;
-    // the m_last_index points to the last trellis_node.
-    gint32 m_last_index;
+    // the m_sub_index points to the inside of last trellis_node.
+    gint32 m_sub_index;
     // the current index in this trellis_node.
     // only initialized in the get_candidates method.
     gint32 m_current_index;
@@ -46,7 +46,7 @@ struct trellis_value_t {
         m_sentence_length = 0;
         m_poss = poss;
         m_last_step = -1;
-        m_last_index = -1;
+        m_sub_index = -1;
         m_current_index = -1;
     }
 };
@@ -129,7 +129,7 @@ public:
     bool get_tails(/* out */ GArray * tails) const;
     /* get candidate */
     bool get_candidate(gint32 index, phrase_token_t token,
-                       gint32 last_index, trellis_value_t * candidate) const;
+                       gint32 sub_index, trellis_value_t * candidate) const;
 };
 
 template <gint32 nbest>
