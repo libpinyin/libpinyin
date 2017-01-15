@@ -190,8 +190,7 @@ private:
     const gfloat unigram_lambda;
 
 protected:
-    ForwardPhoneticTrellis<nbest> m_forward_trellis;
-    BackwardPhoneticMatrix<nbest> m_backward_matrix;
+    ForwardPhoneticTrellis<nbest> m_trellis;
 
 protected:
     /* saved varibles */
