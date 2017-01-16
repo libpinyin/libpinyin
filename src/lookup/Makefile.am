@@ -22,7 +22,11 @@ INCLUDES		= -I$(top_srcdir)/src/include \
 
 noinst_HEADERS		= lookup.h \
 			  pinyin_lookup2.h \
-			  phrase_lookup.h
+			  phrase_lookup.h \
+			  phonetic_lookup.h \
+			  phonetic_lookup_linear.h \
+			  phonetic_lookup_heap.h
+
 
 noinst_LTLIBRARIES	= liblookup.la
 
@@ -32,4 +36,5 @@ liblookup_la_LDFLAGS	= -static
 
 liblookup_la_SOURCES	= pinyin_lookup2.cpp \
 			  phrase_lookup.cpp \
-			  lookup.cpp
+			  lookup.cpp \
+			  phonetic_lookup.cpp
