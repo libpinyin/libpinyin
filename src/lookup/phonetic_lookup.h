@@ -24,6 +24,8 @@
 
 #include "novel_types.h"
 #include <limits.h>
+#include "phonetic_key_matrix.h"
+#include "ngram.h"
 
 namespace pinyin{
 
@@ -78,6 +80,8 @@ struct matrix_value_t {
 /* for optimization */
 #include "phonetic_lookup_heap.h"
 #endif
+
+enum constraint_type{NO_CONSTRAINT, CONSTRAINT_ONESTEP, CONSTRAINT_NOSEARCH };
 
 struct trellis_constraint_t {
     /* the constraint type */
@@ -201,10 +205,10 @@ protected:
                         PhraseIndexRanges ranges);
 
     bool unigram_gen_next_step(int start, int end,
-                               lookup_value_t * cur_step,
+                               trellis_value_t * cur_step,
                                phrase_token_t token);
     bool bigram_gen_next_step(int start, int end,
-                              lookup_value_t * cur_step,
+                              trellis_value_t * cur_step,
                               phrase_token_t token,
                               gfloat bigram_poss);
 

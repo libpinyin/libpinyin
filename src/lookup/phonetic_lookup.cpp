@@ -27,8 +27,7 @@ static bool get_top_results(/* out */ GPtrArray * topresults,
                             /* in */ GPtrArray * candidates);
 
 
-int ForwardPhoneticConstraints::add_constraint(CandidateConstraints constraints,
-                                               size_t start, size_t end,
+int ForwardPhoneticConstraints::add_constraint(size_t start, size_t end,
                                                phrase_token_t token) {
 
     if (end > constraints->len)
@@ -55,8 +54,7 @@ int ForwardPhoneticConstraints::add_constraint(CandidateConstraints constraints,
     return end - start;
 }
 
-bool ForwardPhoneticConstraints::clear_constraint(CandidateConstraints constraints,
-                                                  size_t index) {
+bool ForwardPhoneticConstraints::clear_constraint(size_t index) {
     if (index < 0 || index >= constraints->len)
         return false;
 
@@ -88,8 +86,7 @@ bool ForwardPhoneticConstraints::clear_constraint(CandidateConstraints constrain
     return true;
 }
 
-bool ForwardPhoneticConstraints::validate_constraint(PhoneticKeyMatrix * matrix,
-                                                     CandidateConstraints constraints) {
+bool ForwardPhoneticConstraints::validate_constraint(PhoneticKeyMatrix * matrix) {
     /* resize constraints array first */
     const size_t oldlength = constraints->len;
     const size_t newlength = matrix->size();

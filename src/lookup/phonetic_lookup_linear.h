@@ -64,6 +64,7 @@ public:
     }
 };
 
+#if 0
 template <gint32 nbest>
 struct matrix_step {
 private:
@@ -106,6 +107,6 @@ public:
         return false;
     }
 };
-
+#endif
 
 #endif

@@ -102,6 +102,7 @@ public:
 };
 
 
+#if 0
 static inline bool matrix_value_more_than(const matrix_value_t &lhs,
                                           const matrix_value_t &rhs) {
     /* min heap here */
@@ -179,6 +180,7 @@ public:
         return false;
     }
 };
+#endif
 
 
 #endif
