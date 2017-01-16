@@ -163,21 +163,11 @@ private:
 protected:
     FacadePhraseIndex * m_phrase_index;
 
-#if 0
-    /* pre-mature optimazition? */
-    GArray * m_cached_keys;
-    PhraseItem m_cached_phrase_item;
-#endif
-
 public:
     int add_constraint(size_t start, size_t end, phrase_token_t token);
     bool clear_constraint(size_t index);
     bool validate_constraint(PhoneticKeyMatrix * matrix);
 };
-
-/* use maximum heap to get the topest results. */
-static bool get_top_results(/* out */ GPtrArray * topresults,
-                            /* in */ GPtrArray * candidates);
 
 
 /* Array of MatchResults */
