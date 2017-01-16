@@ -30,23 +30,23 @@ static bool get_top_results(/* out */ GPtrArray * topresults,
 int ForwardPhoneticConstraints::add_constraint(size_t start, size_t end,
                                                phrase_token_t token) {
 
-    if (end > constraints->len)
+    if (end > m_constraints->len)
         return 0;
 
     for (size_t i = start; i < end; ++i){
-        clear_constraint(constraints, i);
+        clear_constraint(i);
     }
 
     /* store one step constraint */
-    lookup_constraint_t * constraint = &g_array_index
-        (constraints, lookup_constraint_t, start);
+    trellis_constraint_t * constraint = &g_array_index
+        (m_constraints, trellis_constraint_t, start);
     constraint->m_type = CONSTRAINT_ONESTEP;
     constraint->m_token = token;
-    constraint->m_end = end;
+    constraint->m_constraint_step = end;
 
     /* propagate no search constraint */
     for (size_t i = start + 1; i < end; ++i){
-        constraint = &g_array_index(constraints, lookup_constraint_t, i);
+        constraint = &g_array_index(m_constraints, trellis_constraint_t, i);
         constraint->m_type = CONSTRAINT_NOSEARCH;
         constraint->m_constraint_step = start;
     }
@@ -55,31 +55,31 @@ int ForwardPhoneticConstraints::add_constraint(size_t start, size_t end,
 }
 
 bool ForwardPhoneticConstraints::clear_constraint(size_t index) {
-    if (index < 0 || index >= constraints->len)
+    if (index < 0 || index >= m_constraints->len)
         return false;
 
-    lookup_constraint_t * constraint = &g_array_index
-        (constraints, lookup_constraint_t, index);
+    trellis_constraint_t * constraint = &g_array_index
+        (m_constraints, trellis_constraint_t, index);
 
     if (NO_CONSTRAINT == constraint->m_type)
         return false;
 
     if (CONSTRAINT_NOSEARCH == constraint->m_type){
         index = constraint->m_constraint_step;
-        constraint = &g_array_index(constraints, lookup_constraint_t, index);
+        constraint = &g_array_index(m_constraints, trellis_constraint_t, index);
     }
 
     /* now var constraint points to the one step constraint. */
     assert(constraint->m_type == CONSTRAINT_ONESTEP);
 
     /* phrase_token_t token = constraint->m_token; */
-    size_t end = constraint->m_end;
+    size_t end = constraint->m_constraint_step;
     for (size_t i = index; i < end; ++i){
-        if (i >= constraints->len)
+        if (i >= m_constraints->len)
             continue;
 
         constraint = &g_array_index
-            (constraints, lookup_constraint_t, i);
+            (m_constraints, trellis_constraint_t, i);
         constraint->m_type = NO_CONSTRAINT;
     }
 
@@ -87,41 +87,41 @@ bool ForwardPhoneticConstraints::clear_constraint(size_t index) {
 }
 
 bool ForwardPhoneticConstraints::validate_constraint(PhoneticKeyMatrix * matrix) {
-    /* resize constraints array first */
-    const size_t oldlength = constraints->len;
+    /* resize m_constraints array first */
+    const size_t oldlength = m_constraints->len;
     const size_t newlength = matrix->size();
 
     if ( newlength > oldlength ){
-        g_array_set_size(constraints, newlength);
+        g_array_set_size(m_constraints, newlength);
 
         /* initialize new element */
         for( size_t i = oldlength; i < newlength; ++i){
-            lookup_constraint_t * constraint = &g_array_index
-                (constraints, lookup_constraint_t, i);
+            trellis_constraint_t * constraint = &g_array_index
+                (m_constraints, trellis_constraint_t, i);
             constraint->m_type = NO_CONSTRAINT;
         }
 
     }else if (newlength < oldlength ){
         /* just shrink it */
-        g_array_set_size(constraints, newlength);
+        g_array_set_size(m_constraints, newlength);
     }
 
     GArray * keys = g_array_new(TRUE, TRUE, sizeof(ChewingKey));
     PhraseItem item;
-    for (size_t i = 0; i < constraints->len; ++i){
-        lookup_constraint_t * constraint = &g_array_index
-            (constraints, lookup_constraint_t, i);
+    for (size_t i = 0; i < m_constraints->len; ++i){
+        trellis_constraint_t * constraint = &g_array_index
+            (m_constraints, trellis_constraint_t, i);
 
         /* handle one step constraint */
         if ( constraint->m_type == CONSTRAINT_ONESTEP ){
 
             phrase_token_t token = constraint->m_token;
             m_phrase_index->get_phrase_item(token, item);
-            guint32 end = constraint->m_end;
+            guint32 end = constraint->m_constraint_step;
 
             /* clear too long constraint */
-            if (end >= constraints->len){
-                clear_constraint(constraints, i);
+            if (end >= m_constraints->len){
+                clear_constraint(i);
                 continue;
             }
 
@@ -129,7 +129,7 @@ bool ForwardPhoneticConstraints::validate_constraint(PhoneticKeyMatrix * matrix)
                 (matrix, i, end, keys, item);
             /* clear invalid pinyin */
             if (pinyin_poss < FLT_EPSILON)
-                clear_constraint(constraints, i);
+                clear_constraint(i);
         }
     }
 
