@@ -117,6 +117,18 @@ private:
     GPtrArray * m_steps_content;
 
 public:
+    ForwardPhoneticTrellis() {
+        m_steps_index = g_ptr_array_new();
+        m_steps_content = g_ptr_array_new();
+    }
+
+    ~ForwardPhoneticTrellis() {
+        clear();
+        g_ptr_array_free(m_steps_index, TRUE);
+        g_ptr_array_free(m_steps_content, TRUE);
+    }
+
+public:
     bool clear() {
         /* clear m_steps_index */
         for ( size_t i = 0; i < m_steps_index->len; ++i){
@@ -169,7 +181,7 @@ public:
                 (initial_step_content, initial_node);
 
             LookupStepIndex initial_step_index = (LookupStepIndex)
-                g_ptr_array_index(steps_index, 0);
+                g_ptr_array_index(m_steps_index, 0);
             g_hash_table_insert(initial_step_index,
                                 GUINT_TO_POINTER(initial_key),
                                 GUINT_TO_POINTER(initial_step_content->len - 1));
@@ -180,7 +192,7 @@ public:
 
     /* Array of trellis_value_t */
     bool get_candidates(/* in */ gint32 index,
-                        /* out */ GArray * candidates) const {
+                        /* out */ GPtrArray * candidates) const {
         LookupStepContent step = (LookupStepContent)
             g_ptr_array_index(m_steps_content, index);
 
