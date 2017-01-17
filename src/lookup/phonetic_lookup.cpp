@@ -22,9 +22,80 @@
 
 namespace pinyin{
 
+/* internal definition */
+static const size_t nbeam = 32;
+
+bool dump_max_value(GPtrArray * values){
+    if (0 == values->len)
+        return false;
+
+    const trellis_value_t * max =
+        (const trellis_value_t *) g_ptr_array_index(values, 0);
+
+    for (size_t i = 1; i < values->len; ++i) {
+        const trellis_value_t * cur =
+            (const trellis_value_t *) g_ptr_array_index(values, i);
+
+        if (cur->m_poss > max->m_poss)
+            max = cur;
+    }
+
+    printf("max value: %f\n", max->m_poss);
+
+    return true;
+}
+
+bool dump_all_values(GPtrArray * values) {
+    if (0 == values->len)
+        return false;
+
+    printf("values:");
+    for (size_t i = 0; i < values->len; ++i) {
+        const trellis_value_t * cur =
+            (const trellis_value_t *) g_ptr_array_index(values, i);
+
+        printf("%f\t", cur->m_poss);
+    }
+    printf("\n");
+
+    return true;
+}
+
+static bool trellis_value_less_than(trellis_value_t * lhs,
+                                    trellis_value_t * rhs){
+    return lhs->m_poss < rhs->m_poss;
+}
+
 /* use maximum heap to get the topest results. */
 static bool get_top_results(/* out */ GPtrArray * topresults,
-                            /* in */ GPtrArray * candidates);
+                            /* in */ GPtrArray * candidates) {
+    g_ptr_array_set_size(topresults, 0);
+
+    if (0 == candidates->len)
+        return false;
+
+    trellis_value_t ** begin =
+        (trellis_value_t **) &g_ptr_array_index(candidates, 0);
+    trellis_value_t ** end =
+        (trellis_value_t **) &g_ptr_array_index(candidates, candidates->len);
+
+    std_lite::make_heap(begin, end, trellis_value_less_than);
+
+    while (end != begin) {
+        trellis_value_t * one = *begin;
+        g_ptr_array_add(topresults, one);
+
+        std_lite::pop_heap(begin, end, trellis_value_less_than);
+        --end;
+
+        if (topresults->len >= nbeam)
+            break;
+    }
+
+    /* dump_all_values(topresults); */
+
+    return true;
+}
 
 
 int ForwardPhoneticConstraints::add_constraint(size_t start, size_t end,

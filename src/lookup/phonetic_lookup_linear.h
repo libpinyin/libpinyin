@@ -38,6 +38,11 @@ public:
     const trellis_value_t * begin() { return m_elements; }
     const trellis_value_t * end() { return m_elements + m_nelem; }
 
+    bool number() {
+        for (ssize_t i = 0; i < m_nelem; ++i)
+            m_elements[i].m_current_index = i;
+    }
+
     /* return true if the item is stored into m_elements. */
     bool eval_item(const trellis_value_t * item) {
         /* still have space */

@@ -151,10 +151,62 @@ public:
     }
 
     /* Array of phrase_token_t */
-    bool fill_prefixes(/* in */ TokenVector prefixes);
+    bool fill_prefixes(/* in */ TokenVector prefixes) {
+        assert(prefixes->len > 0);
+
+        for (size_t i = 0; i < prefixes->len; ++i) {
+            phrase_token_t token = g_array_index(prefixes, phrase_token_t, i);
+            lookup_key_t initial_key = token;
+            trellis_value_t initial_value(log(1.f));
+            initial_value.m_handles[1] = token;
+
+            trellis_node<nbest> initial_node;
+            assert(initial_node.eval_item(&initial_value));
+
+            LookupStepContent initial_step_content = (LookupStepContent)
+                g_ptr_array_index(m_steps_content, 0);
+            initial_step_content = g_array_append_val
+                (initial_step_content, initial_node);
+
+            LookupStepIndex initial_step_index = (LookupStepIndex)
+                g_ptr_array_index(steps_index, 0);
+            g_hash_table_insert(initial_step_index,
+                                GUINT_TO_POINTER(initial_key),
+                                GUINT_TO_POINTER(initial_step_content->len - 1));
+        }
+
+        return true;
+    }
+
     /* Array of trellis_value_t */
     bool get_candidates(/* in */ gint32 index,
-                        /* out */ GArray * candidates) const;
+                        /* out */ GArray * candidates) const {
+        LookupStepContent step = (LookupStepContent)
+            g_ptr_array_index(m_steps_content, index);
+
+        g_ptr_array_set_size(candidates, 0);
+
+        if (0 == step->len)
+            return false;
+
+        for (size_t i = 0; i < step->len; ++i) {
+            trellis_node<nbest> * node = &g_array_index
+                (step, trellis_node<nbest>, i);
+
+            // only initialized in the get_candidates method.
+            node->number();
+
+            const trellis_value_t * value = node->begin();
+            for (size_t j = 0; j < node->length(); ++j) {
+                g_ptr_array_add(candidates, value);
+            }
+        }
+
+        /* dump_max_value(candidates); */
+
+        return true;
+    }
+
     /* insert candidate */
     bool insert_candidate(gint32 index, phrase_token_t token,
                           const trellis_value_t * candidate);
