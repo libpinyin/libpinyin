@@ -133,6 +133,11 @@ public:
     }
 
 public:
+    size_t size() const {
+        assert(m_steps_index->len == m_steps_content->len);
+        return m_steps_index->len;
+    }
+
     bool clear() {
         /* clear m_steps_index */
         for ( size_t i = 0; i < m_steps_index->len; ++i){
@@ -254,8 +259,7 @@ public:
     /* get tails */
     /* Array of trellis_value_t * */
     bool get_tails(/* out */ GPtrArray * tails) const {
-        assert(m_steps_index->len == m_steps_content->len);
-        gint32 tail_index = m_steps_index->len - 1;
+        gint32 tail_index = size() - 1;
 
         GPtrArray * candidates = g_ptr_array_new();
         get_candidates(tail_index, candidates);
@@ -294,7 +298,32 @@ public:
 template <gint32 nbest>
 bool extract_result(const ForwardPhoneticTrellis<nbest> * trellis,
                     const trellis_value_t * tail,
-                    /* out */ MatchResults & result);
+                    /* out */ MatchResults & results) {
+    /* reset results */
+    g_array_set_size(results, trellis->size());
+    for (size_t i = 0; i < results->len; ++i){
+        phrase_token_t * token = &g_array_index(results, phrase_token_t, i);
+        *token = null_token;
+    }
+
+    /* backtracing */
+    while( true ){
+        int index = tail->m_last_step;
+        if ( -1 == index )
+            break;
+
+        phrase_token_t * token = &g_array_index
+            (results, phrase_token_t, index);
+        *token = tail->m_handles[1];
+
+        phrase_token_t last_token = tail->m_handles[0];
+        int sub_index = tail->m_sub_index;
+        assert(trellis->get_candidate(index, last_token, sub_index, tail));
+    }
+
+    /* no need to reverse the result */
+    return true;
+}
 
 #if 0
 template <gint32 nbest>
