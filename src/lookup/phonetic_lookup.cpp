@@ -66,39 +66,6 @@ static bool trellis_value_less_than(trellis_value_t * lhs,
     return lhs->m_poss < rhs->m_poss;
 }
 
-/* use maximum heap to get the topest results. */
-bool get_top_results(size_t num,
-                     /* out */ GPtrArray * topresults,
-                     /* in */ GPtrArray * candidates) {
-    g_ptr_array_set_size(topresults, 0);
-
-    if (0 == candidates->len)
-        return false;
-
-    trellis_value_t ** begin =
-        (trellis_value_t **) &g_ptr_array_index(candidates, 0);
-    trellis_value_t ** end =
-        (trellis_value_t **) &g_ptr_array_index(candidates, candidates->len);
-
-    std_lite::make_heap(begin, end, trellis_value_less_than);
-
-    while (end != begin) {
-        trellis_value_t * one = *begin;
-        g_ptr_array_add(topresults, one);
-
-        std_lite::pop_heap(begin, end, trellis_value_less_than);
-        --end;
-
-        if (topresults->len >= num)
-            break;
-    }
-
-    /* dump_all_values(topresults); */
-
-    return true;
-}
-
-
 int ForwardPhoneticConstraints::add_constraint(size_t start, size_t end,
                                                phrase_token_t token) {
 
