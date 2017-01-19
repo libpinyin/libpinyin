@@ -59,11 +59,6 @@ public:
         if (m_nelem < nbest) {
             m_elements[m_nelem] = *item;
             m_nelem ++;
-
-            /* mark the first slot of trellis_node. */
-            if (1 == m_nelem)
-                m_elements[0].m_current_index = 0;
-
             push_heap(begin(), end(), trellis_value_more_than<nbest>);
             return true;
         }
@@ -103,9 +98,6 @@ public:
 
     /* return true if the item is stored into m_element. */
     bool eval_item(const trellis_value_t * item) {
-        /* mark the first slot of trellis_node. */
-        m_element.m_current_index = 0;
-
         if (compare_tellis_value<nbest>(&m_element, item)) {
             m_element = *item;
             return true;

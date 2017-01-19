@@ -30,6 +30,8 @@
 
 namespace pinyin{
 
+#define LONG_SENTENCE_PENALTY 1.2
+
 struct trellis_value_t {
     phrase_token_t m_handles[2];
     // the character length of the final sentence.
@@ -57,6 +59,13 @@ struct trellis_value_t {
 template <gint32 nbest>
 static bool inline trellis_value_less_than(const trellis_value_t * exist_item,
                                            const trellis_value_t * new_item) {
+    if (nbest > 1) {
+        /* allow longer sentence */
+        if (exist_item->m_sentence_length + 1 == new_item->m_sentence_length &&
+            exist_item->m_poss * LONG_SENTENCE_PENALTY < new_item->m_poss)
+            return true;
+    }
+
     /* shorter sentence */
     if (exist_item->m_sentence_length > new_item->m_sentence_length ||
         /* the same length but better possibility */
@@ -66,9 +75,8 @@ static bool inline trellis_value_less_than(const trellis_value_t * exist_item,
 
     if (nbest > 1) {
         /* allow longer sentence */
-        if (exist_item->m_current_index == 0 &&
-            exist_item->m_sentence_length == new_item->m_sentence_length + 1 &&
-            exist_item->m_poss < new_item->m_poss)
+        if (exist_item->m_sentence_length == new_item->m_sentence_length + 1 &&
+            exist_item->m_poss < new_item->m_poss * LONG_SENTENCE_PENALTY)
             return true;
     }
 

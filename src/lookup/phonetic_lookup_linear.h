@@ -49,10 +49,6 @@ public:
         if (m_nelem < nbest) {
             m_elements[m_nelem] = *item;
             m_nelem ++;
-
-            /* mark the first slot of trellis_node. */
-            if (1 == m_nelem)
-                m_elements[0].m_current_index = 0;
             return true;
         }
 
