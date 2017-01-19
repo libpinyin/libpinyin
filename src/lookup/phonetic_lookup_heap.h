@@ -21,10 +21,11 @@
 #ifndef PHONETIC_LOOKUP_HEAP_H
 #define PHONETIC_LOOKUP_HEAP_H
 
-static inline bool trellis_value_more_than(const trellis_value_t &lhs,
-                                           const trellis_value_t &rhs) {
+template <gint32 nbest>
+static inline bool trellis_value_more_than(const trellis_value_t &exist_item,
+                                           const trellis_value_t &new_item) {
     /* min heap here */
-    return lhs.m_poss > rhs.m_poss;
+    return trellis_value_less_than<nbest>(&new_item, &exist_item);
 }
 
 template <gint32 nbest>
@@ -58,7 +59,12 @@ public:
         if (m_nelem < nbest) {
             m_elements[m_nelem] = *item;
             m_nelem ++;
-            push_heap(begin(), end(), trellis_value_more_than);
+
+            /* mark the first slot of trellis_node. */
+            if (1 == m_nelem)
+                m_elements[0].m_current_index = 0;
+
+            push_heap(begin(), end(), trellis_value_more_than<nbest>);
             return true;
         }
 
@@ -67,9 +73,9 @@ public:
 
         /* compare new item */
         if (item->m_poss > min->m_poss) {
-            pop_heap(begin(), end(), trellis_value_more_than);
+            pop_heap(begin(), end(), trellis_value_more_than<nbest>);
             m_elements[m_nelem - 1] = *item;
-            push_heap(begin(), end(), trellis_value_more_than);
+            push_heap(begin(), end(), trellis_value_more_than<nbest>);
             return true;
         }
 
@@ -97,7 +103,10 @@ public:
 
     /* return true if the item is stored into m_element. */
     bool eval_item(const trellis_value_t * item) {
-        if (item->m_poss > m_element.m_poss) {
+        /* mark the first slot of trellis_node. */
+        m_element.m_current_index = 0;
+
+        if (compare_tellis_value<nbest>(&m_element, item)) {
             m_element = *item;
             return true;
         }

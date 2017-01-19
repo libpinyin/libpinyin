@@ -24,6 +24,7 @@
 
 #include "novel_types.h"
 #include <limits.h>
+#include <math.h>
 #include "phonetic_key_matrix.h"
 #include "ngram.h"
 
@@ -52,6 +53,27 @@ struct trellis_value_t {
         m_current_index = -1;
     }
 };
+
+template <gint32 nbest>
+static bool inline trellis_value_less_than(const trellis_value_t * exist_item,
+                                           const trellis_value_t * new_item) {
+    /* shorter sentence */
+    if (exist_item->m_sentence_length > new_item->m_sentence_length ||
+        /* the same length but better possibility */
+        (exist_item->m_sentence_length == new_item->m_sentence_length &&
+         exist_item->m_poss < new_item->m_poss))
+        return true;
+
+    if (nbest > 1) {
+        /* allow longer sentence */
+        if (exist_item->m_current_index == 0 &&
+            exist_item->m_sentence_length == new_item->m_sentence_length + 1 &&
+            exist_item->m_poss < new_item->m_poss)
+            return true;
+    }
+
+    return false;
+}
 
 #if 0
 struct matrix_value_t {

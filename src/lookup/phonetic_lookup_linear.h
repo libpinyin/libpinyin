@@ -49,18 +49,22 @@ public:
         if (m_nelem < nbest) {
             m_elements[m_nelem] = *item;
             m_nelem ++;
+
+            /* mark the first slot of trellis_node. */
+            if (1 == m_nelem)
+                m_elements[0].m_current_index = 0;
             return true;
         }
 
         /* find minium item */
         trellis_value_t * min = m_elements;
         for (gint32 i = 1; i < m_nelem; ++i) {
-            if (min->m_poss > m_elements[i].m_poss)
+            if (trellis_value_less_than<nbest>(m_elements + i, min))
                 min = m_elements + i;
         }
 
         /* compare new item */
-        if (item->m_poss > min->m_poss) {
+        if (trellis_value_less_than<nbest>(min, item)) {
             *min = *item;
             return true;
         }
