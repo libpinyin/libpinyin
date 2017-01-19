@@ -132,15 +132,15 @@ public:
     bool clear() {
         /* clear m_steps_index */
         for ( size_t i = 0; i < m_steps_index->len; ++i){
-            GHashTable * table = (GHashTable *) g_ptr_array_index(m_steps_index, i);
-            g_hash_table_destroy(table);
+            LookupStepIndex step_index = (LookupStepIndex) g_ptr_array_index(m_steps_index, i);
+            g_hash_table_destroy(step_index);
             g_ptr_array_index(m_steps_index, i) = NULL;
         }
 
         /* clear m_steps_content */
         for ( size_t i = 0; i < m_steps_content->len; ++i){
-            GArray * array = (GArray *) g_ptr_array_index(m_steps_content, i);
-            g_array_free(array, TRUE);
+            LookupStepContent step_content = (LookupStepContent) g_ptr_array_index(m_steps_content, i);
+            g_array_free(step_content, TRUE);
             g_ptr_array_index(m_steps_content, i) = NULL;
         }
 
@@ -220,14 +220,36 @@ public:
     }
 
     /* insert candidate */
-    bool insert_candidate(gint32 index, phrase_token_t token,
+    bool insert_candidate(gint32 index, lookup_key_t token,
                           const trellis_value_t * candidate);
     /* get tails */
     /* Array of trellis_value_t */
     bool get_tails(/* out */ GArray * tails) const;
+
     /* get candidate */
-    bool get_candidate(gint32 index, phrase_token_t token,
-                       gint32 sub_index, trellis_value_t * candidate) const;
+    bool get_candidate(gint32 index, lookup_key_t token, gint32 sub_index,
+                       const trellis_value_t * & candidate) const {
+        LookupStepIndex step_index = (LookupStepIndex) g_ptr_array_index(m_steps_index, index);
+        LookupStepContent step_content = (LookupStepContent) g_ptr_array_index(m_steps_content, index);
+
+        gpointer key = NULL, value = NULL;
+        gboolean lookup_result = g_hash_table_lookup_extended
+            (step_index, GUINT_TO_POINTER(token), &key, &value);
+
+        if (!lookup_result)
+            return false;
+
+        size_t node_index = GPOINTER_TO_UINT(value);
+        trellis_node<nbest> * node = &g_array_index
+            (step_content, trellis_node<nbest>, node_index);
+
+        if (sub_index >= node->length())
+            return false;
+
+        candidate = node->begin() + sub_index;
+
+        return true;
+    }
 };
 
 template <gint32 nbest>
@@ -265,6 +287,16 @@ public:
     int add_constraint(size_t start, size_t end, phrase_token_t token);
     bool clear_constraint(size_t index);
     bool validate_constraint(PhoneticKeyMatrix * matrix);
+
+    bool get_constraint(size_t index,
+                        const trellis_constraint_t * & constraint) const {
+        if (index >= m_constraints->len)
+            return false;
+
+        constraint = &g_array_index(m_constraints, trellis_constraint_t, index);
+
+        return true;
+    }
 };
 
 
