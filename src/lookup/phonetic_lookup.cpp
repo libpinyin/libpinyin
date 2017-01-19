@@ -67,8 +67,9 @@ static bool trellis_value_less_than(trellis_value_t * lhs,
 }
 
 /* use maximum heap to get the topest results. */
-static bool get_top_results(/* out */ GPtrArray * topresults,
-                            /* in */ GPtrArray * candidates) {
+bool get_top_results(size_t num,
+                     /* out */ GPtrArray * topresults,
+                     /* in */ GPtrArray * candidates) {
     g_ptr_array_set_size(topresults, 0);
 
     if (0 == candidates->len)
@@ -88,7 +89,7 @@ static bool get_top_results(/* out */ GPtrArray * topresults,
         std_lite::pop_heap(begin, end, trellis_value_less_than);
         --end;
 
-        if (topresults->len >= nbeam)
+        if (topresults->len >= num)
             break;
     }
 

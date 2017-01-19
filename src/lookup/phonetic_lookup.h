@@ -108,6 +108,10 @@ typedef GHashTable * LookupStepIndex;
  /* Array of trellis_node */
 typedef GArray * LookupStepContent;
 
+bool get_top_results(size_t num,
+                     /* out */ GPtrArray * topresults,
+                     /* in */ GPtrArray * candidates);
+
 template <gint32 nbest>
 class ForwardPhoneticTrellis {
 private:
@@ -221,10 +225,45 @@ public:
 
     /* insert candidate */
     bool insert_candidate(gint32 index, lookup_key_t token,
-                          const trellis_value_t * candidate);
+                          const trellis_value_t * candidate) {
+        LookupStepIndex step_index = (LookupStepIndex) g_ptr_array_index(m_steps_index, index);
+        LookupStepContent step_content = (LookupStepContent) g_ptr_array_index(m_steps_content, index);
+
+        gpointer key = NULL, value = NULL;
+        gboolean lookup_result = g_hash_table_lookup_extended
+            (step_index, GUINT_TO_POINTER(token), &key, &value);
+
+        if (!lookup_result) {
+            trellis_node<nbest> node;
+            assert(node.eval_item(candidate));
+
+            g_array_append_val(step_content, node);
+            g_hash_table_insert(step_index, GUINT_TO_POINTER(token), GUINT_TO_POINTER(step_content->len - 1));
+            return true;
+        } else {
+            size_t node_index = GPOINTER_TO_UINT(value);
+            trellis_node<nbest> * node = &g_array_index
+                (step_content, trellis_node<nbest>, node_index);
+
+            return node->eval_item(candidate);
+        }
+
+        assert(FALSE);
+    }
+
     /* get tails */
-    /* Array of trellis_value_t */
-    bool get_tails(/* out */ GArray * tails) const;
+    /* Array of trellis_value_t * */
+    bool get_tails(/* out */ GPtrArray * tails) const {
+        assert(m_steps_index->len == m_steps_content->len);
+        gint32 tail_index = m_steps_index->len - 1;
+
+        GPtrArray * candidates = g_ptr_array_new();
+        get_candidates(tail_index, candidates);
+        get_top_results(nbest, tails, candidates);
+
+        g_ptr_array_free(candidates, TRUE);
+        return true;
+    }
 
     /* get candidate */
     bool get_candidate(gint32 index, lookup_key_t token, gint32 sub_index,
