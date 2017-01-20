@@ -62,7 +62,7 @@ static bool inline trellis_value_less_than(const trellis_value_t * exist_item,
     if (nbest > 1) {
         /* allow longer sentence */
         if (exist_item->m_sentence_length + 1 == new_item->m_sentence_length &&
-            exist_item->m_poss * LONG_SENTENCE_PENALTY < new_item->m_poss)
+            exist_item->m_poss + LONG_SENTENCE_PENALTY < new_item->m_poss)
             return true;
     }
 
@@ -76,7 +76,7 @@ static bool inline trellis_value_less_than(const trellis_value_t * exist_item,
     if (nbest > 1) {
         /* allow longer sentence */
         if (exist_item->m_sentence_length == new_item->m_sentence_length + 1 &&
-            exist_item->m_poss < new_item->m_poss * LONG_SENTENCE_PENALTY)
+            exist_item->m_poss < new_item->m_poss + LONG_SENTENCE_PENALTY)
             return true;
     }
 

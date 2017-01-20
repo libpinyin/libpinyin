@@ -98,7 +98,7 @@ public:
 
     /* return true if the item is stored into m_element. */
     bool eval_item(const trellis_value_t * item) {
-        if (compare_tellis_value<nbest>(&m_element, item)) {
+        if (trellis_value_less_than<1>(&m_element, item)) {
             m_element = *item;
             return true;
         }
