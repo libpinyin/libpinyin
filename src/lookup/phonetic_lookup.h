@@ -436,6 +436,9 @@ private:
     const gfloat bigram_lambda;
     const gfloat unigram_lambda;
 
+    /* memory cache */
+    SingleGram m_merged_single_gram;
+
 protected:
     ForwardPhoneticTrellis<nbest> m_trellis;
 
@@ -452,10 +455,106 @@ protected:
 protected:
     bool search_unigram2(GPtrArray * topresults,
                          int start, int end,
-                         PhraseIndexRanges ranges);
+                         PhraseIndexRanges ranges) {
+        if (0 == topresults->len)
+            return false;
+
+        trellis_value_t * max = (trellis_value_t *)
+            g_ptr_array_index(topresults, 0);
+
+        const trellis_constraint_t * constraint = NULL;
+        assert(m_constraints.get_constraint(start, constraint));
+
+        if (CONSTRAINT_ONESTEP == constraint->m_type) {
+            return unigram_gen_next_step(start, constraint->m_constraint_step,
+                                         max, constraint->m_token);
+        }
+
+        bool found = false;
+
+        if (NO_CONSTRAINT == constraint->m_type) {
+            for ( size_t m = 0; m < PHRASE_INDEX_LIBRARY_COUNT; ++m){
+                GArray * array = ranges[m];
+                if ( !array ) continue;
+
+                for ( size_t n = 0; n < array->len; ++n){
+                    PhraseIndexRange * range = &g_array_index(array, PhraseIndexRange, n);
+                    for ( phrase_token_t token = range->m_range_begin;
+                          token != range->m_range_end; ++token){
+                        found = unigram_gen_next_step(start, end, max, token) ||
+                            found;
+                    }
+                }
+            }
+        }
+
+        return found;
+    }
+
     bool search_bigram2(GPtrArray * topresults,
                         int start, int end,
-                        PhraseIndexRanges ranges);
+                        PhraseIndexRanges ranges) {
+        const trellis_constraint_t * constraint = NULL;
+        assert(m_constraints.get_constraint(start, constraint));
+
+        bool found = false;
+        BigramPhraseArray bigram_phrase_items = g_array_new
+            (FALSE, FALSE, sizeof(BigramPhraseItem));
+
+        for (size_t i = 0; i < topresults->len; ++i) {
+            trellis_value_t * value = (trellis_value_t *)
+                g_ptr_array_index(topresults, i);
+
+            phrase_token_t index_token = value->m_handles[1];
+
+            SingleGram * system = NULL, * user = NULL;
+            m_system_bigram->load(index_token, system);
+            m_user_bigram->load(index_token, user);
+
+            if ( !merge_single_gram(&m_merged_single_gram, system, user) )
+                continue;
+
+            if ( CONSTRAINT_ONESTEP == constraint->m_type ){
+                phrase_token_t token = constraint->m_token;
+
+                guint32 freq;
+                if( m_merged_single_gram.get_freq(token, freq) ){
+                    guint32 total_freq;
+                    m_merged_single_gram.get_total_freq(total_freq);
+                    gfloat bigram_poss = freq / (gfloat) total_freq;
+                    found = bigram_gen_next_step(start,
+                                                 constraint->m_constraint_step,
+                                                 value, token, bigram_poss) || found;
+                }
+            }
+
+            if (NO_CONSTRAINT == constraint->m_type) {
+                for( size_t m = 0; m < PHRASE_INDEX_LIBRARY_COUNT; ++m){
+                    GArray * array = ranges[m];
+                    if ( !array ) continue;
+
+                    for ( size_t n = 0; n < array->len; ++n){
+                        PhraseIndexRange * range =
+                            &g_array_index(array, PhraseIndexRange, n);
+
+                        g_array_set_size(bigram_phrase_items, 0);
+                        m_merged_single_gram.search(range, bigram_phrase_items);
+                        for( size_t k = 0; k < bigram_phrase_items->len; ++k) {
+                            BigramPhraseItem * item = &g_array_index(bigram_phrase_items, BigramPhraseItem, k);
+                            found = bigram_gen_next_step(start, end, value, item->m_token, item->m_freq) || found;
+                        }
+                    }
+                }
+            }
+            if (system)
+                delete system;
+            if (user)
+                delete user;
+        }
+
+        g_array_free(bigram_phrase_items, TRUE);
+        return found;
+    }
 
     bool unigram_gen_next_step(int start, int end,
                                trellis_value_t * cur_step,
