@@ -625,7 +625,111 @@ public:
     bool get_best_match(TokenVector prefixes,
                         PhoneticKeyMatrix * matrix,
                         ForwardPhoneticConstraints constraints,
-                        NBestMatchResults & results);
+                        NBestMatchResults & results) {
+        m_constraints = constraints;
+        m_matrix = matrix;
+
+        int nstep = m_matrix->size();
+        if (0 == nstep)
+            return false;
+
+        /* free results */
+        for (size_t i = 0; i < results->len; ++i) {
+            MatchResults result = (MatchResults) g_ptr_array_index(results, i);
+            g_array_free(result, TRUE);
+        }
+        g_ptr_array_set_size(results, 0);
+
+        m_trellis.clear();
+        m_trellis.prepare(nstep);
+
+        m_trellis.fill_prefixes(prefixes);
+
+        PhraseIndexRanges ranges;
+        memset(ranges, 0, sizeof(PhraseIndexRanges));
+        m_phrase_index->prepare_ranges(ranges);
+
+        GPtrArray * candidates = g_ptr_array_new();
+        GPtrArray * topresults = g_ptr_array_new();
+
+        /* begin the viterbi beam search. */
+        for ( int i = 0; i < nstep - 1; ++i ){
+            const trellis_constraint_t * cur_constraint = NULL;
+            assert(m_constraints.get_constraint(i, cur_constraint));
+
+            if (CONSTRAINT_NOSEARCH == cur_constraint->m_type)
+                continue;
+
+            m_trellis.get_candidates(i, candidates);
+            get_top_results<nbest>(topresults, candidates);
+
+            if (0 == topresults->len)
+                continue;
+
+            if (CONSTRAINT_ONESTEP == cur_constraint->m_type) {
+                int m = cur_constraint->m_constraint_step;
+
+                m_phrase_index->clear_ranges(ranges);
+
+                /* do one pinyin table search. */
+                int retval = search_matrix(m_pinyin_table, m_matrix,
+                                           i, m, ranges);
+
+                if (retval & SEARCH_OK) {
+                    /* assume topresults always contains items. */
+                    search_bigram2(topresults, i, m, ranges),
+                        search_unigram2(topresults, i, m, ranges);
+                }
+
+                continue;
+            }
+
+            for ( int m = i + 1; m < nstep; ++m ){
+                const trellis_constraint_t * next_constraint = NULL;
+                assert(m_constraints.get_constraint(m, next_constraint));
+
+                if (CONSTRAINT_NOSEARCH == next_constraint->m_type)
+                    break;
+
+                m_phrase_index->clear_ranges(ranges);
+
+                /* do one pinyin table search. */
+                int retval = search_matrix(m_pinyin_table, m_matrix,
+                                           i, m, ranges);
+
+                if (retval & SEARCH_OK) {
+                    /* assume topresults always contains items. */
+                    search_bigram2(topresults, i, m, ranges),
+                        search_unigram2(topresults, i, m, ranges);
+                }
+
+                /* no longer pinyin */
+                if (!(retval & SEARCH_CONTINUED))
+                    break;
+            }
+        }
+
+        m_phrase_index->destroy_ranges(ranges);
+
+        g_ptr_array_free(candidates, TRUE);
+        g_ptr_array_free(topresults, TRUE);
+
+        /* extract every result. */
+        GPtrArray * tails = g_ptr_array_new();
+        m_trellis.get_tails(tails);
+        for (size_t i = 0; i < tails->len; ++i) {
+            MatchResults result = g_array_new
+                (TRUE, TRUE, sizeof(phrase_token_t));
+            const trellis_value_t * tail = (const trellis_value_t *)
+                g_ptr_array_index(tails, i);
+
+            assert(extract_result<nbest>(m_trellis, tail, result));
+            g_ptr_array_add(results, result);
+        }
+        g_ptr_array_free(tails, TRUE);
+
+        return true;
+    }
 
 };
 
