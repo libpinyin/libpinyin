@@ -357,11 +357,11 @@ public:
 template <gint32 nbest>
 bool extract_result(const ForwardPhoneticTrellis<nbest> * trellis,
                     const trellis_value_t * tail,
-                    /* out */ MatchResults & results) {
-    /* reset results */
-    g_array_set_size(results, trellis->size());
-    for (size_t i = 0; i < results->len; ++i){
-        phrase_token_t * token = &g_array_index(results, phrase_token_t, i);
+                    /* out */ MatchResults & result) {
+    /* reset result */
+    g_array_set_size(result, trellis->size());
+    for (size_t i = 0; i < result->len; ++i){
+        phrase_token_t * token = &g_array_index(result, phrase_token_t, i);
         *token = null_token;
     }
 
@@ -372,7 +372,7 @@ bool extract_result(const ForwardPhoneticTrellis<nbest> * trellis,
             break;
 
         phrase_token_t * token = &g_array_index
-            (results, phrase_token_t, index);
+            (result, phrase_token_t, index);
         *token = tail->m_handles[1];
 
         phrase_token_t last_token = tail->m_handles[0];
