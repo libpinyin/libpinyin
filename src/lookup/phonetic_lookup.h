@@ -582,7 +582,7 @@ protected:
         next_step.m_last_step = start;
         next_step.m_sub_index = cur_step->m_current_index;
 
-        return save_next_step(end, cur_step, &next_step);
+        return save_next_step(end, &next_step);
     }
 
     bool bigram_gen_next_step(int start, int end,
@@ -612,10 +612,13 @@ protected:
         next_step.m_last_step = start;
         next_step.m_sub_index = cur_step->m_current_index;
 
-        return save_next_step(end, cur_step, &next_step);
+        return save_next_step(end, &next_step);
     }
 
-    bool save_next_step(int next_step_pos, trellis_value_t * cur_step, trellis_value_t * next_step);
+    bool save_next_step(int index, trellis_value_t * candidate) {
+        lookup_key_t token = candidate->m_handles[1];
+        m_trellis.insert_candidate(index, token, candidate);
+    }
 
 public:
 
