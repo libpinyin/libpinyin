@@ -437,6 +437,8 @@ private:
     const gfloat unigram_lambda;
 
     /* memory cache */
+    GArray * m_cached_keys;
+    PhraseItem m_cached_phrase_item;
     SingleGram m_merged_single_gram;
 
 protected:
@@ -558,11 +560,60 @@ protected:
 
     bool unigram_gen_next_step(int start, int end,
                                trellis_value_t * cur_step,
-                               phrase_token_t token);
+                               phrase_token_t token) {
+        if (m_phrase_index->get_phrase_item(token, m_cached_phrase_item))
+            return false;
+
+        size_t phrase_length = m_cached_phrase_item.get_phrase_length();
+        gdouble elem_poss = m_cached_phrase_item.get_unigram_frequency() /
+            (gdouble) m_phrase_index->get_phrase_index_total_freq();
+        if ( elem_poss < DBL_EPSILON )
+            return false;
+
+        gfloat pinyin_poss = compute_pronunciation_possibility
+            (m_matrix, start, end, m_cached_keys, m_cached_phrase_item);
+        if (pinyin_poss < FLT_EPSILON )
+            return false;
+
+        trellis_value_t next_step;
+        next_step.m_handles[0] = cur_step->m_handles[1]; next_step.m_handles[1] = token;
+        next_step.m_sentence_length = cur_step->m_sentence_length + phrase_length;
+        next_step.m_poss = cur_step->m_poss + log(elem_poss * pinyin_poss * unigram_lambda);
+        next_step.m_last_step = start;
+        next_step.m_sub_index = cur_step->m_current_index;
+
+        return save_next_step(end, cur_step, &next_step);
+    }
+
     bool bigram_gen_next_step(int start, int end,
                               trellis_value_t * cur_step,
                               phrase_token_t token,
-                              gfloat bigram_poss);
+                              gfloat bigram_poss) {
+        if (m_phrase_index->get_phrase_item(token, m_cached_phrase_item))
+            return false;
+
+        size_t phrase_length = m_cached_phrase_item.get_phrase_length();
+        gdouble unigram_poss = m_cached_phrase_item.get_unigram_frequency() /
+            (gdouble) m_phrase_index->get_phrase_index_total_freq();
+        if ( bigram_poss < FLT_EPSILON && unigram_poss < DBL_EPSILON )
+            return false;
+
+        gfloat pinyin_poss = compute_pronunciation_possibility
+                           (m_matrix, start, end,
+                            m_cached_keys, m_cached_phrase_item);
+        if ( pinyin_poss < FLT_EPSILON )
+            return false;
+
+        trellis_value_t next_step;
+        next_step.m_handles[0] = cur_step->m_handles[1]; next_step.m_handles[1] = token;
+        next_step.m_sentence_length = cur_step->m_sentence_length + phrase_length;
+        next_step.m_poss = cur_step->m_poss +
+            log((bigram_lambda * bigram_poss + unigram_lambda * unigram_poss) * pinyin_poss);
+        next_step.m_last_step = start;
+        next_step.m_sub_index = cur_step->m_current_index;
+
+        return save_next_step(end, cur_step, &next_step);
+    }
 
     bool save_next_step(int next_step_pos, trellis_value_t * cur_step, trellis_value_t * next_step);
 
