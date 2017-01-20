@@ -171,6 +171,12 @@ bool get_top_results(size_t num,
     return true;
 }
 
+static gint trellis_value_compare(const trellis_value_t ** lhs,
+                                  const trellis_value_t ** rhs) {
+    /* in descending order */
+    return -((*lhs)->m_poss - (*rhs)->m_poss);
+}
+
 template <gint32 nbest>
 class ForwardPhoneticTrellis {
 private:
@@ -323,6 +329,8 @@ public:
         GPtrArray * candidates = g_ptr_array_new();
         get_candidates(tail_index, candidates);
         get_top_results<nbest>(nbest, tails, candidates);
+
+        g_ptr_array_sort(tails, trellis_value_compare);
 
         g_ptr_array_free(candidates, TRUE);
         return true;

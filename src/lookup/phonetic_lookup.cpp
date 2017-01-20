@@ -61,11 +61,6 @@ bool dump_all_values(GPtrArray * values) {
     return true;
 }
 
-static bool trellis_value_less_than(trellis_value_t * lhs,
-                                    trellis_value_t * rhs){
-    return lhs->m_poss < rhs->m_poss;
-}
-
 int ForwardPhoneticConstraints::add_constraint(size_t start, size_t end,
                                                phrase_token_t token) {
 
