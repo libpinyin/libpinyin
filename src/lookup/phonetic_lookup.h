@@ -64,21 +64,20 @@ static bool inline trellis_value_less_than(const trellis_value_t * exist_item,
         if (exist_item->m_sentence_length + 1 == new_item->m_sentence_length &&
             exist_item->m_poss + LONG_SENTENCE_PENALTY < new_item->m_poss)
             return true;
-    }
 
-    /* shorter sentence */
-    if (exist_item->m_sentence_length > new_item->m_sentence_length ||
-        /* the same length but better possibility */
-        (exist_item->m_sentence_length == new_item->m_sentence_length &&
-         exist_item->m_poss < new_item->m_poss))
-        return true;
-
-    if (nbest > 1) {
-        /* allow longer sentence */
         if (exist_item->m_sentence_length == new_item->m_sentence_length + 1 &&
             exist_item->m_poss < new_item->m_poss + LONG_SENTENCE_PENALTY)
             return true;
     }
+
+    /* the same length but better possibility */
+    if (exist_item->m_sentence_length == new_item->m_sentence_length &&
+        exist_item->m_poss < new_item->m_poss)
+        return true;
+
+    /* shorter sentence */
+    if (exist_item->m_sentence_length > new_item->m_sentence_length)
+        return true;
 
     return false;
 }
@@ -625,7 +624,7 @@ protected:
 
     bool save_next_step(int index, trellis_value_t * candidate) {
         lookup_key_t token = candidate->m_handles[1];
-        m_trellis.insert_candidate(index, token, candidate);
+        return m_trellis.insert_candidate(index, token, candidate);
     }
 
 public:
