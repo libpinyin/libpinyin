@@ -418,6 +418,16 @@ protected:
     FacadePhraseIndex * m_phrase_index;
 
 public:
+    ForwardPhoneticConstraints() {
+        m_constraints = g_array_new(TRUE, TRUE, sizeof(trellis_constraint_t));
+    }
+
+    ~ForwardPhoneticConstraints() {
+        g_array_free(m_constraints, TRUE);
+        m_constraints = NULL;
+    }
+
+public:
     int add_constraint(size_t start, size_t end, phrase_token_t token);
     bool clear_constraint(size_t index);
     bool validate_constraint(PhoneticKeyMatrix * matrix);
@@ -631,6 +641,33 @@ protected:
     }
 
 public:
+
+    PhoneticLookup(const gfloat lambda,
+                   FacadeChewingTable2 * pinyin_table,
+                   FacadePhraseIndex * phrase_index,
+                   Bigram * system_bigram,
+                   Bigram * user_bigram)
+        : bigram_lambda(lambda),
+          unigram_lambda(1. - lambda)
+    {
+        /* store the pointer. */
+        m_pinyin_table = pinyin_table;
+        m_phrase_index = phrase_index;
+        m_system_bigram = system_bigram;
+        m_user_bigram = user_bigram;
+
+        m_cached_keys = g_array_new(TRUE, TRUE, sizeof(ChewingKey));
+
+        /* the member variables below are saved in get_nbest_match call. */
+        m_matrix = NULL;
+        m_constraints = NULL;
+    }
+
+    ~PhoneticLookup(){
+        g_array_free(m_cached_keys, TRUE);
+        m_cached_keys = NULL;
+    }
+
 
     bool get_nbest_match(TokenVector prefixes,
                          PhoneticKeyMatrix * matrix,
