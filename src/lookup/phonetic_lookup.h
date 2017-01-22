@@ -431,6 +431,8 @@ public:
 
         return true;
     }
+
+    bool diff_result(MatchResults best, MatchResults other);
 };
 
 

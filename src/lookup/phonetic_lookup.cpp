@@ -172,4 +172,43 @@ bool ForwardPhoneticConstraints::validate_constraint(PhoneticKeyMatrix * matrix)
 }
 
 
+bool ForwardPhoneticConstraints::diff_result(MatchResults best,
+                                             MatchResults other){
+    bool changed = false;
+
+    assert(best->len == other->len);
+
+    for (size_t pos = 0; pos < other->len; ++pos) {
+        phrase_token_t other_token = g_array_index(other, phrase_token_t, pos);
+
+        if (null_token == other_token)
+            continue;
+
+        phrase_token_t best_token = g_array_index(best, phrase_token_t, pos);
+
+        /* the same token */
+        if (best_token == other_token)
+            continue;
+
+        changed = true;
+
+        /* skip the tail node, as not searched in nbest algorithm. */
+        size_t next_pos = other->len - 1;
+        for (size_t i = pos + 1; i < other->len; ++i) {
+            phrase_token_t token = g_array_index(other, phrase_token_t, i);
+
+            if (null_token != token) {
+                next_pos = i;
+                break;
+            }
+        }
+
+        assert(add_constraint(pos, next_pos, other_token));
+    }
+
+    /* best and other results should be different. */
+    assert(changed);
+    return changed;
+}
+
 };
