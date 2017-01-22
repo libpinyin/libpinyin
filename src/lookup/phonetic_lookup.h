@@ -422,6 +422,7 @@ public:
     bool clear_constraint(size_t index);
     bool validate_constraint(PhoneticKeyMatrix * matrix);
 
+    size_t length() const { return m_constraints->len; }
     bool get_constraint(size_t index,
                         const trellis_constraint_t * & constraint) const {
         if (index >= m_constraints->len)
@@ -631,10 +632,10 @@ protected:
 
 public:
 
-    bool get_best_match(TokenVector prefixes,
-                        PhoneticKeyMatrix * matrix,
-                        ForwardPhoneticConstraints constraints,
-                        NBestMatchResults & results) {
+    bool get_nbest_match(TokenVector prefixes,
+                         PhoneticKeyMatrix * matrix,
+                         ForwardPhoneticConstraints constraints,
+                         NBestMatchResults & results) {
         m_constraints = constraints;
         m_matrix = matrix;
 
@@ -740,6 +741,99 @@ public:
         return true;
     }
 
+    bool train_result3(const PhoneticKeyMatrix * matrix,
+                       const ForwardPhoneticConstraints * constraints,
+                       MatchResults result) {
+        const guint32 initial_seed = 23 * 3;
+        const guint32 expand_factor = 2;
+        const guint32 unigram_factor = 7;
+        const guint32 pinyin_factor = 1;
+        const guint32 ceiling_seed = 23 * 15 * 64;
+
+        /* begin training based on constraints and result. */
+        bool train_next = false;
+
+        phrase_token_t last_token = sentence_start;
+
+        for (size_t i = 0; i < constraints->length(); ++i) {
+            phrase_token_t token = g_array_index(result, phrase_token_t, i);
+            if (null_token == token)
+                continue;
+
+            const trellis_constraint_t * constraint = NULL;
+            assert(constraints->get_constraint(i, constraint));
+
+            if (train_next || CONSTRAINT_ONESTEP == constraint->m_type) {
+                if (CONSTRAINT_ONESTEP == constraint->m_type) {
+                    assert(token == constraint->m_token);
+                    train_next = true;
+                } else {
+                    train_next = false;
+                }
+
+                guint32 seed = initial_seed;
+                /* train bi-gram first, and get train seed. */
+                if (last_token) {
+                    SingleGram * user = NULL;
+                    m_user_bigram->load(last_token, user);
+
+                    guint32 total_freq = 0;
+                    if (!user) {
+                        user = new SingleGram;
+                    }
+                    assert(user->get_total_freq(total_freq));
+
+                    guint32 freq = 0;
+                    /* compute train factor */
+                    if (!user->get_freq(token, freq)) {
+                        assert(user->insert_freq(token, 0));
+                        seed = initial_seed;
+                    } else {
+                        seed = std_lite::max(freq, initial_seed);
+                        seed *= expand_factor;
+                        seed = std_lite::min(seed, ceiling_seed);
+                    }
+
+                    /* protect against total_freq overflow */
+                    if (seed > 0 && total_freq > total_freq + seed)
+                        goto next;
+
+                    assert(user->set_total_freq(total_freq + seed));
+                    /* if total_freq is not overflow, then freq won't overflow. */
+                    assert(user->set_freq(token, freq + seed));
+                    assert(m_user_bigram->store(last_token, user));
+                next:
+                    assert(NULL != user);
+                    if (user)
+                        delete user;
+                }
+
+                /* compute the position of next token. */
+                size_t next_pos = i + 1;
+                for (; next_pos < constraints->length(); ++next_pos) {
+                    phrase_token_t next_token = g_array_index
+                        (result, phrase_token_t, next_pos);
+
+                    if (null_token != next_token)
+                        break;
+                }
+                /* safe guard for last token. */
+                next_pos = std_lite::min(next_pos, constraints->length() - 1);
+
+                /* train uni-gram */
+                m_phrase_index->get_phrase_item(token, m_cached_phrase_item);
+                increase_pronunciation_possibility
+                    (matrix, i, next_pos,
+                     m_cached_keys, m_cached_phrase_item, seed * pinyin_factor);
+                m_phrase_index->add_unigram_frequency
+                    (token, seed * unigram_factor);
+            }
+
+            last_token = token;
+        }
+
+        return true;
+    }
 };
 
 };
