@@ -58,7 +58,7 @@ public:
         return true;
     }
 
-    size_t size() {
+    size_t size() const {
         return m_table_content->len;
     }
 
@@ -130,7 +130,7 @@ public:
         return m_keys.clear_all() && m_key_rests.clear_all();
     }
 
-    size_t size() {
+    size_t size() const {
         assert(m_keys.size() == m_key_rests.size());
         return m_keys.size();
     }

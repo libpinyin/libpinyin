@@ -466,8 +466,8 @@ protected:
 
 protected:
     /* saved varibles */
-    ForwardPhoneticConstraints m_constraints;
-    PhoneticKeyMatrix * m_matrix;
+    const ForwardPhoneticConstraints * m_constraints;
+    const PhoneticKeyMatrix * m_matrix;
 
     FacadeChewingTable2 * m_pinyin_table;
     FacadePhraseIndex * m_phrase_index;
@@ -485,7 +485,7 @@ protected:
             g_ptr_array_index(topresults, 0);
 
         const trellis_constraint_t * constraint = NULL;
-        assert(m_constraints.get_constraint(start, constraint));
+        assert(m_constraints->get_constraint(start, constraint));
 
         if (CONSTRAINT_ONESTEP == constraint->m_type) {
             return unigram_gen_next_step(start, constraint->m_constraint_step,
@@ -517,7 +517,7 @@ protected:
                         int start, int end,
                         PhraseIndexRanges ranges) {
         const trellis_constraint_t * constraint = NULL;
-        assert(m_constraints.get_constraint(start, constraint));
+        assert(m_constraints->get_constraint(start, constraint));
 
         bool found = false;
         BigramPhraseArray bigram_phrase_items = g_array_new
@@ -670,8 +670,8 @@ public:
 
 
     bool get_nbest_match(TokenVector prefixes,
-                         PhoneticKeyMatrix * matrix,
-                         ForwardPhoneticConstraints constraints,
+                         const PhoneticKeyMatrix * matrix,
+                         const ForwardPhoneticConstraints * constraints,
                          NBestMatchResults & results) {
         m_constraints = constraints;
         m_matrix = matrix;
@@ -702,7 +702,7 @@ public:
         /* begin the viterbi beam search. */
         for ( int i = 0; i < nstep - 1; ++i ){
             const trellis_constraint_t * cur_constraint = NULL;
-            assert(m_constraints.get_constraint(i, cur_constraint));
+            assert(m_constraints->get_constraint(i, cur_constraint));
 
             if (CONSTRAINT_NOSEARCH == cur_constraint->m_type)
                 continue;
@@ -733,7 +733,7 @@ public:
 
             for ( int m = i + 1; m < nstep; ++m ){
                 const trellis_constraint_t * next_constraint = NULL;
-                assert(m_constraints.get_constraint(m, next_constraint));
+                assert(m_constraints->get_constraint(m, next_constraint));
 
                 if (CONSTRAINT_NOSEARCH == next_constraint->m_type)
                     break;
