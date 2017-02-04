@@ -209,6 +209,7 @@ public:
             g_hash_table_destroy(step_index);
             g_ptr_array_index(m_steps_index, i) = NULL;
         }
+        g_ptr_array_set_size(m_steps_index, 0);
 
         /* clear m_steps_content */
         for ( size_t i = 0; i < m_steps_content->len; ++i){
@@ -216,6 +217,7 @@ public:
             g_array_free(step_content, TRUE);
             g_ptr_array_index(m_steps_content, i) = NULL;
         }
+        g_ptr_array_set_size(m_steps_content, 0);
 
         return true;
     }
@@ -447,8 +449,57 @@ public:
 };
 
 
-/* Array of MatchResults */
-typedef GPtrArray * NBestMatchResults;
+class NBestMatchResults {
+private:
+    /* Array of MatchResult */
+    GPtrArray * m_results;
+
+public:
+    NBestMatchResults() {
+        m_results = g_ptr_array_new();
+    }
+
+    ~NBestMatchResults() {
+        clear();
+        g_ptr_array_free(m_results, TRUE);
+    }
+
+public:
+    size_t size() const {
+        return m_results->len;
+    }
+
+    bool get_result(size_t index, MatchResults & result) const {
+        if (index >= m_results->len)
+            return false;
+
+        result = (MatchResults) g_ptr_array_index(m_results, index);
+        return true;
+    }
+
+    bool clear() {
+        /* free m_results */
+        for (size_t i = 0; i < m_results->len; ++i) {
+            MatchResults array =
+                (MatchResults) g_ptr_array_index(m_results, i);
+            g_array_free(array, TRUE);
+        }
+        g_ptr_array_set_size(m_results, 0);
+
+        return true;
+    }
+
+    /* copy result here */
+    bool add_result(MatchResults result) {
+        MatchResults array = g_array_new
+            (TRUE, TRUE, sizeof(phrase_token_t));
+
+        g_array_append_vals(array, result->data, result->len);
+
+        g_ptr_array_add(m_results, array);
+        return true;
+    }
+};
 
 template <gint32 nbest>
 class PhoneticLookup {
@@ -672,7 +723,7 @@ public:
     bool get_nbest_match(TokenVector prefixes,
                          const PhoneticKeyMatrix * matrix,
                          const ForwardPhoneticConstraints * constraints,
-                         NBestMatchResults & results) {
+                         NBestMatchResults * results) {
         m_constraints = constraints;
         m_matrix = matrix;
 
@@ -681,11 +732,7 @@ public:
             return false;
 
         /* free results */
-        for (size_t i = 0; i < results->len; ++i) {
-            MatchResults result = (MatchResults) g_ptr_array_index(results, i);
-            g_array_free(result, TRUE);
-        }
-        g_ptr_array_set_size(results, 0);
+        results->clear();
 
         m_trellis.clear();
         m_trellis.prepare(nstep);
@@ -764,15 +811,18 @@ public:
         /* extract every result. */
         GPtrArray * tails = g_ptr_array_new();
         m_trellis.get_tails(tails);
+
+        MatchResults result = g_array_new
+            (TRUE, TRUE, sizeof(phrase_token_t));
         for (size_t i = 0; i < tails->len; ++i) {
-            MatchResults result = g_array_new
-                (TRUE, TRUE, sizeof(phrase_token_t));
             const trellis_value_t * tail = (const trellis_value_t *)
                 g_ptr_array_index(tails, i);
 
             assert(extract_result<nbest>(m_trellis, tail, result));
-            g_ptr_array_add(results, result);
+            results->add_result(result);
         }
+
+        g_array_free(result, TRUE);
         g_ptr_array_free(tails, TRUE);
 
         return true;
