@@ -172,8 +172,8 @@ bool ForwardPhoneticConstraints::validate_constraint(PhoneticKeyMatrix * matrix)
 }
 
 
-bool ForwardPhoneticConstraints::diff_result(MatchResults best,
-                                             MatchResults other){
+bool ForwardPhoneticConstraints::diff_result(MatchResult best,
+                                             MatchResult other){
     bool changed = false;
 
     assert(best->len == other->len);

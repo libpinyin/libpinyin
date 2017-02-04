@@ -135,7 +135,7 @@ typedef GArray * ChewingKeyRestVector;
 
 /* Array of phrase_token_t */
 typedef GArray * TokenVector;
-typedef TokenVector MatchResults;
+typedef TokenVector MatchResult;
 
 /* Array of lookup_constraint_t */
 typedef GArray * CandidateConstraints;

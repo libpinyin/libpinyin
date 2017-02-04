@@ -218,7 +218,7 @@ PinyinLookup2::~PinyinLookup2(){
 bool PinyinLookup2::get_best_match(TokenVector prefixes,
                                    PhoneticKeyMatrix * matrix,
                                    CandidateConstraints constraints,
-                                   MatchResults & results){
+                                   MatchResult & result){
     m_constraints = constraints;
     m_matrix = matrix;
 
@@ -304,7 +304,7 @@ bool PinyinLookup2::get_best_match(TokenVector prefixes,
     g_ptr_array_free(candidates, TRUE);
     g_ptr_array_free(topresults, TRUE);
 
-    return final_step(results);
+    return final_step(result);
 }
 
 bool PinyinLookup2::search_unigram2(GPtrArray * topresults,
@@ -507,12 +507,12 @@ bool PinyinLookup2::save_next_step(int next_step_pos,
     }
 }
 
-bool PinyinLookup2::final_step(MatchResults & results){
+bool PinyinLookup2::final_step(MatchResult & result){
 
-    /* reset results */
-    g_array_set_size(results, m_steps_content->len);
-    for (size_t i = 0; i < results->len; ++i){
-        phrase_token_t * token = &g_array_index(results, phrase_token_t, i);
+    /* reset result */
+    g_array_set_size(result, m_steps_content->len);
+    for (size_t i = 0; i < result->len; ++i){
+        phrase_token_t * token = &g_array_index(result, phrase_token_t, i);
         *token = null_token;
     }
 
@@ -539,7 +539,7 @@ bool PinyinLookup2::final_step(MatchResults & results){
             break;
 
         phrase_token_t * token = &g_array_index
-            (results, phrase_token_t, cur_step_pos);
+            (result, phrase_token_t, cur_step_pos);
         *token = max_value->m_handles[1];
 
         phrase_token_t last_token = max_value->m_handles[0];
@@ -565,7 +565,7 @@ bool PinyinLookup2::final_step(MatchResults & results){
 
 bool PinyinLookup2::train_result2(PhoneticKeyMatrix * matrix,
                                   CandidateConstraints constraints,
-                                  MatchResults results) {
+                                  MatchResult result) {
     const guint32 initial_seed = 23 * 3;
     const guint32 expand_factor = 2;
     const guint32 unigram_factor = 7;
@@ -578,7 +578,7 @@ bool PinyinLookup2::train_result2(PhoneticKeyMatrix * matrix,
     phrase_token_t last_token = sentence_start;
 
     for (size_t i = 0; i < constraints->len; ++i) {
-        phrase_token_t token = g_array_index(results, phrase_token_t, i);
+        phrase_token_t token = g_array_index(result, phrase_token_t, i);
         if (null_token == token)
             continue;
 
@@ -633,7 +633,7 @@ bool PinyinLookup2::train_result2(PhoneticKeyMatrix * matrix,
             guint next_pos = i + 1;
             for (; next_pos < constraints->len; ++next_pos) {
                 phrase_token_t next_token = g_array_index
-                    (results, phrase_token_t, next_pos);
+                    (result, phrase_token_t, next_pos);
 
                 if (null_token != next_token)
                     break;

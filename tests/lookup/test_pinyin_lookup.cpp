@@ -70,7 +70,7 @@ int main( int argc, char * argv[]){
     CandidateConstraints constraints = g_array_new
         (TRUE, FALSE, sizeof(lookup_constraint_t));
 
-    MatchResults results = g_array_new(FALSE, FALSE, sizeof(phrase_token_t));
+    MatchResult result = g_array_new(FALSE, FALSE, sizeof(phrase_token_t));
 
     char* linebuf = NULL; size_t size = 0; ssize_t read;
     while( (read = getline(&linebuf, &size, stdin)) != -1 ){
@@ -113,11 +113,11 @@ int main( int argc, char * argv[]){
 
         guint32 start_time = record_time();
         for (size_t i = 0; i < bench_times; ++i)
-            pinyin_lookup.get_best_match(prefixes, &matrix, constraints, results);
+            pinyin_lookup.get_best_match(prefixes, &matrix, constraints, result);
         print_time(start_time, bench_times);
 
-        for (size_t i = 0; i < results->len; ++i){
-            phrase_token_t * token = &g_array_index(results, phrase_token_t, i);
+        for (size_t i = 0; i < result->len; ++i){
+            phrase_token_t * token = &g_array_index(result, phrase_token_t, i);
             if ( null_token == *token)
                 continue;
             printf("pos:%ld,token:%d\t", i, *token);
@@ -125,7 +125,7 @@ int main( int argc, char * argv[]){
         printf("\n");
 
         char * sentence = NULL;
-        pinyin_lookup.convert_to_utf8(results, sentence);
+        pinyin_lookup.convert_to_utf8(result, sentence);
         printf("%s\n", sentence);
 
         g_array_free(keys, TRUE);
@@ -135,7 +135,7 @@ int main( int argc, char * argv[]){
 
     g_array_free(prefixes, TRUE);
     g_array_free(constraints, TRUE);
-    g_array_free(results, TRUE);
+    g_array_free(result, TRUE);
 
     free(linebuf);
     return 0;

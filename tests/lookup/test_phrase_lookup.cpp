@@ -32,23 +32,23 @@
 bool try_phrase_lookup(PhraseLookup * phrase_lookup,
                        ucs4_t * ucs4_str, glong ucs4_len){
     char * result_string = NULL;
-    MatchResults results = g_array_new(FALSE, FALSE, sizeof(phrase_token_t));
-    phrase_lookup->get_best_match(ucs4_len, ucs4_str, results);
+    MatchResult result = g_array_new(FALSE, FALSE, sizeof(phrase_token_t));
+    phrase_lookup->get_best_match(ucs4_len, ucs4_str, result);
 #if 0
-    for ( size_t i = 0; i < results->len; ++i) {
-        phrase_token_t * token = &g_array_index(results, phrase_token_t, i);
+    for (size_t i = 0; i < result->len; ++i) {
+        phrase_token_t * token = &g_array_index(result, phrase_token_t, i);
         if ( *token == null_token )
             continue;
         printf("%d:%d\t", i, *token);
     }
     printf("\n");
 #endif
-    phrase_lookup->convert_to_utf8(results, result_string);
+    phrase_lookup->convert_to_utf8(result, result_string);
     if (result_string)
         printf("%s\n", result_string);
     else
         fprintf(stderr, "Error: Un-segmentable sentence encountered!\n");
-    g_array_free(results, TRUE);
+    g_array_free(result, TRUE);
     g_free(result_string);
     return true;
 }

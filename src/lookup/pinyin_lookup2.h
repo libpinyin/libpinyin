@@ -125,7 +125,7 @@ protected:
 
     bool save_next_step(int next_step_pos, lookup_value_t * cur_step, lookup_value_t * next_step);
 
-    bool final_step(MatchResults & results);
+    bool final_step(MatchResult & result);
 
 public:
     /**
@@ -158,7 +158,7 @@ public:
      * @prefixes: the phrase tokens before the guessed sentence.
      * @matrix: the matrix of the pinyin keys.
      * @constraints: the constraints on the guessed sentence.
-     * @results: the guessed sentence in the form of the phrase tokens.
+     * @result: the guessed sentence in the form of the phrase tokens.
      * @returns: whether the guess operation is successful.
      *
      * Guess the best sentence according to user inputs.
@@ -167,13 +167,13 @@ public:
     bool get_best_match(TokenVector prefixes,
                         PhoneticKeyMatrix * matrix,
                         CandidateConstraints constraints,
-                        MatchResults & results);
+                        MatchResult & result);
 
     /**
      * PinyinLookup2::train_result2:
      * @matrix: the matrix of the pinyin keys.
      * @constraints: the constraints on the guessed sentence.
-     * @results: the guessed sentence in the form of the phrase tokens.
+     * @result: the guessed sentence in the form of the phrase tokens.
      * @returns: whether the train operation is successful.
      *
      * Self learning the guessed sentence based on the constraints.
@@ -181,21 +181,21 @@ public:
      */
     bool train_result2(PhoneticKeyMatrix * matrix,
                        CandidateConstraints constraints,
-                       MatchResults results);
+                       MatchResult result);
 
     /**
      * PinyinLookup2::convert_to_utf8:
-     * @results: the guessed sentence in the form of the phrase tokens.
+     * @result: the guessed sentence in the form of the phrase tokens.
      * @result_string: the guessed sentence in the utf8 encoding.
      * @returns: whether the convert operation is successful.
      *
      * Convert the guessed sentence from the phrase tokens to the utf8 string.
      *
      */
-    bool convert_to_utf8(MatchResults results,
+    bool convert_to_utf8(MatchResult result,
                          /* out */ char * & result_string)
     {
-        return pinyin::convert_to_utf8(m_phrase_index, results,
+        return pinyin::convert_to_utf8(m_phrase_index, result,
                                        NULL, false, result_string);
     }
 

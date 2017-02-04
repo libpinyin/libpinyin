@@ -77,7 +77,7 @@ struct _pinyin_instance_t{
 
     /* cached pinyin lookup variables. */
     CandidateConstraints m_constraints;
-    MatchResults m_match_results;
+    MatchResult m_match_results;
     CandidateVector m_candidates;
 };
 
@@ -2609,7 +2609,7 @@ bool pinyin_get_n_phrase(pinyin_instance_t * instance,
 bool pinyin_get_phrase_token(pinyin_instance_t * instance,
                              guint index,
                              phrase_token_t * token){
-    MatchResults & match_results = instance->m_match_results;
+    MatchResult & match_results = instance->m_match_results;
 
     *token = null_token;
 

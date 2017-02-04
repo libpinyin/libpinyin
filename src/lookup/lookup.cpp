@@ -25,7 +25,7 @@
 namespace pinyin{
 
 bool convert_to_utf8(FacadePhraseIndex * phrase_index,
-                     MatchResults match_results,
+                     MatchResult result,
                      /* in */ const char * delimiter,
                      /* in */ bool show_tokens,
                      /* out */ char * & result_string){
@@ -36,9 +36,9 @@ bool convert_to_utf8(FacadePhraseIndex * phrase_index,
 
     PhraseItem item;
 
-    for ( size_t i = 0; i < match_results->len; ++i ){
+    for ( size_t i = 0; i < result->len; ++i ){
         phrase_token_t token = g_array_index
-            (match_results, phrase_token_t, i);
+            (result, phrase_token_t, i);
         if ( null_token == token )
             continue;
 

@@ -76,7 +76,7 @@ protected:
 
     bool save_next_step(int next_step_pos, lookup_value_t * cur_value, lookup_value_t * next_step);
 
-    bool final_step(MatchResults & results);
+    bool final_step(MatchResult & result);
 public:
     /**
      * PhraseLookup::PhraseLookup:
@@ -115,7 +115,7 @@ public:
      * Note: this method only accepts the characters in phrase large table.
      *
      */
-    bool get_best_match(int sentence_length, ucs4_t sentence[], MatchResults & results);
+    bool get_best_match(int sentence_length, ucs4_t sentence[], MatchResult & result);
 
     /**
      * PhraseLookup::convert_to_utf8:
@@ -128,10 +128,10 @@ public:
      * Note: free the result_string by g_free.
      *
      */
-    bool convert_to_utf8(MatchResults results,
+    bool convert_to_utf8(MatchResult result,
                          /* out */ char * & result_string)
     {
-        return pinyin::convert_to_utf8(m_phrase_index, results,
+        return pinyin::convert_to_utf8(m_phrase_index, result,
                                        "\n", true, result_string);
     }
 };

@@ -366,7 +366,7 @@ public:
 template <gint32 nbest>
 bool extract_result(const ForwardPhoneticTrellis<nbest> * trellis,
                     const trellis_value_t * tail,
-                    /* out */ MatchResults & result) {
+                    /* out */ MatchResult & result) {
     /* reset result */
     g_array_set_size(result, trellis->size());
     for (size_t i = 0; i < result->len; ++i){
@@ -445,7 +445,7 @@ public:
         return true;
     }
 
-    bool diff_result(MatchResults best, MatchResults other);
+    bool diff_result(MatchResult best, MatchResult other);
 };
 
 
@@ -469,19 +469,19 @@ public:
         return m_results->len;
     }
 
-    bool get_result(size_t index, MatchResults & result) const {
+    bool get_result(size_t index, MatchResult & result) const {
         if (index >= m_results->len)
             return false;
 
-        result = (MatchResults) g_ptr_array_index(m_results, index);
+        result = (MatchResult) g_ptr_array_index(m_results, index);
         return true;
     }
 
     bool clear() {
         /* free m_results */
         for (size_t i = 0; i < m_results->len; ++i) {
-            MatchResults array =
-                (MatchResults) g_ptr_array_index(m_results, i);
+            MatchResult array =
+                (MatchResult) g_ptr_array_index(m_results, i);
             g_array_free(array, TRUE);
         }
         g_ptr_array_set_size(m_results, 0);
@@ -490,8 +490,8 @@ public:
     }
 
     /* copy result here */
-    bool add_result(MatchResults result) {
-        MatchResults array = g_array_new
+    bool add_result(MatchResult result) {
+        MatchResult array = g_array_new
             (TRUE, TRUE, sizeof(phrase_token_t));
 
         g_array_append_vals(array, result->data, result->len);
@@ -812,7 +812,7 @@ public:
         GPtrArray * tails = g_ptr_array_new();
         m_trellis.get_tails(tails);
 
-        MatchResults result = g_array_new
+        MatchResult result = g_array_new
             (TRUE, TRUE, sizeof(phrase_token_t));
         for (size_t i = 0; i < tails->len; ++i) {
             const trellis_value_t * tail = (const trellis_value_t *)
@@ -830,7 +830,7 @@ public:
 
     bool train_result3(const PhoneticKeyMatrix * matrix,
                        const ForwardPhoneticConstraints * constraints,
-                       MatchResults result) {
+                       MatchResult result) {
         const guint32 initial_seed = 23 * 3;
         const guint32 expand_factor = 2;
         const guint32 unigram_factor = 7;

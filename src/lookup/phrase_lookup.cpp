@@ -117,7 +117,7 @@ PhraseLookup::~PhraseLookup(){
 }
 
 bool PhraseLookup::get_best_match(int sentence_length, ucs4_t sentence[],
-                                  MatchResults & results){
+                                  MatchResult & result){
     m_sentence_length = sentence_length;
     m_sentence = sentence;
     int nstep = m_sentence_length + 1;
@@ -154,7 +154,7 @@ bool PhraseLookup::get_best_match(int sentence_length, ucs4_t sentence[],
 
     m_phrase_index->destroy_tokens(tokens);
 
-    return final_step(results);
+    return final_step(result);
 }
 
 #if 0
@@ -379,12 +379,12 @@ bool PhraseLookup::save_next_step(int next_step_pos, lookup_value_t * cur_value,
     }
 }
 
-bool PhraseLookup::final_step(MatchResults & results ){
+bool PhraseLookup::final_step(MatchResult & result){
 
     /* reset results */
-    g_array_set_size(results, m_steps_content->len - 1);
-    for ( size_t i = 0; i < results->len; ++i ){
-        phrase_token_t * token = &g_array_index(results, phrase_token_t, i);
+    g_array_set_size(result, m_steps_content->len - 1);
+    for ( size_t i = 0; i < result->len; ++i ){
+        phrase_token_t * token = &g_array_index(result, phrase_token_t, i);
         *token = null_token;
     }
 
@@ -411,7 +411,7 @@ bool PhraseLookup::final_step(MatchResults & results ){
             break;
 
         phrase_token_t * token = &g_array_index
-            (results, phrase_token_t, cur_step_pos);
+            (result, phrase_token_t, cur_step_pos);
         *token = max_value->m_handles[1];
 
         phrase_token_t last_token = max_value->m_handles[0];

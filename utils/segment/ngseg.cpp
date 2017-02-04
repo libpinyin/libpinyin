@@ -68,11 +68,11 @@ bool deal_with_segmentable(PhraseLookup * phrase_lookup,
                            GArray * current_ucs4,
                            FILE * output){
     char * result_string = NULL;
-    MatchResults results = g_array_new(FALSE, FALSE, sizeof(phrase_token_t));
+    MatchResult result = g_array_new(FALSE, FALSE, sizeof(phrase_token_t));
     phrase_lookup->get_best_match(current_ucs4->len,
-                                  (ucs4_t *) current_ucs4->data, results);
+                                  (ucs4_t *) current_ucs4->data, result);
 
-    phrase_lookup->convert_to_utf8(results, result_string);
+    phrase_lookup->convert_to_utf8(result, result_string);
 
     if (result_string) {
         fprintf(output, "%s\n", result_string);
@@ -82,10 +82,10 @@ bool deal_with_segmentable(PhraseLookup * phrase_lookup,
               NULL, NULL, NULL);
         fprintf(stderr, "Un-segmentable sentence encountered:%s\n",
                 tmp_string);
-        g_array_free(results, TRUE);
+        g_array_free(result, TRUE);
         return false;
     }
-    g_array_free(results, TRUE);
+    g_array_free(result, TRUE);
     g_free(result_string);
     return true;
 }

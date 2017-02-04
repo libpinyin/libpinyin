@@ -73,7 +73,7 @@ typedef GHashTable * LookupStepIndex;
 typedef GArray * LookupStepContent; /* array of lookup_value_t */
 
 bool convert_to_utf8(FacadePhraseIndex * phrase_index,
-                     MatchResults match_results,
+                     MatchResult match_result,
                      /* in */ const char * delimiter,
                      /* in */ bool show_tokens,
                      /* out */ char * & result_string);
