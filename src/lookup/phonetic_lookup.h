@@ -111,8 +111,6 @@ struct matrix_value_t {
 #include "phonetic_lookup_heap.h"
 #endif
 
-enum constraint_type{NO_CONSTRAINT, CONSTRAINT_ONESTEP, CONSTRAINT_NOSEARCH };
-
 struct trellis_constraint_t {
     /* the constraint type */
     constraint_type m_type;

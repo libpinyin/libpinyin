@@ -53,6 +53,8 @@ struct lookup_value_t{
 };
 
 
+enum constraint_type{NO_CONSTRAINT, CONSTRAINT_ONESTEP, CONSTRAINT_NOSEARCH };
+
 class FacadePhraseIndex;
 
 

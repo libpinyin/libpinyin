@@ -43,9 +43,6 @@ namespace pinyin{
  */
 
 
-
-enum constraint_type{NO_CONSTRAINT, CONSTRAINT_ONESTEP, CONSTRAINT_NOSEARCH };
-
 struct lookup_constraint_t{
     /* current type of the step */
     constraint_type m_type;
