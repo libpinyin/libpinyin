@@ -41,6 +41,7 @@ public:
     bool number() {
         for (ssize_t i = 0; i < m_nelem; ++i)
             m_elements[i].m_current_index = i;
+        return true;
     }
 
     /* return true if the item is stored into m_elements. */

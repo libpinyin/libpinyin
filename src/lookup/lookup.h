@@ -68,9 +68,10 @@ class FacadePhraseIndex;
  *     See also comments on lookup_value_t.
  */
 
-typedef GHashTable * LookupStepIndex;
 /* Key: lookup_key_t, Value: int m, index to m_steps_content[i][m] */
-typedef GArray * LookupStepContent; /* array of lookup_value_t */
+typedef GHashTable * LookupStepIndex;
+/* Array of lookup_value_t or trellis_node */
+typedef GArray * LookupStepContent;
 
 bool convert_to_utf8(FacadePhraseIndex * phrase_index,
                      MatchResult match_result,

@@ -27,6 +27,7 @@
 #include <math.h>
 #include "phonetic_key_matrix.h"
 #include "ngram.h"
+#include "lookup.h"
 
 namespace pinyin{
 
@@ -131,11 +132,6 @@ struct trellis_constraint_t {
     }
 };
 
-typedef phrase_token_t lookup_key_t;
-/* Key: lookup_key_t, Value: int m, index to m_steps_content[i][m] */
-typedef GHashTable * LookupStepIndex;
-/* Array of trellis_node */
-typedef GArray * LookupStepContent;
 
 /* use maximum heap to get the topest results. */
 template<gint32 nbest>
@@ -921,6 +917,14 @@ public:
 
         return true;
     }
+
+    bool convert_to_utf8(MatchResult result,
+                         /* out */ char * & result_string)
+    {
+        return pinyin::convert_to_utf8(m_phrase_index, result,
+                                       NULL, false, result_string);
+    }
+
 };
 
 };
