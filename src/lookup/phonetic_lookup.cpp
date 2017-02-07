@@ -22,9 +22,6 @@
 
 namespace pinyin{
 
-/* internal definition */
-static const size_t nbeam = 32;
-
 bool dump_max_value(GPtrArray * values){
     if (0 == values->len)
         return false;

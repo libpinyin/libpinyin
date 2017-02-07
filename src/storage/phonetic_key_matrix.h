@@ -77,7 +77,7 @@ public:
     }
 
     /* Array of Item. */
-    bool get_items(size_t index, GArray * items) {
+    bool get_items(size_t index, GArray * items) const {
         g_array_set_size(items, 0);
 
         if (index >= m_table_content->len)
@@ -99,7 +99,7 @@ public:
         return true;
     }
 
-    size_t get_column_size(size_t index) {
+    size_t get_column_size(size_t index) const {
         assert(index < m_table_content->len);
 
         GArray * column = (GArray *)
@@ -107,7 +107,7 @@ public:
         return column->len;
     }
 
-    bool get_item(size_t index, size_t row, Item & item) {
+    bool get_item(size_t index, size_t row, Item & item) const {
         assert(index < m_table_content->len);
 
         GArray * column = (GArray *)
@@ -141,7 +141,7 @@ public:
     }
 
     /* Array of keys and key rests. */
-    bool get_items(size_t index, GArray * keys, GArray * key_rests) {
+    bool get_items(size_t index, GArray * keys, GArray * key_rests) const {
         bool result = m_keys.get_items(index, keys) &&
             m_key_rests.get_items(index, key_rests);
 
@@ -155,14 +155,14 @@ public:
             m_key_rests.append(index, key_rest);
     }
 
-    size_t get_column_size(size_t index) {
+    size_t get_column_size(size_t index) const {
         const size_t size = m_keys.get_column_size(index);
         assert(size == m_key_rests.get_column_size(index));
         return size;
     }
 
     bool get_item(size_t index, size_t row,
-                  ChewingKey & key, ChewingKeyRest & key_rest) {
+                  ChewingKey & key, ChewingKeyRest & key_rest) const {
         return m_keys.get_item(index, row, key) &&
             m_key_rests.get_item(index, row, key_rest);
     }
@@ -207,12 +207,12 @@ bool fuzzy_syllable_step(pinyin_option_t options,
 
 bool dump_matrix(PhoneticKeyMatrix * matrix);
 
-int search_matrix(FacadeChewingTable2 * table,
-                  PhoneticKeyMatrix * matrix,
+int search_matrix(const FacadeChewingTable2 * table,
+                  const PhoneticKeyMatrix * matrix,
                   size_t start, size_t end,
                   PhraseIndexRanges ranges);
 
-gfloat compute_pronunciation_possibility(PhoneticKeyMatrix * matrix,
+gfloat compute_pronunciation_possibility(const PhoneticKeyMatrix * matrix,
                                          size_t start, size_t end,
                                          GArray * cached_keys,
                                          PhraseItem & item);

@@ -59,18 +59,16 @@ int main( int argc, char * argv[]){
 
     gfloat lambda = system_table_info.get_lambda();
 
-    PinyinLookup2 pinyin_lookup(lambda, &largetable, &phrase_index,
-                                &system_bigram, &user_bigram);
+    PhoneticLookup<1> pinyin_lookup(lambda, &largetable, &phrase_index,
+                                    &system_bigram, &user_bigram);
 
     /* prepare the prefixes for get_best_match. */
     TokenVector prefixes = g_array_new
         (FALSE, FALSE, sizeof(phrase_token_t));
     g_array_append_val(prefixes, sentence_start);
-    
-    CandidateConstraints constraints = g_array_new
-        (TRUE, FALSE, sizeof(lookup_constraint_t));
 
-    MatchResult result = g_array_new(FALSE, FALSE, sizeof(phrase_token_t));
+    ForwardPhoneticConstraints constraints;
+    NBestMatchResults results;
 
     char* linebuf = NULL; size_t size = 0; ssize_t read;
     while( (read = getline(&linebuf, &size, stdin)) != -1 ){
@@ -105,16 +103,16 @@ int main( int argc, char * argv[]){
         dump_matrix(&matrix);
 
         /* initialize constraints. */
-        g_array_set_size(constraints, matrix.size());
-        for ( size_t i = 0; i < constraints->len; ++i){
-            lookup_constraint_t * constraint = &g_array_index(constraints, lookup_constraint_t, i);
-            constraint->m_type = NO_CONSTRAINT;
-        }
+        constraints.validate_constraint(&matrix);
 
         guint32 start_time = record_time();
         for (size_t i = 0; i < bench_times; ++i)
-            pinyin_lookup.get_best_match(prefixes, &matrix, constraints, result);
+            pinyin_lookup.get_nbest_match(prefixes, &matrix, &constraints, &results);
         print_time(start_time, bench_times);
+
+        assert(1 == results.size());
+        MatchResult result = NULL;
+        assert(results.get_result(0, result));
 
         for (size_t i = 0; i < result->len; ++i){
             phrase_token_t * token = &g_array_index(result, phrase_token_t, i);
@@ -134,8 +132,6 @@ int main( int argc, char * argv[]){
     }
 
     g_array_free(prefixes, TRUE);
-    g_array_free(constraints, TRUE);
-    g_array_free(result, TRUE);
 
     free(linebuf);
     return 0;

@@ -31,6 +31,10 @@
 
 namespace pinyin{
 
+
+/* internal definition */
+static const size_t nbeam = 32;
+
 #define LONG_SENTENCE_PENALTY 1.2
 
 struct trellis_value_t {
@@ -278,8 +282,8 @@ public:
             node->number();
 
             const trellis_value_t * value = node->begin();
-            for (size_t j = 0; j < node->length(); ++j) {
-                g_ptr_array_add(candidates, value);
+            for (gint32 j = 0; j < node->length(); ++j) {
+                g_ptr_array_add(candidates, (trellis_value_t *)value);
             }
         }
 
@@ -325,7 +329,7 @@ public:
         get_candidates(tail_index, candidates);
         get_top_results<nbest>(nbest, tails, candidates);
 
-        g_ptr_array_sort(tails, trellis_value_compare);
+        g_ptr_array_sort(tails, (GCompareFunc)trellis_value_compare);
 
         g_ptr_array_free(candidates, TRUE);
         return true;
@@ -749,7 +753,7 @@ public:
                 continue;
 
             m_trellis.get_candidates(i, candidates);
-            get_top_results<nbest>(topresults, candidates);
+            get_top_results<nbest>(nbeam, topresults, candidates);
 
             if (0 == topresults->len)
                 continue;
@@ -812,7 +816,7 @@ public:
             const trellis_value_t * tail = (const trellis_value_t *)
                 g_ptr_array_index(tails, i);
 
-            assert(extract_result<nbest>(m_trellis, tail, result));
+            assert(extract_result<nbest>(&m_trellis, tail, result));
             results->add_result(result);
         }
 

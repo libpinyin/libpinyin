@@ -348,8 +348,8 @@ bool dump_matrix(PhoneticKeyMatrix * matrix) {
 }
 
 int search_matrix_recur(GArray * cached_keys,
-                        FacadeChewingTable2 * table,
-                        PhoneticKeyMatrix * matrix,
+                        const FacadeChewingTable2 * table,
+                        const PhoneticKeyMatrix * matrix,
                         size_t start, size_t end,
                         PhraseIndexRanges ranges,
                         size_t & longest) {
@@ -407,8 +407,8 @@ int search_matrix_recur(GArray * cached_keys,
     return result;
 }
 
-int search_matrix(FacadeChewingTable2 * table,
-                  PhoneticKeyMatrix * matrix,
+int search_matrix(const FacadeChewingTable2 * table,
+                  const PhoneticKeyMatrix * matrix,
                   size_t start, size_t end,
                   PhraseIndexRanges ranges) {
     assert(end < matrix->size());
@@ -437,7 +437,7 @@ int search_matrix(FacadeChewingTable2 * table,
     return result;
 }
 
-gfloat compute_pronunciation_possibility_recur(PhoneticKeyMatrix * matrix,
+gfloat compute_pronunciation_possibility_recur(const PhoneticKeyMatrix * matrix,
                                                size_t start, size_t end,
                                                GArray * cached_keys,
                                                PhraseItem & item){
@@ -490,7 +490,7 @@ gfloat compute_pronunciation_possibility_recur(PhoneticKeyMatrix * matrix,
     return result;
 }
 
-gfloat compute_pronunciation_possibility(PhoneticKeyMatrix * matrix,
+gfloat compute_pronunciation_possibility(const PhoneticKeyMatrix * matrix,
                                          size_t start, size_t end,
                                          GArray * cached_keys,
                                          PhraseItem & item){
