@@ -54,13 +54,14 @@ public:
 
     /* return true if the item is stored into m_elements. */
     bool eval_item(const trellis_value_t * item) {
+
         /* min heap here, and always push heap. */
 
         /* still have space */
         if (m_nelem < nbest) {
             m_elements[m_nelem] = *item;
             m_nelem ++;
-            push_heap(begin(), end(), trellis_value_more_than<nbest>);
+            std_lite::push_heap(m_elements, m_elements + m_nelem, trellis_value_more_than<nbest>);
             return true;
         }
 
@@ -69,9 +70,9 @@ public:
 
         /* compare new item */
         if (item->m_poss > min->m_poss) {
-            pop_heap(begin(), end(), trellis_value_more_than<nbest>);
+            std_lite::pop_heap(m_elements, m_elements + m_nelem, trellis_value_more_than<nbest>);
             m_elements[m_nelem - 1] = *item;
-            push_heap(begin(), end(), trellis_value_more_than<nbest>);
+            std_lite::push_heap(m_elements, m_elements + m_nelem, trellis_value_more_than<nbest>);
             return true;
         }
 
@@ -97,8 +98,20 @@ public:
     const trellis_value_t * begin() { return &m_element; }
     const trellis_value_t * end() { return &m_element + 1; }
 
+    bool number() {
+        m_element.m_current_index = 0;
+        return true;
+    }
+
     /* return true if the item is stored into m_element. */
     bool eval_item(const trellis_value_t * item) {
+
+        /* no item yet. */
+        if (0 == m_element.m_sentence_length) {
+            m_element = *item;
+            return true;
+        }
+
         if (trellis_value_less_than<1>(&m_element, item)) {
             m_element = *item;
             return true;

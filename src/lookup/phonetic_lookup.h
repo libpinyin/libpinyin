@@ -107,7 +107,7 @@ struct matrix_value_t {
 };
 #endif
 
-#if 1
+#if 0
 /* for debug purpose */
 #include "phonetic_lookup_linear.h"
 #else
@@ -191,7 +191,9 @@ public:
     ~ForwardPhoneticTrellis() {
         clear();
         g_ptr_array_free(m_steps_index, TRUE);
+        m_steps_index = NULL;
         g_ptr_array_free(m_steps_content, TRUE);
+        m_steps_content = NULL;
     }
 
 public:
@@ -460,6 +462,7 @@ public:
     ~NBestMatchResults() {
         clear();
         g_ptr_array_free(m_results, TRUE);
+        m_results = NULL;
     }
 
 public:

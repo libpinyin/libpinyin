@@ -41,5 +41,8 @@ namespace std_lite{
     using std::pop_heap;
 
 
+    using std::push_heap;
+
+
 }
 #endif

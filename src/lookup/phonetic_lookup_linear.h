@@ -46,6 +46,7 @@ public:
 
     /* return true if the item is stored into m_elements. */
     bool eval_item(const trellis_value_t * item) {
+
         /* still have space */
         if (m_nelem < nbest) {
             m_elements[m_nelem] = *item;
