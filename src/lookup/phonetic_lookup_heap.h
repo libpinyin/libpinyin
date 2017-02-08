@@ -22,10 +22,10 @@
 #define PHONETIC_LOOKUP_HEAP_H
 
 template <gint32 nbest>
-static inline bool trellis_value_more_than(const trellis_value_t &exist_item,
-                                           const trellis_value_t &new_item) {
+static inline bool trellis_value_comp(const trellis_value_t &exist_item,
+                                      const trellis_value_t &new_item) {
     /* min heap here */
-    return trellis_value_less_than<nbest>(&new_item, &exist_item);
+    return trellis_value_less_than<nbest>(&exist_item, &new_item);
 }
 
 template <gint32 nbest>
@@ -61,7 +61,7 @@ public:
         if (m_nelem < nbest) {
             m_elements[m_nelem] = *item;
             m_nelem ++;
-            std_lite::push_heap(m_elements, m_elements + m_nelem, trellis_value_more_than<nbest>);
+            std_lite::push_heap(m_elements, m_elements + m_nelem, trellis_value_comp<nbest>);
             return true;
         }
 
@@ -69,10 +69,10 @@ public:
         trellis_value_t * min = m_elements;
 
         /* compare new item */
-        if (item->m_poss > min->m_poss) {
-            std_lite::pop_heap(m_elements, m_elements + m_nelem, trellis_value_more_than<nbest>);
+        if (trellis_value_less_than<nbest>(min, item)) {
+            std_lite::pop_heap(m_elements, m_elements + m_nelem, trellis_value_comp<nbest>);
             m_elements[m_nelem - 1] = *item;
-            std_lite::push_heap(m_elements, m_elements + m_nelem, trellis_value_more_than<nbest>);
+            std_lite::push_heap(m_elements, m_elements + m_nelem, trellis_value_comp<nbest>);
             return true;
         }
 

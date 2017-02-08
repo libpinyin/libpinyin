@@ -64,6 +64,7 @@ struct trellis_value_t {
 template <gint32 nbest>
 static bool inline trellis_value_less_than(const trellis_value_t * exist_item,
                                            const trellis_value_t * new_item) {
+#if 1
     if (nbest > 1) {
         /* allow longer sentence */
         if (exist_item->m_sentence_length + 1 == new_item->m_sentence_length &&
@@ -74,6 +75,7 @@ static bool inline trellis_value_less_than(const trellis_value_t * exist_item,
             exist_item->m_poss < new_item->m_poss + LONG_SENTENCE_PENALTY)
             return true;
     }
+#endif
 
     /* the same length but better possibility */
     if (exist_item->m_sentence_length == new_item->m_sentence_length &&
