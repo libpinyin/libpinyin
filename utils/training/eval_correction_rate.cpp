@@ -60,32 +60,25 @@ bool get_possible_pinyin(FacadePhraseIndex * phrase_index,
     return true;
 }
 
-bool get_best_match(PinyinLookup2 * pinyin_lookup,
+bool get_best_match(PhoneticLookup<1> * pinyin_lookup,
                     PhoneticKeyMatrix * matrix,
-                    TokenVector tokens) {
-    /* prepare the prefixes for get_best_match. */
+                    NBestMatchResults * results) {
+    /* prepare the prefixes for get_nbest_match. */
     TokenVector prefixes = g_array_new
         (FALSE, FALSE, sizeof(phrase_token_t));
     g_array_append_val(prefixes, sentence_start);
 
     /* initialize constraints. */
-    CandidateConstraints constraints = g_array_new
-        (TRUE, FALSE, sizeof(lookup_constraint_t));
-    g_array_set_size(constraints, matrix->size());
-    for ( size_t i = 0; i < constraints->len; ++i ) {
-        lookup_constraint_t * constraint = &g_array_index
-            (constraints, lookup_constraint_t, i);
-        constraint->m_type = NO_CONSTRAINT;
-    }
+    ForwardPhoneticConstraints constraints;
+    constraints.validate_constraint(matrix);
 
-    bool retval = pinyin_lookup->get_best_match(prefixes, matrix, constraints, tokens);
+    bool retval = pinyin_lookup->get_nbest_match(prefixes, matrix, &constraints, results);
 
     g_array_free(prefixes, TRUE);
-    g_array_free(constraints, TRUE);
     return retval;
 }
 
-bool do_one_test(PinyinLookup2 * pinyin_lookup,
+bool do_one_test(PhoneticLookup<1> * pinyin_lookup,
                  FacadePhraseIndex * phrase_index,
                  TokenVector tokens){
     bool retval = false;
@@ -93,8 +86,7 @@ bool do_one_test(PinyinLookup2 * pinyin_lookup,
     ChewingKeyVector keys = g_array_new(TRUE, TRUE, sizeof(ChewingKey));
     ChewingKeyRestVector key_rests = g_array_new
         (TRUE, TRUE, sizeof(ChewingKeyRest));
-    TokenVector guessed_tokens = g_array_new
-        (FALSE, TRUE, sizeof(phrase_token_t));
+    TokenVector guessed_tokens = NULL;
 
     get_possible_pinyin(phrase_index, tokens, keys);
 
@@ -107,8 +99,12 @@ bool do_one_test(PinyinLookup2 * pinyin_lookup,
     }
 
     PhoneticKeyMatrix matrix;
+    NBestMatchResults results;
     fill_matrix(&matrix, keys, key_rests, keys->len);
-    get_best_match(pinyin_lookup, &matrix, guessed_tokens);
+    get_best_match(pinyin_lookup, &matrix, &results);
+
+    assert(1 == results.size());
+    assert(results.get_result(0, guessed_tokens));
 
     /* compare the results */
     char * sentence = NULL; char * guessed_sentence = NULL;
@@ -127,7 +123,6 @@ bool do_one_test(PinyinLookup2 * pinyin_lookup,
 
     g_free(sentence); g_free(guessed_sentence);
     g_array_free(keys, TRUE); g_array_free(key_rests, TRUE);
-    g_array_free(guessed_tokens, TRUE);
     return retval;
 }
 
@@ -160,9 +155,9 @@ int main(int argc, char * argv[]){
 
     gfloat lambda = system_table_info.get_lambda();
 
-    PinyinLookup2 pinyin_lookup(lambda,
-                                &largetable, &phrase_index,
-                                &system_bigram, &user_bigram);
+    PhoneticLookup<1> pinyin_lookup(lambda,
+                                    &largetable, &phrase_index,
+                                    &system_bigram, &user_bigram);
 
     /* open evals text. */
     FILE * evals_file = fopen(evals_text, "r");
