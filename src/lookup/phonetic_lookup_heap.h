@@ -22,10 +22,10 @@
 #define PHONETIC_LOOKUP_HEAP_H
 
 template <gint32 nbest>
-static inline bool trellis_value_comp(const trellis_value_t &exist_item,
-                                      const trellis_value_t &new_item) {
+static inline bool trellis_value_comp(const trellis_value_t &lhs,
+                                      const trellis_value_t &rhs) {
     /* min heap here */
-    return trellis_value_less_than<nbest>(&exist_item, &new_item);
+    return trellis_value_less_than<nbest>(&lhs, &rhs);
 }
 
 template <gint32 nbest>
@@ -55,12 +55,13 @@ public:
     /* return true if the item is stored into m_elements. */
     bool eval_item(const trellis_value_t * item) {
 
-        /* min heap here, and always push heap. */
+        /* min heap here. */
 
         /* still have space */
         if (m_nelem < nbest) {
             m_elements[m_nelem] = *item;
             m_nelem ++;
+            /* always push heap. */
             std_lite::push_heap(m_elements, m_elements + m_nelem, trellis_value_comp<nbest>);
             return true;
         }

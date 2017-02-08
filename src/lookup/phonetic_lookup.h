@@ -62,28 +62,28 @@ struct trellis_value_t {
 };
 
 template <gint32 nbest>
-static bool inline trellis_value_less_than(const trellis_value_t * exist_item,
-                                           const trellis_value_t * new_item) {
+static bool inline trellis_value_less_than(const trellis_value_t * item_lhs,
+                                           const trellis_value_t * item_rhs) {
 #if 1
     if (nbest > 1) {
         /* allow longer sentence */
-        if (exist_item->m_sentence_length + 1 == new_item->m_sentence_length &&
-            exist_item->m_poss + LONG_SENTENCE_PENALTY < new_item->m_poss)
+        if (item_lhs->m_sentence_length + 1 == item_rhs->m_sentence_length &&
+            item_lhs->m_poss + LONG_SENTENCE_PENALTY < item_rhs->m_poss)
             return true;
 
-        if (exist_item->m_sentence_length == new_item->m_sentence_length + 1 &&
-            exist_item->m_poss < new_item->m_poss + LONG_SENTENCE_PENALTY)
+        if (item_lhs->m_sentence_length == item_rhs->m_sentence_length + 1 &&
+            item_lhs->m_poss < item_rhs->m_poss + LONG_SENTENCE_PENALTY)
             return true;
     }
 #endif
 
     /* the same length but better possibility */
-    if (exist_item->m_sentence_length == new_item->m_sentence_length &&
-        exist_item->m_poss < new_item->m_poss)
+    if (item_lhs->m_sentence_length == item_rhs->m_sentence_length &&
+        item_lhs->m_poss < item_rhs->m_poss)
         return true;
 
     /* shorter sentence */
-    if (exist_item->m_sentence_length > new_item->m_sentence_length)
+    if (item_lhs->m_sentence_length > item_rhs->m_sentence_length)
         return true;
 
     return false;
