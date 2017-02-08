@@ -40,7 +40,7 @@ int main( int argc, char * argv[]){
     }
 
     pinyin_option_t options =
-        USE_TONE | PINYIN_CORRECT_ALL | PINYIN_AMB_ALL | PINYIN_INCOMPLETE;
+        USE_TONE | PINYIN_CORRECT_ALL | PINYIN_INCOMPLETE;
     FacadeChewingTable2 largetable;
 
     largetable.load("../../data/pinyin_index.bin", NULL);
@@ -59,10 +59,10 @@ int main( int argc, char * argv[]){
 
     gfloat lambda = system_table_info.get_lambda();
 
-    PhoneticLookup<1> pinyin_lookup(lambda, &largetable, &phrase_index,
+    PhoneticLookup<3> pinyin_lookup(lambda, &largetable, &phrase_index,
                                     &system_bigram, &user_bigram);
 
-    /* prepare the prefixes for get_best_match. */
+    /* prepare the prefixes for get_nbest_match. */
     TokenVector prefixes = g_array_new
         (FALSE, FALSE, sizeof(phrase_token_t));
     g_array_append_val(prefixes, sentence_start);
@@ -102,6 +102,9 @@ int main( int argc, char * argv[]){
 
         dump_matrix(&matrix);
 
+        g_array_free(keys, TRUE);
+        g_array_free(key_rests, TRUE);
+
         /* initialize constraints. */
         constraints.validate_constraint(&matrix);
 
@@ -110,25 +113,23 @@ int main( int argc, char * argv[]){
             pinyin_lookup.get_nbest_match(prefixes, &matrix, &constraints, &results);
         print_time(start_time, bench_times);
 
-        assert(1 == results.size());
-        MatchResult result = NULL;
-        assert(results.get_result(0, result));
+        for (size_t i = 0; i < results.size(); ++i) {
+            MatchResult result = NULL;
+            assert(results.get_result(i, result));
 
-        for (size_t i = 0; i < result->len; ++i){
-            phrase_token_t * token = &g_array_index(result, phrase_token_t, i);
-            if ( null_token == *token)
-                continue;
-            printf("pos:%ld,token:%d\t", i, *token);
+            for (size_t j = 0; j < result->len; ++j){
+                phrase_token_t * token = &g_array_index(result, phrase_token_t, j);
+                if ( null_token == *token)
+                    continue;
+                printf("pos:%ld,token:%d\t", j, *token);
+            }
+            printf("\n");
+
+            char * sentence = NULL;
+            pinyin_lookup.convert_to_utf8(result, sentence);
+            printf("%s\n", sentence);
+            g_free(sentence);
         }
-        printf("\n");
-
-        char * sentence = NULL;
-        pinyin_lookup.convert_to_utf8(result, sentence);
-        printf("%s\n", sentence);
-
-        g_array_free(keys, TRUE);
-        g_array_free(key_rests, TRUE);
-        g_free(sentence);
     }
 
     g_array_free(prefixes, TRUE);
