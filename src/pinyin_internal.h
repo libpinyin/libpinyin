@@ -39,7 +39,6 @@
 #include "phrase_index_logger.h"
 #include "ngram.h"
 #include "lookup.h"
-#include "pinyin_lookup2.h"
 #include "phonetic_lookup.h"
 #include "phrase_lookup.h"
 #include "tag_utility.h"
