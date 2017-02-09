@@ -1172,6 +1172,12 @@ bool pinyin_get_sentence(pinyin_instance_t * instance,
     pinyin_context_t * & context = instance->m_context;
     NBestMatchResults & results = instance->m_match_results;
 
+    /* check the candidate type. */
+    CandidateVector candidates = instance->m_candidates;
+    lookup_candidate_t * candidate = &g_array_index
+        (candidates, lookup_candidate_t, index);
+    assert(NBEST_MATCH_CANDIDATE == candidate->m_candidate_type);
+
     MatchResult result = NULL;
     assert(index < instance->m_match_results.size());
     assert(results.get_result(index, result));
@@ -1919,9 +1925,16 @@ int pinyin_choose_candidate(pinyin_instance_t * instance,
 
     pinyin_context_t * context = instance->m_context;
     PhoneticKeyMatrix & matrix = instance->m_matrix;
+    ForwardPhoneticConstraints & constraints = instance->m_constraints;
+    NBestMatchResults & results = instance->m_match_results;
 
-    if (BEST_MATCH_CANDIDATE == candidate->m_candidate_type)
+    if (NBEST_MATCH_CANDIDATE == candidate->m_candidate_type) {
+        MatchResult best = NULL, other = NULL;
+        assert(results.get_result(0, best));
+        assert(results.get_result(candidate->m_nbest_index, other));
+        constraints.diff_result(best, other);
         return matrix.size() - 1;
+    }
 
     if (ADDON_CANDIDATE == candidate->m_candidate_type) {
         PhraseItem item;
@@ -2047,6 +2060,12 @@ bool pinyin_train(pinyin_instance_t * instance, gint8 index){
     pinyin_context_t * context = instance->m_context;
     PhoneticKeyMatrix & matrix = instance->m_matrix;
     NBestMatchResults & results = instance->m_match_results;
+
+    /* check the candidate type. */
+    CandidateVector candidates = instance->m_candidates;
+    lookup_candidate_t * candidate = &g_array_index
+        (candidates, lookup_candidate_t, index);
+    assert(NBEST_MATCH_CANDIDATE == candidate->m_candidate_type);
 
     context->m_modified = true;
 

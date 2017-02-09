@@ -203,8 +203,6 @@ bool ForwardPhoneticConstraints::diff_result(MatchResult best,
         assert(add_constraint(pos, next_pos, other_token));
     }
 
-    /* best and other results should be different. */
-    assert(changed);
     return changed;
 }
 
