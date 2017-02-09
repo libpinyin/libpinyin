@@ -40,7 +40,7 @@ typedef struct _import_iterator_t import_iterator_t;
 typedef struct _export_iterator_t export_iterator_t;
 
 typedef enum _lookup_candidate_type_t{
-    BEST_MATCH_CANDIDATE = 1,
+    NBEST_MATCH_CANDIDATE = 1,
     NORMAL_CANDIDATE,
     ZOMBIE_CANDIDATE,
     PREDICTED_CANDIDATE,
@@ -351,6 +351,7 @@ bool pinyin_phrase_segment(pinyin_instance_t * instance,
 /**
  * pinyin_get_sentence:
  * @instance: the pinyin instance.
+ * @index: the index of the nbest result.
  * @sentence: the saved sentence in the instance.
  * @returns: whether the sentence is already saved in the instance.
  *
@@ -360,6 +361,7 @@ bool pinyin_phrase_segment(pinyin_instance_t * instance,
  *
  */
 bool pinyin_get_sentence(pinyin_instance_t * instance,
+                         gint8 index,
                          char ** sentence);
 
 /**
@@ -544,12 +546,13 @@ bool pinyin_lookup_tokens(pinyin_instance_t * instance,
 /**
  * pinyin_train:
  * @instance: the pinyin instance.
+ * @index: the index of the nbest result.
  * @returns: whether the sentence is trained.
  *
  * Train the current user input sentence.
  *
  */
-bool pinyin_train(pinyin_instance_t * instance);
+bool pinyin_train(pinyin_instance_t * instance, gint8 index);
 
 /**
  * pinyin_reset:

@@ -1167,11 +1167,17 @@ bool pinyin_phrase_segment(pinyin_instance_t * instance,
 
 /* the returned sentence should be freed by g_free(). */
 bool pinyin_get_sentence(pinyin_instance_t * instance,
+                         gint8 index,
                          char ** sentence){
     pinyin_context_t * & context = instance->m_context;
+    NBestMatchResults & results = instance->m_match_results;
+
+    MatchResult result = NULL;
+    assert(index < instance->m_match_results.size());
+    assert(results.get_result(index, result));
 
     bool retval = pinyin::convert_to_utf8
-        (context->m_phrase_index, instance->m_match_results,
+        (context->m_phrase_index, result,
          NULL, false, *sentence);
 
     return retval;
@@ -1485,19 +1491,21 @@ static void _compute_frequency_of_items(pinyin_context_t * context,
     }
 }
 
-static bool _prepend_sentence_candidate(pinyin_instance_t * instance,
-                                        CandidateVector candidates) {
-    /* check whether the best match candidate exists. */
-    gchar * sentence = NULL;
-    pinyin_get_sentence(instance, &sentence);
-    if (NULL == sentence)
-        return false;
-    g_free(sentence);
+static bool _prepend_sentence_candidates(pinyin_instance_t * instance,
+                                         CandidateVector candidates) {
+    const size_t size = instance->m_match_results.size();
 
-    /* prepend best match candidate to candidates. */
-    lookup_candidate_t candidate;
-    candidate.m_candidate_type = BEST_MATCH_CANDIDATE;
-    g_array_prepend_val(candidates, candidate);
+    /* check whether the nbest match candidate exists. */
+    if (0 == size)
+        return false;
+
+    /* prepend nbest match candidates to candidates. */
+    for (size_t i = size - 1; i >= 0; --i) {
+        lookup_candidate_t candidate;
+        candidate.m_candidate_type = NBEST_MATCH_CANDIDATE;
+        candidate.m_nbest_index = i;
+        g_array_prepend_val(candidates, candidate);
+    }
 
     return true;
 }
@@ -1515,7 +1523,7 @@ static bool _compute_phrase_length(pinyin_context_t * context,
             (candidates, lookup_candidate_t, i);
 
         switch(candidate->m_candidate_type) {
-        case BEST_MATCH_CANDIDATE:
+        case NBEST_MATCH_CANDIDATE:
             assert(FALSE);
         case NORMAL_CANDIDATE:
         case PREDICTED_CANDIDATE: {
@@ -1545,9 +1553,9 @@ static bool _compute_phrase_strings_of_items(pinyin_instance_t * instance,
             (candidates, lookup_candidate_t, i);
 
         switch(candidate->m_candidate_type) {
-        case BEST_MATCH_CANDIDATE: {
+        case NBEST_MATCH_CANDIDATE: {
             gchar * sentence = NULL;
-            pinyin_get_sentence(instance, &sentence);
+            pinyin_get_sentence(instance, candidate->m_nbest_index, &sentence);
             candidate->m_phrase_string = sentence;
             break;
         }
@@ -1618,13 +1626,27 @@ static bool _remove_duplicated_items_by_phrase_string
                         cur_item->m_phrase_string)) {
             /* found duplicated candidates */
 
-            /* keep best match candidate */
-            if (BEST_MATCH_CANDIDATE == saved_item->m_candidate_type) {
+            /* both are nbest match candidate */
+            if (NBEST_MATCH_CANDIDATE == saved_item->m_candidate_type &&
+                NBEST_MATCH_CANDIDATE == cur_item->m_candidate_type) {
+                /* keep the high possiblity one */
+                if (saved_item->m_nbest_index < cur_item->m_nbest_index) {
+                    cur_item->m_candidate_type = ZOMBIE_CANDIDATE;
+                } else {
+                    saved_item->m_candidate_type = ZOMBIE_CANDIDATE;
+                    saved_item = cur_item;
+                }
+
+                continue;
+            }
+
+            /* keep nbest match candidate */
+            if (NBEST_MATCH_CANDIDATE == saved_item->m_candidate_type) {
                 cur_item->m_candidate_type = ZOMBIE_CANDIDATE;
                 continue;
             }
 
-            if (BEST_MATCH_CANDIDATE == cur_item->m_candidate_type) {
+            if (NBEST_MATCH_CANDIDATE == cur_item->m_candidate_type) {
                 saved_item->m_candidate_type = ZOMBIE_CANDIDATE;
                 saved_item = cur_item;
                 continue;
@@ -2018,18 +2040,22 @@ bool pinyin_lookup_tokens(pinyin_instance_t * instance,
     return SEARCH_OK & retval;
 }
 
-bool pinyin_train(pinyin_instance_t * instance){
+bool pinyin_train(pinyin_instance_t * instance, gint8 index){
     if (!instance->m_context->m_user_dir)
         return false;
 
     pinyin_context_t * context = instance->m_context;
     PhoneticKeyMatrix & matrix = instance->m_matrix;
+    NBestMatchResults & results = instance->m_match_results;
 
     context->m_modified = true;
 
-    bool retval = context->m_pinyin_lookup->train_result2
-        (&matrix, instance->m_constraints,
-         instance->m_match_results);
+    MatchResult result = NULL;
+    assert(index < results.size());
+    assert(results.get_result(index, result));
+
+    bool retval = context->m_pinyin_lookup->train_result3
+        (&matrix, &(instance->m_constraints), result);
 
     return retval;
 }
