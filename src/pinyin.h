@@ -361,7 +361,7 @@ bool pinyin_phrase_segment(pinyin_instance_t * instance,
  *
  */
 bool pinyin_get_sentence(pinyin_instance_t * instance,
-                         gint8 index,
+                         guint8 index,
                          char ** sentence);
 
 /**
@@ -552,7 +552,7 @@ bool pinyin_lookup_tokens(pinyin_instance_t * instance,
  * Train the current user input sentence.
  *
  */
-bool pinyin_train(pinyin_instance_t * instance, gint8 index);
+bool pinyin_train(pinyin_instance_t * instance, guint8 index);
 
 /**
  * pinyin_reset:

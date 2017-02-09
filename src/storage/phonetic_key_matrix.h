@@ -217,7 +217,7 @@ gfloat compute_pronunciation_possibility(const PhoneticKeyMatrix * matrix,
                                          GArray * cached_keys,
                                          PhraseItem & item);
 
-bool increase_pronunciation_possibility(PhoneticKeyMatrix * matrix,
+bool increase_pronunciation_possibility(const PhoneticKeyMatrix * matrix,
                                         size_t start, size_t end,
                                         GArray * cached_keys,
                                         PhraseItem & item, gint32 delta);

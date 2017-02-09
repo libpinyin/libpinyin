@@ -432,6 +432,11 @@ public:
     }
 
 public:
+    bool clear() {
+        g_array_set_size(m_constraints, 0);
+        return true;
+    }
+
     int add_constraint(size_t start, size_t end, phrase_token_t token);
     bool clear_constraint(size_t index);
     bool validate_constraint(PhoneticKeyMatrix * matrix);

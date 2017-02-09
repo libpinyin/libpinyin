@@ -506,7 +506,7 @@ gfloat compute_pronunciation_possibility(const PhoneticKeyMatrix * matrix,
         (matrix, start, end, cached_keys, item);
 }
 
-bool increase_pronunciation_possibility_recur(PhoneticKeyMatrix * matrix,
+bool increase_pronunciation_possibility_recur(const PhoneticKeyMatrix * matrix,
                                               size_t start, size_t end,
                                               GArray * cached_keys,
                                               PhraseItem & item, gint32 delta) {
@@ -560,7 +560,7 @@ bool increase_pronunciation_possibility_recur(PhoneticKeyMatrix * matrix,
     return result;
 }
 
-bool increase_pronunciation_possibility(PhoneticKeyMatrix * matrix,
+bool increase_pronunciation_possibility(const PhoneticKeyMatrix * matrix,
                                         size_t start, size_t end,
                                         GArray * cached_keys,
                                         PhraseItem & item, gint32 delta) {
