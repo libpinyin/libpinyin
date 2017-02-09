@@ -49,7 +49,7 @@ struct _pinyin_context_t{
     Bigram * m_user_bigram;
 
     /* lookups. */
-    PinyinLookup2 * m_pinyin_lookup;
+    PhoneticLookup<3> * m_pinyin_lookup;
     PhraseLookup * m_phrase_lookup;
 
     /* addon tables. */
@@ -76,8 +76,8 @@ struct _pinyin_instance_t{
     size_t m_parsed_len;
 
     /* cached pinyin lookup variables. */
-    CandidateConstraints m_constraints;
-    MatchResult m_match_results;
+    ForwardPhoneticConstraints m_constraints;
+    NBestMatchResults m_match_results;
     CandidateVector m_candidates;
 };
 
@@ -86,6 +86,7 @@ struct _lookup_candidate_t{
     gchar * m_phrase_string;
     phrase_token_t m_token;
     guint8 m_phrase_length;
+    gint8 m_nbest_index; /* only for NBEST_MATCH_CANDIDATE. */
     guint16 m_begin; /* must contain the preceding "'" character. */
     guint16 m_end; /* must not contain the following "'" character. */
     guint32 m_freq; /* the amplifed gfloat numerical value. */
@@ -96,6 +97,7 @@ public:
         m_phrase_string = NULL;
         m_token = null_token;
         m_phrase_length = 0;
+        m_nbest_index = -1;
         m_begin = 0; m_end = 0;
         m_freq = 0;
     }
@@ -364,10 +366,10 @@ pinyin_context_t * pinyin_init(const char * systemdir, const char * userdir){
 
     gfloat lambda = context->m_system_table_info.get_lambda();
 
-    context->m_pinyin_lookup = new PinyinLookup2
-        ( lambda,
-          context->m_pinyin_table, context->m_phrase_index,
-          context->m_system_bigram, context->m_user_bigram);
+    context->m_pinyin_lookup = new PhoneticLookup<3>
+        (lambda,
+         context->m_pinyin_table, context->m_phrase_index,
+         context->m_system_bigram, context->m_user_bigram);
 
     context->m_phrase_lookup = new PhraseLookup
         (lambda,
