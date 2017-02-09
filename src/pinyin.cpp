@@ -77,7 +77,8 @@ struct _pinyin_instance_t{
 
     /* cached pinyin lookup variables. */
     ForwardPhoneticConstraints m_constraints;
-    NBestMatchResults m_match_results;
+    NBestMatchResults m_nbest_results;
+    TokenVector m_phrase_result;
     CandidateVector m_candidates;
 };
 
@@ -1045,8 +1046,8 @@ pinyin_instance_t * pinyin_alloc_instance(pinyin_context_t * context){
 
     instance->m_constraints = g_array_new
         (TRUE, TRUE, sizeof(lookup_constraint_t));
-    instance->m_match_results =
-        g_array_new(TRUE, TRUE, sizeof(phrase_token_t));
+    instance->m_phrase_result = g_array_new
+        (TRUE, TRUE, sizeof(phrase_token_t));
     instance->m_candidates =
         g_array_new(TRUE, TRUE, sizeof(lookup_candidate_t));
 
@@ -1056,7 +1057,7 @@ pinyin_instance_t * pinyin_alloc_instance(pinyin_context_t * context){
 void pinyin_free_instance(pinyin_instance_t * instance){
     g_array_free(instance->m_prefixes, TRUE);
     g_array_free(instance->m_constraints, TRUE);
-    g_array_free(instance->m_match_results, TRUE);
+    g_array_free(instance->m_phrase_result, TRUE);
     g_array_free(instance->m_candidates, TRUE);
 
     delete instance;
@@ -1089,8 +1090,8 @@ bool pinyin_guess_sentence(pinyin_instance_t * instance){
     bool retval = context->m_pinyin_lookup->get_best_match
         (instance->m_prefixes,
          &matrix,
-         instance->m_constraints,
-         instance->m_match_results);
+         &instance->m_constraints,
+         &instance->m_nbest_results);
 
     return retval;
 }
@@ -1142,8 +1143,8 @@ bool pinyin_guess_sentence_with_prefix(pinyin_instance_t * instance,
     bool retval = context->m_pinyin_lookup->get_best_match
         (instance->m_prefixes,
          &matrix,
-         instance->m_constraints,
-         instance->m_match_results);
+         &instance->m_constraints,
+         &instance->m_nbest_results);
 
     return retval;
 }
@@ -1159,7 +1160,7 @@ bool pinyin_phrase_segment(pinyin_instance_t * instance,
     g_return_val_if_fail(num_of_chars == ucs4_len, FALSE);
 
     bool retval = context->m_phrase_lookup->get_best_match
-        (ucs4_len, ucs4_str, instance->m_match_results);
+        (ucs4_len, ucs4_str, instance->m_phrase_result);
 
     g_free(ucs4_str);
     return retval;
@@ -1170,7 +1171,7 @@ bool pinyin_get_sentence(pinyin_instance_t * instance,
                          gint8 index,
                          char ** sentence){
     pinyin_context_t * & context = instance->m_context;
-    NBestMatchResults & results = instance->m_match_results;
+    NBestMatchResults & results = instance->m_nbest_results;
 
     /* check the candidate type. */
     CandidateVector candidates = instance->m_candidates;
@@ -1179,7 +1180,7 @@ bool pinyin_get_sentence(pinyin_instance_t * instance,
     assert(NBEST_MATCH_CANDIDATE == candidate->m_candidate_type);
 
     MatchResult result = NULL;
-    assert(index < instance->m_match_results.size());
+    assert(index < results.size());
     assert(results.get_result(index, result));
 
     bool retval = pinyin::convert_to_utf8
@@ -1499,7 +1500,7 @@ static void _compute_frequency_of_items(pinyin_context_t * context,
 
 static bool _prepend_sentence_candidates(pinyin_instance_t * instance,
                                          CandidateVector candidates) {
-    const size_t size = instance->m_match_results.size();
+    const size_t size = instance->m_nbest_results.size();
 
     /* check whether the nbest match candidate exists. */
     if (0 == size)
@@ -1926,7 +1927,7 @@ int pinyin_choose_candidate(pinyin_instance_t * instance,
     pinyin_context_t * context = instance->m_context;
     PhoneticKeyMatrix & matrix = instance->m_matrix;
     ForwardPhoneticConstraints & constraints = instance->m_constraints;
-    NBestMatchResults & results = instance->m_match_results;
+    NBestMatchResults & results = instance->m_nbest_results;
 
     if (NBEST_MATCH_CANDIDATE == candidate->m_candidate_type) {
         MatchResult best = NULL, other = NULL;
@@ -2059,7 +2060,7 @@ bool pinyin_train(pinyin_instance_t * instance, gint8 index){
 
     pinyin_context_t * context = instance->m_context;
     PhoneticKeyMatrix & matrix = instance->m_matrix;
-    NBestMatchResults & results = instance->m_match_results;
+    NBestMatchResults & results = instance->m_nbest_results;
 
     /* check the candidate type. */
     CandidateVector candidates = instance->m_candidates;
@@ -2085,7 +2086,7 @@ bool pinyin_reset(pinyin_instance_t * instance){
 
     g_array_set_size(instance->m_prefixes, 0);
     g_array_set_size(instance->m_constraints, 0);
-    g_array_set_size(instance->m_match_results, 0);
+    g_array_set_size(instance->m_phrase_result, 0);
     _free_candidates(instance->m_candidates);
 
     return true;
@@ -2618,52 +2619,23 @@ bool pinyin_get_character_offset(pinyin_instance_t * instance,
     return result;
 }
 
-#if 0
-bool pinyin_get_character_offset(pinyin_instance_t * instance,
-                                 size_t offset,
-                                 size_t * plength) {
-    pinyin_context_t * context = instance->m_context;
-    FacadePhraseIndex * phrase_index = context->m_phrase_index;
-
-    PhoneticKeyMatrix & matrix = instance->m_matrix;
-    MatchResults results = instance->m_match_results;
-    _check_offset(matrix, offset);
-
-    size_t length = 0;
-    PhraseItem item;
-    for (size_t i = 0; i < offset; ++i) {
-        phrase_token_t token = g_array_index(results, phrase_token_t, i);
-        if (null_token == token)
-            continue;
-
-        int retval = phrase_index->get_phrase_item(token, item);
-        assert(ERROR_OK == retval);
-        guint8 len = item.get_phrase_length();
-        length += len;
-    }
-
-    *plength = length;
-    return true;
-}
-#endif
-
 bool pinyin_get_n_phrase(pinyin_instance_t * instance,
                          guint * num) {
-    *num = instance->m_match_results->len;
+    *num = instance->m_phrase_result->len;
     return true;
 }
 
 bool pinyin_get_phrase_token(pinyin_instance_t * instance,
                              guint index,
                              phrase_token_t * token){
-    MatchResult & match_results = instance->m_match_results;
+    MatchResult & result = instance->m_phrase_result;
 
     *token = null_token;
 
-    if (index >= match_results->len)
+    if (index >= result->len)
         return false;
 
-    *token = g_array_index(match_results, phrase_token_t, index);
+    *token = g_array_index(result, phrase_token_t, index);
 
     return true;
 }
