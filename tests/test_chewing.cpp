@@ -49,7 +49,7 @@ int main(int argc, char * argv[]){
         pinyin_guess_sentence(instance);
 
         char * sentence = NULL;
-        pinyin_get_sentence (instance, &sentence);
+        pinyin_get_sentence (instance, 0, &sentence);
         if (sentence)
             printf("%s\n", sentence);
         g_free(sentence);
@@ -61,7 +61,7 @@ int main(int argc, char * argv[]){
             g_free(aux_text);
         }
 
-        pinyin_train(instance);
+        pinyin_train(instance, 0);
         pinyin_reset(instance);
         pinyin_save(context);
     }

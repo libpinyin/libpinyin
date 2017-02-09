@@ -92,7 +92,7 @@ int main(int argc, char * argv[]){
         }
         printf("\n");
 
-        pinyin_train(instance);
+        pinyin_train(instance, 0);
         pinyin_reset(instance);
         pinyin_save(context);
     }
