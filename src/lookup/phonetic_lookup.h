@@ -422,11 +422,13 @@ protected:
     FacadePhraseIndex * m_phrase_index;
 
 public:
-    ForwardPhoneticConstraints() {
+    ForwardPhoneticConstraints(FacadePhraseIndex * phrase_index) {
+        m_phrase_index = phrase_index;
         m_constraints = g_array_new(TRUE, TRUE, sizeof(trellis_constraint_t));
     }
 
     ~ForwardPhoneticConstraints() {
+        m_phrase_index = NULL;
         g_array_free(m_constraints, TRUE);
         m_constraints = NULL;
     }

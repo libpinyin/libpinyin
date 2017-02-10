@@ -60,7 +60,8 @@ bool get_possible_pinyin(FacadePhraseIndex * phrase_index,
     return true;
 }
 
-bool get_best_match(PhoneticLookup<1> * pinyin_lookup,
+bool get_best_match(FacadePhraseIndex * phrase_index,
+                    PhoneticLookup<1> * pinyin_lookup,
                     PhoneticKeyMatrix * matrix,
                     NBestMatchResults * results) {
     /* prepare the prefixes for get_nbest_match. */
@@ -69,7 +70,7 @@ bool get_best_match(PhoneticLookup<1> * pinyin_lookup,
     g_array_append_val(prefixes, sentence_start);
 
     /* initialize constraints. */
-    ForwardPhoneticConstraints constraints;
+    ForwardPhoneticConstraints constraints(phrase_index);
     constraints.validate_constraint(matrix);
 
     bool retval = pinyin_lookup->get_nbest_match(prefixes, matrix, &constraints, results);
@@ -101,7 +102,7 @@ bool do_one_test(PhoneticLookup<1> * pinyin_lookup,
     PhoneticKeyMatrix matrix;
     NBestMatchResults results;
     fill_matrix(&matrix, keys, key_rests, keys->len);
-    get_best_match(pinyin_lookup, &matrix, &results);
+    get_best_match(phrase_index, pinyin_lookup, &matrix, &results);
 
     assert(1 == results.size());
     assert(results.get_result(0, guessed_tokens));

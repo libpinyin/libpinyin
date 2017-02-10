@@ -76,7 +76,7 @@ struct _pinyin_instance_t{
     size_t m_parsed_len;
 
     /* cached pinyin lookup variables. */
-    ForwardPhoneticConstraints m_constraints;
+    ForwardPhoneticConstraints * m_constraints;
     NBestMatchResults m_nbest_results;
     TokenVector m_phrase_result;
     CandidateVector m_candidates;
@@ -1044,6 +1044,9 @@ pinyin_instance_t * pinyin_alloc_instance(pinyin_context_t * context){
 
     instance->m_parsed_len = 0;
 
+    instance->m_constraints = new ForwardPhoneticConstraints
+        (context->m_phrase_index);
+
     instance->m_phrase_result = g_array_new
         (TRUE, TRUE, sizeof(phrase_token_t));
     instance->m_candidates =
@@ -1054,6 +1057,7 @@ pinyin_instance_t * pinyin_alloc_instance(pinyin_context_t * context){
 
 void pinyin_free_instance(pinyin_instance_t * instance){
     g_array_free(instance->m_prefixes, TRUE);
+    delete instance->m_constraints;
     g_array_free(instance->m_phrase_result, TRUE);
     g_array_free(instance->m_candidates, TRUE);
 
@@ -1066,9 +1070,9 @@ pinyin_context_t * pinyin_get_context (pinyin_instance_t * instance){
 
 static bool pinyin_update_constraints(pinyin_instance_t * instance){
     PhoneticKeyMatrix & matrix = instance->m_matrix;
-    ForwardPhoneticConstraints & constraints = instance->m_constraints;
+    ForwardPhoneticConstraints * constraints = instance->m_constraints;
 
-    constraints.validate_constraint(&matrix);
+    constraints->validate_constraint(&matrix);
 
     return true;
 }
@@ -1085,7 +1089,7 @@ bool pinyin_guess_sentence(pinyin_instance_t * instance){
     bool retval = context->m_pinyin_lookup->get_nbest_match
         (instance->m_prefixes,
          &matrix,
-         &instance->m_constraints,
+         instance->m_constraints,
          &instance->m_nbest_results);
 
     return retval;
@@ -1138,7 +1142,7 @@ bool pinyin_guess_sentence_with_prefix(pinyin_instance_t * instance,
     bool retval = context->m_pinyin_lookup->get_nbest_match
         (instance->m_prefixes,
          &matrix,
-         &instance->m_constraints,
+         instance->m_constraints,
          &instance->m_nbest_results);
 
     return retval;
@@ -1929,14 +1933,14 @@ int pinyin_choose_candidate(pinyin_instance_t * instance,
 
     pinyin_context_t * context = instance->m_context;
     PhoneticKeyMatrix & matrix = instance->m_matrix;
-    ForwardPhoneticConstraints & constraints = instance->m_constraints;
+    ForwardPhoneticConstraints * constraints = instance->m_constraints;
     NBestMatchResults & results = instance->m_nbest_results;
 
     if (NBEST_MATCH_CANDIDATE == candidate->m_candidate_type) {
         MatchResult best = NULL, other = NULL;
         assert(results.get_result(0, best));
         assert(results.get_result(candidate->m_nbest_index, other));
-        constraints.diff_result(best, other);
+        constraints->diff_result(best, other);
         return matrix.size() - 1;
     }
 
@@ -1972,14 +1976,14 @@ int pinyin_choose_candidate(pinyin_instance_t * instance,
     }
 
     /* sync m_constraints to the length of m_pinyin_keys. */
-    bool retval = constraints.validate_constraint(&matrix);
+    bool retval = constraints->validate_constraint(&matrix);
 
     phrase_token_t token = candidate->m_token;
-    guint8 len = constraints.add_constraint
+    guint8 len = constraints->add_constraint
         (candidate->m_begin, candidate->m_end, token);
 
     /* safe guard: validate the m_constraints again. */
-    retval = constraints.validate_constraint(&matrix) && len;
+    retval = constraints->validate_constraint(&matrix) && len;
 
     return offset + len;
 }
@@ -2028,9 +2032,9 @@ bool pinyin_choose_predicted_candidate(pinyin_instance_t * instance,
 
 bool pinyin_clear_constraint(pinyin_instance_t * instance,
                              size_t offset){
-    ForwardPhoneticConstraints & constraints = instance->m_constraints;
+    ForwardPhoneticConstraints * constraints = instance->m_constraints;
 
-    bool retval = constraints.clear_constraint(offset);
+    bool retval = constraints->clear_constraint(offset);
 
     return retval;
 }
@@ -2074,7 +2078,7 @@ bool pinyin_train(pinyin_instance_t * instance, guint8 index){
     assert(results.get_result(index, result));
 
     bool retval = context->m_pinyin_lookup->train_result3
-        (&matrix, &(instance->m_constraints), result);
+        (&matrix, instance->m_constraints, result);
 
     return retval;
 }
@@ -2085,7 +2089,7 @@ bool pinyin_reset(pinyin_instance_t * instance){
 
     g_array_set_size(instance->m_prefixes, 0);
 
-    instance->m_constraints.clear();
+    instance->m_constraints->clear();
     instance->m_nbest_results.clear();
     g_array_set_size(instance->m_phrase_result, 0);
     _free_candidates(instance->m_candidates);

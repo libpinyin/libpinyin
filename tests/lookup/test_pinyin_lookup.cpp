@@ -67,7 +67,7 @@ int main( int argc, char * argv[]){
         (FALSE, FALSE, sizeof(phrase_token_t));
     g_array_append_val(prefixes, sentence_start);
 
-    ForwardPhoneticConstraints constraints;
+    ForwardPhoneticConstraints constraints(&phrase_index);
     NBestMatchResults results;
 
     char* linebuf = NULL; size_t size = 0; ssize_t read;
