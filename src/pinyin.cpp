@@ -2266,6 +2266,14 @@ bool pinyin_get_candidate_string(pinyin_instance_t * instance,
     return true;
 }
 
+bool pinyin_get_candidate_nbest_index(pinyin_instance_t * instance,
+                                      lookup_candidate_t * candidate,
+                                      guint8 * index) {
+    assert(NBEST_MATCH_CANDIDATE == candidate->m_candidate_type);
+    *index = candidate->m_nbest_index;
+    return true;
+}
+
 #if 0
 bool pinyin_get_n_pinyin(pinyin_instance_t * instance,
                          guint * num) {
@@ -2619,6 +2627,35 @@ bool pinyin_get_character_offset(pinyin_instance_t * instance,
     *plength = length;
     return result;
 }
+
+#if 0
+bool pinyin_get_character_offset(pinyin_instance_t * instance,
+                                 size_t offset,
+                                 size_t * plength) {
+    pinyin_context_t * context = instance->m_context;
+    FacadePhraseIndex * phrase_index = context->m_phrase_index;
+
+    PhoneticKeyMatrix & matrix = instance->m_matrix;
+    MatchResults results = instance->m_match_results;
+    _check_offset(matrix, offset);
+
+    size_t length = 0;
+    PhraseItem item;
+    for (size_t i = 0; i < offset; ++i) {
+        phrase_token_t token = g_array_index(results, phrase_token_t, i);
+        if (null_token == token)
+            continue;
+
+        int retval = phrase_index->get_phrase_item(token, item);
+        assert(ERROR_OK == retval);
+        guint8 len = item.get_phrase_length();
+        length += len;
+    }
+
+    *plength = length;
+    return true;
+}
+#endif
 
 bool pinyin_get_n_phrase(pinyin_instance_t * instance,
                          guint * num) {

@@ -57,6 +57,7 @@ LIBPINYIN {
         pinyin_get_candidate;
         pinyin_get_candidate_type;
         pinyin_get_candidate_string;
+        pinyin_get_candidate_nbest_index;
         pinyin_get_pinyin_key;
         pinyin_get_pinyin_key_rest;
         pinyin_get_pinyin_key_rest_positions;
