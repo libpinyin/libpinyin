@@ -1510,7 +1510,7 @@ static bool _prepend_sentence_candidates(pinyin_instance_t * instance,
         return false;
 
     /* prepend nbest match candidates to candidates. */
-    for (size_t i = size - 1; i >= 0; --i) {
+    for (ssize_t i = size - 1; i >= 0; --i) {
         lookup_candidate_t candidate;
         candidate.m_candidate_type = NBEST_MATCH_CANDIDATE;
         candidate.m_nbest_index = i;
