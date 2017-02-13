@@ -26,7 +26,7 @@ G_BEGIN_DECLS
 
 
 /**
- * PinyinStandardOption: type pinyin_standard_option_t.
+ * PinyinStandardOption: type pinyin_option_t.
  *
  * The enums of pinyin standard option.
  *
@@ -45,7 +45,7 @@ enum PinyinStandardOption{
 };
 
 /**
- * PinyinFuzzyOption: type pinyin_fuzzy_option_t.
+ * PinyinFuzzyOption: type pinyin_option_t.
  *
  * The enums of pinyin fuzzy option.
  *
@@ -65,7 +65,7 @@ enum PinyinFuzzyOption{
 };
 
 /**
- * PinyinCorrectOption: type pinyin_correct_option_t.
+ * PinyinCorrectOption: type pinyin_option_t.
  *
  * The enums of pinyin correct option.
  *
@@ -83,7 +83,7 @@ enum PinyinCorrectOption{
 };
 
 /**
- * ZhuyinCorrectOption: type pinyin_correct_option_t.
+ * ZhuyinCorrectOption: type pinyin_option_t.
  *
  * The enums of zhuyin correct option.
  *
