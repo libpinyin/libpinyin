@@ -35,7 +35,7 @@ namespace pinyin{
 /* internal definition */
 static const size_t nbeam = 32;
 
-#define LONG_SENTENCE_PENALTY log(1.2)
+#define LONG_SENTENCE_PENALTY log(1.2f)
 
 struct trellis_value_t {
     phrase_token_t m_handles[2];
