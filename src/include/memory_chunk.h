@@ -60,7 +60,7 @@ private:
     char * m_allocated; //one data pass the end.
     free_func_t m_free_func;
 
-    const guint32 header = sizeof(guint32) * 2;
+    const gint32 header = sizeof(guint32) * 2;
 
 private:
     void freemem(){
