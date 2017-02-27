@@ -1172,6 +1172,9 @@ bool pinyin_get_sentence(pinyin_instance_t * instance,
     pinyin_context_t * & context = instance->m_context;
     NBestMatchResults & results = instance->m_nbest_results;
 
+    if (0 == results.size())
+        return false;
+
     MatchResult result = NULL;
     assert(index < results.size());
     assert(results.get_result(index, result));
