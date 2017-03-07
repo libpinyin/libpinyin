@@ -2062,6 +2062,9 @@ bool pinyin_train(pinyin_instance_t * instance, guint8 index){
     PhoneticKeyMatrix & matrix = instance->m_matrix;
     NBestMatchResults & results = instance->m_nbest_results;
 
+    if (0 == results.size())
+        return false;
+
     context->m_modified = true;
 
     MatchResult result = NULL;
