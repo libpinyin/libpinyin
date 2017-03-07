@@ -1,3 +1,6 @@
+version 1.9.92
+* fixes crash in double pinyin;
+
 version 1.9.91
 * multiple sentence candidates;
 
