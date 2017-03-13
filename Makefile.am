@@ -23,7 +23,7 @@ MAINTAINERCLEANFILES 	= Makefile.in
 
 CLEANFILES		= *.bak 
 
-ACLOCAL			= aclocal -I .
+ACLOCAL_AMFLAGS = -I m4
 
 pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = libpinyin.pc

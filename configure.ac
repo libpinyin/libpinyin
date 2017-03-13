@@ -22,8 +22,10 @@ m4_define([libpinyin_binary_version],
 AC_PREREQ(2.60)
 AC_INIT([libpinyin], [libpinyin_version], [https://github.com/libpinyin/libpinyin/issues/new])
 AM_INIT_AUTOMAKE
+
 AC_CONFIG_SRCDIR([config.h.in])
 AC_CONFIG_HEADER([config.h])
+AC_CONFIG_MACRO_DIR([m4])
 m4_ifdef([AM_SILENT_RULES],[AM_SILENT_RULES([yes])])
 
 # Define a string for binary compatibility
