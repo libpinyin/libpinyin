@@ -308,6 +308,7 @@ bool zhuyin_parse_chewing(zhuyin_instance_t * instance,
 size_t zhuyin_parse_more_chewings(zhuyin_instance_t * instance,
                                   const char * chewings);
 
+#if 0
 /**
  * zhuyin_valid_zhuyin_keys:
  * @instance: the zhuyin instance.
@@ -318,6 +319,7 @@ size_t zhuyin_parse_more_chewings(zhuyin_instance_t * instance,
  *
  */
 bool zhuyin_valid_zhuyin_keys(zhuyin_instance_t * instance);
+#endif
 
 /**
  * zhuyin_get_parsed_input_length:
@@ -426,18 +428,18 @@ bool zhuyin_train(zhuyin_instance_t * instance);
 bool zhuyin_reset(zhuyin_instance_t * instance);
 
 /**
- * zhuyin_get_bopomofo_string:
+ * zhuyin_get_zhuyin_string:
  * @instance: the zhuyin instance.
  * @key: the chewing key.
- * @utf8_str: the chewing string.
+ * @utf8_str: the zhuyin string.
  * @returns: whether the get operation is successful.
  *
- * Get the chewing string of the key.
+ * Get the zhuyin string of the key.
  *
  */
-bool zhuyin_get_bopomofo_string(zhuyin_instance_t * instance,
-                                ChewingKey * key,
-                                gchar ** utf8_str);
+bool zhuyin_get_zhuyin_string(zhuyin_instance_t * instance,
+                              ChewingKey * key,
+                              gchar ** utf8_str);
 
 /**
  * zhuyin_get_pinyin_string:
@@ -663,6 +665,7 @@ bool zhuyin_get_zhuyin_key_rest_offset(zhuyin_instance_t * instance,
                                        guint16 cursor,
                                        guint16 * offset);
 
+#if 0
 /**
  * zhuyin_get_raw_user_input:
  * @instance: the zhuyin instance.
@@ -674,6 +677,7 @@ bool zhuyin_get_zhuyin_key_rest_offset(zhuyin_instance_t * instance,
  */
 bool zhuyin_get_raw_user_input(zhuyin_instance_t * instance,
                                const gchar ** utf8_str);
+#endif
 
 /**
  * zhuyin_get_n_phrase:
