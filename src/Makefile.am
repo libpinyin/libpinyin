@@ -48,6 +48,15 @@ libpinyin_la_LIBADD	= storage/libstorage.la lookup/liblookup.la @GLIB2_LIBS@
 libpinyin_la_LDFLAGS	= -Wl,--version-script=$(srcdir)/libpinyin.ver \
 			  -version-info @LT_VERSION_INFO@
 
+lib_LTLIBRARIES     += libzhuyin.la
+
+libzhuyin_la_SOURCES    = zhuyin.cpp
+
+libzhuyin_la_LIBADD	= storage/libstorage.la lookup/liblookup.la @GLIB2_LIBS@
+
+libzhuyin_la_LDFLAGS	= -Wl,--version-script=$(srcdir)/libzhuyin.ver \
+			  -version-info @LT_VERSION_INFO@
+
 libpinyin_internal_la_SOURCES	= pinyin_internal.cpp
 
 libpinyin_internal_la_LIBADD	= storage/libstorage.la lookup/liblookup.la
