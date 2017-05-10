@@ -54,12 +54,12 @@ struct _zhuyin_context_t{
     char * m_user_dir;
     bool m_modified;
 
-    SystemTableInfo m_system_table_info;
+    SystemTableInfo2 m_system_table_info;
 };
 
-struct _pinyin_instance_t{
-    /* pointer of pinyin_context_t. */
-    pinyin_context_t * m_context;
+struct _zhuyin_instance_t{
+    /* pointer of zhuyin_context_t. */
+    zhuyin_context_t * m_context;
 
     /* the tokens of phrases before the user input. */
     TokenVector m_prefixes;
@@ -98,6 +98,6 @@ public:
 };
 
 struct _import_iterator_t{
-    pinyin_context_t * m_context;
+    zhuyin_context_t * m_context;
     guint8 m_phrase_index;
 };
