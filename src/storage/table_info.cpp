@@ -129,6 +129,7 @@ static TABLE_TARGET to_table_target(const char * str) {
 static guint8 to_index_of_default_tables(const char * str) {
     HANDLE(RESERVED);
     HANDLE(GB_DICTIONARY);
+    HANDLE(TSI_DICTIONARY);
     HANDLE(GBK_DICTIONARY);
     HANDLE(OPENGRAM_DICTIONARY);
     HANDLE(MERGED_DICTIONARY);
@@ -207,8 +208,8 @@ bool SystemTableInfo2::load(const char * filename) {
     m_model_data_version = modelver;
     m_lambda = lambda;
 
-    /* Note: only support pinyin table now. */
-    assert(PINYIN_TABLE == type);
+    /* Note: only support pinyin or zhuyin table now. */
+    assert(PINYIN_TABLE == type || ZHUYIN_TABLE == type);
     m_table_phonetic_type = type;
 
     int index = 0;
@@ -266,6 +267,10 @@ const pinyin_table_info_t * SystemTableInfo2::get_addon_tables() {
 
 gfloat SystemTableInfo2::get_lambda() {
     return m_lambda;
+}
+
+TABLE_PHONETIC_TYPE SystemTableInfo2::get_table_phonetic_type() {
+    return m_table_phonetic_type;
 }
 
 

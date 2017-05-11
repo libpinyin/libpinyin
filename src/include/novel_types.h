@@ -152,6 +152,7 @@ typedef enum {
     /* for default tables. */
     RESERVED = 0,
     GB_DICTIONARY = 1,
+    TSI_DICTIONARY = 1,
     GBK_DICTIONARY = 2,
     OPENGRAM_DICTIONARY = 3,
     MERGED_DICTIONARY = 4,
