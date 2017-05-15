@@ -18,7 +18,7 @@ INCLUDES                = -I$(top_srcdir)/src \
                           -I$(top_srcdir)/src/include \
                           -I$(top_srcdir)/src/storage \
                           -I$(top_srcdir)/src/lookup \
-			  -I$(top_srcdir)/utils \
+                          -I$(top_srcdir)/utils \
                           @GLIB2_CFLAGS@
 
 LDADD			= ../../src/libpinyin_internal.la @GLIB2_LIBS@
@@ -27,7 +27,8 @@ bin_PROGRAMS		= gen_binary_files \
 			  import_interpolation
 
 noinst_PROGRAMS		= export_interpolation \
-			  gen_pinyin_table
+			  gen_pinyin_table \
+			  gen_zhuyin_table
 
 gen_binary_files_SOURCES    = gen_binary_files.cpp
 
@@ -36,3 +37,5 @@ import_interpolation_SOURCES = import_interpolation.cpp
 export_interpolation_SOURCES = export_interpolation.cpp
 
 gen_pinyin_table_SOURCES    = gen_pinyin_table.cpp
+
+gen_zhuyin_table_SOURCES    = gen_zhuyin_table.cpp
