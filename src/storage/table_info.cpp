@@ -208,7 +208,7 @@ bool SystemTableInfo2::load(const char * filename) {
     m_model_data_version = modelver;
     m_lambda = lambda;
 
-    /* Note: only support pinyin or zhuyin table now. */
+    /* Note: support pinyin and zhuyin table now. */
     assert(PINYIN_TABLE == type || ZHUYIN_TABLE == type);
     m_table_phonetic_type = type;
 
