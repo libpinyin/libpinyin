@@ -20,8 +20,11 @@ INCLUDES                = -I$(top_srcdir)/src/include \
 
 libpinyinincludedir	= $(includedir)/libpinyin-@VERSION@
 
-libpinyininclude_HEADERS= pinyin_custom2.h
+libpinyininclude_HEADERS = pinyin_custom2.h
 
+if ENABLE_LIBZHUYIN
+libpinyininclude_HEADERS += zhuyin_custom2.h
+endif
 
 noinst_HEADERS		= chewing_enum.h \
 			  chewing_key.h \

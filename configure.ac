@@ -123,6 +123,7 @@ AM_CONDITIONAL(ENABLE_LIBZHUYIN, test x"$enable_libzhuyin" = x"yes")
 
 
 AC_CONFIG_FILES([libpinyin.pc
+                 libzhuyin.pc
                  libpinyin.spec
                  Makefile
                  doc/Makefile
@@ -148,5 +149,5 @@ Build options:
     Version                     $VERSION
     Install prefix              $prefix
     DBM                         $DBM
-    enable libzhuyin            $enable_libzhuyin
+    Enable libzhuyin            $enable_libzhuyin
 ])

@@ -35,6 +35,10 @@ libpinyinincludedir	= $(includedir)/libpinyin-@VERSION@
 
 libpinyininclude_HEADERS = pinyin.h
 
+if ENABLE_LIBZHUYIN
+libpinyininclude_HEADERS += zhuyin.h
+endif
+
 noinst_HEADERS		= pinyin_internal.h
 
 lib_LTLIBRARIES		= libpinyin.la
