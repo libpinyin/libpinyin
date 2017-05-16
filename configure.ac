@@ -112,20 +112,30 @@ fi
 
 AM_CONDITIONAL([KYOTOCABINET], [test x"$DBM" = x"KyotoCabinet"])
 
+# --enable-libzhuyin
+AC_ARG_ENABLE(libzhuyin,
+    AC_HELP_STRING([--enable-libzhuyin],
+        [Support libzhuyin library.]),
+        [enable_libzhuyin=$enableval],
+        [enable_libzhuyin=no]
+)
+AM_CONDITIONAL(ENABLE_LIBZHUYIN, test x"$enable_libzhuyin" = x"yes")
+
+
 AC_CONFIG_FILES([libpinyin.pc
                  libpinyin.spec
-		 Makefile
+                 Makefile
                  doc/Makefile
-		 data/Makefile
-		 src/Makefile
+                 data/Makefile
+                 src/Makefile
                  src/include/Makefile
                  src/storage/Makefile
-		 src/lookup/Makefile
-		 tests/Makefile
+                 src/lookup/Makefile
+                 tests/Makefile
                  tests/include/Makefile
                  tests/storage/Makefile
-		 tests/lookup/Makefile
-		 utils/Makefile
+                 tests/lookup/Makefile
+                 utils/Makefile
                  utils/storage/Makefile
                  utils/segment/Makefile
                  utils/training/Makefile
@@ -138,4 +148,5 @@ Build options:
     Version                     $VERSION
     Install prefix              $prefix
     DBM                         $DBM
+    enable libzhuyin            $enable_libzhuyin
 ])

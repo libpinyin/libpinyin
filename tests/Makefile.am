@@ -50,9 +50,10 @@ test_chewing_SOURCES	= test_chewing.cpp
 
 test_chewing_LDADD      = ../src/libpinyin.la
 
-
+if ENABLE_LIBZHUYIN
 noinst_PROGRAMS         += test_zhuyin
 
 test_zhuyin_SOURCES = test_zhuyin.cpp
 
 test_zhuyin_LDADD   = ../src/libzhuyin.la
+endif
