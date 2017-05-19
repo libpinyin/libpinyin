@@ -1883,23 +1883,6 @@ bool zhuyin_get_n_zhuyin(zhuyin_instance_t * instance,
 }
 #endif
 
-/* skip the beginning of zero ChewingKey "'". */
-static size_t _compute_zhuyin_start(PhoneticKeyMatrix & matrix,
-                                    size_t offset) {
-    size_t start = offset;
-    ChewingKey key; ChewingKeyRest key_rest;
-    for (; start < matrix.size() - 1; ++start) {
-        size_t size = matrix.get_column_size(start);
-        if (1 != size)
-            break;
-
-        matrix.get_item(start, 0, key, key_rest);
-        break;
-    }
-
-    return start;
-}
-
 bool zhuyin_get_zhuyin_key(zhuyin_instance_t * instance,
                            size_t offset,
                            ChewingKey ** ppkey) {
@@ -1913,7 +1896,6 @@ bool zhuyin_get_zhuyin_key(zhuyin_instance_t * instance,
         return false;
 
     _check_offset(matrix, offset);
-    offset = _compute_zhuyin_start(matrix, offset);
 
     static ChewingKey key;
     ChewingKeyRest key_rest;
@@ -1936,7 +1918,6 @@ bool zhuyin_get_zhuyin_key_rest(zhuyin_instance_t * instance,
         return false;
 
     _check_offset(matrix, offset);
-    offset = _compute_zhuyin_start(matrix, offset);
 
     ChewingKey key;
     static ChewingKeyRest key_rest;
