@@ -1883,6 +1883,337 @@ bool zhuyin_get_n_zhuyin(zhuyin_instance_t * instance,
 }
 #endif
 
+/* skip the beginning of zero ChewingKey "'". */
+static size_t _compute_zhuyin_start(PhoneticKeyMatrix & matrix,
+                                    size_t offset) {
+    size_t start = offset;
+    ChewingKey key; ChewingKeyRest key_rest;
+    for (; start < matrix.size() - 1; ++start) {
+        size_t size = matrix.get_column_size(start);
+        if (1 != size)
+            break;
+
+        matrix.get_item(start, 0, key, key_rest);
+        break;
+    }
+
+    return start;
+}
+
+bool zhuyin_get_zhuyin_key(zhuyin_instance_t * instance,
+                           size_t offset,
+                           ChewingKey ** ppkey) {
+    PhoneticKeyMatrix & matrix = instance->m_matrix;
+    *ppkey = NULL;
+
+    if (offset >= matrix.size() - 1)
+        return false;
+
+    if (0 == matrix.get_column_size(offset))
+        return false;
+
+    _check_offset(matrix, offset);
+    offset = _compute_zhuyin_start(matrix, offset);
+
+    static ChewingKey key;
+    ChewingKeyRest key_rest;
+    matrix.get_item(offset, 0, key, key_rest);
+
+    *ppkey = &key;
+    return true;
+}
+
+bool zhuyin_get_zhuyin_key_rest(zhuyin_instance_t * instance,
+                                size_t offset,
+                                ChewingKeyRest ** ppkey_rest) {
+    PhoneticKeyMatrix & matrix = instance->m_matrix;
+    *ppkey_rest = NULL;
+
+    if (offset >= matrix.size() - 1)
+        return false;
+
+    if (0 == matrix.get_column_size(offset))
+        return false;
+
+    _check_offset(matrix, offset);
+    offset = _compute_zhuyin_start(matrix, offset);
+
+    ChewingKey key;
+    static ChewingKeyRest key_rest;
+    matrix.get_item(offset, 0, key, key_rest);
+
+    *ppkey_rest = &key_rest;
+    return true;
+}
+
+bool zhuyin_get_zhuyin_key_rest_positions(zhuyin_instance_t * instance,
+                                          ChewingKeyRest * key_rest,
+                                          guint16 * begin, guint16 * end) {
+    if (begin)
+        *begin = key_rest->m_raw_begin;
+
+    if (end)
+        *end = key_rest->m_raw_end;
+
+    return true;
+}
+
+bool zhuyin_get_zhuyin_key_rest_length(zhuyin_instance_t * instance,
+                                       ChewingKeyRest * key_rest,
+                                       guint16 * length) {
+    *length = key_rest->length();
+    return true;
+}
+
+/* when lookup offset:
+   get the previous non-zero ChewingKey. */
+bool zhuyin_get_zhuyin_offset(zhuyin_instance_t * instance,
+                              size_t cursor,
+                              size_t * poffset) {
+    PhoneticKeyMatrix & matrix = instance->m_matrix;
+    size_t offset = std_lite::min(cursor, instance->m_parsed_len);
+
+    /* find the first ChewingKey. */
+    for (; offset > 0; --offset) {
+        const size_t size = matrix.get_column_size(offset);
+
+        if (size > 0)
+            break;
+    }
+
+    _check_offset(matrix, offset);
+
+    *poffset = offset;
+    return true;
+}
+
+bool zhuyin_get_left_zhuyin_offset(zhuyin_instance_t * instance,
+                                   size_t offset,
+                                   size_t * pleft) {
+    PhoneticKeyMatrix & matrix = instance->m_matrix;
+    _check_offset(matrix, offset);
+
+    /* find the ChewingKey ends at offset. */
+    size_t left = offset > 0 ? offset - 1 : 0;
+
+    ChewingKey key; ChewingKeyRest key_rest;
+    for (; left > 0; --left) {
+        const size_t size = matrix.get_column_size(left);
+
+        size_t i = 0;
+        for (; i < size; ++i) {
+            matrix.get_item(left, i, key, key_rest);
+
+            if (offset == key_rest.m_raw_end)
+                break;
+        }
+
+        if (i < size)
+            break;
+    }
+
+    _check_offset(matrix, left);
+
+    *pleft = left;
+    return true;
+}
+
+bool zhuyin_get_right_zhuyin_offset(zhuyin_instance_t * instance,
+                                    size_t offset,
+                                    size_t * pright) {
+    PhoneticKeyMatrix & matrix = instance->m_matrix;
+    _check_offset(matrix, offset);
+
+    /* find the first non-zero ChewingKey. */
+    size_t right = offset;
+
+    ChewingKey key; ChewingKeyRest key_rest;
+    for (size_t index = right; index < matrix.size() - 1; ++index) {
+        const size_t size = matrix.get_column_size(index);
+
+        if (1 != size)
+            break;
+
+        matrix.get_item(index, 0, key, key_rest);
+        break;
+    }
+
+    if (0 == matrix.get_column_size(right))
+        return false;
+
+    matrix.get_item(right, 0, key, key_rest);
+    right = key_rest.m_raw_end;
+    _check_offset(matrix, right);
+
+    *pright = right;
+    return true;
+}
+
+static bool _pre_compute_tokens(zhuyin_context_t * context,
+                                TokenVector cached_tokens,
+                                ucs4_t * phrase,
+                                size_t phrase_length) {
+    FacadePhraseIndex * phrase_index = context->m_phrase_index;
+    FacadePhraseTable3 * phrase_table = context->m_phrase_table;
+
+    /* do phrase table search. */
+    PhraseTokens tokens;
+    memset(tokens, 0, sizeof(PhraseTokens));
+    phrase_index->prepare_tokens(tokens);
+
+    for (size_t i = 0; i < phrase_length; ++i) {
+        phrase_token_t token = null_token;
+        ucs4_t character = phrase[i];
+
+        phrase_index->clear_tokens(tokens);
+        int retval = phrase_table->search(1, &character, tokens);
+
+        int num = get_first_token(tokens, token);
+        /* en-counter un-known character, such as the emoji unicode. */
+        if (0 == num) {
+            phrase_index->destroy_tokens(tokens);
+            return false;
+        }
+
+        g_array_append_val(cached_tokens, token);
+    }
+
+    phrase_index->destroy_tokens(tokens);
+
+    return true;
+}
+
+static bool _get_char_offset_recur(zhuyin_instance_t * instance,
+                                   TokenVector cached_tokens,
+                                   size_t start,
+                                   size_t offset,
+                                   size_t * plength) {
+    zhuyin_context_t * context = instance->m_context;
+    PhoneticKeyMatrix & matrix = instance->m_matrix;
+    FacadePhraseIndex * phrase_index = context->m_phrase_index;
+    size_t length = *plength;
+
+    if (start > offset)
+        return true;
+
+    const size_t size = matrix.get_column_size(start);
+    /* assume pinyin parsers will filter invalid keys. */
+    assert(size > 0);
+
+    bool result = false;
+
+    PhraseItem item;
+    for (size_t i = 0; i < size; ++i) {
+        ChewingKey key; ChewingKeyRest key_rest;
+        matrix.get_item(start, i, key, key_rest);
+
+        const size_t newstart = key_rest.m_raw_end;
+
+        /* check pronunciation */
+        phrase_token_t token = g_array_index
+            (cached_tokens, phrase_token_t, length);
+        phrase_index->get_phrase_item(token, item);
+
+        gfloat pinyin_poss = item.get_pronunciation_possibility(&key);
+        if (pinyin_poss < FLT_EPSILON)
+            continue;
+
+        if (newstart > offset)
+            return true;
+
+        ++length;
+
+        result = _get_char_offset_recur
+            (instance, cached_tokens, newstart, offset, &length);
+        if (result) {
+            *plength = length;
+            return result;
+        }
+
+        --length;
+    }
+
+    return result;
+}
+
+bool zhuyin_get_character_offset(zhuyin_instance_t * instance,
+                                 const char * phrase,
+                                 size_t offset,
+                                 size_t * plength) {
+    zhuyin_context_t * context = instance->m_context;
+    PhoneticKeyMatrix & matrix = instance->m_matrix;
+
+    if (0 == matrix.size())
+        return false;
+
+    assert(offset < matrix.size());
+    _check_offset(matrix, offset);
+
+    if (NULL == phrase)
+        return false;
+
+    glong phrase_length = 0;
+    ucs4_t * ucs4_phrase = g_utf8_to_ucs4(phrase, -1, NULL, &phrase_length, NULL);
+
+    if (0 == phrase_length)
+        return false;
+
+    size_t length = 0;
+    const size_t start = 0;
+
+    /* pre-compute the tokens vector from phrase. */
+    TokenVector cached_tokens = g_array_new(TRUE, TRUE, sizeof(phrase_token_t));
+
+    bool retval = _pre_compute_tokens
+        (context, cached_tokens, ucs4_phrase, phrase_length);
+
+    if (!retval) {
+        g_array_free(cached_tokens, TRUE);
+        g_free(ucs4_phrase);
+        return false;
+    }
+
+    assert(cached_tokens->len == phrase_length);
+
+    bool result = _get_char_offset_recur
+        (instance, cached_tokens, start, offset, &length);
+
+    g_array_free(cached_tokens, TRUE);
+    g_free(ucs4_phrase);
+
+    *plength = length;
+    return result;
+}
+
+#if 0
+bool zhuyin_get_character_offset(zhuyin_instance_t * instance,
+                                 size_t offset,
+                                 size_t * plength) {
+    zhuyin_context_t * context = instance->m_context;
+    FacadePhraseIndex * phrase_index = context->m_phrase_index;
+
+    PhoneticKeyMatrix & matrix = instance->m_matrix;
+    MatchResults results = instance->m_match_results;
+    _check_offset(matrix, offset);
+
+    size_t length = 0;
+    PhraseItem item;
+    for (size_t i = 0; i < offset; ++i) {
+        phrase_token_t token = g_array_index(results, phrase_token_t, i);
+        if (null_token == token)
+            continue;
+
+        int retval = phrase_index->get_phrase_item(token, item);
+        assert(ERROR_OK == retval);
+        guint8 len = item.get_phrase_length();
+        length += len;
+    }
+
+    *plength = length;
+    return true;
+}
+#endif
+
 
 bool zhuyin_get_n_phrase(zhuyin_instance_t * instance,
                          guint * num) {
