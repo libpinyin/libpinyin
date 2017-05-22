@@ -27,3 +27,7 @@ ACLOCAL_AMFLAGS = -I m4
 
 pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = libpinyin.pc
+
+if ENABLE_LIBZHUYIN
+pkgconfig_DATA += libzhuyin.pc
+endif

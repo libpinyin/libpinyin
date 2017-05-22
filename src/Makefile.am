@@ -17,7 +17,8 @@
 AUTOMAKE_OPTIONS 	= gnu
 SUBDIRS 		= include storage lookup
 
-EXTRA_DIST		= libpinyin.ver
+EXTRA_DIST      = libpinyin.ver \
+                  libzhuyin.ver
 
 MAINTAINERCLEANFILES 	= Makefile.in 
 
@@ -26,9 +27,9 @@ CLEANFILES		= *.bak
 ACLOCAL			= aclocal -I $(ac_aux_dir)
 
 INCLUDES                = -I$(top_srcdir)/src \
-			  -I$(top_srcdir)/src/include \
-			  -I$(top_srcdir)/src/storage \
-			  -I$(top_srcdir)/src/lookup \
+                          -I$(top_srcdir)/src/include \
+                          -I$(top_srcdir)/src/storage \
+                          -I$(top_srcdir)/src/lookup \
                           @GLIB2_CFLAGS@
 
 libpinyinincludedir	= $(includedir)/libpinyin-@VERSION@
