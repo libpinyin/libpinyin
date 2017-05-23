@@ -1013,7 +1013,7 @@ bool zhuyin_parse_full_pinyin(zhuyin_instance_t * instance,
     return retval;
 }
 
-size_t pinyin_parse_more_full_pinyins(zhuyin_instance_t * instance,
+size_t zhuyin_parse_more_full_pinyins(zhuyin_instance_t * instance,
                                       const char * pinyins){
     zhuyin_context_t * & context = instance->m_context;
     zhuyin_option_t options = context->m_options;

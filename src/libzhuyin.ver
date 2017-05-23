@@ -42,12 +42,14 @@ LIBZHUYIN {
         zhuyin_get_candidate;
         zhuyin_get_candidate_type;
         zhuyin_get_candidate_string;
-        zhuyin_get_n_zhuyin;
         zhuyin_get_zhuyin_key;
         zhuyin_get_zhuyin_key_rest;
         zhuyin_get_zhuyin_key_rest_positions;
         zhuyin_get_zhuyin_key_rest_length;
-        zhuyin_get_zhuyin_key_rest_offset;
+        zhuyin_get_zhuyin_offset;
+        zhuyin_get_left_zhuyin_offset;
+        zhuyin_get_right_zhuyin_offset;
+        zhuyin_get_character_offset;
         zhuyin_get_n_phrase;
         zhuyin_get_phrase_token;
 

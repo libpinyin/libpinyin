@@ -582,6 +582,7 @@ bool zhuyin_get_candidate_string(zhuyin_instance_t * instance,
                                  lookup_candidate_t * candidate,
                                  const gchar ** utf8_str);
 
+#if 0
 /**
  * zhuyin_get_n_zhuyin:
  * @instance: the zhuyin instance.
@@ -593,6 +594,7 @@ bool zhuyin_get_candidate_string(zhuyin_instance_t * instance,
  */
 bool zhuyin_get_n_zhuyin(zhuyin_instance_t * instance,
                          guint * num);
+#endif
 
 /**
  * zhuyin_get_zhuyin_key:
@@ -652,18 +654,62 @@ bool zhuyin_get_zhuyin_key_rest_length(zhuyin_instance_t * instance,
                                        guint16 * length);
 
 /**
- * zhuyin_get_zhuyin_key_rest_offset:
+ * zhuyin_get_zhuyin_offset:
  * @instance: the zhuyin instance.
- * @cursor: the cursor.
- * @offset: the offset in the zhuyin array.
+ * @cursor: the user cursor.
+ * @offset: the lookup offset.
  * @returns: whether the get operation is successful.
  *
- * Get the offset in the zhuyin key array.
+ * Get the lookup offset from the user cursor.
  *
  */
-bool zhuyin_get_zhuyin_key_rest_offset(zhuyin_instance_t * instance,
-                                       guint16 cursor,
-                                       guint16 * offset);
+bool zhuyin_get_zhuyin_offset(zhuyin_instance_t * instance,
+                              size_t cursor,
+                              size_t * offset);
+
+/**
+ * zhuyin_get_left_zhuyin_offset:
+ * @instance: the zhuyin instance.
+ * @offset: the lookup offset.
+ * @left: the left offset.
+ * @returns: whether the get operation is successful.
+ *
+ * Get the left offset from the lookup offset.
+ *
+ */
+bool zhuyin_get_left_zhuyin_offset(zhuyin_instance_t * instance,
+                                   size_t offset,
+                                   size_t * left);
+
+/**
+ * zhuyin_get_right_zhuyin_offset:
+ * @instance: the zhuyin instance.
+ * @offset: the lookup offset.
+ * @right: the right offset.
+ * @returns: whether the get operation is successful.
+ *
+ * Get the right offset from the lookup offset.
+ *
+ */
+bool zhuyin_get_right_zhuyin_offset(zhuyin_instance_t * instance,
+                                    size_t offset,
+                                    size_t * right);
+
+/**
+ * zhuyin_get_character_offset:
+ * @instance: the zhuyin instance.
+ * @phrase: the utf8 phrase.
+ * @offset: the lookup offset.
+ * @length: the character offset.
+ * @returns: whether the get operation is successful.
+ *
+ * Get the character offset from the lookup offset.
+ *
+ */
+bool zhuyin_get_character_offset(zhuyin_instance_t * instance,
+                                 const char * phrase,
+                                 size_t offset,
+                                 size_t * length);
 
 #if 0
 /**
