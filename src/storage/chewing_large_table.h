@@ -26,6 +26,7 @@
 #include "novel_types.h"
 #include "memory_chunk.h"
 #include "chewing_key.h"
+#include "table_info.h"
 
 namespace pinyin{
 
@@ -123,7 +124,7 @@ public:
         return m_bitmap_table.store(new_chunk, 0, end);
     }
 
-    bool load_text(FILE * file);
+    bool load_text(FILE * file, TABLE_PHONETIC_TYPE type);
 
     /* search method */
     int search(int phrase_length, /* in */ const ChewingKey keys[],

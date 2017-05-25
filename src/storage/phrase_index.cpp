@@ -511,7 +511,8 @@ bool SubPhraseIndex::merge(PhraseIndexLogger * logger){
     return true;
 }
 
-bool FacadePhraseIndex::load_text(guint8 phrase_index, FILE * infile){
+bool FacadePhraseIndex::load_text(guint8 phrase_index, FILE * infile,
+                                  TABLE_PHONETIC_TYPE type){
     SubPhraseIndex * & sub_phrases = m_sub_phrase_indices[phrase_index];
     if ( !sub_phrases ){
         sub_phrases = new SubPhraseIndex;
@@ -554,14 +555,26 @@ bool FacadePhraseIndex::load_text(guint8 phrase_index, FILE * infile){
             item_ptr->set_phrase_string(written, phrase_ucs4);
         }
 
-        pinyin_option_t options = USE_TONE;
-        PinyinDirectParser2 parser;
         ChewingKeyVector keys = g_array_new(FALSE, FALSE, sizeof(ChewingKey));
         ChewingKeyRestVector key_rests =
             g_array_new(FALSE, FALSE, sizeof(ChewingKeyRest));
 
-        parser.parse(options, keys, key_rests, pinyin, strlen(pinyin));
-	
+        switch (type) {
+        case PINYIN_TABLE: {
+            PinyinDirectParser2 parser;
+            pinyin_option_t options = USE_TONE;
+            parser.parse(options, keys, key_rests, pinyin, strlen(pinyin));
+            break;
+        }
+
+        case ZHUYIN_TABLE: {
+            ZhuyinDirectParser2 parser;
+            pinyin_option_t options = USE_TONE | FORCE_TONE;
+            parser.parse(options, keys, key_rests, pinyin, strlen(pinyin));
+            break;
+        }
+        };
+
         if (item_ptr->get_phrase_length() == keys->len) {
             item_ptr->add_pronunciation((ChewingKey *)keys->data, freq);
         } else {

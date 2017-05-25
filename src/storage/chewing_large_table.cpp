@@ -23,6 +23,7 @@
 #include "pinyin_phrase2.h"
 #include "pinyin_phrase3.h"
 #include "pinyin_parser2.h"
+#include "zhuyin_parser2.h"
 
 
 /* internal class definition */
@@ -661,7 +662,7 @@ int ChewingArrayIndexLevel<phrase_length>::remove_index
 
 
 /* load text method */
-bool ChewingLargeTable::load_text(FILE * infile) {
+bool ChewingLargeTable::load_text(FILE * infile, TABLE_PHONETIC_TYPE type) {
     char pinyin[256];
     char phrase[256];
     phrase_token_t token;
@@ -679,15 +680,27 @@ bool ChewingLargeTable::load_text(FILE * infile) {
 
         glong len = g_utf8_strlen(phrase, -1);
 
-        PinyinDirectParser2 parser;
         ChewingKeyVector keys;
         ChewingKeyRestVector key_rests;
 
         keys = g_array_new(FALSE, FALSE, sizeof(ChewingKey));
         key_rests = g_array_new(FALSE, FALSE, sizeof(ChewingKeyRest));
 
-        pinyin_option_t options = USE_TONE;
-        parser.parse(options, keys, key_rests, pinyin, strlen(pinyin));
+        switch (type) {
+        case PINYIN_TABLE: {
+            PinyinDirectParser2 parser;
+            pinyin_option_t options = USE_TONE;
+            parser.parse(options, keys, key_rests, pinyin, strlen(pinyin));
+            break;
+        }
+
+        case ZHUYIN_TABLE: {
+            ZhuyinDirectParser2 parser;
+            pinyin_option_t options = USE_TONE | FORCE_TONE;
+            parser.parse(options, keys, key_rests, pinyin, strlen(pinyin));
+            break;
+        }
+        };
 
         if (len != keys->len) {
             fprintf(stderr, "ChewingLargeTable::load_text:%s\t%s\t%u\t%ld\n",

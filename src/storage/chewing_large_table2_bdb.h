@@ -24,6 +24,7 @@
 #include <stdio.h>
 #include <db.h>
 #include <glib.h>
+#include "table_info.h"
 
 namespace pinyin{
 
@@ -94,7 +95,7 @@ public:
 
     bool store_db(const char * new_filename);
 
-    bool load_text(FILE * infile);
+    bool load_text(FILE * infile, TABLE_PHONETIC_TYPE type);
 
     /* search method */
     int search(int phrase_length, /* in */ const ChewingKey keys[],

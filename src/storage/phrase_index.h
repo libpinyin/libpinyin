@@ -26,9 +26,11 @@
 #include "novel_types.h"
 #include "chewing_key.h"
 #include "pinyin_parser2.h"
+#include "zhuyin_parser2.h"
 #include "pinyin_phrase3.h"
 #include "memory_chunk.h"
 #include "phrase_index_logger.h"
+#include "table_info.h"
 
 /**
  * Phrase Index File Format
@@ -467,13 +469,15 @@ public:
      * FacadePhraseIndex::load_text:
      * @phrase_index: the index of sub phrase index to be loaded.
      * @infile: the textual format file of the phrase table.
+     * @type: the type of phonetic table.
      * @returns: whether the load operation is successful.
      *
      * Load one sub phrase index from the textual format file.
      * Note: load sub phrase index according to the config in future.
      *
      */
-    bool load_text(guint8 phrase_index, FILE * infile);
+    bool load_text(guint8 phrase_index, FILE * infile,
+                   TABLE_PHONETIC_TYPE type);
 
     /**
      * FacadePhraseIndex::load:
