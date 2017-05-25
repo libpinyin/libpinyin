@@ -45,7 +45,9 @@ int main(int argc, char * argv[]) {
     const pinyin_table_info_t * phrase_files =
         system_table_info.get_default_tables();
 
-    if (!load_phrase_table(phrase_files, &largetable, NULL, &phrase_index))
+    TABLE_PHONETIC_TYPE type = system_table_info.get_table_phonetic_type();
+    if (!load_phrase_table(phrase_files, &largetable,
+                           NULL, &phrase_index, type))
         exit(ENOENT);
 
 #if 0

@@ -51,7 +51,8 @@ inline bool load_phrase_index(const pinyin_table_info_t * phrase_files,
 inline bool load_phrase_table(const pinyin_table_info_t * phrase_files,
                               ChewingLargeTable2 * chewing_table,
                               PhraseLargeTable3 * phrase_table,
-                              FacadePhraseIndex * phrase_index){
+                              FacadePhraseIndex * phrase_index,
+                              TABLE_PHONETIC_TYPE type){
     for (size_t i = 0; i < PHRASE_INDEX_LIBRARY_COUNT; ++i) {
         const pinyin_table_info_t * table_info = phrase_files + i;
 
@@ -70,13 +71,13 @@ inline bool load_phrase_table(const pinyin_table_info_t * phrase_files,
         g_free(filename);
 
         if (chewing_table)
-            chewing_table->load_text(tablefile);
+            chewing_table->load_text(tablefile, type);
         fseek(tablefile, 0L, SEEK_SET);
         if (phrase_table)
             phrase_table->load_text(tablefile);
         fseek(tablefile, 0L, SEEK_SET);
         if (phrase_index)
-            phrase_index->load_text(i, tablefile);
+            phrase_index->load_text(i, tablefile, type);
         fclose(tablefile);
     }
     return true;

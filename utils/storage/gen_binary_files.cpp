@@ -33,7 +33,8 @@ static GOptionEntry entries[] =
 
 bool generate_binary_files(const char * pinyin_table_filename,
                            const char * phrase_table_filename,
-                           const pinyin_table_info_t * phrase_files) {
+                           const pinyin_table_info_t * phrase_files,
+                           TABLE_PHONETIC_TYPE type) {
     /* generate pinyin index*/
     ChewingLargeTable2 pinyin_table;
     pinyin_table.attach(pinyin_table_filename, ATTACH_READWRITE|ATTACH_CREATE);
@@ -62,11 +63,11 @@ bool generate_binary_files(const char * pinyin_table_filename,
             exit(ENOENT);
         }
 
-        pinyin_table.load_text(tablefile);
+        pinyin_table.load_text(tablefile, type);
         fseek(tablefile, 0L, SEEK_SET);
         phrase_table.load_text(tablefile);
         fseek(tablefile, 0L, SEEK_SET);
-        phrase_index.load_text(i, tablefile);
+        phrase_index.load_text(i, tablefile, type);
         fclose(tablefile);
         g_free(filename);
     }
@@ -108,15 +109,16 @@ int main(int argc, char * argv[]){
     const pinyin_table_info_t * phrase_files =
         system_table_info.get_default_tables();
 
+    TABLE_PHONETIC_TYPE type = system_table_info.get_table_phonetic_type();
     generate_binary_files(SYSTEM_PINYIN_INDEX,
                           SYSTEM_PHRASE_INDEX,
-                          phrase_files);
+                          phrase_files, type);
 
     phrase_files = system_table_info.get_addon_tables();
 
     generate_binary_files(ADDON_SYSTEM_PINYIN_INDEX,
                           ADDON_SYSTEM_PHRASE_INDEX,
-                          phrase_files);
+                          phrase_files, type);
 
     return 0;
 }
