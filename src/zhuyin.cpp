@@ -1494,16 +1494,14 @@ bool zhuyin_guess_candidates_after_cursor(zhuyin_instance_t * instance,
 
     /* matrix reserved one extra slot. */
     const size_t start = offset;
-    for (size_t end = start + 1; end < matrix.size();) {
+    for (size_t end = start + 1; end < matrix.size(); ++end) {
         /* do pinyin search. */
         context->m_phrase_index->clear_ranges(ranges);
         int retval = search_matrix(context->m_pinyin_table, &matrix,
                                    start, end, ranges);
 
-        if ( !(retval & SEARCH_OK) ) {
-            ++end;
+        if ( !(retval & SEARCH_OK) )
             continue;
-        }
 
         lookup_candidate_t template_item;
         template_item.m_begin = start; template_item.m_end = end;
