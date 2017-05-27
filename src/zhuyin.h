@@ -308,19 +308,6 @@ bool zhuyin_parse_chewing(zhuyin_instance_t * instance,
 size_t zhuyin_parse_more_chewings(zhuyin_instance_t * instance,
                                   const char * chewings);
 
-#if 0
-/**
- * zhuyin_valid_zhuyin_keys:
- * @instance: the zhuyin instance.
- * @returns: whether all zhuyin keys are valid.
- *
- * Valid parsed zhuyin keys, if all valid, return true;
- * if not, modify raw user input and return false.
- *
- */
-bool zhuyin_valid_zhuyin_keys(zhuyin_instance_t * instance);
-#endif
-
 /**
  * zhuyin_get_parsed_input_length:
  * @instance: the zhuyin instance.
