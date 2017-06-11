@@ -143,7 +143,7 @@ bool taglib_validate_token_with_string(FacadePhraseIndex * phrase_index,
 /* Note: the following function is only available when the optional tag exists.
    bool taglib_report_status(int line_type); */
 
-/* Note: taglib_write is omited, as printf is more suitable for this. */
+/* Note: taglib_write is omitted, as printf is more suitable for this. */
 
 };
 
