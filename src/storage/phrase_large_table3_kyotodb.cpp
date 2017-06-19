@@ -67,6 +67,7 @@ bool PhraseLargeTable3::attach(const char * dbfile, guint32 flags) {
     return m_db->open(dbfile, mode);
 }
 
+#if 0
 /* load_db/store_db method */
 /* use in-memory DBM here, for better performance. */
 bool PhraseLargeTable3::load_db(const char * filename) {
@@ -94,7 +95,7 @@ bool PhraseLargeTable3::load_db(const char * filename) {
     return true;
 }
 
-bool PhraseLargeTable3::store_db(const char * new_filename){
+bool PhraseLargeTable3::store_db(const char * new_filename) {
     int ret = unlink(new_filename);
     if ( ret != 0 && errno != ENOENT)
         return false;
@@ -112,6 +113,7 @@ bool PhraseLargeTable3::store_db(const char * new_filename){
 
     return true;
 }
+#endif
 
 /* search method */
 int PhraseLargeTable3::search(int phrase_length,

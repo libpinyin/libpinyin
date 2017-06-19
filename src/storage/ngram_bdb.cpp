@@ -44,6 +44,7 @@ void Bigram::reset(){
     }
 }
 
+#if 0
 bool Bigram::load_db(const char * dbfile){
     reset();
 
@@ -106,6 +107,7 @@ bool Bigram::save_db(const char * dbfile){
 
     return true;
 }
+#endif
 
 bool Bigram::attach(const char * dbfile, guint32 flags){
     reset();

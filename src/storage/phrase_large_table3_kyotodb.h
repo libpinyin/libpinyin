@@ -49,11 +49,19 @@ public:
     /* attach method */
     bool attach(const char * dbfile, guint32 flags);
 
+    bool sync() {
+        assert(NULL != m_db);
+        m_db->synchronize();
+        return true;
+    }
+
+#if 0
     /* load_db/store_db method */
     /* use in-memory DBM here, for better performance. */
     bool load_db(const char * filename);
 
     bool store_db(const char * new_filename);
+#endif
 
     bool load_text(FILE * infile);
 

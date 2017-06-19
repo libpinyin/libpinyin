@@ -56,6 +56,7 @@ public:
      */
     ~Bigram();
 
+#if 0
     /**
      * Bigram::load_db:
      * @dbfile: the Berkeley DB file name.
@@ -75,6 +76,7 @@ public:
      *
      */
     bool save_db(const char * dbfile);
+#endif
 
     /**
      * Bigram::attach:
@@ -86,6 +88,12 @@ public:
      *
      */
     bool attach(const char * dbfile, guint32 flags);
+
+    bool sync() {
+        assert(NULL != m_db);
+        m_db->sync(m_db, 0);
+        return true;
+    }
 
     /**
      * Bigram::load:

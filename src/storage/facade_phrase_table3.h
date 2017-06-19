@@ -83,17 +83,25 @@ public:
         }
         if (user_filename) {
             m_user_phrase_table = new PhraseLargeTable3;
-            result = m_user_phrase_table->load_db
-                (user_filename) || result;
+            result = m_user_phrase_table->attach
+                (user_filename, ATTACH_READWRITE|ATTACH_CREATE) || result;
         }
         return result;
     }
 
+    bool sync() {
+        if (NULL == m_user_phrase_table)
+            return false;
+        return m_user_phrase_table->sync();
+    }
+
+#if 0
     bool store(const char * new_user_filename) {
         if (NULL == m_user_phrase_table)
             return false;
         return m_user_phrase_table->store_db(new_user_filename);
     }
+#endif
 
     /**
      * FacadePhraseTable3::search:

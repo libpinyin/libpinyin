@@ -84,17 +84,25 @@ public:
         }
         if (user_filename) {
             m_user_chewing_table = new ChewingLargeTable2;
-            result = m_user_chewing_table->load_db
-                (user_filename) || result;
+            result = m_user_chewing_table->attach
+                (user_filename, ATTACH_READWRITE|ATTACH_CREATE) || result;
         }
         return result;
     }
 
+    bool sync() {
+        if (NULL == m_user_chewing_table)
+            return false;
+        return m_user_chewing_table->sync();
+    }
+
+#if 0
     bool store(const char * new_user_filename) {
         if (NULL == m_user_chewing_table)
             return false;
         return m_user_chewing_table->store_db(new_user_filename);
     }
+#endif
 
     /**
      * FacadeChewingTable2::search:

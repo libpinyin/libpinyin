@@ -72,6 +72,7 @@ bool PhraseLargeTable3::attach(const char * dbfile, guint32 flags) {
     return true;
 }
 
+#if 0
 /* load/store method */
 bool PhraseLargeTable3::load_db(const char * filename) {
     reset();
@@ -137,6 +138,7 @@ bool PhraseLargeTable3::store_db(const char * new_filename) {
 
     return true;
 }
+#endif
 
 /* search method */
 int PhraseLargeTable3::search(int phrase_length,
