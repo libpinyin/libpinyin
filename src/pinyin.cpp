@@ -1329,13 +1329,36 @@ static gint compare_item_with_token(gconstpointer lhs,
 }
 #endif
 
-static gint compare_item_with_length_and_frequency(gconstpointer lhs,
-                                                   gconstpointer rhs) {
+static gint compare_item_with_phrase_length_and_frequency(gconstpointer lhs,
+                                                          gconstpointer rhs) {
     lookup_candidate_t * item_lhs = (lookup_candidate_t *)lhs;
     lookup_candidate_t * item_rhs = (lookup_candidate_t *)rhs;
 
     guint8 len_lhs = item_lhs->m_phrase_length;
     guint8 len_rhs = item_rhs->m_phrase_length;
+
+    if (len_lhs != len_rhs)
+        return -(len_lhs - len_rhs); /* in descendant order */
+
+    guint32 freq_lhs = item_lhs->m_freq;
+    guint32 freq_rhs = item_rhs->m_freq;
+
+    return -(freq_lhs - freq_rhs); /* in descendant order */
+}
+
+static gint compare_item_with_phrase_length_and_pinyin_length_and_frequency
+(gconstpointer lhs, gconstpointer rhs) {
+    lookup_candidate_t * item_lhs = (lookup_candidate_t *)lhs;
+    lookup_candidate_t * item_rhs = (lookup_candidate_t *)rhs;
+
+    guint8 len_lhs = item_lhs->m_phrase_length;
+    guint8 len_rhs = item_rhs->m_phrase_length;
+
+    if (len_lhs != len_rhs)
+        return -(len_lhs - len_rhs); /* in descendant order */
+
+    len_lhs = item_lhs->m_end - item_lhs->m_begin;
+    len_rhs = item_rhs->m_end - item_rhs->m_begin;
 
     if (len_lhs != len_rhs)
         return -(len_lhs - len_rhs); /* in descendant order */
@@ -1705,7 +1728,8 @@ static bool _check_offset(PhoneticKeyMatrix & matrix, size_t offset) {
 }
 
 bool pinyin_guess_candidates(pinyin_instance_t * instance,
-                             size_t offset) {
+                             size_t offset,
+                             sort_option_t sort_option) {
 
     pinyin_context_t * & context = instance->m_context;
     pinyin_option_t & options = context->m_options;
@@ -1806,8 +1830,17 @@ bool pinyin_guess_candidates(pinyin_instance_t * instance,
 
     _compute_frequency_of_items(context, prev_token, &merged_gram, candidates);
 
-    /* sort the candidates by length and frequency. */
-    g_array_sort(candidates, compare_item_with_length_and_frequency);
+    /* sort the candidates. */
+    switch (sort_option) {
+    case SORT_BY_PHRASE_LENGTH_AND_FREQUENCY:
+        g_array_sort(candidates,
+                     compare_item_with_phrase_length_and_frequency);
+        break;
+    case SORT_BY_PHRASE_LENGTH_AND_PINYIN_LENGTH_AND_FREQUENCY:
+        g_array_sort(candidates,
+                     compare_item_with_phrase_length_and_pinyin_length_and_frequency);
+        break;
+    }
 
     /* post process to remove duplicated candidates */
 
@@ -1886,8 +1919,8 @@ bool pinyin_guess_predicted_candidates(pinyin_instance_t * instance,
 
     _compute_frequency_of_items(context, prev_token, &merged_gram, candidates);
 
-    /* sort the candidates by length and frequency. */
-    g_array_sort(candidates, compare_item_with_length_and_frequency);
+    /* sort the candidates by phrase length and frequency. */
+    g_array_sort(candidates, compare_item_with_phrase_length_and_frequency);
 
     /* post process to remove duplicated candidates */
 

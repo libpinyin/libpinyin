@@ -47,6 +47,11 @@ typedef enum _lookup_candidate_type_t{
     ADDON_CANDIDATE,
 } lookup_candidate_type_t;
 
+typedef enum _sort_option_t{
+    SORT_BY_PHRASE_LENGTH_AND_FREQUENCY = 1,
+    SORT_BY_PHRASE_LENGTH_AND_PINYIN_LENGTH_AND_FREQUENCY,
+} sort_option_t;
+
 /**
  * pinyin_init:
  * @systemdir: the system wide language model data directory.
@@ -470,27 +475,15 @@ bool pinyin_in_chewing_keyboard(pinyin_instance_t * instance,
  * pinyin_guess_candidates:
  * @instance: the pinyin instance.
  * @offset: the lookup offset.
+ * @sort_option: the sort option.
  * @returns: whether a list of tokens are gotten.
  *
  * Guess the candidates at the offset.
  *
  */
 bool pinyin_guess_candidates(pinyin_instance_t * instance,
-                             size_t offset);
-
-#if 0
-/**
- * pinyin_guess_full_pinyin_candidates:
- * @instance: the pinyin instance.
- * @offset: the offset in the pinyin keys.
- * @returns: whether a list of lookup_candidate_t candidates are gotten.
- *
- * Guess the full pinyin candidates at the offset.
- *
- */
-bool pinyin_guess_full_pinyin_candidates(pinyin_instance_t * instance,
-                                       size_t offset);
-#endif
+                             size_t offset,
+                             sort_option_t sort_option);
 
 /**
  * pinyin_choose_candidate:
