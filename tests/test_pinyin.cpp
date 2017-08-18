@@ -69,7 +69,8 @@ int main(int argc, char * argv[]){
 
         size_t len = pinyin_parse_more_full_pinyins(instance, linebuf);
         pinyin_guess_sentence_with_prefix(instance, prefixbuf);
-        pinyin_guess_candidates(instance, 0);
+        pinyin_guess_candidates(instance, 0,
+                                SORT_BY_PHRASE_LENGTH_AND_FREQUENCY);
 
         size_t i = 0;
         for (i = 0; i <= len; ++i) {
