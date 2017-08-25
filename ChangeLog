@@ -1,6 +1,5 @@
 version 2.1.0
 * support sort option in pinyin_guess_candidates function
-* bump version
 
 version 2.0.92
 * reduce memory consumption after imported user dictionary;
