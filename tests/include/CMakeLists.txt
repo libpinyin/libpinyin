@@ -5,5 +5,5 @@ add_executable(
 
 target_link_libraries(
     test_memory_chunk
-    libpinyin
+    pinyin
 )

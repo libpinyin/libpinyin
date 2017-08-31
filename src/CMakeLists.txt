@@ -9,31 +9,31 @@ set(
 )
 
 add_library(
-    libpinyin
+    pinyin
     SHARED
     ${LIBPINYIN_SOURCES}
 )
 
 target_link_libraries(
-    libpinyin
+    pinyin
     storage
     lookup
 )
 
 set_target_properties(
-    libpinyin
+    pinyin
     PROPERTIES
         OUTPUT_NAME
-            libpinyin
+            pinyin
         VERSION
-            10.0.0
+            13.0.0
         SOVERSION
-            10
+            13
 )
 
 install(
     TARGETS
-        libpinyin
+        pinyin
     LIBRARY DESTINATION
         ${DIR_LIBRARY}
 )

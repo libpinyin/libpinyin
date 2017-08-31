@@ -5,6 +5,7 @@ set(
 set(
     LIBLOOKUP_SOURCES
     pinyin_lookup2.cpp
+    phonetic_lookup.cpp
     phrase_lookup.cpp
     lookup.cpp
 )

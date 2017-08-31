@@ -5,7 +5,7 @@ add_executable(
 
 target_link_libraries(
     gen_ngram
-    libpinyin
+    pinyin
 )
 
 add_executable(
@@ -15,7 +15,7 @@ add_executable(
 
 target_link_libraries(
     gen_deleted_ngram
-    libpinyin
+    pinyin
 )
 
 add_executable(
@@ -25,7 +25,7 @@ add_executable(
 
 target_link_libraries(
     gen_unigram
-    libpinyin
+    pinyin
 )
 
 add_executable(
@@ -35,7 +35,7 @@ add_executable(
 
 target_link_libraries(
     gen_k_mixture_model
-    libpinyin
+    pinyin
 )
 
 add_executable(
@@ -45,7 +45,7 @@ add_executable(
 
 target_link_libraries(
     estimate_interpolation
-    libpinyin
+    pinyin
 )
 
 add_executable(
@@ -55,7 +55,7 @@ add_executable(
 
 target_link_libraries(
     estimate_k_mixture_model
-    libpinyin
+    pinyin
 )
 
 add_executable(
@@ -65,7 +65,7 @@ add_executable(
 
 target_link_libraries(
     merge_k_mixture_model
-    libpinyin
+    pinyin
 )
 
 add_executable(
@@ -75,7 +75,7 @@ add_executable(
 
 target_link_libraries(
     prune_k_mixture_model
-    libpinyin
+    pinyin
 )
 
 add_executable(
@@ -85,7 +85,7 @@ add_executable(
 
 target_link_libraries(
     import_k_mixture_model
-    libpinyin
+    pinyin
 )
 
 add_executable(
@@ -95,7 +95,7 @@ add_executable(
 
 target_link_libraries(
     export_k_mixture_model
-    libpinyin
+    pinyin
 )
 
 add_executable(
@@ -105,7 +105,7 @@ add_executable(
 
 target_link_libraries(
     k_mixture_model_to_interpolation
-    libpinyin
+    pinyin
 )
 
 add_executable(
@@ -115,7 +115,7 @@ add_executable(
 
 target_link_libraries(
     validate_k_mixture_model
-    libpinyin
+    pinyin
 )
 
 add_executable(
@@ -125,5 +125,5 @@ add_executable(
 
 target_link_libraries(
     eval_correction_rate
-    libpinyin
+    pinyin
 )

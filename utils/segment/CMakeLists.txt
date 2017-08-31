@@ -5,7 +5,7 @@ add_executable(
 
 target_link_libraries(
     spseg
-    libpinyin
+    pinyin
 )
 
 add_executable(
@@ -15,5 +15,5 @@ add_executable(
 
 target_link_libraries(
     ngseg
-    libpinyin
+    pinyin
 )

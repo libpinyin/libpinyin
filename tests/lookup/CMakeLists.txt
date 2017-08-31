@@ -7,7 +7,7 @@ add_executable(
 
 target_link_libraries(
     test_pinyin_lookup
-    libpinyin
+    pinyin
 )
 
 add_executable(
@@ -17,5 +17,5 @@ add_executable(
 
 target_link_libraries(
     test_phrase_lookup
-    libpinyin
+    pinyin
 )

@@ -5,7 +5,7 @@ add_executable(
 
 target_link_libraries(
     gen_binary_files
-    libpinyin
+    pinyin
 )
 
 add_executable(
@@ -15,7 +15,7 @@ add_executable(
 
 target_link_libraries(
     import_interpolation
-    libpinyin
+    pinyin
 )
 
 add_executable(
@@ -25,5 +25,5 @@ add_executable(
 
 target_link_libraries(
     export_interpolation
-    libpinyin
+    pinyin
 )

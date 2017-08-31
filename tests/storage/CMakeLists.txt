@@ -7,7 +7,7 @@ add_executable(
 
 target_link_libraries(
     test_parser2
-    libpinyin
+    pinyin
 )
 
 add_executable(
@@ -17,7 +17,7 @@ add_executable(
 
 target_link_libraries(
     test_chewing_table
-    libpinyin
+    pinyin
 )
 
 add_executable(
@@ -27,7 +27,7 @@ add_executable(
 
 target_link_libraries(
     test_phrase_index
-    libpinyin
+    pinyin
 )
 
 add_executable(
@@ -37,7 +37,7 @@ add_executable(
 
 target_link_libraries(
     test_phrase_index_logger
-    libpinyin
+    pinyin
 )
 
 add_executable(
@@ -47,7 +47,7 @@ add_executable(
 
 target_link_libraries(
     test_phrase_table
-    libpinyin
+    pinyin
 )
 
 add_executable(
@@ -57,7 +57,7 @@ add_executable(
 
 target_link_libraries(
     test_ngram
-    libpinyin
+    pinyin
 )
 
 add_executable(
@@ -67,5 +67,5 @@ add_executable(
 
 target_link_libraries(
     test_flexible_ngram
-    libpinyin
+    pinyin
 )
