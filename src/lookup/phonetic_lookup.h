@@ -286,7 +286,7 @@ public:
             node->number();
 
             const trellis_value_t * value = node->begin();
-            for (gint32 j = 0; j < node->length(); ++j) {
+            for (; value < node->end(); ++value) {
                 g_ptr_array_add(candidates, (trellis_value_t *)value);
             }
         }
