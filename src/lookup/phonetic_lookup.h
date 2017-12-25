@@ -267,7 +267,7 @@ public:
         return true;
     }
 
-    /* Array of trellis_value_t */
+    /* PtrArray of trellis_value_t pointer */
     bool get_candidates(/* in */ gint32 index,
                         /* out */ GPtrArray * candidates) const {
         LookupStepContent step = (LookupStepContent)
