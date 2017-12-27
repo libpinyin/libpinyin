@@ -387,17 +387,16 @@ def handle_special_rules(zhuyin, corrects):
 
 
 def gen_table_index_for_chewing_key():
+    chewings = [x[4] for x in content_table]
+
     entries = []
-    for i in range(0, len(chewing.CHEWING_INITIAL_LIST)):
-        initial = chewing.CHEWING_INITIAL_LIST[i]
-        for m in range(0, len(chewing.CHEWING_MIDDLE_LIST)):
-            middle = chewing.CHEWING_MIDDLE_LIST[m]
-            for f in range(0, len(chewing.CHEWING_FINAL_LIST)):
-                final = chewing.CHEWING_FINAL_LIST[f]
+    for initial in chewing.CHEWING_INITIAL_LIST:
+        for middle in chewing.CHEWING_MIDDLE_LIST:
+            for final in chewing.CHEWING_FINAL_LIST:
                 chewingkey = 'ChewingKey({0}, {1}, {2})'.format(initial, middle, final)
                 index = -1
                 try:
-                    index = [x[4] for x in content_table].index(chewingkey)
+                    index = chewings.index(chewingkey)
                 except ValueError:
                     pass
 

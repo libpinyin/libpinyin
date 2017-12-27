@@ -99,6 +99,9 @@ ASCII_CHEWING_TONE_LIST = [
     ("CHEWING_5" , "˙"),
 ]
 
+ASCII_CHEWING_TONE_MAP = dict([(k, v) for k, v in ASCII_CHEWING_TONE_LIST if v])
+
+CHEWING_ASCII_TONE_MAP = dict([(v, k) for k, v in ASCII_CHEWING_TONE_LIST if v])
 
 CHEWING_INITIAL_LIST = [k for k, v in ASCII_CHEWING_INITIAL_LIST]
 
