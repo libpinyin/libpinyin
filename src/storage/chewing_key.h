@@ -65,6 +65,7 @@ struct _ChewingKey
 
 public:
     gint get_table_index();
+    bool is_valid_zhuyin();
 
     /* Note: the return value should be freed by g_free. */
     gchar * get_pinyin_string();

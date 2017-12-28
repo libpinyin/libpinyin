@@ -35,6 +35,15 @@ gint _ChewingKey::get_table_index() {
     return index == -1 ? 0 : index;
 }
 
+bool _ChewingKey::is_valid_zhuyin() {
+    assert(m_initial <  CHEWING_NUMBER_OF_INITIALS);
+    assert(m_middle < CHEWING_NUMBER_OF_MIDDLES);
+    assert(m_final < CHEWING_NUMBER_OF_FINALS);
+    assert(m_tone < CHEWING_NUMBER_OF_TONES);
+
+    return valid_zhuyin_table[((m_initial * CHEWING_NUMBER_OF_MIDDLES + m_middle) * CHEWING_NUMBER_OF_FINALS + m_final) * CHEWING_NUMBER_OF_TONES + m_tone];
+}
+
 gchar * _ChewingKey::get_pinyin_string() {
     assert(m_tone < CHEWING_NUMBER_OF_TONES);
     gint index = get_table_index();

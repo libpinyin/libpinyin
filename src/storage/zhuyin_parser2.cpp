@@ -250,6 +250,9 @@ int ZhuyinSimpleParser2::parse(pinyin_option_t options,
         if (0 == i)        /* no more possible chewings. */
             break;
 
+        if (!key.is_valid_zhuyin())
+            break;
+
         key_rest.m_raw_begin = parsed_len; key_rest.m_raw_end = parsed_len + i;
         parsed_len += i;
 
@@ -435,6 +438,9 @@ int ZhuyinDiscreteParser2::parse(pinyin_option_t options,
         }
 
         if (0 == i)        /* no more possible chewings. */
+            break;
+
+        if (!key.is_valid_zhuyin())
             break;
 
         key_rest.m_raw_begin = parsed_len; key_rest.m_raw_end = parsed_len + i;
@@ -741,6 +747,9 @@ int ZhuyinDaChenCP26Parser2::parse(pinyin_option_t options,
         if (0 == i)        /* no more possible chewings. */
             break;
 
+        if (!key.is_valid_zhuyin())
+            break;
+
         key_rest.m_raw_begin = parsed_len; key_rest.m_raw_end = parsed_len + i;
         parsed_len += i;
 
@@ -761,6 +770,9 @@ int ZhuyinDaChenCP26Parser2::parse(pinyin_option_t options,
         if (success)
             break;
     }
+
+    if (!key.is_valid_zhuyin())
+        return parsed_len;
 
     if (i > 0) { /* found one */
         key_rest.m_raw_begin = parsed_len; key_rest.m_raw_end = parsed_len + i;
@@ -911,6 +923,13 @@ int ZhuyinDirectParser2::parse(pinyin_option_t options,
         next = i;
 
         if (parse_one_key(options, key, str + cur, next - cur)) {
+#if 0
+            /* as direct parser handles data source,
+               assume the data is correct when loading. */
+            if (!key.is_valid_zhuyin())
+                return parsed_len;
+#endif
+
             key_rest.m_raw_begin = cur; key_rest.m_raw_end = next;
 
             /* save the pinyin. */
