@@ -65,6 +65,7 @@ def compute_zero_tone():
             final_maps = middle_maps[middle]
             for final in final_maps.keys():
                 tone_maps = final_maps[final]
+                # assume all valid zero tones have sub tones
                 if len(tone_maps) > 0:
                     tone_maps["CHEWING_ZERO_TONE"] = True
 
@@ -94,6 +95,8 @@ def is_valid_zhuyin(key):
     # handle tone
     if tone not in maps:
         return False
+
+    return True
 
 
 # generate valid_zhuyin_table
