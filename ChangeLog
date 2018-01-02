@@ -1,5 +1,8 @@
+version 2.1.91
+* fixes zhuyin parsers;
+
 version 2.1.0
-* support sort option in pinyin_guess_candidates function
+* support sort option in pinyin_guess_candidates function;
 
 version 2.0.92
 * reduce memory consumption after imported user dictionary;
