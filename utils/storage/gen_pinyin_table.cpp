@@ -37,11 +37,11 @@ static gint phrase_index = 0;
 static const gchar * outputfile = "temp.out";
 
 static GOptionEntry entries[] =
-{
-    {"phraseindex", 't', 0, G_OPTION_ARG_INT, &phrase_index, "phrase index", NULL},
-    {"outputfile", 'o', 0, G_OPTION_ARG_FILENAME, &outputfile, "output filename", NULL},
-    {NULL}
-};
+    {
+        {"phraseindex", 't', 0, G_OPTION_ARG_INT, &phrase_index, "phrase index", NULL},
+        {"outputfile", 'o', 0, G_OPTION_ARG_FILENAME, &outputfile, "output filename", NULL},
+        {NULL}
+    };
 
 
 using namespace pinyin;
@@ -85,10 +85,10 @@ gint phrase_item_compare(gconstpointer a, gconstpointer b){
     phrase_item * itema = (phrase_item *) a;
     phrase_item * itemb = (phrase_item *) b;
     if ( itema->length != itemb->length )
-	return itema->length - itemb->length;
+        return itema->length - itemb->length;
     else
-	return memcmp(itema->uniphrase, itemb->uniphrase,
-		      sizeof(gunichar) * itema->length);
+        return memcmp(itema->uniphrase, itemb->uniphrase,
+                      sizeof(gunichar) * itema->length);
 }
 
 
@@ -116,14 +116,14 @@ int main(int argc, char * argv[]){
     /* store in item array */
     g_item_array[0] = NULL;
     for (i = 1; i < MAX_PHRASE_LENGTH + 1; ++i){
-	g_item_array[i] = g_array_new
+        g_item_array[i] = g_array_new
             (FALSE, TRUE, sizeof(phrase_and_array_item));
     }
     g_tree_foreach(g_chewing_tree, store_one_item, NULL);
 
     /* sort item array */
     for ( int i = 1; i < MAX_PHRASE_LENGTH + 1; ++i){
-	g_array_sort_with_data(g_item_array[i], phrase_array_compare , &i);
+        g_array_sort_with_data(g_item_array[i], phrase_array_compare , &i);
     }
 
     gen_phrase_file(outputfile, phrase_index);
@@ -142,16 +142,16 @@ void feed_file ( const char * filename){
     }
 
     while ( !feof(infile)){
-	int num = fscanf(infile, "%1023s %1023s %u",
+        int num = fscanf(infile, "%1023s %1023s %u",
                          phrase, pinyin, &freq);
 
         if (3 != num)
             continue;
 
-	if (feof(infile))
+        if (feof(infile))
             break;
 
-	feed_line(phrase, pinyin, freq);
+        feed_line(phrase, pinyin, freq);
     }
 
     fclose(infile);
@@ -162,7 +162,7 @@ void feed_line(const char * phrase, const char * pinyin, const guint32 freq) {
     item->length = g_utf8_strlen(phrase, -1);
 
     /* FIXME: modify ">" to ">=" according to pinyin_large_table.cpp
-     *	where is the code which I don't want to touch. :-)
+     * where is the code which I don't want to touch. :-)
      */
 
     if (item->length >= MAX_PHRASE_LENGTH) {
