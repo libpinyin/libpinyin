@@ -142,7 +142,7 @@ void feed_file ( const char * filename){
     }
 
     while ( !feof(infile)){
-	int num = fscanf(infile, "%1024s %1024s %u",
+	int num = fscanf(infile, "%1023s %1023s %u",
                          phrase, pinyin, &freq);
 
         if (3 != num)

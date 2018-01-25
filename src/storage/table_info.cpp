@@ -196,7 +196,7 @@ bool SystemTableInfo2::load(const char * filename) {
 
     TABLE_PHONETIC_TYPE type = PINYIN_TABLE;
     char str[256];
-    num = fscanf(input, "source table format:%256s", str);
+    num = fscanf(input, "source table format:%255s", str);
     type = to_table_phonetic_type(str);
 
 #if 0
@@ -216,7 +216,7 @@ bool SystemTableInfo2::load(const char * filename) {
     char tableinfo[256], dictstr[256];
     char tablefile[256], sysfile[256], userfile[256], filetype[256];
     while (!feof(input)) {
-        num = fscanf(input, "%256s %256s %256s %256s %256s %256s\n",
+        num = fscanf(input, "%255s %255s %255s %255s %255s %255s\n",
                      tableinfo, dictstr, tablefile,
                      sysfile, userfile, filetype);
 

@@ -669,7 +669,7 @@ bool ChewingLargeTable::load_text(FILE * infile, TABLE_PHONETIC_TYPE type) {
     size_t freq;
 
     while (!feof(infile)) {
-        int num = fscanf(infile, "%256s %256s %u %ld",
+        int num = fscanf(infile, "%255s %255s %u %ld",
                          pinyin, phrase, &token, &freq);
 
         if (4 != num)
