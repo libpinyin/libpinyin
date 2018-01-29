@@ -47,7 +47,7 @@ struct _zhuyin_context_t{
     Bigram * m_user_bigram;
 
     /* lookups. */
-    PhoneticLookup<1> * m_pinyin_lookup;
+    PhoneticLookup<1, 1> * m_pinyin_lookup;
     PhraseLookup * m_phrase_lookup;
 
     char * m_system_dir;
@@ -345,7 +345,7 @@ zhuyin_context_t * zhuyin_init(const char * systemdir, const char * userdir){
 
     gfloat lambda = context->m_system_table_info.get_lambda();
 
-    context->m_pinyin_lookup = new PhoneticLookup<1>
+    context->m_pinyin_lookup = new PhoneticLookup<1, 1>
         ( lambda,
           context->m_pinyin_table, context->m_phrase_index,
           context->m_system_bigram, context->m_user_bigram);

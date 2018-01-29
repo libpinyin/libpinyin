@@ -49,7 +49,7 @@ struct _pinyin_context_t{
     Bigram * m_user_bigram;
 
     /* lookups. */
-    PhoneticLookup<3> * m_pinyin_lookup;
+    PhoneticLookup<3, 3> * m_pinyin_lookup;
     PhraseLookup * m_phrase_lookup;
 
     /* addon tables. */
@@ -367,7 +367,7 @@ pinyin_context_t * pinyin_init(const char * systemdir, const char * userdir){
 
     gfloat lambda = context->m_system_table_info.get_lambda();
 
-    context->m_pinyin_lookup = new PhoneticLookup<3>
+    context->m_pinyin_lookup = new PhoneticLookup<3, 3>
         (lambda,
          context->m_pinyin_table, context->m_phrase_index,
          context->m_system_bigram, context->m_user_bigram);

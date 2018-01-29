@@ -59,7 +59,7 @@ int main( int argc, char * argv[]){
 
     gfloat lambda = system_table_info.get_lambda();
 
-    PhoneticLookup<3> pinyin_lookup(lambda, &largetable, &phrase_index,
+    PhoneticLookup<3, 3> pinyin_lookup(lambda, &largetable, &phrase_index,
                                     &system_bigram, &user_bigram);
 
     /* prepare the prefixes for get_nbest_match. */

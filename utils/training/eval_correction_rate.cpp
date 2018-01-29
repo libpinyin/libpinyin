@@ -61,7 +61,7 @@ bool get_possible_pinyin(FacadePhraseIndex * phrase_index,
 }
 
 bool get_best_match(FacadePhraseIndex * phrase_index,
-                    PhoneticLookup<1> * pinyin_lookup,
+                    PhoneticLookup<1, 1> * pinyin_lookup,
                     PhoneticKeyMatrix * matrix,
                     NBestMatchResults * results) {
     /* prepare the prefixes for get_nbest_match. */
@@ -79,7 +79,7 @@ bool get_best_match(FacadePhraseIndex * phrase_index,
     return retval;
 }
 
-bool do_one_test(PhoneticLookup<1> * pinyin_lookup,
+bool do_one_test(PhoneticLookup<1, 1> * pinyin_lookup,
                  FacadePhraseIndex * phrase_index,
                  TokenVector tokens){
     bool retval = false;
@@ -156,7 +156,7 @@ int main(int argc, char * argv[]){
 
     gfloat lambda = system_table_info.get_lambda();
 
-    PhoneticLookup<1> pinyin_lookup(lambda,
+    PhoneticLookup<1, 1> pinyin_lookup(lambda,
                                     &largetable, &phrase_index,
                                     &system_bigram, &user_bigram);
 
