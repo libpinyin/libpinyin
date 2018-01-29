@@ -21,19 +21,19 @@
 #ifndef PHONETIC_LOOKUP_HEAP_H
 #define PHONETIC_LOOKUP_HEAP_H
 
-template <gint32 nbest>
+template <gint32 nstore>
 static inline bool trellis_value_comp(const trellis_value_t &lhs,
                                       const trellis_value_t &rhs) {
     /* min heap here */
-    return trellis_value_less_than<nbest>(&lhs, &rhs);
+    return trellis_value_less_than<nstore>(&lhs, &rhs);
 }
 
-template <gint32 nbest>
+template <gint32 nstore>
 struct trellis_node {
 private:
     gint32 m_nelem;
     /* invariant: min heap */
-    trellis_value_t m_elements[nbest];
+    trellis_value_t m_elements[nstore];
 
 public:
     trellis_node(){
@@ -58,11 +58,11 @@ public:
         /* min heap here. */
 
         /* still have space */
-        if (m_nelem < nbest) {
+        if (m_nelem < nstore) {
             m_elements[m_nelem] = *item;
             m_nelem ++;
             /* always push heap. */
-            std_lite::push_heap(m_elements, m_elements + m_nelem, trellis_value_comp<nbest>);
+            std_lite::push_heap(m_elements, m_elements + m_nelem, trellis_value_comp<nstore>);
             return true;
         }
 
@@ -70,10 +70,10 @@ public:
         trellis_value_t * min = m_elements;
 
         /* compare new item */
-        if (trellis_value_less_than<nbest>(min, item)) {
-            std_lite::pop_heap(m_elements, m_elements + m_nelem, trellis_value_comp<nbest>);
+        if (trellis_value_less_than<nstore>(min, item)) {
+            std_lite::pop_heap(m_elements, m_elements + m_nelem, trellis_value_comp<nstore>);
             m_elements[m_nelem - 1] = *item;
-            std_lite::push_heap(m_elements, m_elements + m_nelem, trellis_value_comp<nbest>);
+            std_lite::push_heap(m_elements, m_elements + m_nelem, trellis_value_comp<nstore>);
             return true;
         }
 

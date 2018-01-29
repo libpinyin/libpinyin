@@ -21,11 +21,11 @@
 #ifndef PHONETIC_LOOKUP_LINEAR_H
 #define PHONETIC_LOOKUP_LINEAR_H
 
-template <gint32 nbest>
+template <gint32 nstore>
 struct trellis_node {
 private:
     gint32 m_nelem;
-    trellis_value_t m_elements[nbest];
+    trellis_value_t m_elements[nstore];
 
 public:
     trellis_node(){
@@ -48,7 +48,7 @@ public:
     bool eval_item(const trellis_value_t * item) {
 
         /* still have space */
-        if (m_nelem < nbest) {
+        if (m_nelem < nstore) {
             m_elements[m_nelem] = *item;
             m_nelem ++;
             return true;
@@ -57,12 +57,12 @@ public:
         /* find minium item */
         trellis_value_t * min = m_elements;
         for (gint32 i = 1; i < m_nelem; ++i) {
-            if (trellis_value_less_than<nbest>(m_elements + i, min))
+            if (trellis_value_less_than<nstore>(m_elements + i, min))
                 min = m_elements + i;
         }
 
         /* compare new item */
-        if (trellis_value_less_than<nbest>(min, item)) {
+        if (trellis_value_less_than<nstore>(min, item)) {
             *min = *item;
             return true;
         }

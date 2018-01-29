@@ -61,11 +61,11 @@ struct trellis_value_t {
     }
 };
 
-template <gint32 nbest>
+template <gint32 nstore>
 static bool inline trellis_value_less_than(const trellis_value_t * item_lhs,
                                            const trellis_value_t * item_rhs) {
 #if 1
-    if (nbest > 1) {
+    if (nstore > 1) {
         /* allow longer sentence */
         if (item_lhs->m_sentence_length + 1 == item_rhs->m_sentence_length &&
             item_lhs->m_poss + LONG_SENTENCE_PENALTY < item_rhs->m_poss)
@@ -138,7 +138,7 @@ struct trellis_constraint_t {
 
 
 /* use maximum heap to get the topest results. */
-template<gint32 nbest>
+template<gint32 nstore>
 bool get_top_results(size_t num,
                      /* out */ GPtrArray * topresults,
                      /* in */ GPtrArray * candidates) {
@@ -152,13 +152,13 @@ bool get_top_results(size_t num,
     trellis_value_t ** end =
         (trellis_value_t **) &g_ptr_array_index(candidates, candidates->len);
 
-    std_lite::make_heap(begin, end, trellis_value_less_than<nbest>);
+    std_lite::make_heap(begin, end, trellis_value_less_than<nstore>);
 
     while (end != begin) {
         trellis_value_t * one = *begin;
         g_ptr_array_add(topresults, one);
 
-        std_lite::pop_heap(begin, end, trellis_value_less_than<nbest>);
+        std_lite::pop_heap(begin, end, trellis_value_less_than<nstore>);
         --end;
 
         if (topresults->len >= num)
@@ -176,7 +176,7 @@ static gint trellis_value_compare(const trellis_value_t ** lhs,
     return -((*lhs)->m_poss - (*rhs)->m_poss);
 }
 
-template <gint32 nbest>
+template <gint32 nstore, gint32 nbest>
 class ForwardPhoneticTrellis {
 private:
     /* Array of LookupStepIndex */
@@ -233,7 +233,7 @@ public:
             /* initialize m_steps_index */
             g_ptr_array_index(m_steps_index, i) = g_hash_table_new(g_direct_hash, g_direct_equal);
             /* initialize m_steps_content */
-            g_ptr_array_index(m_steps_content, i) = g_array_new(FALSE, FALSE, sizeof(trellis_node<nbest>));
+            g_ptr_array_index(m_steps_content, i) = g_array_new(FALSE, FALSE, sizeof(trellis_node<nstore>));
         }
 
         return true;
@@ -249,7 +249,7 @@ public:
             trellis_value_t initial_value(log(1.f));
             initial_value.m_handles[1] = token;
 
-            trellis_node<nbest> initial_node;
+            trellis_node<nstore> initial_node;
             assert(initial_node.eval_item(&initial_value));
 
             LookupStepContent initial_step_content = (LookupStepContent)
@@ -279,8 +279,8 @@ public:
             return false;
 
         for (size_t i = 0; i < step->len; ++i) {
-            trellis_node<nbest> * node = &g_array_index
-                (step, trellis_node<nbest>, i);
+            trellis_node<nstore> * node = &g_array_index
+                (step, trellis_node<nstore>, i);
 
             // only initialized in the get_candidates method.
             node->number();
@@ -307,7 +307,7 @@ public:
             (step_index, GUINT_TO_POINTER(token), &key, &value);
 
         if (!lookup_result) {
-            trellis_node<nbest> node;
+            trellis_node<nstore> node;
             assert(node.eval_item(candidate));
 
             g_array_append_val(step_content, node);
@@ -315,8 +315,8 @@ public:
             return true;
         } else {
             size_t node_index = GPOINTER_TO_UINT(value);
-            trellis_node<nbest> * node = &g_array_index
-                (step_content, trellis_node<nbest>, node_index);
+            trellis_node<nstore> * node = &g_array_index
+                (step_content, trellis_node<nstore>, node_index);
 
             return node->eval_item(candidate);
         }
@@ -331,7 +331,7 @@ public:
 
         GPtrArray * candidates = g_ptr_array_new();
         get_candidates(tail_index, candidates);
-        get_top_results<nbest>(nbest, tails, candidates);
+        get_top_results<nstore>(nbest, tails, candidates);
 
         g_ptr_array_sort(tails, (GCompareFunc)trellis_value_compare);
 
@@ -353,8 +353,8 @@ public:
             return false;
 
         size_t node_index = GPOINTER_TO_UINT(value);
-        trellis_node<nbest> * node = &g_array_index
-            (step_content, trellis_node<nbest>, node_index);
+        trellis_node<nstore> * node = &g_array_index
+            (step_content, trellis_node<nstore>, node_index);
 
         if (sub_index >= node->length())
             return false;
@@ -365,8 +365,8 @@ public:
     }
 };
 
-template <gint32 nbest>
-bool extract_result(const ForwardPhoneticTrellis<nbest> * trellis,
+template <gint32 nstore, gint32 nbest>
+bool extract_result(const ForwardPhoneticTrellis<nstore, nbest> * trellis,
                     const trellis_value_t * tail,
                     /* out */ MatchResult & result) {
     /* reset result */
@@ -396,7 +396,7 @@ bool extract_result(const ForwardPhoneticTrellis<nbest> * trellis,
 }
 
 #if 0
-template <gint32 nbest>
+template <gint32 nstore>
 class BackwardPhoneticMatrix {
 private:
     /* Array of matrix_step */
@@ -404,7 +404,7 @@ private:
 
 public:
     /* set tail node */
-    bool set_tail(const matrix_step<nbest> * tail);
+    bool set_tail(const matrix_step<nstore> * tail);
     /* back trace */
     /* always assume/assert matrix_step.eval_item(...) return true? */
     bool back_trace(const ForwardPhoneticTrellis * trellis);
@@ -511,7 +511,7 @@ public:
     }
 };
 
-template <gint32 nbest>
+template <gint32 nstore, gint32 nbest>
 class PhoneticLookup {
 private:
     const gfloat bigram_lambda;
@@ -523,7 +523,7 @@ private:
     SingleGram m_merged_single_gram;
 
 protected:
-    ForwardPhoneticTrellis<nbest> m_trellis;
+    ForwardPhoneticTrellis<nstore, nbest> m_trellis;
 
 protected:
     /* saved varibles */
@@ -711,6 +711,8 @@ public:
         : bigram_lambda(lambda),
           unigram_lambda(1. - lambda)
     {
+        assert(nstore <= nbest);
+
         /* store the pointer. */
         m_pinyin_table = pinyin_table;
         m_phrase_index = phrase_index;
@@ -765,7 +767,7 @@ public:
                 continue;
 
             m_trellis.get_candidates(i, candidates);
-            get_top_results<nbest>(nbeam, topresults, candidates);
+            get_top_results<nstore>(nbeam, topresults, candidates);
 
             if (0 == topresults->len)
                 continue;
@@ -828,7 +830,7 @@ public:
             const trellis_value_t * tail = (const trellis_value_t *)
                 g_ptr_array_index(tails, i);
 
-            assert(extract_result<nbest>(&m_trellis, tail, result));
+            assert(extract_result<nstore>(&m_trellis, tail, result));
             results->add_result(result);
         }
 
