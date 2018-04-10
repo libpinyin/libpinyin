@@ -29,6 +29,9 @@
 
 using namespace pinyin;
 
+/* reduce bigram frequency affects on candidates sorting */
+#define BIGRAM_FREQUENCY_DISCOUNT 0.1f
+
 /* a glue layer for input method integration. */
 
 typedef GArray * CandidateVector; /* GArray of lookup_candidate_t */
@@ -1504,7 +1507,7 @@ static void _compute_frequency_of_items(pinyin_context_t * context,
         assert (0 < total_freq);
 
         /* Note: possibility value <= 1.0. */
-        guint32 freq = (lambda * bigram_poss +
+        guint32 freq = (lambda * bigram_poss * BIGRAM_FREQUENCY_DISCOUNT +
                         (1 - lambda) *
                         cached_item.get_unigram_frequency() /
                         (gfloat) total_freq) * 256 * 256 * 256;
