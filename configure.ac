@@ -80,7 +80,7 @@ AC_FUNC_STAT
 AC_FUNC_MMAP
 AC_CHECK_FUNCS([gettimeofday memmove memset setlocale])
 
-AC_CHECK_HEADERS([libintl.h string.h])
+AC_CHECK_HEADERS([string.h], , AC_MSG_ERROR([Cannot find string.h]))
 
 # Check Berkeley DB or Kyoto Cabinet
 DBM="BerkeleyDB"

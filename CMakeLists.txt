@@ -43,7 +43,6 @@ set (VERSION ${LIBPINYIN_VERSION})
 
 include(CheckIncludeFileCXX)
 check_include_file_cxx(locale.h HAVE_LOCALE_H)
-check_include_file_cxx(libintl.h HAVE_LIBINTL_H)
 check_include_file_cxx(stdlib.h HAVE_STDLIB_H)
 check_include_file_cxx(string.h HAVE_STRING_H)
 check_include_file_cxx(sys/time.h HAVE_SYS_TIME_H)
