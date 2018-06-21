@@ -1858,26 +1858,36 @@ bool pinyin_guess_candidates(pinyin_instance_t * instance,
 
 bool pinyin_guess_predicted_candidates(pinyin_instance_t * instance,
                                        const char * prefix) {
-    const guint32 filter = 256;
+    const guint32 length = 2;
+    const guint32 filter = 3;
 
     pinyin_context_t * context = instance->m_context;
     FacadePhraseIndex * phrase_index = context->m_phrase_index;
     CandidateVector candidates = instance->m_candidates;
+    TokenVector prefixes = instance->m_prefixes;
+    phrase_token_t prev_token = null_token;
 
     _free_candidates(candidates);
 
+    g_array_set_size(instance->m_prefixes, 0);
     _compute_prefixes(instance, prefix);
 
-    phrase_token_t prev_token = _get_previous_token(instance, 0);
-    if (null_token == prev_token)
+    if (0 == prefixes->len)
         return false;
 
     /* merge single gram. */
     SingleGram merged_gram;
     SingleGram * system_gram = NULL, * user_gram = NULL;
-    context->m_system_bigram->load(prev_token, system_gram);
-    context->m_user_bigram->load(prev_token, user_gram);
-    merge_single_gram(&merged_gram, system_gram, user_gram);
+    for (gint i = prefixes->len - 1; i >= 0; --i) {
+        prev_token = g_array_index(prefixes, phrase_token_t, i);
+
+        context->m_system_bigram->load(prev_token, system_gram);
+        context->m_user_bigram->load(prev_token, user_gram);
+        merge_single_gram(&merged_gram, system_gram, user_gram);
+
+        if (merged_gram.get_length())
+            break;
+    }
 
     /* retrieve all items. */
     BigramPhraseWithCountArray tokens = g_array_new
@@ -1886,7 +1896,7 @@ bool pinyin_guess_predicted_candidates(pinyin_instance_t * instance,
 
     /* sort the longer word first. */
     PhraseItem cached_item;
-    for (size_t len = MAX_PHRASE_LENGTH; len > 0; --len) {
+    for (ssize_t len = length; len > 0; --len) {
         /* append items. */
         for (size_t k = 0; k < tokens->len; ++k){
             BigramPhraseItemWithCount * phrase_item = &g_array_index
