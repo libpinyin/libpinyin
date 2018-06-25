@@ -1859,7 +1859,7 @@ bool pinyin_guess_candidates(pinyin_instance_t * instance,
 bool pinyin_guess_predicted_candidates(pinyin_instance_t * instance,
                                        const char * prefix) {
     const guint32 length = 2;
-    const guint32 filter = 3;
+    const guint32 filter = 10;
 
     pinyin_context_t * context = instance->m_context;
     FacadePhraseIndex * phrase_index = context->m_phrase_index;
