@@ -1889,6 +1889,9 @@ bool pinyin_guess_predicted_candidates(pinyin_instance_t * instance,
             break;
     }
 
+    if (0 == merged_gram.get_length())
+        return false;
+
     /* retrieve all items. */
     BigramPhraseWithCountArray tokens = g_array_new
         (FALSE, FALSE, sizeof(BigramPhraseItemWithCount));
