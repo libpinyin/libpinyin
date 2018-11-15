@@ -1822,10 +1822,6 @@ bool pinyin_guess_candidates(pinyin_instance_t * instance,
     }
 
     context->m_phrase_index->destroy_ranges(ranges);
-    if (system_gram)
-        delete system_gram;
-    if (user_gram)
-        delete user_gram;
 
     /* post process to sort the candidates */
 
@@ -1853,6 +1849,11 @@ bool pinyin_guess_candidates(pinyin_instance_t * instance,
 
     _remove_duplicated_items_by_phrase_string(instance, instance->m_candidates);
 
+    if (system_gram)
+        delete system_gram;
+    if (user_gram)
+        delete user_gram;
+
     return true;
 }
 
@@ -1877,13 +1878,12 @@ bool pinyin_guess_predicted_candidates(pinyin_instance_t * instance,
 
     /* merge single gram. */
     SingleGram merged_gram;
-    SingleGram * system_gram = NULL, * user_gram = NULL;
+    SingleGram * user_gram = NULL;
     for (gint i = prefixes->len - 1; i >= 0; --i) {
         prev_token = g_array_index(prefixes, phrase_token_t, i);
 
-        context->m_system_bigram->load(prev_token, system_gram);
         context->m_user_bigram->load(prev_token, user_gram);
-        merge_single_gram(&merged_gram, system_gram, user_gram);
+        merge_single_gram(&merged_gram, NULL, user_gram);
 
         if (merged_gram.get_length())
             break;
@@ -1924,11 +1924,6 @@ bool pinyin_guess_predicted_candidates(pinyin_instance_t * instance,
 
     }
 
-    if (system_gram)
-        delete system_gram;
-    if (user_gram)
-        delete user_gram;
-
     /* post process to sort the candidates */
 
     _compute_phrase_length(context, candidates);
@@ -1943,6 +1938,9 @@ bool pinyin_guess_predicted_candidates(pinyin_instance_t * instance,
     _compute_phrase_strings_of_items(instance, instance->m_candidates);
 
     _remove_duplicated_items_by_phrase_string(instance, instance->m_candidates);
+
+    if (user_gram)
+        delete user_gram;
 
     return true;
 }
