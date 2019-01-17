@@ -340,7 +340,7 @@ zhuyin_context_t * zhuyin_init(const char * systemdir, const char * userdir){
 
     context->m_user_bigram = new Bigram;
     filename = g_build_filename(context->m_user_dir, USER_BIGRAM, NULL);
-    context->m_user_bigram->attach(filename, ATTACH_READWRITE|ATTACH_CREATE);
+    context->m_user_bigram->load_db(filename);
     g_free(filename);
 
     gfloat lambda = context->m_system_table_info.get_lambda();
@@ -644,13 +644,53 @@ bool zhuyin_save(zhuyin_context_t * context){
     }
 
     /* save user pinyin table */
-    context->m_pinyin_table->sync();
+    gchar * tmpfilename = g_build_filename
+        (context->m_user_dir, USER_PINYIN_INDEX ".tmp", NULL);
+    unlink(tmpfilename);
+    gchar * filename = g_build_filename
+        (context->m_user_dir, USER_PINYIN_INDEX, NULL);
+
+    context->m_pinyin_table->store(tmpfilename);
+
+    int result = rename(tmpfilename, filename);
+    if (0 != result)
+        fprintf(stderr, "rename %s to %s failed.\n",
+                tmpfilename, filename);
+
+    g_free(tmpfilename);
+    g_free(filename);
 
     /* save user phrase table */
-    context->m_phrase_table->sync();
+    tmpfilename = g_build_filename
+        (context->m_user_dir, USER_PHRASE_INDEX ".tmp", NULL);
+    unlink(tmpfilename);
+    filename = g_build_filename
+        (context->m_user_dir, USER_PHRASE_INDEX, NULL);
+
+    context->m_phrase_table->store(tmpfilename);
+
+    result = rename(tmpfilename, filename);
+    if (0 != result)
+        fprintf(stderr, "rename %s to %s failed.\n",
+                tmpfilename, filename);
+
+    g_free(tmpfilename);
+    g_free(filename);
 
     /* save user bi-gram */
-    context->m_user_bigram->sync();
+    tmpfilename = g_build_filename
+        (context->m_user_dir, USER_BIGRAM ".tmp", NULL);
+    unlink(tmpfilename);
+    filename = g_build_filename(context->m_user_dir, USER_BIGRAM, NULL);
+    context->m_user_bigram->save_db(tmpfilename);
+
+    result = rename(tmpfilename, filename);
+    if (0 != result)
+        fprintf(stderr, "rename %s to %s failed.\n",
+                tmpfilename, filename);
+
+    g_free(tmpfilename);
+    g_free(filename);
 
     mark_version(context);
 
