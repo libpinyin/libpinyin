@@ -63,7 +63,6 @@ bool ChewingLargeTable2::attach(const char * dbfile, guint32 flags) {
     return m_db->open(dbfile, mode);
 }
 
-#if 0
 /* load/store method */
 /* use in-memory DBM here, for better performance. */
 bool ChewingLargeTable2::load_db(const char * filename) {
@@ -109,7 +108,6 @@ bool ChewingLargeTable2::store_db(const char * new_filename) {
 
     return true;
 }
-#endif
 
 template<int phrase_length>
 int ChewingLargeTable2::search_internal(/* in */ const ChewingKey index[],

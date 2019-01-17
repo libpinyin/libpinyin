@@ -70,7 +70,6 @@ bool ChewingLargeTable2::attach(const char * dbfile, guint32 flags) {
     return true;
 }
 
-#if 0
 /* load/store method */
 bool ChewingLargeTable2::load_db(const char * filename) {
     reset();
@@ -136,7 +135,6 @@ bool ChewingLargeTable2::store_db(const char * new_filename) {
 
     return true;
 }
-#endif
 
 template<int phrase_length>
 int ChewingLargeTable2::search_internal(/* in */ const ChewingKey index[],
