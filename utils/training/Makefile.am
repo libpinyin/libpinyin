@@ -16,18 +16,17 @@
 
 MAINTAINERCLEANFILES    = Makefile.in
 
-INCLUDES		= -I$(top_srcdir)/src \
-			  -I$(top_srcdir)/src/include \
-			  -I$(top_srcdir)/src/storage \
-			  -I$(top_srcdir)/src/lookup \
-			  -I$(top_srcdir)/utils \
-			  @GLIB2_CFLAGS@
+AM_CPPFLAGS = -I$(top_srcdir)/src \
+              -I$(top_srcdir)/src/include \
+              -I$(top_srcdir)/src/storage \
+              -I$(top_srcdir)/src/lookup \
+              -I$(top_srcdir)/utils \
+              @GLIB2_CFLAGS@
 
-LDADD			= \
-				../../src/libpinyin_internal.a \
-				../../src/storage/libstorage.a \
-				../../src/lookup/liblookup.a \
-				@GLIB2_LIBS@
+LDADD = ../../src/libpinyin_internal.a \
+        ../../src/storage/libstorage.a \
+        ../../src/lookup/liblookup.a \
+        @GLIB2_LIBS@
 
 noinst_HEADERS		= k_mixture_model.h
 

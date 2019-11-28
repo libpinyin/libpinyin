@@ -14,7 +14,7 @@
 ## You should have received a copy of the GNU General Public License
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-INCLUDES                = -I$(top_srcdir)/src \
+AM_CPPFLAGS             = -I$(top_srcdir)/src \
                           -I$(top_srcdir)/src/include \
                           -I$(top_srcdir)/src/storage \
                           -I$(top_srcdir)/src/lookup \
