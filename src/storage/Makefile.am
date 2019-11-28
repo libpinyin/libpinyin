@@ -66,8 +66,6 @@ noinst_HEADERS = chewing_enum.h \
 
 noinst_LIBRARIES = libstorage.a
 
-libstorage_a_CXXFLAGS = "-fPIC"
-
 libstorage_a_SOURCES = phrase_index.cpp \
 			   phrase_large_table2.cpp \
 			   phrase_large_table3.cpp \

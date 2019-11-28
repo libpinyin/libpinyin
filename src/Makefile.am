@@ -14,7 +14,7 @@
 ## You should have received a copy of the GNU General Public License
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-AUTOMAKE_OPTIONS = gnu
+AUTOMAKE_OPTIONS = gnu subdir-objects
 SUBDIRS = include storage lookup
 
 EXTRA_DIST = libpinyin.ver libzhuyin.ver
@@ -39,15 +39,47 @@ if ENABLE_LIBZHUYIN
 libpinyininclude_HEADERS += zhuyin.h
 endif
 
+pinyin_SOURCES = \
+               storage/phrase_index.cpp \
+               storage/phrase_large_table2.cpp \
+               storage/phrase_large_table3.cpp \
+               storage/ngram.cpp \
+               storage/tag_utility.cpp \
+               storage/chewing_key.cpp \
+               storage/pinyin_parser2.cpp \
+               storage/zhuyin_parser2.cpp \
+               storage/phonetic_key_matrix.cpp \
+               storage/chewing_large_table.cpp \
+               storage/chewing_large_table2.cpp \
+               storage/table_info.cpp \
+               lookup/pinyin_lookup2.cpp \
+               lookup/phrase_lookup.cpp \
+               lookup/lookup.cpp \
+               lookup/phonetic_lookup.cpp \
+               $(NULL)
+
+if BERKELEYDB
+pinyin_SOURCES += storage/ngram_bdb.cpp \
+                  storage/phrase_large_table3_bdb.cpp \
+                  storage/chewing_large_table2_bdb.cpp
+endif
+
+if KYOTOCABINET
+pinyin_SOURCES += storage/ngram_kyotodb.cpp \
+                  storage/phrase_large_table3_kyotodb.cpp \
+                  storage/chewing_large_table2_kyotodb.cpp
+endif
+
+
 noinst_HEADERS		= pinyin_internal.h
 
 lib_LTLIBRARIES = libpinyin.la
 
 noinst_LIBRARIES = libpinyin_internal.a
 
-libpinyin_la_SOURCES = pinyin.cpp
+libpinyin_la_SOURCES = $(pinyin_SOURCES) pinyin.cpp
 
-libpinyin_la_LIBADD	= storage/libstorage.a lookup/liblookup.a @GLIB2_LIBS@
+libpinyin_la_LIBADD	= @GLIB2_LIBS@
 
 libpinyin_la_LDFLAGS = -Wl,--version-script=$(srcdir)/libpinyin.ver \
 			  -version-info @LT_VERSION_INFO@
@@ -55,9 +87,9 @@ libpinyin_la_LDFLAGS = -Wl,--version-script=$(srcdir)/libpinyin.ver \
 if ENABLE_LIBZHUYIN
 lib_LTLIBRARIES     += libzhuyin.la
 
-libzhuyin_la_SOURCES = zhuyin.cpp
+libzhuyin_la_SOURCES = $(pinyin_SOURCES) zhuyin.cpp
 
-libzhuyin_la_LIBADD	= storage/libstorage.la lookup/liblookup.la @GLIB2_LIBS@
+libzhuyin_la_LIBADD	= @GLIB2_LIBS@
 
 libzhuyin_la_LDFLAGS = -Wl,--version-script=$(srcdir)/libzhuyin.ver \
 			  -version-info @LT_VERSION_INFO@

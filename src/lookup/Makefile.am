@@ -17,22 +17,20 @@
 MAINTAINERCLEANFILES = Makefile.in
 
 AM_CPPFLAGS = -I$(top_srcdir)/src/include \
-			  -I$(top_srcdir)/src/storage \
-			  @GLIB2_CFLAGS@
+              -I$(top_srcdir)/src/storage \
+              @GLIB2_CFLAGS@
 
 noinst_HEADERS = lookup.h \
-			  pinyin_lookup2.h \
-			  phrase_lookup.h \
-			  phonetic_lookup.h \
-			  phonetic_lookup_linear.h \
-			  phonetic_lookup_heap.h
+               pinyin_lookup2.h \
+               phrase_lookup.h \
+               phonetic_lookup.h \
+               phonetic_lookup_linear.h \
+               phonetic_lookup_heap.h
 
 
 noinst_LIBRARIES = liblookup.a
 
-liblookup_a_CXXFLAGS = "-fPIC"
-
-liblookup_a_SOURCES	= pinyin_lookup2.cpp \
-			  phrase_lookup.cpp \
-			  lookup.cpp \
-			  phonetic_lookup.cpp
+liblookup_a_SOURCES = pinyin_lookup2.cpp \
+                    phrase_lookup.cpp \
+                    lookup.cpp \
+                    phonetic_lookup.cpp

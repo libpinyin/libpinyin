@@ -14,11 +14,11 @@
 ## You should have received a copy of the GNU General Public License
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-MAINTAINERCLEANFILES    = Makefile.in
+MAINTAINERCLEANFILES = Makefile.in
 
 libpinyinincludedir	= $(includedir)/libpinyin-@VERSION@
 
 libpinyininclude_HEADERS= novel_types.h
 
-noinst_HEADERS		= memory_chunk.h \
-			  stl_lite.h
+noinst_HEADERS = memory_chunk.h \
+                 stl_lite.h
