@@ -14,13 +14,13 @@
 ## You should have received a copy of the GNU General Public License
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-MAINTAINERCLEANFILES    = Makefile.in
+MAINTAINERCLEANFILES = Makefile.in
 
-INCLUDES		= -I$(top_srcdir)/src/include \
+AM_CPPFLAGS = -I$(top_srcdir)/src/include \
 			  -I$(top_srcdir)/src/storage \
 			  @GLIB2_CFLAGS@
 
-noinst_HEADERS		= lookup.h \
+noinst_HEADERS = lookup.h \
 			  pinyin_lookup2.h \
 			  phrase_lookup.h \
 			  phonetic_lookup.h \
@@ -28,13 +28,11 @@ noinst_HEADERS		= lookup.h \
 			  phonetic_lookup_heap.h
 
 
-noinst_LTLIBRARIES	= liblookup.la
+noinst_LIBRARIES = liblookup.a
 
-liblookup_la_CXXFLAGS	= "-fPIC"
+liblookup_a_CXXFLAGS = "-fPIC"
 
-liblookup_la_LDFLAGS	= -static
-
-liblookup_la_SOURCES	= pinyin_lookup2.cpp \
+liblookup_a_SOURCES	= pinyin_lookup2.cpp \
 			  phrase_lookup.cpp \
 			  lookup.cpp \
 			  phonetic_lookup.cpp

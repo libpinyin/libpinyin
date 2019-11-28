@@ -21,7 +21,11 @@ INCLUDES                = -I$(top_srcdir)/src \
                           -I$(top_srcdir)/tests \
                           @GLIB2_CFLAGS@
 
-LDADD			= ../../src/libpinyin_internal.la @GLIB2_LIBS@
+LDADD			= \
+				../../src/libpinyin_internal.a \
+				../../src/storage/libstorage.a \
+				../../src/lookup/liblookup.a \
+				@GLIB2_LIBS@
 
 noinst_PROGRAMS		= test_pinyin_lookup \
 			  test_phrase_lookup

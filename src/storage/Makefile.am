@@ -14,7 +14,7 @@
 ## You should have received a copy of the GNU General Public License
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-INCLUDES                = -I$(top_srcdir)/src/include \
+AM_CPPFLAGS = -I$(top_srcdir)/src/include \
 			  -I$(top_srcdir)/src/storage \
 			  @GLIB2_CFLAGS@
 
@@ -26,7 +26,7 @@ if ENABLE_LIBZHUYIN
 libpinyininclude_HEADERS += zhuyin_custom2.h
 endif
 
-noinst_HEADERS		= chewing_enum.h \
+noinst_HEADERS = chewing_enum.h \
 			  chewing_key.h \
 			  pinyin_parser2.h \
 			  zhuyin_parser2.h \
@@ -64,13 +64,11 @@ noinst_HEADERS		= chewing_enum.h \
 			  kyotodb_utils.h
 
 
-noinst_LTLIBRARIES      = libstorage.la
+noinst_LIBRARIES = libstorage.a
 
-libstorage_la_CXXFLAGS	= "-fPIC"
+libstorage_a_CXXFLAGS = "-fPIC"
 
-libstorage_la_LDFLAGS	= -static
-
-libstorage_la_SOURCES   = phrase_index.cpp \
+libstorage_a_SOURCES = phrase_index.cpp \
 			   phrase_large_table2.cpp \
 			   phrase_large_table3.cpp \
 			   ngram.cpp \
@@ -84,13 +82,13 @@ libstorage_la_SOURCES   = phrase_index.cpp \
 			   table_info.cpp
 
 if BERKELEYDB
-libstorage_la_SOURCES   += ngram_bdb.cpp \
+libstorage_a_SOURCES += ngram_bdb.cpp \
 			   phrase_large_table3_bdb.cpp \
 			   chewing_large_table2_bdb.cpp
 endif
 
 if KYOTOCABINET
-libstorage_la_SOURCES   += ngram_kyotodb.cpp \
+libstorage_a_SOURCES += ngram_kyotodb.cpp \
 			   phrase_large_table3_kyotodb.cpp \
 			   chewing_large_table2_kyotodb.cpp
 endif

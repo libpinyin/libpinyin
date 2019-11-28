@@ -23,7 +23,11 @@ INCLUDES		= -I$(top_srcdir)/src \
 			  -I$(top_srcdir)/utils \
 			  @GLIB2_CFLAGS@
 
-LDADD			= ../../src/libpinyin_internal.la @GLIB2_LIBS@
+LDADD			= \
+				../../src/libpinyin_internal.a \
+				../../src/storage/libstorage.a \
+				../../src/lookup/liblookup.a \
+				@GLIB2_LIBS@
 
 noinst_HEADERS		= k_mixture_model.h
 
