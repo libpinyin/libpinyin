@@ -25,7 +25,8 @@ LDADD			= \
 				../../src/libpinyin_internal.a \
 				../../src/storage/libstorage.a \
 				../../src/lookup/liblookup.a \
-				@GLIB2_LIBS@
+				@GLIB2_LIBS@ \
+				$(NULL)
 
 bin_PROGRAMS		= gen_binary_files \
 			  import_interpolation

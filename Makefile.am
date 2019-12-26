@@ -31,3 +31,8 @@ pkgconfig_DATA = libpinyin.pc
 if ENABLE_LIBZHUYIN
 pkgconfig_DATA += libzhuyin.pc
 endif
+
+dist-hook:
+	if test -d .git ; then \
+		git log --name-status --date=iso > $(distdir)/ChangeLog ; \
+	fi
