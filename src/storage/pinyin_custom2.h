@@ -28,7 +28,7 @@ G_BEGIN_DECLS
 /**
  * PinyinTableFlag:
  */
-enum PinyinTableFlag{
+typedef enum{
     IS_PINYIN = 1U << 1,
     IS_ZHUYIN = 1U << 2,
     PINYIN_INCOMPLETE = 1U << 3,
@@ -38,7 +38,7 @@ enum PinyinTableFlag{
     USE_DIVIDED_TABLE = 1U << 7,
     USE_RESPLIT_TABLE = 1U << 8,
     DYNAMIC_ADJUST = 1U << 9
-};
+} PinyinTableFlag;
 
 /**
  * PinyinAmbiguity2:
@@ -46,7 +46,7 @@ enum PinyinTableFlag{
  * The enums of pinyin ambiguities.
  *
  */
-enum PinyinAmbiguity2{
+typedef enum{
     PINYIN_AMB_C_CH = 1U << 10,
     PINYIN_AMB_S_SH = 1U << 11,
     PINYIN_AMB_Z_ZH = 1U << 12,
@@ -58,7 +58,7 @@ enum PinyinAmbiguity2{
     PINYIN_AMB_EN_ENG = 1U << 18,
     PINYIN_AMB_IN_ING = 1U << 19,
     PINYIN_AMB_ALL = 0x3FFU << 10
-};
+} PinyinAmbiguity2;
 
 /**
  * PinyinCorrection2:
@@ -67,7 +67,7 @@ enum PinyinAmbiguity2{
  *
  */
 
-enum PinyinCorrection2{
+typedef enum{
     PINYIN_CORRECT_GN_NG = 1U << 21,
     PINYIN_CORRECT_MG_NG = 1U << 22,
     PINYIN_CORRECT_IOU_IU = 1U << 23,
@@ -77,37 +77,35 @@ enum PinyinCorrection2{
     PINYIN_CORRECT_V_U = 1U << 27,
     PINYIN_CORRECT_ON_ONG = 1U << 28,
     PINYIN_CORRECT_ALL = 0xFFU << 21
-};
+} PinyinCorrection2;
 
 /**
- * PinyinCorrection2:
+ * ZhuyinCorrection2:
  *
- * The enums of pinyin corrections.
+ * The enums of zhuyin corrections.
  *
  */
-enum ZhuyinCorrection2{
+typedef enum{
     ZHUYIN_CORRECT_HSU = 1U << 29,
     ZHUYIN_CORRECT_ETEN26 = 1U << 30,
     ZHUYIN_CORRECT_SHUFFLE = 1U << 31,
     ZHUYIN_CORRECT_ALL = 0x7U << 29
-};
+} ZhuyinCorrection2;
 
 /**
  * @brief enums of Full Pinyin Schemes.
  */
-enum FullPinyinScheme
-{
+typedef enum{
     FULL_PINYIN_HANYU = 1,
     FULL_PINYIN_LUOMA = 2,
     FULL_PINYIN_SECONDARY_ZHUYIN = 3,
     FULL_PINYIN_DEFAULT = FULL_PINYIN_HANYU
-};
+} FullPinyinScheme;
 
 /**
  * @brief enums of Double Pinyin Schemes.
  */
-enum DoublePinyinScheme
-{
+typedef enum{
     DOUBLE_PINYIN_ZRM        = 1,
     DOUBLE_PINYIN_MS         = 2,
     DOUBLE_PINYIN_ZIGUANG    = 3,
@@ -116,13 +114,12 @@ enum DoublePinyinScheme
     DOUBLE_PINYIN_XHE        = 6,
     DOUBLE_PINYIN_CUSTOMIZED = 30,        /* for user's keyboard */
     DOUBLE_PINYIN_DEFAULT    = DOUBLE_PINYIN_MS
-};
+} DoublePinyinScheme;
 
 /**
  * @brief enums of Zhuyin Schemes.
  */
-enum ZhuyinScheme
-{
+typedef enum{
     ZHUYIN_STANDARD = 1,
     ZHUYIN_HSU      = 2,
     ZHUYIN_IBM      = 3,
@@ -133,7 +130,7 @@ enum ZhuyinScheme
     ZHUYIN_HSU_DVORAK = 8,
     ZHUYIN_DACHEN_CP26 = 9,
     ZHUYIN_DEFAULT  = ZHUYIN_STANDARD
-};
+} ZhuyinScheme;
 
 G_END_DECLS
 
