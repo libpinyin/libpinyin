@@ -45,6 +45,7 @@ add_custom_command(
         ${CMAKE_SOURCE_DIR}/data/gb_char.table
         ${CMAKE_SOURCE_DIR}/data/gbk_char.table
         ${CMAKE_SOURCE_DIR}/data/interpolation2.text
+        ${CMAKE_SOURCE_DIR}/data/table.conf
     COMMENT
         "Downloading textual model data..."
     COMMAND
