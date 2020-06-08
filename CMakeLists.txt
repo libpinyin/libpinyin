@@ -162,6 +162,7 @@ if (CMAKE_BUILD_TYPE MATCHES Debug)
 endif (CMAKE_BUILD_TYPE MATCHES Debug)
 
 include_directories(
+    ${CMAKE_BINARY_DIR}
     ${GLIB2_INCLUDE_DIR}
     ${PROJECT_SOURCE_DIR}/
     ${PROJECT_SOURCE_DIR}/src
