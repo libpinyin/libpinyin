@@ -149,7 +149,7 @@ bool ChewingLargeTable2::load_text(FILE * infile, TABLE_PHONETIC_TYPE type) {
         };
 
         if (len != keys->len) {
-            fprintf(stderr, "ChewingLargeTable::load_text:%s\t%s\t%u\t%ld\n",
+            fprintf(stderr, "ChewingLargeTable2::load_text:%s\t%s\t%u\t%ld\n",
                     pinyin, phrase, token, freq);
             continue;
         }
