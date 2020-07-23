@@ -600,20 +600,6 @@ bool pinyin_get_luoma_pinyin_string(pinyin_instance_t * instance,
                                     gchar ** utf8_str);
 
 /**
- * pinyin_get_luoma_pinyin_string:
- * @instance: the pinyin instance.
- * @key: the pinyin key.
- * @utf8_str: the luoma pinyin string.
- * @returns: whether the get operation is successful.
- *
- * Get the luoma pinyin string of the key.
- *
- */
-bool pinyin_get_luoma_pinyin_string(pinyin_instance_t * instance,
-                                    ChewingKey * key,
-                                    gchar ** utf8_str);
-
-/**
  * pinyin_get_secondary_zhuyin_string:
  * @instance: the pinyin instance.
  * @key: the pinyin key.
