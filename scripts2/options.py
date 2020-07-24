@@ -22,47 +22,47 @@
 
 auto_correct = [
     # "correct", "wrong"
-    ("ng", "gn"),
-    ("ng", "mg"),
-    ("iu", "iou"),
-    ("ui", "uei"),
-    ("un", "uen"),
+    ("ng", "gn", 1),
+    ("ng", "mg", 1),
+    ("iu", "iou", 1),
+    ("ui", "uei", 1),
+    ("un", "uen", 1),
 #    ("ue", "ve"),
-    ("ve", "ue"),
-    ("ong", "on"),
+    ("ve", "ue", 1),
+    ("ong", "on", 1),
 ]
 
 auto_correct_ext = [
     # "correct", "wrong", flag
-    ("ju", "jv", "PINYIN_CORRECT_V_U"),
-    ("qu", "qv", "PINYIN_CORRECT_V_U"),
-    ("xu", "xv", "PINYIN_CORRECT_V_U"),
-    ("yu", "yv", "PINYIN_CORRECT_V_U"),
+    ("ju", "jv", "PINYIN_CORRECT_V_U", 1),
+    ("qu", "qv", "PINYIN_CORRECT_V_U", 1),
+    ("xu", "xv", "PINYIN_CORRECT_V_U", 1),
+    ("yu", "yv", "PINYIN_CORRECT_V_U", 1),
 
-    ("jue", "jve", "PINYIN_CORRECT_V_U"),
-    ("que", "qve", "PINYIN_CORRECT_V_U"),
-    ("xue", "xve", "PINYIN_CORRECT_V_U"),
-    ("yue", "yve", "PINYIN_CORRECT_V_U"),
+    ("jue", "jve", "PINYIN_CORRECT_V_U", 1),
+    ("que", "qve", "PINYIN_CORRECT_V_U", 1),
+    ("xue", "xve", "PINYIN_CORRECT_V_U", 1),
+    ("yue", "yve", "PINYIN_CORRECT_V_U", 1),
 
-    ("juan", "jvan", "PINYIN_CORRECT_V_U"),
-    ("quan", "qvan", "PINYIN_CORRECT_V_U"),
-    ("xuan", "xvan", "PINYIN_CORRECT_V_U"),
-    ("yuan", "yvan", "PINYIN_CORRECT_V_U"),
+    ("juan", "jvan", "PINYIN_CORRECT_V_U", 1),
+    ("quan", "qvan", "PINYIN_CORRECT_V_U", 1),
+    ("xuan", "xvan", "PINYIN_CORRECT_V_U", 1),
+    ("yuan", "yvan", "PINYIN_CORRECT_V_U", 1),
 
-    ("jun", "jvn", "PINYIN_CORRECT_V_U"),
-    ("qun", "qvn", "PINYIN_CORRECT_V_U"),
-    ("xun", "xvn", "PINYIN_CORRECT_V_U"),
-    ("yun", "yvn", "PINYIN_CORRECT_V_U"),
+    ("jun", "jvn", "PINYIN_CORRECT_V_U", 1),
+    ("qun", "qvn", "PINYIN_CORRECT_V_U", 1),
+    ("xun", "xvn", "PINYIN_CORRECT_V_U", 1),
+    ("yun", "yvn", "PINYIN_CORRECT_V_U", 1),
 
-#    ("juang", "jvang", "PINYIN_CORRECT_V_U"),
-#    ("quang", "qvang", "PINYIN_CORRECT_V_U"),
-#    ("xuang", "xvang", "PINYIN_CORRECT_V_U"),
-#    ("yuang", "yvang", "PINYIN_CORRECT_V_U"),
+#    ("juang", "jvang", "PINYIN_CORRECT_V_U", 1),
+#    ("quang", "qvang", "PINYIN_CORRECT_V_U", 1),
+#    ("xuang", "xvang", "PINYIN_CORRECT_V_U", 1),
+#    ("yuang", "yvang", "PINYIN_CORRECT_V_U", 1),
 
-#    ("jun", "jven", "PINYIN_CORRECT_UEN_UN | PINYIN_CORRECT_V_U"),
-#    ("qun", "qven", "PINYIN_CORRECT_UEN_UN | PINYIN_CORRECT_V_U"),
-#    ("xun", "xven", "PINYIN_CORRECT_UEN_UN | PINYIN_CORRECT_V_U"),
-#    ("yun", "yven", "PINYIN_CORRECT_UEN_UN | PINYIN_CORRECT_V_U"),
+#    ("jun", "jven", "PINYIN_CORRECT_UEN_UN | PINYIN_CORRECT_V_U", 1),
+#    ("qun", "qven", "PINYIN_CORRECT_UEN_UN | PINYIN_CORRECT_V_U", 1),
+#    ("xun", "xven", "PINYIN_CORRECT_UEN_UN | PINYIN_CORRECT_V_U", 1),
+#    ("yun", "yven", "PINYIN_CORRECT_UEN_UN | PINYIN_CORRECT_V_U", 1),
 ]
 
 
