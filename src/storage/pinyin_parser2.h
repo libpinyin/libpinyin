@@ -42,6 +42,7 @@ typedef struct {
     const char * m_pinyin_input;
     guint32      m_flags;
     guint16      m_table_index;
+    guint16      m_distance;
 } pinyin_index_item_t;
 
 typedef struct {
@@ -114,7 +115,7 @@ public:
      * Parse only one struct ChewingKey from a string.
      *
      */
-    virtual bool parse_one_key(pinyin_option_t options, ChewingKey & key, const char *str, int len) const = 0;
+    virtual bool parse_one_key(pinyin_option_t options, ChewingKey & key, gint16 & distance, const char *str, int len) const = 0;
 
     /**
      * PhoneticParser2::parse:
@@ -156,7 +157,7 @@ public:
         g_array_free(m_parse_steps, TRUE);
     }
 
-    virtual bool parse_one_key(pinyin_option_t options, ChewingKey & key, const char *str, int len) const;
+    virtual bool parse_one_key(pinyin_option_t options, ChewingKey & key, gint16 & distance, const char *str, int len) const;
 
     /* Note:
      *   the parse method will use dynamic programming to drive parse_one_key.
@@ -195,7 +196,7 @@ public:
 
     virtual ~DoublePinyinParser2() {}
 
-    virtual bool parse_one_key(pinyin_option_t options, ChewingKey & key, const char *str, int len) const;
+    virtual bool parse_one_key(pinyin_option_t options, ChewingKey & key, gint16 & distance, const char *str, int len) const;
 
     virtual int parse(pinyin_option_t options, ChewingKeyVector & keys, ChewingKeyRestVector & key_rests, const char *str, int len) const;
 
@@ -215,7 +216,7 @@ public:
 
     virtual ~PinyinDirectParser2() {}
 
-    virtual bool parse_one_key(pinyin_option_t options, ChewingKey & key, const char *str, int len) const;
+    virtual bool parse_one_key(pinyin_option_t options, ChewingKey & key, gint16 & distance, const char *str, int len) const;
 
     virtual int parse(pinyin_option_t options, ChewingKeyVector & keys, ChewingKeyRestVector & key_rests, const char *str, int len) const;
 };

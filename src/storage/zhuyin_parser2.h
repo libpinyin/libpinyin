@@ -98,7 +98,7 @@ public:
 
     virtual ~ZhuyinSimpleParser2() {}
 
-    virtual bool parse_one_key(pinyin_option_t options, ChewingKey & key, const char *str, int len) const;
+    virtual bool parse_one_key(pinyin_option_t options, ChewingKey & key, gint16 & distance, const char *str, int len) const;
 
     virtual int parse(pinyin_option_t options, ChewingKeyVector & keys, ChewingKeyRestVector & key_rests, const char *str, int len) const;
 
@@ -142,7 +142,7 @@ public:
 
     virtual ~ZhuyinDiscreteParser2() {}
 
-    virtual bool parse_one_key(pinyin_option_t options, ChewingKey & key, const char *str, int len) const;
+    virtual bool parse_one_key(pinyin_option_t options, ChewingKey & key, gint16 & distance, const char *str, int len) const;
 
     virtual int parse(pinyin_option_t options, ChewingKeyVector & keys, ChewingKeyRestVector & key_rests, const char *str, int len) const;
 
@@ -167,7 +167,7 @@ public:
 
     virtual ~ZhuyinDaChenCP26Parser2() {}
 
-    virtual bool parse_one_key(pinyin_option_t options, ChewingKey & key, const char *str, int len) const;
+    virtual bool parse_one_key(pinyin_option_t options, ChewingKey & key, gint16 & distance, const char *str, int len) const;
 
     virtual int parse(pinyin_option_t options, ChewingKeyVector & keys, ChewingKeyRestVector & key_rests, const char *str, int len) const;
 
@@ -187,7 +187,7 @@ public:
 
     virtual ~ZhuyinDirectParser2() {}
 
-    virtual bool parse_one_key(pinyin_option_t options, ChewingKey & key, const char *str, int len) const;
+    virtual bool parse_one_key(pinyin_option_t options, ChewingKey & key, gint16 & distance, const char *str, int len) const;
 
     virtual int parse(pinyin_option_t options, ChewingKeyVector & keys, ChewingKeyRestVector & key_rests, const char *str, int len) const;
 };

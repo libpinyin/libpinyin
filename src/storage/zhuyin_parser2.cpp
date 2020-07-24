@@ -160,6 +160,7 @@ static int search_chewing_symbols2(const zhuyin_symbol_item_t * symbol_table,
 
 bool ZhuyinSimpleParser2::parse_one_key(pinyin_option_t options,
                                         ChewingKey & key,
+                                        gint16 & distance,
                                         const char * str, int len) const {
     options &= ~PINYIN_AMB_ALL;
     unsigned char tone = CHEWING_ZERO_TONE;
@@ -240,9 +241,10 @@ int ZhuyinSimpleParser2::parse(pinyin_option_t options,
         i = std_lite::min(maximum_len - parsed_len,
                           (int)max_chewing_length);
 
+        gint16 distance = 0;
         ChewingKey key; ChewingKeyRest key_rest;
         for (; i > 0; --i) {
-            bool success = parse_one_key(options, key, cur_str, i);
+            bool success = parse_one_key(options, key, distance, cur_str, i);
             if (success)
                 break;
         }
@@ -331,6 +333,7 @@ bool ZhuyinSimpleParser2::in_chewing_scheme(pinyin_option_t options,
 
 bool ZhuyinDiscreteParser2::parse_one_key(pinyin_option_t options,
                                           ChewingKey & key,
+                                          gint16 & distance,
                                           const char * str, int len) const {
     if (0 == len)
         return false;
@@ -430,9 +433,10 @@ int ZhuyinDiscreteParser2::parse(pinyin_option_t options,
         i = std_lite::min(maximum_len - parsed_len,
                           (int)max_chewing_length);
 
+        gint16 distance = 0;
         ChewingKey key; ChewingKeyRest key_rest;
         for (; i > 0; --i) {
-            bool success = parse_one_key(options, key, cur_str, i);
+            bool success = parse_one_key(options, key, distance, cur_str, i);
             if (success)
                 break;
         }
@@ -567,6 +571,7 @@ static int count_same_chars(const char * str, int len) {
 
 bool ZhuyinDaChenCP26Parser2::parse_one_key(pinyin_option_t options,
                                             ChewingKey & key,
+                                            gint16 & distance,
                                             const char *str, int len) const {
     if (0 == len)
         return false;
@@ -731,15 +736,16 @@ int ZhuyinDaChenCP26Parser2::parse(pinyin_option_t options,
     /* maximum forward match for chewing. */
     int parsed_len = 0;
     const char * cur_str = NULL;
-    ChewingKey key; ChewingKeyRest key_rest;
 
     while (parsed_len < maximum_len) {
         cur_str = str + parsed_len;
         i = std_lite::min(maximum_len - parsed_len,
                           (int)max_chewing_dachen26_length);
 
+        gint16 distance = 0;
+        ChewingKey key; ChewingKeyRest key_rest;
         for (; i > 0; --i) {
-            bool success = parse_one_key(options, key, cur_str, i);
+            bool success = parse_one_key(options, key, distance, cur_str, i);
             if (success)
                 break;
         }
@@ -851,6 +857,7 @@ ZhuyinDirectParser2::ZhuyinDirectParser2 (){
 
 bool ZhuyinDirectParser2::parse_one_key(pinyin_option_t options,
                                         ChewingKey & key,
+                                        gint16 & distance,
                                         const char *str, int len) const {
     options &= ~PINYIN_AMB_ALL;
     /* by default, chewing will use the first tone. */
@@ -910,8 +917,6 @@ int ZhuyinDirectParser2::parse(pinyin_option_t options,
     g_array_set_size(keys, 0);
     g_array_set_size(key_rests, 0);
 
-    ChewingKey key; ChewingKeyRest key_rest;
-
     int parsed_len = 0;
     int i = 0, cur = 0, next = 0;
     while (cur < len) {
@@ -922,7 +927,9 @@ int ZhuyinDirectParser2::parse(pinyin_option_t options,
         }
         next = i;
 
-        if (parse_one_key(options, key, str + cur, next - cur)) {
+        gint16 distance = 0;
+        ChewingKey key; ChewingKeyRest key_rest;
+        if (parse_one_key(options, key, distance, str + cur, next - cur)) {
 #if 0
             /* as direct parser handles data source,
                assume the data is correct when loading. */
