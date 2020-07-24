@@ -100,6 +100,7 @@ def gen_pinyin_list():
 
 def gen_pinyins():
     #generate all pinyins
+    distance = 0
     for pinyin in pinyin_list:
         flags = []
         if pinyin in PINYIN_ZHUYIN_MAP.keys():
@@ -113,7 +114,7 @@ def gen_pinyins():
         if zhuyin in chewing.CHEWING_ASCII_INITIAL_MAP and \
                 pinyin not in ZHUYIN_SPECIAL_INITIAL_SET_IN_PINYIN_FORM:
             flags.append("ZHUYIN_INCOMPLETE")
-        yield pinyin, pinyin, zhuyin, flags, get_chewing(pinyin)
+        yield pinyin, pinyin, zhuyin, flags, get_chewing(pinyin), distance
 
 
 def get_shengmu_chewing(shengmu):
@@ -127,6 +128,7 @@ def get_shengmu_chewing(shengmu):
 
 def gen_shengmu():
     #generate all shengmu
+    distance = 0
     for shengmu in shengmu_list:
         if shengmu in pinyin_list:
             continue
@@ -135,12 +137,12 @@ def gen_shengmu():
         chewing_initial = chewing_key[0]
         if chewing_initial in chewing.ASCII_CHEWING_INITIAL_MAP:
             chewing_initial = chewing.ASCII_CHEWING_INITIAL_MAP[chewing_initial]
-        yield shengmu, shengmu, chewing_initial, flags, chewing_key
+        yield shengmu, shengmu, chewing_initial, flags, chewing_key, distance
 
 
 def gen_corrects():
     #generate corrections
-    for correct, wrong in auto_correct:
+    for correct, wrong, distance in auto_correct:
         flags = ['IS_PINYIN', 'PINYIN_CORRECT_{0}_{1}'.format(wrong.upper(),
                                                               correct.upper())]
         for pinyin in pinyin_list:
@@ -149,17 +151,17 @@ def gen_corrects():
                 zhuyin = PINYIN_ZHUYIN_MAP[pinyin]
                 wrong_pinyin = pinyin.replace(correct, wrong)
                 yield pinyin, wrong_pinyin, zhuyin,\
-                    flags, get_chewing(pinyin)
+                    flags, get_chewing(pinyin), distance
 
 
 def gen_u_to_v():
     #generate U to V
-    for correct, wrong, flags in auto_correct_ext:
+    for correct, wrong, flags, distance in auto_correct_ext:
         #over-ride flags
         flags = ['IS_PINYIN', 'PINYIN_CORRECT_V_U']
         pinyin = correct
         zhuyin = PINYIN_ZHUYIN_MAP[pinyin]
-        yield correct, wrong, zhuyin, flags, get_chewing(pinyin)
+        yield correct, wrong, zhuyin, flags, get_chewing(pinyin), distance
 
 
 #pinyin table
@@ -174,7 +176,8 @@ eten26_zhuyin_index = []
 
 
 def filter_pinyin_list():
-    for (correct, wrong, zhuyin, flags, chewing_key) in gen_pinyin_list():
+    for (correct, wrong, zhuyin, flags, chewing_key, distance) in \
+        gen_pinyin_list():
         (luoma, secondary) = (None, None)
 
         if zhuyin in ZHUYIN_LUOMA_PINYIN_MAP:
@@ -190,7 +193,7 @@ def filter_pinyin_list():
         content_table.append((correct, zhuyin, luoma, secondary, chewing_key))
 
         if "IS_PINYIN" in flags:
-            pinyin_index.append((wrong, flags, correct))
+            pinyin_index.append((wrong, flags, correct, distance))
         #skip pinyin correct options
         if correct != wrong:
             continue
@@ -292,9 +295,9 @@ def gen_content_table():
 
 def gen_pinyin_index():
     entries = []
-    for (wrong, flags, correct) in pinyin_index:
+    for (wrong, flags, correct, distance) in pinyin_index:
         index = [x[0] for x in content_table].index(correct)
-        entry = '{{"{0}", {1}, {2}}}'.format(wrong, flags, index)
+        entry = '{{"{0}", {1}, {2}, {3}}}'.format(wrong, flags, index, distance)
         entries.append(entry)
     return ',\n'.join(entries)
 
