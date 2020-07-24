@@ -66,6 +66,7 @@ struct parse_value_t{
     ChewingKeyRest m_key_rest;
     gint16 m_num_keys;
     gint16 m_parsed_len;
+    gint16 m_distance;
     gint16 m_last_step;
 
     /* constructor */
@@ -73,6 +74,7 @@ public:
     parse_value_t(){
         m_num_keys = 0;
         m_parsed_len = 0;
+        m_distance = 0;
         m_last_step = -1;
     }
 };
@@ -121,7 +123,8 @@ static inline bool search_pinyin_index2(pinyin_option_t options,
                                         const pinyin_index_item_t * index,
                                         size_t len,
                                         const char * pinyin,
-                                        ChewingKey & key){
+                                        ChewingKey & key,
+                                        gint16 & distance){
     pinyin_index_item_t item;
     memset(&item, 0, sizeof(item));
     item.m_pinyin_input = pinyin;
@@ -141,6 +144,7 @@ static inline bool search_pinyin_index2(pinyin_option_t options,
             return false;
 
         key = content_table[index->m_table_index].m_chewing_key;
+        distance = index->m_distance;
         assert(key.get_table_index() == index->m_table_index);
         return true;
     }
@@ -159,6 +163,7 @@ FullPinyinParser2::FullPinyinParser2 (){
 
 bool FullPinyinParser2::parse_one_key (pinyin_option_t options,
                                        ChewingKey & key,
+                                       gint16 & distance,
                                        const char * pinyin, int len) const {
     /* "'" are not accepted in parse_one_key. */
     gchar * input = g_strndup(pinyin, len);
@@ -189,7 +194,7 @@ bool FullPinyinParser2::parse_one_key (pinyin_option_t options,
     /* Note: optimize here? */
     input[parsed_len] = '\0';
     if (!search_pinyin_index2(options, m_pinyin_index, m_pinyin_index_len,
-                              input, key)) {
+                              input, key, distance)) {
         g_free(input);
         return false;
     }
@@ -239,6 +244,7 @@ int FullPinyinParser2::parse (pinyin_option_t options, ChewingKeyVector & keys,
             nextstep->m_key_rest = ChewingKeyRest();
             nextstep->m_num_keys = curstep->m_num_keys;
             nextstep->m_parsed_len = curstep->m_parsed_len + 1;
+            nextstep->m_distance = curstep->m_distance;
             nextstep->m_last_step = i;
             next_sep = 0;
             continue;
@@ -265,13 +271,14 @@ int FullPinyinParser2::parse (pinyin_option_t options, ChewingKeyVector & keys,
                 nextstep = &g_array_index(m_parse_steps, parse_value_t, n);
 
                 /* gen next step */
+                gint16 distance = 0;
                 const char * onepinyin = input + m;
                 gint16 onepinyinlen = n - m;
                 value = parse_value_t();
 
                 ChewingKey key; ChewingKeyRest rest;
                 bool parsed = parse_one_key
-                    (options, key, onepinyin, onepinyinlen);
+                    (options, key, distance, onepinyin, onepinyinlen);
                 rest.m_raw_begin = m; rest.m_raw_end = n;
                 if (!parsed)
                     continue;
@@ -281,6 +288,7 @@ int FullPinyinParser2::parse (pinyin_option_t options, ChewingKeyVector & keys,
                 value.m_key = key; value.m_key_rest = rest;
                 value.m_num_keys = curstep->m_num_keys + 1;
                 value.m_parsed_len = curstep->m_parsed_len + onepinyinlen;
+                value.m_distance = curstep->m_distance + distance;
                 value.m_last_step = m;
 
                 /* save next step */
@@ -297,7 +305,9 @@ int FullPinyinParser2::parse (pinyin_option_t options, ChewingKeyVector & keys,
 
                 /* handle with the same pinyin length and the number of keys */
                 if (value.m_parsed_len == nextstep->m_parsed_len &&
-                    value.m_num_keys == nextstep->m_num_keys) {
+                    value.m_num_keys == nextstep->m_num_keys &&
+                    value.m_distance < nextstep->m_distance) {
+                    *nextstep = value;
 
 #if 0
                     /* prefer the 'a' at the end of clause,
@@ -391,6 +401,7 @@ bool FullPinyinParser2::set_scheme(FullPinyinScheme scheme){
 
 bool DoublePinyinParser2::parse_one_key(pinyin_option_t options,
                                         ChewingKey & key,
+                                        gint16 & distance,
                                         const char *str, int len) const {
     options &= ~(PINYIN_CORRECT_ALL|PINYIN_AMB_ALL);
 
@@ -537,9 +548,10 @@ int DoublePinyinParser2::parse(pinyin_option_t options, ChewingKeyVector & keys,
         i = std_lite::min(maximum_len - parsed_len,
                           (int)max_double_pinyin_length);
 
+        gint16 distance = 0;
         ChewingKey key; ChewingKeyRest key_rest;
         for (; i > 0; --i) {
-            bool success = parse_one_key(options, key, cur_str, i);
+            bool success = parse_one_key(options, key, distance, cur_str, i);
             if (success)
                 break;
         }
@@ -607,6 +619,7 @@ PinyinDirectParser2::PinyinDirectParser2 (){
 
 bool PinyinDirectParser2::parse_one_key(pinyin_option_t options,
                                         ChewingKey & key,
+                                        gint16 & distance,
                                         const char *str, int len) const {
     /* "'" are not accepted in parse_one_key. */
     gchar * input = g_strndup(str, len);
@@ -637,7 +650,7 @@ bool PinyinDirectParser2::parse_one_key(pinyin_option_t options,
     /* Note: optimize here? */
     input[parsed_len] = '\0';
     if (!search_pinyin_index2(options, m_pinyin_index, m_pinyin_index_len,
-                              input, key)) {
+                              input, key, distance)) {
         g_free(input);
         return false;
     }
@@ -663,8 +676,6 @@ int PinyinDirectParser2::parse(pinyin_option_t options,
     g_array_set_size(keys, 0);
     g_array_set_size(key_rests, 0);
 
-    ChewingKey key; ChewingKeyRest key_rest;
-
     int parsed_len = 0;
     int i = 0, cur = 0, next = 0;
     while (cur < len) {
@@ -675,7 +686,9 @@ int PinyinDirectParser2::parse(pinyin_option_t options,
         }
         next = i;
 
-        if (parse_one_key(options, key, str + cur, next - cur)) {
+        gint16 distance = 0;
+        ChewingKey key; ChewingKeyRest key_rest;
+        if (parse_one_key(options, key, distance, str + cur, next - cur)) {
             key_rest.m_raw_begin = cur; key_rest.m_raw_end = next;
 
             /* save the pinyin. */
