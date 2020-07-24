@@ -1208,9 +1208,10 @@ bool pinyin_parse_full_pinyin(pinyin_instance_t * instance,
     pinyin_context_t * & context = instance->m_context;
     pinyin_option_t options = context->m_options;
 
+    gint16 distance = 0;
     int pinyin_len = strlen(onepinyin);
     bool retval = context->m_full_pinyin_parser->parse_one_key
-        (options, *onekey, onepinyin, pinyin_len);
+        (options, *onekey, distance, onepinyin, pinyin_len);
     return retval;
 }
 
@@ -1249,9 +1250,10 @@ bool pinyin_parse_double_pinyin(pinyin_instance_t * instance,
     pinyin_context_t * & context = instance->m_context;
     pinyin_option_t options = context->m_options;
 
+    gint16 distance = 0;
     int pinyin_len = strlen(onepinyin);
     bool retval = context->m_double_pinyin_parser->parse_one_key
-        (options, *onekey, onepinyin, pinyin_len);
+        (options, *onekey, distance, onepinyin, pinyin_len);
     return retval;
 }
 
@@ -1289,9 +1291,10 @@ bool pinyin_parse_chewing(pinyin_instance_t * instance,
     /* disable the zhuyin correction options. */
     options &= ~ZHUYIN_CORRECT_ALL;
 
+    gint16 distance = 0;
     int chewing_len = strlen(onechewing);
     bool retval = context->m_chewing_parser->parse_one_key
-        (options, *onekey, onechewing, chewing_len );
+        (options, *onekey, distance, onechewing, chewing_len );
     return retval;
 }
 
