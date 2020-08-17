@@ -284,14 +284,14 @@ bool merge_single_gram(SingleGram * merged, const SingleGram * system,
     MemoryChunk & merged_chunk = merged->m_chunk;
 
     if (NULL == system) {
-        merged_chunk.set_chunk(user->m_chunk.begin(),
-                               user->m_chunk.size(), NULL);
+        merged_chunk.set_content(0, user->m_chunk.begin(),
+                                 user->m_chunk.size());
         return true;
     }
 
     if (NULL == user) {
-        merged_chunk.set_chunk(system->m_chunk.begin(),
-                               system->m_chunk.size(), NULL);
+        merged_chunk.set_content(0, system->m_chunk.begin(),
+                                 system->m_chunk.size());
         return true;
     }
 
