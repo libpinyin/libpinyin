@@ -306,22 +306,25 @@ int FullPinyinParser2::parse (pinyin_option_t options, ChewingKeyVector & keys,
                 /* handle with the same pinyin length and the number of keys */
                 if (value.m_parsed_len == nextstep->m_parsed_len &&
                     value.m_num_keys == nextstep->m_num_keys &&
-                    value.m_distance < nextstep->m_distance) {
+                    value.m_distance < nextstep->m_distance)
                     *nextstep = value;
 
-#if 0
-                    /* prefer the 'a' at the end of clause,
-                     * ex: "zheyanga$" -> "zhe'yang'a$".
-                     */
-                    if (value.m_parsed_len == len &&
-                        (nextstep->m_key.m_initial != CHEWING_ZERO_INITIAL &&
-                         nextstep->m_key.m_final == CHEWING_A) &&
-                        (value.m_key.m_initial == CHEWING_ZERO_INITIAL &&
-                         value.m_key.m_middle == CHEWING_ZERO_MIDDLE &&
-                         value.m_key.m_final == CHEWING_A))
-                        *nextstep = value;
+#if 1
+                /* prefer the 'a' at the end of clause,
+                 * ex: "zheyanga$" -> "zhe'yang'a$".
+                 */
+                if (value.m_parsed_len == len &&
+                    (value.m_parsed_len == nextstep->m_parsed_len &&
+                     value.m_num_keys == nextstep->m_num_keys &&
+                     value.m_distance == nextstep->m_distance) &&
+                    (nextstep->m_key.m_initial != CHEWING_ZERO_INITIAL &&
+                     nextstep->m_key.m_middle == CHEWING_ZERO_MIDDLE &&
+                     nextstep->m_key.m_final == CHEWING_A) &&
+                    (value.m_key.m_initial == CHEWING_ZERO_INITIAL &&
+                     value.m_key.m_middle == CHEWING_ZERO_MIDDLE &&
+                     value.m_key.m_final == CHEWING_A))
+                    *nextstep = value;
 #endif
-                }
             }
         }
     }
