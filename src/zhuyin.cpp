@@ -1946,6 +1946,28 @@ bool zhuyin_get_zhuyin_key_rest_length(zhuyin_instance_t * instance,
     return true;
 }
 
+/* find the first zero ChewingKey "'". */
+static size_t _compute_zero_start(PhoneticKeyMatrix & matrix, size_t offset) {
+    ChewingKey key; ChewingKeyRest key_rest;
+    const ChewingKey zero_key;
+
+    ssize_t index = offset - 1;
+    for (; index > 0; --index) {
+        const size_t size = matrix.get_column_size(index);
+
+        if (1 != size)
+            break;
+
+        matrix.get_item(index, 0, key, key_rest);
+        if (zero_key == key)
+            offset = index;
+        else
+            break;
+    }
+
+    return offset;
+}
+
 /* when lookup offset:
    get the previous non-zero ChewingKey. */
 bool zhuyin_get_zhuyin_offset(zhuyin_instance_t * instance,
@@ -1962,6 +1984,7 @@ bool zhuyin_get_zhuyin_offset(zhuyin_instance_t * instance,
             break;
     }
 
+    offset = _compute_zero_start(matrix, offset);
     _check_offset(matrix, offset);
 
     *poffset = offset;
@@ -1993,6 +2016,7 @@ bool zhuyin_get_left_zhuyin_offset(zhuyin_instance_t * instance,
             break;
     }
 
+    offset = _compute_zero_start(matrix, offset);
     _check_offset(matrix, left);
 
     *pleft = left;
@@ -2009,6 +2033,7 @@ bool zhuyin_get_right_zhuyin_offset(zhuyin_instance_t * instance,
     size_t right = offset;
 
     ChewingKey key; ChewingKeyRest key_rest;
+    const ChewingKey zero_key;
     for (size_t index = right; index < matrix.size() - 1; ++index) {
         const size_t size = matrix.get_column_size(index);
 
@@ -2016,7 +2041,10 @@ bool zhuyin_get_right_zhuyin_offset(zhuyin_instance_t * instance,
             break;
 
         matrix.get_item(index, 0, key, key_rest);
-        break;
+        if (zero_key == key)
+            right = index + 1;
+        else
+            break;
     }
 
     if (0 == matrix.get_column_size(right))
