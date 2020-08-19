@@ -39,6 +39,8 @@ set (
 
 set (VERSION ${LIBPINYIN_VERSION})
 
+option(USE_SYSTEM_MODEL "Use model data from the system rather than downloading it in CMake" OFF)
+
 ######## Validation
 
 include(CheckIncludeFileCXX)
