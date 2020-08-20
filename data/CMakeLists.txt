@@ -68,9 +68,9 @@ add_custom_command(
         ${gen_binary_files_BIN} --table-dir ${CMAKE_SOURCE_DIR}/data
     DEPENDS
         gen_binary_files
-	${CMAKE_SOURCE_DIR}/data/gb_char.table
-	${CMAKE_SOURCE_DIR}/data/gbk_char.table
-	${CMAKE_SOURCE_DIR}/data/table.conf
+        ${CMAKE_SOURCE_DIR}/data/gb_char.table
+        ${CMAKE_SOURCE_DIR}/data/gbk_char.table
+        ${CMAKE_SOURCE_DIR}/data/table.conf
 )
 
 add_custom_command(
@@ -84,7 +84,11 @@ add_custom_command(
         ${gen_unigram_BIN} --table-dir ${CMAKE_SOURCE_DIR}/data
     DEPENDS
         import_interpolation
-	${CMAKE_SOURCE_DIR}/data/interpolation2.text
+        ${CMAKE_SOURCE_DIR}/data/interpolation2.text
+        ${CMAKE_BINARY_DIR}/data/gb_char.bin
+        ${CMAKE_BINARY_DIR}/data/gbk_char.bin
+        ${CMAKE_BINARY_DIR}/data/phrase_index.bin
+        ${CMAKE_BINARY_DIR}/data/pinyin_index.bin
 )
 
 install(
