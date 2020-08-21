@@ -283,6 +283,8 @@ bool merge_single_gram(SingleGram * merged, const SingleGram * system,
 
     MemoryChunk & merged_chunk = merged->m_chunk;
 
+    merged_chunk.set_size(0);
+
     if (NULL == system) {
         merged_chunk.set_content(0, user->m_chunk.begin(),
                                  user->m_chunk.size());
