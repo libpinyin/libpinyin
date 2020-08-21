@@ -20,7 +20,7 @@
 
 #include "chewing_large_table2.h"
 #include <kchashdb.h>
-#include <kcprotodb.h>
+#include <kccachedb.h>
 #include "kyotodb_utils.h"
 
 using namespace kyotocabinet;
@@ -29,7 +29,7 @@ namespace pinyin{
 
 ChewingLargeTable2::ChewingLargeTable2() {
     /* create in-memory db. */
-    m_db = new ProtoTreeDB;
+    m_db = new GrassDB;
     assert(m_db->open("-", BasicDB::OREADER|BasicDB::OWRITER|BasicDB::OCREATE));
 
     m_entries = NULL;
@@ -71,7 +71,7 @@ bool ChewingLargeTable2::load_db(const char * filename) {
     init_entries();
 
     /* create in-memory db. */
-    m_db = new ProtoTreeDB;
+    m_db = new GrassDB;
 
     if (!m_db->open("-", BasicDB::OREADER|BasicDB::OWRITER|BasicDB::OCREATE))
         return false;

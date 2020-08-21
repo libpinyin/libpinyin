@@ -22,7 +22,7 @@
 #include <assert.h>
 #include <errno.h>
 #include <kchashdb.h>
-#include <kcprotodb.h>
+#include <kcstashdb.h>
 #include "kyotodb_utils.h"
 
 
@@ -50,12 +50,12 @@ void Bigram::reset(){
 }
 
 
-/* Use ProtoHashDB for load_db/save_db methods. */
+/* Use StashDB for load_db/save_db methods. */
 bool Bigram::load_db(const char * dbfile){
     reset();
 
     /* create in-memory db. */
-    m_db = new ProtoHashDB;
+    m_db = new StashDB;
 
     if ( !m_db->open("-", BasicDB::OREADER|BasicDB::OWRITER|BasicDB::OCREATE) )
         return false;

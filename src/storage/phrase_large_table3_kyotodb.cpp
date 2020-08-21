@@ -20,7 +20,7 @@
 
 #include "phrase_large_table3.h"
 #include <kchashdb.h>
-#include <kcprotodb.h>
+#include <kccachedb.h>
 #include "kyotodb_utils.h"
 
 
@@ -30,7 +30,7 @@ namespace pinyin{
 
 PhraseLargeTable3::PhraseLargeTable3() {
     /* create in-memory db. */
-    m_db = new ProtoTreeDB;
+    m_db = new GrassDB;
     assert(m_db->open("-", BasicDB::OREADER|BasicDB::OWRITER|BasicDB::OCREATE));
 
     m_entry = new PhraseTableEntry;
@@ -75,7 +75,7 @@ bool PhraseLargeTable3::load_db(const char * filename) {
     m_entry = new PhraseTableEntry;
 
     /* create in-memory db. */
-    m_db = new ProtoTreeDB;
+    m_db = new GrassDB;
 
     if (!m_db->open("-", BasicDB::OREADER|BasicDB::OWRITER|BasicDB::OCREATE))
         return false;
