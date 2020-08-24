@@ -12,8 +12,6 @@ target_link_libraries(
     pinyin
 )
 
-add_test(NAME pinyin COMMAND test_pinyin)
-
 add_executable(
     test_phrase
     test_phrase.cpp
@@ -24,8 +22,6 @@ target_link_libraries(
     pinyin
 )
 
-add_test(NAME phrase COMMAND test_phrase)
-
 add_executable(
     test_chewing
     test_chewing.cpp
@@ -35,5 +31,3 @@ target_link_libraries(
     test_chewing
     pinyin
 )
-
-add_test(NAME chewing COMMAND test_chewing)
