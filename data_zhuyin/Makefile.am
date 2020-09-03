@@ -44,16 +44,16 @@ CLEANFILES		= $(binary_model_data)
 
 interpolation2.text:
 	wget http://downloads.sourceforge.net/libzhuyin/models/model11.text.tar.gz
-	tar xvf model11.text.tar.gz -C $(top_srcdir)/data
+	tar xvf model11.text.tar.gz -C $(top_srcdir)/data_zhuyin
 
 
 $(tablefiles) table.conf: interpolation2.text
 
 bigram.db: $(textual_model_data)
 	$(RM) $(binary_model_data)
-	../utils/storage/gen_binary_files --table-dir $(top_srcdir)/data
-	../utils/storage/import_interpolation --table-dir $(top_srcdir)/data < $(top_srcdir)/data/interpolation2.text
-	../utils/training/gen_unigram --table-dir $(top_srcdir)/data
+	../utils/storage/gen_binary_files --table-dir $(top_srcdir)/data_zhuyin
+	../utils/storage/import_interpolation --table-dir $(top_srcdir)/data_zhuyin < $(top_srcdir)/data_zhuyin/interpolation2.text
+	../utils/training/gen_unigram --table-dir $(top_srcdir)/data_zhuyin
 
 phrase_index.bin pinyin_index.bin $(binfiles): bigram.db
 

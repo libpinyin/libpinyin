@@ -49,16 +49,16 @@ CLEANFILES		= $(binary_model_data)
 
 interpolation2.text:
 	wget http://downloads.sourceforge.net/libpinyin/models/model17.text.tar.gz
-	tar xvf model17.text.tar.gz -C $(top_srcdir)/data
+	tar xvf model17.text.tar.gz -C $(top_srcdir)/data_pinyin
 
 
 $(tablefiles) table.conf: interpolation2.text
 
 bigram.db: $(textual_model_data)
 	$(RM) $(binary_model_data)
-	../utils/storage/gen_binary_files --table-dir $(top_srcdir)/data
-	../utils/storage/import_interpolation --table-dir $(top_srcdir)/data < $(top_srcdir)/data/interpolation2.text
-	../utils/training/gen_unigram --table-dir $(top_srcdir)/data
+	../utils/storage/gen_binary_files --table-dir $(top_srcdir)/data_pinyin
+	../utils/storage/import_interpolation --table-dir $(top_srcdir)/data_pinyin < $(top_srcdir)/data_pinyin/interpolation2.text
+	../utils/training/gen_unigram --table-dir $(top_srcdir)/data_pinyin
 
 addon_phrase_index.bin phrase_index.bin addon_pinyin_index.bin pinyin_index.bin $(binfiles): bigram.db
 
