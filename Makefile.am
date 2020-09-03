@@ -17,11 +17,11 @@
 EXTRA_DIST		= COPYING
 
 AUTOMAKE_OPTIONS 	= gnu
-SUBDIRS 		= src tests utils data doc
+SUBDIRS 		= src tests utils data_pinyin doc
 
-MAINTAINERCLEANFILES 	= Makefile.in 
+MAINTAINERCLEANFILES 	= Makefile.in
 
-CLEANFILES		= *.bak 
+CLEANFILES		= *.bak
 
 ACLOCAL_AMFLAGS = -I m4
 
@@ -29,6 +29,7 @@ pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = libpinyin.pc
 
 if ENABLE_LIBZHUYIN
+SUBDIRS += data_zhuyin
 pkgconfig_DATA += libzhuyin.pc
 endif
 

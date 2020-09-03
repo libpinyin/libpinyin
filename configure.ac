@@ -127,7 +127,8 @@ AC_CONFIG_FILES([libpinyin.pc
                  libpinyin.spec
                  Makefile
                  doc/Makefile
-                 data/Makefile
+                 data_pinyin/Makefile
+                 data_zhuyin/Makefile
                  src/Makefile
                  src/include/Makefile
                  src/storage/Makefile
