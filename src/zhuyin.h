@@ -594,7 +594,7 @@ bool zhuyin_get_n_zhuyin(zhuyin_instance_t * instance,
  *
  */
 bool zhuyin_get_zhuyin_key(zhuyin_instance_t * instance,
-                           guint index,
+                           size_t index,
                            ChewingKey ** key);
 
 /**
@@ -608,7 +608,7 @@ bool zhuyin_get_zhuyin_key(zhuyin_instance_t * instance,
  *
  */
 bool zhuyin_get_zhuyin_key_rest(zhuyin_instance_t * instance,
-                                guint index,
+                                size_t index,
                                 ChewingKeyRest ** key_rest);
 
 /**
