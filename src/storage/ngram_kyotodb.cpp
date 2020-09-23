@@ -60,6 +60,10 @@ bool Bigram::load_db(const char * dbfile){
     if ( !m_db->open("-", BasicDB::OREADER|BasicDB::OWRITER|BasicDB::OCREATE) )
         return false;
 
+    if (!m_db->load_snapshot(dbfile, NULL))
+        return false;
+
+#if 0
     /* load db into memory. */
     BasicDB * tmp_db = new HashDB;
     if (!tmp_db->open(dbfile, BasicDB::OREADER))
@@ -70,6 +74,7 @@ bool Bigram::load_db(const char * dbfile){
 
     tmp_db->close();
     delete tmp_db;
+#endif
 
     return true;
 }
@@ -80,6 +85,10 @@ bool Bigram::save_db(const char * dbfile){
     if ( ret != 0 && errno != ENOENT)
         return false;
 
+    if (!m_db->dump_snapshot(dbfile, NULL))
+        return false;
+
+#if 0
     BasicDB * tmp_db = new HashDB;
 
     if ( !tmp_db->open(dbfile, BasicDB::OWRITER|BasicDB::OCREATE) )
@@ -91,6 +100,7 @@ bool Bigram::save_db(const char * dbfile){
     tmp_db->synchronize();
     tmp_db->close();
     delete tmp_db;
+#endif
 
     return true;
 }

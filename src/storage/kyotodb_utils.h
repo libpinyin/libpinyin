@@ -49,6 +49,7 @@ inline uint32_t attach_options(guint32 flags) {
 /* Kyoto Cabinet requires non-NULL pointer for zero length value. */
 static const char * empty_vbuf = (char *)UINTPTR_MAX;
 
+#if 0
 class CopyVisitor : public DB::Visitor {
 private:
     BasicDB * m_db;
@@ -68,6 +69,7 @@ public:
         return NOP;
     }
 };
+#endif
 
 };
 

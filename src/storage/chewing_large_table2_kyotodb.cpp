@@ -76,6 +76,10 @@ bool ChewingLargeTable2::load_db(const char * filename) {
     if (!m_db->open("-", BasicDB::OREADER|BasicDB::OWRITER|BasicDB::OCREATE))
         return false;
 
+    if (!m_db->load_snapshot(filename, NULL))
+        return false;
+
+#if 0
     /* load db into memory. */
     BasicDB * tmp_db = new TreeDB;
     if (!tmp_db->open(filename, BasicDB::OREADER))
@@ -86,6 +90,7 @@ bool ChewingLargeTable2::load_db(const char * filename) {
 
     tmp_db->close();
     delete tmp_db;
+#endif
 
     return true;
 }
@@ -95,6 +100,10 @@ bool ChewingLargeTable2::store_db(const char * new_filename) {
     if ( ret != 0 && errno != ENOENT)
         return false;
 
+    if (!m_db->dump_snapshot(new_filename, NULL))
+        return false;
+
+#if 0
     BasicDB * tmp_db = new TreeDB;
     if (!tmp_db->open(new_filename, BasicDB::OWRITER|BasicDB::OCREATE))
         return false;
@@ -105,6 +114,7 @@ bool ChewingLargeTable2::store_db(const char * new_filename) {
     tmp_db->synchronize();
     tmp_db->close();
     delete tmp_db;
+#endif
 
     return true;
 }
