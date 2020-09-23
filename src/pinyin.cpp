@@ -732,15 +732,7 @@ void pinyin_end_get_phrases(export_iterator_t * iter){
     delete iter;
 }
 
-bool pinyin_save(pinyin_context_t * context){
-    if (!context->m_user_dir)
-        return false;
-
-    if (!context->m_modified)
-        return false;
-
-    context->m_phrase_index->compact();
-
+static bool _write_files(pinyin_context_t * context){
     const pinyin_table_info_t * phrase_files =
         context->m_system_table_info.get_default_tables();
 
@@ -788,18 +780,10 @@ bool pinyin_save(pinyin_context_t * context){
 
             gchar * tmppathname = g_build_filename(context->m_user_dir,
                                                    tmpfilename, NULL);
-            g_free(tmpfilename);
 
-            gchar * chunkpathname = g_build_filename(context->m_user_dir,
-                                                     userfilename, NULL);
             log->save(tmppathname);
 
-            int result = rename(tmppathname, chunkpathname);
-            if (0 != result)
-                fprintf(stderr, "rename %s to %s failed.\n",
-                        tmppathname, chunkpathname);
-
-            g_free(chunkpathname);
+            g_free(tmpfilename);
             g_free(tmppathname);
             delete log;
         }
@@ -813,19 +797,10 @@ bool pinyin_save(pinyin_context_t * context){
             gchar * tmpfilename = g_strdup_printf("%s.tmp", userfilename);
             gchar * tmppathname = g_build_filename(context->m_user_dir,
                                                    tmpfilename, NULL);
-            g_free(tmpfilename);
-
-            gchar * chunkpathname = g_build_filename(context->m_user_dir,
-                                                     userfilename, NULL);
 
             chunk->save(tmppathname);
 
-            int result = rename(tmppathname, chunkpathname);
-            if (0 != result)
-                fprintf(stderr, "rename %s to %s failed.\n",
-                        tmppathname, chunkpathname);
-
-            g_free(chunkpathname);
+            g_free(tmpfilename);
             g_free(tmppathname);
             delete chunk;
         }
@@ -835,10 +810,99 @@ bool pinyin_save(pinyin_context_t * context){
     gchar * tmpfilename = g_build_filename
         (context->m_user_dir, USER_PINYIN_INDEX ".tmp", NULL);
     unlink(tmpfilename);
-    gchar * filename = g_build_filename
-        (context->m_user_dir, USER_PINYIN_INDEX, NULL);
 
     context->m_pinyin_table->store(tmpfilename);
+
+    g_free(tmpfilename);
+
+    /* save user phrase table */
+    tmpfilename = g_build_filename
+        (context->m_user_dir, USER_PHRASE_INDEX ".tmp", NULL);
+    unlink(tmpfilename);
+
+    context->m_phrase_table->store(tmpfilename);
+
+    g_free(tmpfilename);
+
+    /* save user bi-gram */
+    tmpfilename = g_build_filename
+        (context->m_user_dir, USER_BIGRAM ".tmp", NULL);
+    unlink(tmpfilename);
+    context->m_user_bigram->save_db(tmpfilename);
+
+    g_free(tmpfilename);
+
+    return true;
+}
+
+static bool _rename_files(pinyin_context_t * context){
+    const pinyin_table_info_t * phrase_files =
+        context->m_system_table_info.get_default_tables();
+
+    /* skip the reserved zero phrase library. */
+    for (size_t i = 1; i < PHRASE_INDEX_LIBRARY_COUNT; ++i) {
+        PhraseIndexRange range;
+        int retval = context->m_phrase_index->get_range(i, range);
+
+        if (ERROR_NO_SUB_PHRASE_INDEX == retval)
+            continue;
+
+        const pinyin_table_info_t * table_info = phrase_files + i;
+
+        if (NOT_USED == table_info->m_file_type)
+            continue;
+
+        const char * userfilename = table_info->m_user_filename;
+
+        if (NULL == userfilename)
+            continue;
+
+        if (SYSTEM_FILE == table_info->m_file_type ||
+            DICTIONARY == table_info->m_file_type) {
+            const char * userfilename = table_info->m_user_filename;
+            gchar * tmpfilename = g_strdup_printf("%s.tmp", userfilename);
+
+            gchar * tmppathname = g_build_filename(context->m_user_dir,
+                                                   tmpfilename, NULL);
+            g_free(tmpfilename);
+
+            gchar * chunkpathname = g_build_filename(context->m_user_dir,
+                                                     userfilename, NULL);
+
+            int result = rename(tmppathname, chunkpathname);
+            if (0 != result)
+                fprintf(stderr, "rename %s to %s failed.\n",
+                        tmppathname, chunkpathname);
+
+            g_free(chunkpathname);
+            g_free(tmppathname);
+        }
+
+        if (USER_FILE == table_info->m_file_type) {
+            const char * userfilename = table_info->m_user_filename;
+            gchar * tmpfilename = g_strdup_printf("%s.tmp", userfilename);
+            gchar * tmppathname = g_build_filename(context->m_user_dir,
+                                                   tmpfilename, NULL);
+            g_free(tmpfilename);
+
+            gchar * chunkpathname = g_build_filename(context->m_user_dir,
+                                                     userfilename, NULL);
+
+            int result = rename(tmppathname, chunkpathname);
+            if (0 != result)
+                fprintf(stderr, "rename %s to %s failed.\n",
+                        tmppathname, chunkpathname);
+
+            g_free(chunkpathname);
+            g_free(tmppathname);
+        }
+    }
+
+    /* save user pinyin table */
+    gchar * tmpfilename = g_build_filename
+        (context->m_user_dir, USER_PINYIN_INDEX ".tmp", NULL);
+    gchar * filename = g_build_filename
+        (context->m_user_dir, USER_PINYIN_INDEX, NULL);
 
     int result = rename(tmpfilename, filename);
     if (0 != result)
@@ -851,11 +915,8 @@ bool pinyin_save(pinyin_context_t * context){
     /* save user phrase table */
     tmpfilename = g_build_filename
         (context->m_user_dir, USER_PHRASE_INDEX ".tmp", NULL);
-    unlink(tmpfilename);
     filename = g_build_filename
         (context->m_user_dir, USER_PHRASE_INDEX, NULL);
-
-    context->m_phrase_table->store(tmpfilename);
 
     result = rename(tmpfilename, filename);
     if (0 != result)
@@ -868,9 +929,7 @@ bool pinyin_save(pinyin_context_t * context){
     /* save user bi-gram */
     tmpfilename = g_build_filename
         (context->m_user_dir, USER_BIGRAM ".tmp", NULL);
-    unlink(tmpfilename);
     filename = g_build_filename(context->m_user_dir, USER_BIGRAM, NULL);
-    context->m_user_bigram->save_db(tmpfilename);
 
     result = rename(tmpfilename, filename);
     if (0 != result)
@@ -880,10 +939,24 @@ bool pinyin_save(pinyin_context_t * context){
     g_free(tmpfilename);
     g_free(filename);
 
+    return true;
+}
+
+bool pinyin_save(pinyin_context_t * context){
+    if (!context->m_user_dir)
+        return false;
+
+    if (!context->m_modified)
+        return false;
+
+    context->m_phrase_index->compact();
+
+    bool retval = _write_files(context) && _rename_files(context);
+
     mark_version(context);
 
     context->m_modified = false;
-    return true;
+    return retval;
 }
 
 bool pinyin_set_full_pinyin_scheme(pinyin_context_t * context,
