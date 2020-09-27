@@ -255,13 +255,12 @@ int main(int argc, char * argv[]){
 
     SystemTableInfo2 system_table_info;
 
-    gchar * filename = g_build_filename(table_dir, SYSTEM_TABLE_INFO, NULL);
+    const gchar * filename = SYSTEM_TABLE_INFO;
     bool retval = system_table_info.load(filename);
     if (!retval) {
         fprintf(stderr, "load table.conf failed.\n");
         exit(ENOENT);
     }
-    g_free(filename);
 
     PhraseLargeTable3 phrase_table;
 
