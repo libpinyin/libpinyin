@@ -112,6 +112,9 @@ fi
 
 AM_CONDITIONAL([KYOTOCABINET], [test x"$DBM" = x"KyotoCabinet"])
 
+DATABASE_FORMAT="$DBM"
+AC_SUBST(DATABASE_FORMAT)
+
 # --enable-libzhuyin
 AC_ARG_ENABLE(libzhuyin,
     AC_HELP_STRING([--enable-libzhuyin],
@@ -128,6 +131,7 @@ AC_CONFIG_FILES([libpinyin.pc
                  Makefile
                  doc/Makefile
                  data/Makefile
+                 data/table.conf
                  src/Makefile
                  src/include/Makefile
                  src/storage/Makefile
