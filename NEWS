@@ -1,3 +1,7 @@
+version 2.4.92
+* update pinyin data
+* bug fixes
+
 version 2.4.91
 * improve full pinyin auto correction
 * bug fixes
