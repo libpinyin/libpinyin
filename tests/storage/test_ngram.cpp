@@ -75,8 +75,8 @@ int main(int argc, char * argv[]){
 	printf("item:%d\n", *token);
     }
 
-    assert(bigram.load_db("/tmp/test.db"));
-    assert(bigram.save_db("/tmp/test.db"));
+    assert(bigram.save_db("/tmp/snapshot.db"));
+    assert(bigram.load_db("/tmp/snapshot.db"));
 
     g_array_free(items, TRUE);
 
