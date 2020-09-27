@@ -32,6 +32,12 @@ typedef enum {
 } TABLE_PHONETIC_TYPE;
 
 typedef enum {
+    UNKNOWN_FORMAT,
+    BERKELEY_DB_FORMAT,
+    KYOTO_CABINET_FORMAT,
+} TABLE_DATABASE_FORMAT_TYPE;
+
+typedef enum {
     DEFAULT_TABLE,
     ADDON_TABLE,
 } TABLE_TARGET;
@@ -62,6 +68,7 @@ private:
     gfloat m_lambda;
 
     TABLE_PHONETIC_TYPE m_table_phonetic_type;
+    TABLE_DATABASE_FORMAT_TYPE m_table_database_format_type;
 
     pinyin_table_info_t m_default_tables[PHRASE_INDEX_LIBRARY_COUNT];
 
@@ -90,6 +97,7 @@ class UserTableInfo{
 private:
     int m_binary_format_version;
     int m_model_data_version;
+    TABLE_DATABASE_FORMAT_TYPE m_table_database_format_type;
 
 private:
     void reset();

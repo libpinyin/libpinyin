@@ -116,6 +116,16 @@ static TABLE_PHONETIC_TYPE to_table_phonetic_type(const char * str) {
     assert(FALSE);
 }
 
+static TABLE_DATABASE_FORMAT_TYPE to_table_database_format_type(const char * str) {
+    if (0 == strcmp("BerkeleyDB", str))
+        return BERKELEY_DB_FORMAT;
+
+    if (0 == strcmp("KyotoCabinet", str))
+        return KYOTO_CABINET_FORMAT;
+
+    assert(FALSE);
+}
+
 static TABLE_TARGET to_table_target(const char * str) {
     if (0 == strcmp("default", str))
         return DEFAULT_TABLE;
@@ -161,6 +171,16 @@ static PHRASE_FILE_TYPE to_file_type(const char * str) {
 
 #undef HANDLE
 
+static const char * from_table_database_format_type(const TABLE_DATABASE_FORMAT_TYPE format) {
+    if (format == BERKELEY_DB_FORMAT)
+        return "BerkeleyDB";
+
+    if (format == KYOTO_CABINET_FORMAT)
+        return "KyotoCabinet";
+
+    assert(FALSE);
+}
+
 
 bool SystemTableInfo2::load(const char * filename) {
     reset();
@@ -196,8 +216,12 @@ bool SystemTableInfo2::load(const char * filename) {
 
     TABLE_PHONETIC_TYPE type = PINYIN_TABLE;
     char str[256];
-    num = fscanf(input, "source table format:%255s", str);
+    num = fscanf(input, "source table format:%255s\n", str);
     type = to_table_phonetic_type(str);
+
+    TABLE_DATABASE_FORMAT_TYPE format = UNKNOWN_FORMAT;
+    num = fscanf(input, "database format:%255s\n", str);
+    format = to_table_database_format_type (str);
 
 #if 0
     printf("binver:%d modelver:%d lambda:%f\n", binver, modelver, lambda);
@@ -211,6 +235,8 @@ bool SystemTableInfo2::load(const char * filename) {
     /* Note: support pinyin and zhuyin table now. */
     assert(PINYIN_TABLE == type || ZHUYIN_TABLE == type);
     m_table_phonetic_type = type;
+    assert(BERKELEY_DB_FORMAT == format || KYOTO_CABINET_FORMAT == format);
+    m_table_database_format_type = format;
 
     int index = 0;
     char tableinfo[256], dictstr[256];
@@ -309,12 +335,19 @@ bool UserTableInfo::load(const char * filename) {
         return false;
     }
 
+    TABLE_DATABASE_FORMAT_TYPE format = UNKNOWN_FORMAT;
+    char str[256];
+    num = fscanf(input, "database format:%255s\n", str);
+    if (EOF != num)
+        format = to_table_database_format_type (str);
+
 #if 0
     printf("binver:%d modelver:%d\n", binver, modelver);
 #endif
 
     m_binary_format_version = binver;
     m_model_data_version = modelver;
+    m_table_database_format_type = format;
 
     fclose(input);
 
@@ -334,6 +367,8 @@ bool UserTableInfo::save(const char * filename) {
 
     fprintf(output, "binary format version:%d\n", m_binary_format_version);
     fprintf(output, "model data version:%d\n", m_model_data_version);
+    fprintf(output, "database format:%s\n",
+            from_table_database_format_type (m_table_database_format_type));
 
     fclose(output);
 
@@ -349,11 +384,15 @@ bool UserTableInfo::is_conform(const SystemTableInfo2 * sysinfo) {
     if (sysinfo->m_model_data_version != m_model_data_version)
         return false;
 
+    if (sysinfo->m_table_database_format_type != m_table_database_format_type)
+        return false;
+
     return true;
 }
 
 bool UserTableInfo::make_conform(const SystemTableInfo2 * sysinfo) {
     m_binary_format_version = sysinfo->m_binary_format_version;
     m_model_data_version = sysinfo->m_model_data_version;
+    m_table_database_format_type = sysinfo->m_table_database_format_type;
     return true;
 }
