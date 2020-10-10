@@ -59,6 +59,10 @@ inline bool copy_bdb(DB * srcdb, DB * destdb) {
     while ((ret = cursorp->c_get(cursorp, &key, &data, DB_NEXT)) == 0) {
         ret = destdb->put(destdb, NULL, &key, &data, 0);
         assert(0 == ret);
+
+        /* Initialize our DBTs. */
+        memset(&key, 0, sizeof(DBT));
+        memset(&data, 0, sizeof(DBT));
     }
     assert(DB_NOTFOUND == ret);
 
