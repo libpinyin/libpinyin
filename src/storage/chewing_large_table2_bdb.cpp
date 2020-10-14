@@ -448,6 +448,9 @@ bool ChewingLargeTable2::mask_out(phrase_token_t mask,
 
 #undef CASE
 
+        /* Initialize our DBTs. */
+        memset(&db_key, 0, sizeof(DBT));
+        memset(&db_data, 0, sizeof(DBT));
     }
     assert(ret == DB_NOTFOUND);
 

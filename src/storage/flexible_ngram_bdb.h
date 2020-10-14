@@ -270,6 +270,10 @@ public:
             }
             phrase_token_t * token = (phrase_token_t *) key.data;
             g_array_append_val(items, *token);
+
+            /* Initialize our DBTs. */
+            memset(&key, 0, sizeof(DBT));
+            memset(&data, 0, sizeof(DBT));
         }
 
         if ( ret != DB_NOTFOUND ){
