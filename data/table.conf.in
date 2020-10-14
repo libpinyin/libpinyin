@@ -1,0 +1,29 @@
+binary format version:6
+model data version:14
+lambda parameter:0.312699
+
+source table format:pinyin
+database format:@DATABASE_FORMAT@
+
+default RESERVED NULL NULL NULL NOT_USED
+default GB_DICTIONARY gb_char.table gb_char.bin gb_char.dbin SYSTEM_FILE
+default GBK_DICTIONARY gbk_char.table gbk_char.bin gbk_char.dbin SYSTEM_FILE
+default OPENGRAM_DICTIONARY opengram.table opengram.bin opengram.dbin SYSTEM_FILE
+default MERGED_DICTIONARY merged.table merged.bin merged.dbin SYSTEM_FILE
+default ADDON_DICTIONARY NULL NULL addon.bin USER_FILE
+default NETWORK_DICTIONARY NULL NULL network.bin USER_FILE
+default USER_DICTIONARY NULL NULL user.bin USER_FILE
+
+addon 4 art.table art.bin NULL DICTIONARY
+addon 5 culture.table culture.bin NULL DICTIONARY
+addon 6 economy.table economy.bin NULL DICTIONARY
+addon 7 geology.table geology.bin NULL DICTIONARY
+addon 8 history.table history.bin NULL DICTIONARY
+
+addon 9 life.table life.bin NULL DICTIONARY
+addon 10 nature.table nature.bin NULL DICTIONARY
+addon 11 people.table people.bin NULL DICTIONARY
+addon 12 science.table science.bin NULL DICTIONARY
+addon 13 society.table society.bin NULL DICTIONARY
+addon 14 sport.table sport.bin NULL DICTIONARY
+addon 15 technology.table technology.bin NULL DICTIONARY
