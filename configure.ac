@@ -92,7 +92,7 @@ AC_ARG_WITH(dbm,
 
 if test x"$DBM" = x"BerkeleyDB"; then
    # Check Berkeley DB
-   AC_CHECK_HEADER([db.h], [], AC_MSG_ERROR([Cannot find Berkeley DB library version 4]))
+   AC_CHECK_HEADER([db.h], [], AC_MSG_ERROR([Cannot find Berkeley DB library version 5]))
 
    AC_SEARCH_LIBS([db_create], [db], [], AC_MSG_ERROR([Cannot find Berkeley DB library version 5]))
 
