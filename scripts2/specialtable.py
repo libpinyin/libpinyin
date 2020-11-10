@@ -170,7 +170,7 @@ def gen_resplit_table():
 
 #init code
 load_phrase("pinyins.txt")
-#load_phrase("specials.txt")
+load_phrase("specials.txt")
 divided_list = filter_divided()
 resplit_list = filter_resplit()
 sort_all()
