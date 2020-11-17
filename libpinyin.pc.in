@@ -3,6 +3,7 @@ exec_prefix=@exec_prefix@
 libdir=@libdir@
 includedir=@includedir@
 pkgdatadir=@libdir@/libpinyin
+database_format=@DATABASE_FORMAT@
 
 libpinyinincludedir=${includedir}/libpinyin-@VERSION@
 libpinyin_binary_version=@LIBPINYIN_BINARY_VERSION@

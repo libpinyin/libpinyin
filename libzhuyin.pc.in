@@ -2,6 +2,7 @@ prefix=@prefix@
 exec_prefix=@exec_prefix@
 libdir=@libdir@
 includedir=@includedir@
+database_format=@DATABASE_FORMAT@
 
 libzhuyinincludedir=${includedir}/libpinyin-@VERSION@
 libzhuyin_binary_version=@LIBPINYIN_BINARY_VERSION@
