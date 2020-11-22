@@ -115,8 +115,13 @@ bool ChewingLargeTable2::load_text(FILE * infile, TABLE_PHONETIC_TYPE type) {
     size_t freq;
 
     while (!feof(infile)) {
+#ifdef __APPLE__
+        int num = fscanf(infile, "%255s %255[^ \t] %u %ld",
+                         pinyin, phrase, &token, &freq);
+#else
         int num = fscanf(infile, "%255s %255s %u %ld",
                          pinyin, phrase, &token, &freq);
+#endif
 
         if (4 != num)
             continue;
