@@ -49,6 +49,14 @@ AC_GNU_SOURCE
 
 AX_CXX_COMPILE_STDCXX([11])
 
+# Detect whether clang is being used
+#   clang has a gcc alias, so we can no tell from $CXX
+using_clang=no
+if `$CXX --version 2>&1 | grep 'clang' >/dev/null 2>&1` ; then
+  using_clang=yes
+fi
+AM_CONDITIONAL([CLANG], [test "$using_clang" = "yes"])
+
 # Init libtool
 AC_PROG_LIBTOOL
 AC_SUBST(LIBTOOL_DEPS)
