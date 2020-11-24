@@ -103,3 +103,9 @@ set_directory_properties(
         ADDITIONAL_MAKE_CLEAN_FILES
             ${BINARY_MODEL_DATA_FILES}
 )
+
+configure_file(
+  table.conf.in
+  table.conf
+  @ONLY
+)
