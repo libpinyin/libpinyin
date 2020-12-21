@@ -81,10 +81,10 @@ libpinyin_la_SOURCES = $(pinyin_SOURCES) pinyin.cpp
 
 libpinyin_la_LIBADD	= @GLIB2_LIBS@
 
-if CLANG
+if LLVMLD
 ## LLVM linker does not support --version-script,
 ##   use -exported_symbols_list instead
-libpinyin_la_LDFLAGS = -Wl -exported_symbols_list $(srcdir)/libpinyin.exp \
+libpinyin_la_LDFLAGS = -Wl,-exported_symbols_list,$(srcdir)/libpinyin.exp \
               -version-info @LT_VERSION_INFO@
 else
 libpinyin_la_LDFLAGS = -Wl,--version-script=$(srcdir)/libpinyin.ver \
@@ -98,10 +98,10 @@ libzhuyin_la_SOURCES = $(pinyin_SOURCES) zhuyin.cpp
 
 libzhuyin_la_LIBADD	= @GLIB2_LIBS@
 
-if CLANG
+if LLVMLD
 ## LLVM linker does not support --version-script,
 ##   use -exported_symbols_list instead
-libzhuyin_la_LDFLAGS = -Wl -exported_symbols_list $(srcdir)/libzhuyin.exp \
+libzhuyin_la_LDFLAGS = -Wl,-exported_symbols_list=$(srcdir)/libzhuyin.exp \
               -version-info @LT_VERSION_INFO@
 else
 libzhuyin_la_LDFLAGS = -Wl,--version-script=$(srcdir)/libzhuyin.ver \
