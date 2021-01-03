@@ -65,6 +65,11 @@ check_type_size(size_t SIZE_OF_SIZE_T)
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 find_package(GLIB2 REQUIRED)
 
+# Options
+
+# For cross-building enable installation of data dirs and set the DATA_UTILS_PATH variable
+option(INSTALL_DATA_UTILS "Install data utilities" OFF)
+
 # DBM: BerkeleyDB
 find_package(BerkeleyDB)
 if (DB_FOUND)
@@ -106,6 +111,13 @@ set (DIR_INCLUDE ${DIR_PREFIX}/include)
 set (DIR_SHARE ${DIR_PREFIX}/share)
 set (DIR_BIN ${DIR_PREFIX}/bin)
 set (DIR_ETC ${DIR_PREFIX}/etc)
+if (NOT DEFINED DATA_UTILS_PATH)
+    set(DATA_UTILS_STORAGE_PATH ${CMAKE_BINARY_DIR}/utils/storage)
+    set(DATA_UTILS_TRAINING_PATH ${CMAKE_BINARY_DIR}/utils/training)
+else()
+    set(DATA_UTILS_STORAGE_PATH ${DATA_UTILS_PATH})
+    set(DATA_UTILS_TRAINING_PATH ${DATA_UTILS_PATH})
+endif()
 
 if (DEFINED CMAKE_INSTALL_LIBDIR)
     set (DIR_LIBRARY ${CMAKE_INSTALL_LIBDIR})

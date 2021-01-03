@@ -20,17 +20,17 @@ set(
 
 set(
     gen_binary_files_BIN
-    ${CMAKE_BINARY_DIR}/utils/storage/gen_binary_files
+    ${DATA_UTILS_STORAGE_PATH}/gen_binary_files
 )
 
 set(
     import_interpolation_BIN
-    ${CMAKE_BINARY_DIR}/utils/storage/import_interpolation
+    ${DATA_UTILS_STORAGE_PATH}/import_interpolation
 )
 
 set(
     gen_unigram_BIN
-    ${CMAKE_BINARY_DIR}/utils/training/gen_unigram
+    ${DATA_UTILS_TRAINING_PATH}/gen_unigram
 )
 
 add_custom_target(
