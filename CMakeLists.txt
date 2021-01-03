@@ -69,6 +69,7 @@ find_package(GLIB2 REQUIRED)
 
 # For cross-building enable installation of data dirs and set the DATA_UTILS_PATH variable
 option(INSTALL_DATA_UTILS "Install data utilities" OFF)
+option(DOWNLOAD_MODEL_DATA_ARCHIVE "Update the model data archive while building" ON)
 
 # DBM: BerkeleyDB
 find_package(BerkeleyDB)

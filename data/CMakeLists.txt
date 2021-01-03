@@ -40,19 +40,35 @@ add_custom_target(
         ${BINARY_MODEL_DATA}
 )
 
-add_custom_command(
-    OUTPUT
-        ${CMAKE_SOURCE_DIR}/data/gb_char.table
-        ${CMAKE_SOURCE_DIR}/data/gbk_char.table
-        ${CMAKE_SOURCE_DIR}/data/interpolation2.text
-        ${CMAKE_SOURCE_DIR}/data/table.conf
-    COMMENT
-        "Downloading textual model data..."
-    COMMAND
-       wget http://downloads.sourceforge.net/libpinyin/models/model19.text.tar.gz
-    COMMAND
-       tar xvf model19.text.tar.gz -C ${CMAKE_SOURCE_DIR}/data
-)
+if(DOWNLOAD_MODEL_DATA_ARCHIVE)
+    add_custom_command(
+        OUTPUT
+            ${CMAKE_SOURCE_DIR}/data/gb_char.table
+            ${CMAKE_SOURCE_DIR}/data/gbk_char.table
+            ${CMAKE_SOURCE_DIR}/data/interpolation2.text
+            ${CMAKE_SOURCE_DIR}/data/table.conf
+        COMMENT
+            "Downloading textual model data..."
+        COMMAND
+        wget -P ${CMAKE_SOURCE_DIR} http://downloads.sourceforge.net/libpinyin/models/model19.text.tar.gz
+        COMMAND
+        tar xvf ${CMAKE_SOURCE_DIR}/model19.text.tar.gz -C ${CMAKE_SOURCE_DIR}/data
+    )
+else()
+    add_custom_command(
+        OUTPUT
+            ${CMAKE_SOURCE_DIR}/data/gb_char.table
+            ${CMAKE_SOURCE_DIR}/data/gbk_char.table
+            ${CMAKE_SOURCE_DIR}/data/interpolation2.text
+            ${CMAKE_SOURCE_DIR}/data/table.conf
+        COMMENT
+            "Checking if model data is provided in ${CMAKE_SOURCE_DIR}/model19.text.tar.gz"
+        COMMAND
+        test -f ${CMAKE_SOURCE_DIR}/model19.text.tar.gz
+        COMMAND
+        tar xvf ${CMAKE_SOURCE_DIR}/model19.text.tar.gz -C ${CMAKE_SOURCE_DIR}/data
+    )
+endif()
 
 add_custom_command(
     OUTPUT
