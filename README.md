@@ -16,7 +16,7 @@ The libpinyin project aims to provide the algorithms core for intelligent senten
 $ sudo apt install gnome-common build-essential autogen
 $ sudo apt install libibus-1.0-dev libsqlite3-dev sqlite3 libdb-dev libpinyin13-dev
 
-$ git clone -depth=1 https://github.com/libpinyin/libpinyin.git
+$ git clone --depth=1 https://github.com/libpinyin/libpinyin.git
 $ cd ./libpinyin
 $ export LDFLAGS=`pkg-config glib-2.0 --libs`
 $ ./autogen.sh --prefix=/usr
