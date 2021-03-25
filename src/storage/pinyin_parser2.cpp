@@ -309,7 +309,7 @@ int FullPinyinParser2::parse (pinyin_option_t options, ChewingKeyVector & keys,
                     value.m_distance < nextstep->m_distance)
                     *nextstep = value;
 
-#if 1
+#if 0
                 /* prefer the 'a' at the end of clause,
                  * ex: "zheyanga$" -> "zhe'yang'a$".
                  */
