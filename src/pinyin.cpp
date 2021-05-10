@@ -2001,6 +2001,9 @@ bool pinyin_guess_predicted_candidates(pinyin_instance_t * instance,
         context->m_user_bigram->load(prev_token, user_gram);
         merge_single_gram(&merged_gram, NULL, user_gram);
 
+        if (user_gram)
+            delete user_gram;
+
         if (merged_gram.get_length())
             break;
     }
@@ -2054,9 +2057,6 @@ bool pinyin_guess_predicted_candidates(pinyin_instance_t * instance,
     _compute_phrase_strings_of_items(instance, instance->m_candidates);
 
     _remove_duplicated_items_by_phrase_string(instance, instance->m_candidates);
-
-    if (user_gram)
-        delete user_gram;
 
     return true;
 }
