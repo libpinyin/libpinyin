@@ -3122,8 +3122,10 @@ static bool _remember_phrase_recur(pinyin_instance_t * instance,
             return false;
 
         /* as cached_keys and phrase has the same length. */
-        assert(cached_keys->len > 0);
-        assert(cached_keys->len <= MAX_PHRASE_LENGTH);
+        if (cached_keys->len <= 0)
+            return false;
+        if (cached_keys->len > MAX_PHRASE_LENGTH)
+            return false;
 
         return _add_phrase(context, index, cached_keys,
                            phrase, phrase_length, count);
@@ -3131,7 +3133,8 @@ static bool _remember_phrase_recur(pinyin_instance_t * instance,
 
     const size_t size = matrix.get_column_size(start);
     /* assume pinyin parsers will filter invalid keys. */
-    assert(size > 0);
+    if (size <= 0)
+        return false;
 
     bool result = false;
 
@@ -3145,7 +3148,9 @@ static bool _remember_phrase_recur(pinyin_instance_t * instance,
         const ChewingKey zero_key;
         if (zero_key == key) {
             /* assume only one key here for "'" or the last key. */
-            assert(1 == size);
+            if (1 != size)
+                return false;
+
             return _remember_phrase_recur
                 (instance, cached_keys, cached_tokens,
                  newstart, phrase, count);
@@ -3212,7 +3217,8 @@ bool pinyin_remember_user_input(pinyin_instance_t * instance,
         return false;
     }
 
-    assert(cached_tokens->len == phrase_length);
+    if (cached_tokens->len != phrase_length)
+        return false;
 
     ChewingKeyVector cached_keys = g_array_new(TRUE, TRUE, sizeof(ChewingKey));
 
