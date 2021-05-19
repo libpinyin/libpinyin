@@ -3156,12 +3156,14 @@ static bool _remember_phrase_recur(pinyin_instance_t * instance,
                  newstart, phrase, count);
         }
 
+#if 0
         /* meet in-complete pinyin */
         if (CHEWING_ZERO_MIDDLE == key.m_middle &&
             CHEWING_ZERO_FINAL == key.m_final) {
             assert(CHEWING_ZERO_TONE == key.m_tone);
             return false;
         }
+#endif
 
         /* check pronunciation */
         if (cached_keys->len >= phrase_length)
