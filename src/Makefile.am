@@ -101,7 +101,7 @@ libzhuyin_la_LIBADD	= @GLIB2_LIBS@
 if LLVMLD
 ## LLVM linker does not support --version-script,
 ##   use -exported_symbols_list instead
-libzhuyin_la_LDFLAGS = -Wl,-exported_symbols_list=$(srcdir)/libzhuyin.exp \
+libzhuyin_la_LDFLAGS = -Wl,-exported_symbols_list,$(srcdir)/libzhuyin.exp \
               -version-info @LT_VERSION_INFO@
 else
 libzhuyin_la_LDFLAGS = -Wl,--version-script=$(srcdir)/libzhuyin.ver \
