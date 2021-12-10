@@ -40,20 +40,20 @@ noinst_PROGRAMS         = test_pinyin \
 
 test_pinyin_SOURCES	= test_pinyin.cpp
 
-test_pinyin_LDADD   = ../src/libpinyin.la
+test_pinyin_LDADD   = ../src/libpinyin.la @GLIB2_LIBS@
 
 test_phrase_SOURCES	= test_phrase.cpp
 
-test_phrase_LDADD   = ../src/libpinyin.la
+test_phrase_LDADD   = ../src/libpinyin.la @GLIB2_LIBS@
 
 test_chewing_SOURCES	= test_chewing.cpp
 
-test_chewing_LDADD      = ../src/libpinyin.la
+test_chewing_LDADD      = ../src/libpinyin.la @GLIB2_LIBS@
 
 if ENABLE_LIBZHUYIN
 noinst_PROGRAMS         += test_zhuyin
 
 test_zhuyin_SOURCES = test_zhuyin.cpp
 
-test_zhuyin_LDADD   = ../src/libzhuyin.la
+test_zhuyin_LDADD   = ../src/libzhuyin.la @GLIB2_LIBS@
 endif
