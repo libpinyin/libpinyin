@@ -28,6 +28,7 @@
  * struct MagicHeader, ArrayHeader, ArrayItem.
  */
 
+#include "pinyin_utils.h"
 #include "flexible_single_gram.h"
 
 #ifdef HAVE_BERKELEY_DB

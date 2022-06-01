@@ -22,6 +22,7 @@
 #include "facade_chewing_table2.h"
 #include "pinyin_lookup2.h"
 #include "stl_lite.h"
+#include "pinyin_utils.h"
 
 using namespace pinyin;
 
@@ -602,12 +603,12 @@ bool PinyinLookup2::train_result2(PhoneticKeyMatrix * matrix,
                 if (!user) {
                     user = new SingleGram;
                 }
-                assert(user->get_total_freq(total_freq));
+                check_result(user->get_total_freq(total_freq));
 
                 guint32 freq = 0;
                 /* compute train factor */
                 if (!user->get_freq(token, freq)) {
-                    assert(user->insert_freq(token, 0));
+                    check_result(user->insert_freq(token, 0));
                     seed = initial_seed;
                 } else {
                     seed = std_lite::max(freq, initial_seed);
@@ -619,10 +620,10 @@ bool PinyinLookup2::train_result2(PhoneticKeyMatrix * matrix,
                 if (seed > 0 && total_freq > total_freq + seed)
                     goto next;
 
-                assert(user->set_total_freq(total_freq + seed));
+                check_result(user->set_total_freq(total_freq + seed));
                 /* if total_freq is not overflow, then freq won't overflow. */
-                assert(user->set_freq(token, freq + seed));
-                assert(m_user_bigram->store(last_token, user));
+                check_result(user->set_freq(token, freq + seed));
+                check_result(m_user_bigram->store(last_token, user));
             next:
                 assert(NULL != user);
                 if (user)

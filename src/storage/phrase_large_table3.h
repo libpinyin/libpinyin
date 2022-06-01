@@ -24,6 +24,7 @@
 #include <stdio.h>
 #include "novel_types.h"
 #include "memory_chunk.h"
+#include "pinyin_utils.h"
 
 #ifdef HAVE_BERKELEY_DB
 #include "phrase_large_table3_bdb.h"

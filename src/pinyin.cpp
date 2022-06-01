@@ -671,7 +671,7 @@ bool pinyin_iterator_get_next_phrase(export_iterator_t * iter,
     /* fill phrase and pronunciation pair. */
     ucs4_t phrase_ucs4[MAX_PHRASE_LENGTH];
     guint8 len = item.get_phrase_length();
-    assert(item.get_phrase_string(phrase_ucs4));
+    check_result(item.get_phrase_string(phrase_ucs4));
     gchar * phrase_utf8 = g_ucs4_to_utf8
         (phrase_ucs4, len, NULL, NULL, NULL);
 
@@ -681,7 +681,7 @@ bool pinyin_iterator_get_next_phrase(export_iterator_t * iter,
     assert(nth_pronun < n_pronuns);
     ChewingKey keys[MAX_PHRASE_LENGTH];
     guint32 freq = 0;
-    assert(item.get_nth_pronunciation(nth_pronun, keys, freq));
+    check_result(item.get_nth_pronunciation(nth_pronun, keys, freq));
 
     GPtrArray * array = g_ptr_array_new();
     for(size_t i = 0; i < len; ++i) {
@@ -1266,7 +1266,7 @@ bool pinyin_get_sentence(pinyin_instance_t * instance,
 
     MatchResult result = NULL;
     assert(index < results.size());
-    assert(results.get_result(index, result));
+    check_result(results.get_result(index, result));
 
     bool retval = pinyin::convert_to_utf8
         (context->m_phrase_index, result,
@@ -1528,7 +1528,7 @@ static phrase_token_t _get_previous_token(pinyin_instance_t * instance,
 
         /* use the first candidate. */
         MatchResult result = NULL;
-        assert(results.get_result(0, result));
+        check_result(results.get_result(0, result));
 
         phrase_token_t cur_token = g_array_index
             (result, phrase_token_t, offset);
@@ -2073,8 +2073,8 @@ int pinyin_choose_candidate(pinyin_instance_t * instance,
 
     if (NBEST_MATCH_CANDIDATE == candidate->m_candidate_type) {
         MatchResult best = NULL, other = NULL;
-        assert(results.get_result(0, best));
-        assert(results.get_result(candidate->m_nbest_index, other));
+        check_result(results.get_result(0, best));
+        check_result(results.get_result(candidate->m_nbest_index, other));
         constraints->diff_result(best, other);
         return matrix.size() - 1;
     }
@@ -2152,14 +2152,14 @@ bool pinyin_choose_predicted_candidate(pinyin_instance_t * instance,
 
     /* train bi-gram */
     guint32 total_freq = 0;
-    assert(user_gram->get_total_freq(total_freq));
+    check_result(user_gram->get_total_freq(total_freq));
     guint32 freq = 0;
     if (!user_gram->get_freq(token, freq)) {
-        assert(user_gram->insert_freq(token, initial_seed));
+        check_result(user_gram->insert_freq(token, initial_seed));
     } else {
-        assert(user_gram->set_freq(token, freq + initial_seed));
+        check_result(user_gram->set_freq(token, freq + initial_seed));
     }
-    assert(user_gram->set_total_freq(total_freq + initial_seed));
+    check_result(user_gram->set_total_freq(total_freq + initial_seed));
     context->m_user_bigram->store(prev_token, user_gram);
     delete user_gram;
     return true;
@@ -2207,7 +2207,7 @@ bool pinyin_train(pinyin_instance_t * instance, guint8 index){
 
     MatchResult result = NULL;
     assert(index < results.size());
-    assert(results.get_result(index, result));
+    check_result(results.get_result(index, result));
 
     bool retval = context->m_pinyin_lookup->train_result3
         (&matrix, instance->m_constraints, result);

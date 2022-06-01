@@ -989,7 +989,7 @@ bool zhuyin_get_sentence(zhuyin_instance_t * instance,
         return false;
 
     MatchResult result = NULL;
-    assert(results.get_result(0, result));
+    check_result(results.get_result(0, result));
 
     bool retval = pinyin::convert_to_utf8
         (context->m_phrase_index, result,
@@ -1183,7 +1183,7 @@ static phrase_token_t _get_previous_token(zhuyin_instance_t * instance,
 
         /* use the first candidate. */
         MatchResult result = NULL;
-        assert(results.get_result(0, result));
+        check_result(results.get_result(0, result));
 
         phrase_token_t cur_token = g_array_index
             (result, phrase_token_t, offset);
@@ -1707,7 +1707,7 @@ bool zhuyin_train(zhuyin_instance_t * instance){
     context->m_modified = true;
 
     MatchResult result = NULL;
-    assert(results.get_result(0, result));
+    check_result(results.get_result(0, result));
 
     bool retval = context->m_pinyin_lookup->train_result3
         (&matrix, instance->m_constraints, result);

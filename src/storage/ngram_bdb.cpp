@@ -227,12 +227,12 @@ bool Bigram::mask_out(phrase_token_t mask, phrase_token_t value){
         phrase_token_t index = g_array_index(items, phrase_token_t, i);
 
         if ((index & mask) == value) {
-            assert(remove(index));
+            check_result(remove(index));
             continue;
         }
 
         SingleGram * gram = NULL;
-        assert(load(index, gram));
+        check_result(load(index, gram));
 
         int num = gram->mask_out(mask, value);
         if (0 == num) {
@@ -241,9 +241,9 @@ bool Bigram::mask_out(phrase_token_t mask, phrase_token_t value){
         }
 
         if (0 == gram->get_length()) {
-            assert(remove(index));
+            check_result(remove(index));
         } else {
-            assert(store(index, gram));
+            check_result(store(index, gram));
         }
 
         delete gram;

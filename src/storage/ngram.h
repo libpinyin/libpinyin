@@ -24,6 +24,7 @@
 #include "config.h"
 #include <glib.h>
 #include "novel_types.h"
+#include "pinyin_utils.h"
 
 #ifdef HAVE_BERKELEY_DB
 #include "ngram_bdb.h"

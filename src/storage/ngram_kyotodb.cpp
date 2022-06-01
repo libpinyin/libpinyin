@@ -133,7 +133,7 @@ bool Bigram::load(phrase_token_t index, SingleGram * & single_gram,
 
     m_chunk.set_size(vsiz);
     char * vbuf = (char *) m_chunk.begin();
-    assert (vsiz == m_db->get(kbuf, sizeof(phrase_token_t),
+    check_result (vsiz == m_db->get(kbuf, sizeof(phrase_token_t),
                               vbuf, vsiz));
 
     single_gram = new SingleGram(m_chunk.begin(), vsiz, copy);
@@ -206,12 +206,12 @@ bool Bigram::mask_out(phrase_token_t mask, phrase_token_t value){
         phrase_token_t index = g_array_index(items, phrase_token_t, i);
 
         if ((index & mask) == value) {
-            assert(remove(index));
+            check_result(remove(index));
             continue;
         }
 
         SingleGram * gram = NULL;
-        assert(load(index, gram));
+        check_result(load(index, gram));
 
         int num = gram->mask_out(mask, value);
         if (0 == num) {
@@ -220,9 +220,9 @@ bool Bigram::mask_out(phrase_token_t mask, phrase_token_t value){
         }
 
         if (0 == gram->get_length()) {
-            assert(remove(index));
+            check_result(remove(index));
         } else {
-            assert(store(index, gram));
+            check_result(store(index, gram));
         }
 
         delete gram;

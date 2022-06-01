@@ -22,9 +22,10 @@
 #define PHONETIC_LOOKUP_H
 
 
-#include "novel_types.h"
 #include <limits.h>
 #include <math.h>
+#include "novel_types.h"
+#include "pinyin_utils.h"
 #include "phonetic_key_matrix.h"
 #include "ngram.h"
 #include "lookup.h"
@@ -250,7 +251,7 @@ public:
             initial_value.m_handles[1] = token;
 
             trellis_node<nstore> initial_node;
-            assert(initial_node.eval_item(&initial_value));
+            check_result(initial_node.eval_item(&initial_value));
 
             LookupStepContent initial_step_content = (LookupStepContent)
                 g_ptr_array_index(m_steps_content, 0);
@@ -308,7 +309,7 @@ public:
 
         if (!lookup_result) {
             trellis_node<nstore> node;
-            assert(node.eval_item(candidate));
+            check_result(node.eval_item(candidate));
 
             g_array_append_val(step_content, node);
             g_hash_table_insert(step_index, GUINT_TO_POINTER(token), GUINT_TO_POINTER(step_content->len - 1));
@@ -388,7 +389,7 @@ bool extract_result(const ForwardPhoneticTrellis<nstore, nbest> * trellis,
 
         phrase_token_t last_token = tail->m_handles[0];
         int sub_index = tail->m_sub_index;
-        assert(trellis->get_candidate(index, last_token, sub_index, tail));
+        check_result(trellis->get_candidate(index, last_token, sub_index, tail));
     }
 
     /* no need to reverse the result */
@@ -406,7 +407,7 @@ public:
     /* set tail node */
     bool set_tail(const matrix_step<nstore> * tail);
     /* back trace */
-    /* always assume/assert matrix_step.eval_item(...) return true? */
+    /* always assume/check_result matrix_step.eval_item(...) return true? */
     bool back_trace(const ForwardPhoneticTrellis * trellis);
     /* extract results */
     int extract(/* out */ GPtrArray * arrays);
@@ -546,7 +547,7 @@ protected:
             g_ptr_array_index(topresults, 0);
 
         const trellis_constraint_t * constraint = NULL;
-        assert(m_constraints->get_constraint(start, constraint));
+        check_result(m_constraints->get_constraint(start, constraint));
 
         if (CONSTRAINT_ONESTEP == constraint->m_type) {
             return unigram_gen_next_step(start, constraint->m_constraint_step,
@@ -578,7 +579,7 @@ protected:
                         int start, int end,
                         PhraseIndexRanges ranges) {
         const trellis_constraint_t * constraint = NULL;
-        assert(m_constraints->get_constraint(start, constraint));
+        check_result(m_constraints->get_constraint(start, constraint));
 
         bool found = false;
         BigramPhraseArray bigram_phrase_items = g_array_new
@@ -761,7 +762,7 @@ public:
         /* begin the viterbi beam search. */
         for ( int i = 0; i < nstep - 1; ++i ){
             const trellis_constraint_t * cur_constraint = NULL;
-            assert(m_constraints->get_constraint(i, cur_constraint));
+            check_result(m_constraints->get_constraint(i, cur_constraint));
 
             if (CONSTRAINT_NOSEARCH == cur_constraint->m_type)
                 continue;
@@ -792,7 +793,7 @@ public:
 
             for ( int m = i + 1; m < nstep; ++m ){
                 const trellis_constraint_t * next_constraint = NULL;
-                assert(m_constraints->get_constraint(m, next_constraint));
+                check_result(m_constraints->get_constraint(m, next_constraint));
 
                 if (CONSTRAINT_NOSEARCH == next_constraint->m_type)
                     break;
@@ -830,7 +831,7 @@ public:
             const trellis_value_t * tail = (const trellis_value_t *)
                 g_ptr_array_index(tails, i);
 
-            assert(extract_result<nstore>(&m_trellis, tail, result));
+            check_result(extract_result<nstore>(&m_trellis, tail, result));
             results->add_result(result);
         }
 
@@ -860,7 +861,7 @@ public:
                 continue;
 
             const trellis_constraint_t * constraint = NULL;
-            assert(constraints->get_constraint(i, constraint));
+            check_result(constraints->get_constraint(i, constraint));
 
             if (train_next || CONSTRAINT_ONESTEP == constraint->m_type) {
                 if (CONSTRAINT_ONESTEP == constraint->m_type) {
@@ -880,12 +881,12 @@ public:
                     if (!user) {
                         user = new SingleGram;
                     }
-                    assert(user->get_total_freq(total_freq));
+                    check_result(user->get_total_freq(total_freq));
 
                     guint32 freq = 0;
                     /* compute train factor */
                     if (!user->get_freq(token, freq)) {
-                        assert(user->insert_freq(token, 0));
+                        check_result(user->insert_freq(token, 0));
                         seed = initial_seed;
                     } else {
                         seed = std_lite::max(freq, initial_seed);
@@ -897,10 +898,10 @@ public:
                     if (seed > 0 && total_freq > total_freq + seed)
                         goto next;
 
-                    assert(user->set_total_freq(total_freq + seed));
+                    check_result(user->set_total_freq(total_freq + seed));
                     /* if total_freq is not overflow, then freq won't overflow. */
-                    assert(user->set_freq(token, freq + seed));
-                    assert(m_user_bigram->store(last_token, user));
+                    check_result(user->set_freq(token, freq + seed));
+                    check_result(m_user_bigram->store(last_token, user));
                 next:
                     assert(NULL != user);
                     if (user)

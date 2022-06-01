@@ -200,7 +200,7 @@ bool ForwardPhoneticConstraints::diff_result(MatchResult best,
             }
         }
 
-        assert(add_constraint(pos, next_pos, other_token));
+        check_result(add_constraint(pos, next_pos, other_token));
     }
 
     return changed;

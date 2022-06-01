@@ -27,6 +27,7 @@
 #include "memory_chunk.h"
 #include "pinyin_custom2.h"
 #include "chewing_key.h"
+#include "pinyin_utils.h"
 #include "pinyin_parser2.h"
 #include "zhuyin_parser2.h"
 #include "phonetic_key_matrix.h"

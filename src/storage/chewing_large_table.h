@@ -26,6 +26,7 @@
 #include "novel_types.h"
 #include "memory_chunk.h"
 #include "chewing_key.h"
+#include "pinyin_utils.h"
 #include "table_info.h"
 
 namespace pinyin{

@@ -68,7 +68,7 @@ guint32 SingleGram::get_length(){
     if (0 == length) {
         /* no items here, total freq should be zero. */
         guint32 total_freq = 0;
-        assert(get_total_freq(total_freq));
+        check_result(get_total_freq(total_freq));
         assert(0 == total_freq);
     }
 
@@ -79,7 +79,7 @@ guint32 SingleGram::mask_out(phrase_token_t mask, phrase_token_t value){
     guint32 removed_items = 0;
 
     guint32 total_freq = 0;
-    assert(get_total_freq(total_freq));
+    check_result(get_total_freq(total_freq));
 
     const SingleGramItem * begin = (const SingleGramItem *)
         ((const char *)(m_chunk.begin()) + sizeof(guint32));
@@ -100,7 +100,7 @@ guint32 SingleGram::mask_out(phrase_token_t mask, phrase_token_t value){
         --cur;
     }
 
-    assert(set_total_freq(total_freq));
+    check_result(set_total_freq(total_freq));
     return removed_items;
 }
 
@@ -122,8 +122,8 @@ bool SingleGram::prune(){
 	}
     }
     guint32 total_freq;
-    assert(get_total_freq(total_freq));
-    assert(set_total_freq(total_freq - nitem));
+    check_result(get_total_freq(total_freq));
+    check_result(set_total_freq(total_freq - nitem));
 #endif
 	return true;
 }
@@ -140,7 +140,7 @@ bool SingleGram::retrieve_all(/* out */ BigramPhraseWithCountArray array)
 
     guint32 total_freq;
     BigramPhraseItemWithCount bigram_item_with_count;
-    assert(get_total_freq(total_freq));
+    check_result(get_total_freq(total_freq));
 
     for ( const SingleGramItem * cur_item = begin; cur_item != end; ++cur_item){
         bigram_item_with_count.m_token = cur_item->m_token;
@@ -164,14 +164,14 @@ bool SingleGram::search(/* in */ PhraseIndexRange * range,
 
     guint32 total_freq;
     BigramPhraseItem bigram_item;
-    assert(get_total_freq(total_freq));
+    check_result(get_total_freq(total_freq));
 
     for ( ; cur_item != end; ++cur_item){
-	if ( cur_item->m_token >= range->m_range_end )
-	    break;
-	bigram_item.m_token = cur_item->m_token;
-	bigram_item.m_freq = cur_item->m_freq / (gfloat)total_freq;
-	g_array_append_val(array, bigram_item);
+        if ( cur_item->m_token >= range->m_range_end )
+            break;
+        bigram_item.m_token = cur_item->m_token;
+        bigram_item.m_freq = cur_item->m_freq / (gfloat)total_freq;
+        g_array_append_val(array, bigram_item);
     }
 
     return true;
@@ -302,8 +302,8 @@ bool merge_single_gram(SingleGram * merged, const SingleGram * system,
 
     /* merge the origin info and delta info */
     guint32 system_total, user_total;
-    assert(system->get_total_freq(system_total));
-    assert(user->get_total_freq(user_total));
+    check_result(system->get_total_freq(system_total));
+    check_result(user->get_total_freq(user_total));
     const guint32 merged_total = system_total + user_total;
     merged_chunk.set_content(0, &merged_total, sizeof(guint32));
 

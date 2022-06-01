@@ -30,7 +30,7 @@ namespace pinyin{
 ChewingLargeTable2::ChewingLargeTable2() {
     /* create in-memory db. */
     m_db = new ProtoTreeDB;
-    assert(m_db->open("-", BasicDB::OREADER|BasicDB::OWRITER|BasicDB::OCREATE));
+    check_result(m_db->open("-", BasicDB::OREADER|BasicDB::OWRITER|BasicDB::OCREATE));
 
     m_entries = NULL;
     init_entries();
@@ -144,8 +144,8 @@ int ChewingLargeTable2::search_internal(/* in */ const ChewingKey index[],
     entry->m_chunk.set_size(vsiz);
     /* m_chunk may re-allocate here. */
     char * vbuf = (char *) entry->m_chunk.begin();
-    assert(vsiz == m_db->get(kbuf, phrase_length * sizeof(ChewingKey),
-                             vbuf, vsiz));
+    check_result(vsiz == m_db->get(kbuf, phrase_length * sizeof(ChewingKey),
+                                   vbuf, vsiz));
 
     result = entry->search(keys, ranges) | result;
 
@@ -236,7 +236,7 @@ int ChewingLargeTable2::add_index_internal(/* in */ const ChewingKey index[],
     entry->m_chunk.set_size(vsiz);
     /* m_chunk may re-allocate here. */
     vbuf = (char *) entry->m_chunk.begin();
-    assert(vsiz == m_db->get(kbuf, ksiz, vbuf, vsiz));
+    check_result(vsiz == m_db->get(kbuf, ksiz, vbuf, vsiz));
 
     int result = entry->add_index(keys, token);
 
@@ -305,7 +305,7 @@ int ChewingLargeTable2::remove_index_internal(/* in */ const ChewingKey index[],
     entry->m_chunk.set_size(vsiz);
     /* m_chunk may re-allocate here. */
     vbuf = (char *) entry->m_chunk.begin();
-    assert(vsiz == m_db->get(kbuf, ksiz, vbuf, vsiz));
+    check_result(vsiz == m_db->get(kbuf, ksiz, vbuf, vsiz));
 
     int result = entry->remove_index(keys, token);
     if (ERROR_OK != result)

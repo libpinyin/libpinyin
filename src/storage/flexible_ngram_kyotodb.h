@@ -171,7 +171,7 @@ public:
 
         m_chunk.set_size(vsiz);
         char * vbuf = (char *) m_chunk.begin();
-        assert (vsiz == m_db->get(kbuf, ksiz, vbuf, vsiz));
+        check_result(vsiz == m_db->get(kbuf, ksiz, vbuf, vsiz));
 
         if ( memcmp(vbuf, m_magic_number,
                     sizeof(m_magic_number)) == 0 )
@@ -206,8 +206,8 @@ public:
 
         m_chunk.set_size(vsiz);
         char * vbuf = (char *) m_chunk.begin();
-        assert (vsiz == m_db->get(kbuf, sizeof(phrase_token_t),
-                                  vbuf, vsiz));
+        check_result(vsiz == m_db->get(kbuf, sizeof(phrase_token_t),
+                                       vbuf, vsiz));
 
         single_gram = new FlexibleSingleGram<ArrayHeader, ArrayItem>
             (m_chunk.begin(), vsiz, copy);
@@ -397,7 +397,7 @@ public:
         } else { /* found */
             m_chunk.set_size(vsiz);
             char * vbuf = (char *) m_chunk.begin();
-            assert(vsiz == m_db->get(kbuf, ksiz, vbuf, vsiz));
+            check_result(vsiz == m_db->get(kbuf, ksiz, vbuf, vsiz));
         }
 
         m_chunk.set_content(0, &header, sizeof(ArrayHeader));

@@ -31,7 +31,7 @@ namespace pinyin{
 PhraseLargeTable3::PhraseLargeTable3() {
     /* create in-memory db. */
     m_db = new ProtoTreeDB;
-    assert(m_db->open("-", BasicDB::OREADER|BasicDB::OWRITER|BasicDB::OCREATE));
+    check_result(m_db->open("-", BasicDB::OREADER|BasicDB::OWRITER|BasicDB::OCREATE));
 
     m_entry = new PhraseTableEntry;
 }
@@ -147,8 +147,8 @@ int PhraseLargeTable3::search(int phrase_length,
     m_entry->m_chunk.set_size(vsiz);
     /* m_chunk may re-allocate here. */
     char * vbuf = (char *) m_entry->m_chunk.begin();
-    assert (vsiz == m_db->get(kbuf, phrase_length * sizeof(ucs4_t),
-                              vbuf, vsiz));
+    check_result(vsiz == m_db->get(kbuf, phrase_length * sizeof(ucs4_t),
+                                   vbuf, vsiz));
 
     result = m_entry->search(tokens) | result;
 
@@ -202,7 +202,7 @@ int PhraseLargeTable3::add_index(int phrase_length,
     m_entry->m_chunk.set_size(vsiz);
     /* m_chunk may re-allocate here. */
     vbuf = (char *) m_entry->m_chunk.begin();
-    assert(vsiz == m_db->get(kbuf, ksiz, vbuf, vsiz));
+    check_result(vsiz == m_db->get(kbuf, ksiz, vbuf, vsiz));
 
     int result = m_entry->add_index(token);
 
@@ -233,7 +233,7 @@ int PhraseLargeTable3::remove_index(int phrase_length,
     m_entry->m_chunk.set_size(vsiz);
     /* m_chunk may re-allocate here. */
     vbuf = (char *) m_entry->m_chunk.begin();
-    assert(vsiz == m_db->get(kbuf, ksiz, vbuf, vsiz));
+    check_result(vsiz == m_db->get(kbuf, ksiz, vbuf, vsiz));
 
     int result = m_entry->remove_index(token);
     if (ERROR_OK != result)
