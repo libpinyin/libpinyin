@@ -55,7 +55,7 @@ bool validate_unigram(KMixtureModelBigram * bigram){
     for (size_t i = 0; i < items->len; ++i) {
         phrase_token_t * token = &g_array_index(items, phrase_token_t, i);
         KMixtureModelArrayHeader array_header;
-        assert(bigram->get_array_header(*token, array_header));
+        check_result(bigram->get_array_header(*token, array_header));
         word_count += array_header.m_WC;
         total_freq += array_header.m_freq;
     }
@@ -88,14 +88,14 @@ bool validate_bigram(KMixtureModelBigram * bigram){
     for (size_t i = 0; i < items->len; ++i) {
         phrase_token_t * token = &g_array_index(items, phrase_token_t, i);
         KMixtureModelSingleGram * single_gram = NULL;
-        assert(bigram->load(*token, single_gram));
+        check_result(bigram->load(*token, single_gram));
 
         FlexibleBigramPhraseArray array = g_array_new
             (FALSE, FALSE, sizeof(KMixtureModelArrayItemWithToken));
         single_gram->retrieve_all(array);
 
         KMixtureModelArrayHeader array_header;
-        assert(single_gram->get_array_header(array_header));
+        check_result(single_gram->get_array_header(array_header));
 
         guint32 expected_sum = array_header.m_WC;
         guint32 freq = array_header.m_freq;

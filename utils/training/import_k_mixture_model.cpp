@@ -77,7 +77,7 @@ static ssize_t my_getline(FILE * input){
 
 bool parse_headline(KMixtureModelBigram * bigram){
     /* enter "\data" line */
-    assert(taglib_add_tag(BEGIN_LINE, "\\data", 0, "model:count:N:total_freq", ""));
+    check_result(taglib_add_tag(BEGIN_LINE, "\\data", 0, "model:count:N:total_freq", ""));
 
     /* read "\data" line */
     if ( !taglib_read(linebuf, line_type, values, required) ) {
@@ -111,13 +111,13 @@ bool parse_body(FILE * input, PhraseLargeTable3 * phrase_table,
                 KMixtureModelBigram * bigram){
     taglib_push_state();
 
-    assert(taglib_add_tag(END_LINE, "\\end", 0, "", ""));
-    assert(taglib_add_tag(GRAM_1_LINE, "\\1-gram", 0, "", ""));
-    assert(taglib_add_tag(GRAM_2_LINE, "\\2-gram", 0, "", ""));
+    check_result(taglib_add_tag(END_LINE, "\\end", 0, "", ""));
+    check_result(taglib_add_tag(GRAM_1_LINE, "\\1-gram", 0, "", ""));
+    check_result(taglib_add_tag(GRAM_2_LINE, "\\2-gram", 0, "", ""));
 
     do {
     retry:
-        assert(taglib_read(linebuf, line_type, values, required));
+        check_result(taglib_read(linebuf, line_type, values, required));
         switch(line_type) {
         case END_LINE:
             goto end;
@@ -130,7 +130,7 @@ bool parse_body(FILE * input, PhraseLargeTable3 * phrase_table,
             parse_bigram(input, phrase_table, phrase_index, bigram);
             goto retry;
         default:
-            assert(false);
+            assert(FALSE);
         }
     } while (my_getline(input) != -1) ;
 
@@ -144,17 +144,17 @@ bool parse_unigram(FILE * input, PhraseLargeTable3 * phrase_table,
                    KMixtureModelBigram * bigram){
     taglib_push_state();
 
-    assert(taglib_add_tag(GRAM_1_ITEM_LINE, "\\item", 2, "count:freq", ""));
+    check_result(taglib_add_tag(GRAM_1_ITEM_LINE, "\\item", 2, "count:freq", ""));
 
     do {
-        assert(taglib_read(linebuf, line_type, values, required));
+        check_result(taglib_read(linebuf, line_type, values, required));
         switch (line_type) {
         case GRAM_1_ITEM_LINE:{
             /* handle \item in \1-gram */
             TAGLIB_GET_TOKEN(token, 0);
             TAGLIB_GET_PHRASE_STRING(word, 1);
-            assert(taglib_validate_token_with_string
-                   (phrase_index, token, word));
+            check_result(taglib_validate_token_with_string
+                         (phrase_index, token, word));
 
             TAGLIB_GET_TAGVALUE(glong, count, atol);
             TAGLIB_GET_TAGVALUE(glong, freq, atol);
@@ -170,7 +170,7 @@ bool parse_unigram(FILE * input, PhraseLargeTable3 * phrase_table,
         case GRAM_2_LINE:
             goto end;
         default:
-            assert(false);
+            assert(FALSE);
         }
     } while (my_getline(input) != -1);
 
@@ -184,26 +184,26 @@ bool parse_bigram(FILE * input, PhraseLargeTable3 * phrase_table,
                   KMixtureModelBigram * bigram){
     taglib_push_state();
 
-    assert(taglib_add_tag(GRAM_2_ITEM_LINE, "\\item", 4,
-                          "count:T:N_n_0:n_1:Mr", ""));
+    check_result(taglib_add_tag(GRAM_2_ITEM_LINE, "\\item", 4,
+                                "count:T:N_n_0:n_1:Mr", ""));
 
     phrase_token_t last_token = null_token;
     KMixtureModelSingleGram * last_single_gram = NULL;
     do {
-        assert(taglib_read(linebuf, line_type, values, required));
+        check_result(taglib_read(linebuf, line_type, values, required));
         switch (line_type) {
         case GRAM_2_ITEM_LINE:{
             /* handle \item in \2-gram */
             /* two tokens */
             TAGLIB_GET_TOKEN(token1, 0);
             TAGLIB_GET_PHRASE_STRING(word1, 1);
-            assert(taglib_validate_token_with_string
-                   (phrase_index, token1, word1));
+            check_result(taglib_validate_token_with_string
+                         (phrase_index, token1, word1));
 
             TAGLIB_GET_TOKEN(token2, 2);
             TAGLIB_GET_PHRASE_STRING(word2, 3);
-            assert(taglib_validate_token_with_string
-                   (phrase_index, token2, word2));
+            check_result(taglib_validate_token_with_string
+                         (phrase_index, token2, word2));
 
             TAGLIB_GET_TAGVALUE(glong, count, atol);
             TAGLIB_GET_TAGVALUE(glong, T, atol);
@@ -236,7 +236,7 @@ bool parse_bigram(FILE * input, PhraseLargeTable3 * phrase_table,
             }
 
             assert(NULL != last_single_gram);
-            assert(last_single_gram->insert_array_item(token2, array_item));
+            check_result(last_single_gram->insert_array_item(token2, array_item));
             break;
         }
         case END_LINE:
@@ -244,7 +244,7 @@ bool parse_bigram(FILE * input, PhraseLargeTable3 * phrase_table,
         case GRAM_2_LINE:
             goto end;
         default:
-            assert(false);
+            assert(FALSE);
         }
     } while (my_getline(input) != -1);
 

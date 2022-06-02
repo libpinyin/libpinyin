@@ -104,7 +104,7 @@ static bool merge_magic_header( /* in & out */ KMixtureModelBigram * target,
     if (!target->get_magic_header(target_magic_header)) {
         memset(&target_magic_header, 0, sizeof(KMixtureModelMagicHeader));
     }
-    assert(new_one->get_magic_header(new_magic_header));
+    check_result(new_one->get_magic_header(new_magic_header));
     if ( target_magic_header.m_WC + new_magic_header.m_WC <
          std_lite::max( target_magic_header.m_WC, new_magic_header.m_WC ) ){
         fprintf(stderr, "the m_WC integer in magic header overflows.\n");
@@ -124,7 +124,7 @@ static bool merge_magic_header( /* in & out */ KMixtureModelBigram * target,
     merged_magic_header.m_total_freq = target_magic_header.m_total_freq +
         new_magic_header.m_total_freq;
 
-    assert(target->set_magic_header(merged_magic_header));
+    check_result(target->set_magic_header(merged_magic_header));
     return true;
 }
 
@@ -139,7 +139,7 @@ static bool merge_array_items( /* in & out */ KMixtureModelBigram * target,
         KMixtureModelSingleGram * target_single_gram = NULL;
         KMixtureModelSingleGram * new_single_gram = NULL;
 
-        assert(new_one->load(*token, new_single_gram));
+        check_result(new_one->load(*token, new_single_gram));
         bool exists_in_target = target->load(*token, target_single_gram);
         if ( !exists_in_target ){
             target->store(*token, new_single_gram);
@@ -152,8 +152,8 @@ static bool merge_array_items( /* in & out */ KMixtureModelBigram * target,
         KMixtureModelArrayHeader new_array_header;
         KMixtureModelArrayHeader merged_array_header;
 
-        assert(new_one->get_array_header(*token, new_array_header));
-        assert(target->get_array_header(*token, target_array_header));
+        check_result(new_one->get_array_header(*token, new_array_header));
+        check_result(target->get_array_header(*token, target_array_header));
         memset(&merged_array_header, 0, sizeof(KMixtureModelArrayHeader));
 
         merged_array_header.m_WC = target_array_header.m_WC +
@@ -176,7 +176,7 @@ static bool merge_array_items( /* in & out */ KMixtureModelBigram * target,
         FlexibleBigramPhraseArray merged_array =
             g_array_new(FALSE, FALSE, sizeof(KMixtureModelArrayItemWithToken));
 
-        assert(merge_two_phrase_array(target_array, new_array, merged_array));
+        check_result(merge_two_phrase_array(target_array, new_array, merged_array));
 
         g_array_free(target_array, TRUE);
         g_array_free(new_array, TRUE);
@@ -189,8 +189,8 @@ static bool merge_array_items( /* in & out */ KMixtureModelBigram * target,
             merged_single_gram->insert_array_item(item->m_token, item->m_item);
         }
 
-        assert(merged_single_gram->set_array_header(merged_array_header));
-        assert(target->store(*token, merged_single_gram));
+        check_result(merged_single_gram->set_array_header(merged_array_header));
+        check_result(target->store(*token, merged_single_gram));
         delete merged_single_gram;
         g_array_free(merged_array, TRUE);
     }

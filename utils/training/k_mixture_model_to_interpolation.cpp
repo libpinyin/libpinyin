@@ -58,8 +58,8 @@ static ssize_t my_getline(FILE * input){
 
 bool parse_headline(FILE * input, FILE * output) {
     /* enter "\data" line */
-    assert(taglib_add_tag(BEGIN_LINE, "\\data", 0, "model",
-                          "count:N:total_freq"));
+    check_result(taglib_add_tag(BEGIN_LINE, "\\data", 0, "model",
+                                "count:N:total_freq"));
 
     /* read "\data" line */
     if ( !taglib_read(linebuf, line_type, values, required) ) {
@@ -83,13 +83,13 @@ bool parse_headline(FILE * input, FILE * output) {
 bool parse_body(FILE * input, FILE * output){
     taglib_push_state();
 
-    assert(taglib_add_tag(END_LINE, "\\end", 0, "", ""));
-    assert(taglib_add_tag(GRAM_1_LINE, "\\1-gram", 0, "", ""));
-    assert(taglib_add_tag(GRAM_2_LINE, "\\2-gram", 0, "", ""));
+    check_result(taglib_add_tag(END_LINE, "\\end", 0, "", ""));
+    check_result(taglib_add_tag(GRAM_1_LINE, "\\1-gram", 0, "", ""));
+    check_result(taglib_add_tag(GRAM_2_LINE, "\\2-gram", 0, "", ""));
 
     do {
     retry:
-        assert(taglib_read(linebuf, line_type, values, required));
+        check_result(taglib_read(linebuf, line_type, values, required));
         switch(line_type) {
         case END_LINE:
             fprintf(output, "\\end\n");
@@ -105,7 +105,7 @@ bool parse_body(FILE * input, FILE * output){
             parse_bigram(input, output);
             goto retry;
         default:
-            assert(false);
+            assert(FALSE);
         }
     } while (my_getline(input) != -1);
 
@@ -117,10 +117,10 @@ bool parse_body(FILE * input, FILE * output){
 bool parse_unigram(FILE * input, FILE * output){
     taglib_push_state();
 
-    assert(taglib_add_tag(GRAM_1_ITEM_LINE, "\\item", 2, "freq", "count"));
+    check_result(taglib_add_tag(GRAM_1_ITEM_LINE, "\\item", 2, "freq", "count"));
 
     do {
-        assert(taglib_read(linebuf, line_type, values, required));
+        check_result(taglib_read(linebuf, line_type, values, required));
         switch(line_type) {
         case GRAM_1_ITEM_LINE: {
             /* handle \item in \1-gram */
@@ -143,7 +143,7 @@ bool parse_unigram(FILE * input, FILE * output){
         case GRAM_2_LINE:
             goto end;
         default:
-            assert(false);
+            assert(FALSE);
         }
     } while (my_getline(input) != -1);
 
@@ -155,11 +155,11 @@ bool parse_unigram(FILE * input, FILE * output){
 bool parse_bigram(FILE * input, FILE * output){
     taglib_push_state();
 
-    assert(taglib_add_tag(GRAM_2_ITEM_LINE, "\\item", 4,
-                          "count", "T:N_n_0:n_1:Mr"));
+    check_result(taglib_add_tag(GRAM_2_ITEM_LINE, "\\item", 4,
+                                "count", "T:N_n_0:n_1:Mr"));
 
     do {
-        assert(taglib_read(linebuf, line_type, values, required));
+        check_result(taglib_read(linebuf, line_type, values, required));
         switch (line_type) {
         case GRAM_2_ITEM_LINE:{
             /* handle \item in \2-gram */
@@ -180,7 +180,7 @@ bool parse_bigram(FILE * input, FILE * output){
         case GRAM_2_LINE:
             goto end;
         default:
-            assert(false);
+            assert(FALSE);
         }
     } while (my_getline(input) != -1);
 

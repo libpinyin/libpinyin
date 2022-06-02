@@ -162,10 +162,10 @@ int main(int argc, char * argv[]){
                 &g_array_index(removed_array,
                               KMixtureModelArrayItemWithToken, m);
             KMixtureModelArrayHeader array_header;
-            assert(bigram.get_array_header(item->m_token, array_header));
+            check_result(bigram.get_array_header(item->m_token, array_header));
             array_header.m_freq -= item->m_item.m_WC;
             assert(array_header.m_freq >= 0);
-            assert(bigram.set_array_header(item->m_token, array_header));
+            check_result(bigram.set_array_header(item->m_token, array_header));
         }
 
         g_array_free(removed_array, TRUE);
@@ -180,9 +180,9 @@ int main(int argc, char * argv[]){
     KMixtureModelArrayHeader array_header;
     for ( size_t i = 0; i < items->len; ++i ){
         phrase_token_t * token = &g_array_index(items, phrase_token_t, i);
-        assert(bigram.get_array_header(*token, array_header));
+        check_result(bigram.get_array_header(*token, array_header));
         if ( 0 == array_header.m_WC && 0 == array_header.m_freq )
-            assert(bigram.remove(*token));
+            check_result(bigram.remove(*token));
     }
 
     g_array_free(items, TRUE);

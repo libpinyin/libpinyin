@@ -45,14 +45,14 @@ bool get_possible_pinyin(FacadePhraseIndex * phrase_index,
         key_index = 0; max_freq = 0;
         for ( size_t m = 0; m < item.get_n_pronunciation(); ++m ) {
             freq = 0;
-            assert(item.get_nth_pronunciation(m, buffer, freq));
+            check_result(item.get_nth_pronunciation(m, buffer, freq));
             if ( freq > max_freq ) {
                 key_index = m;
                 max_freq = freq;
             }
         }
 
-        assert(item.get_nth_pronunciation(key_index, buffer, freq));
+        check_result(item.get_nth_pronunciation(key_index, buffer, freq));
         assert(max_freq == freq);
         guint8 len = item.get_phrase_length();
         g_array_append_vals(keys, buffer, len);
@@ -105,7 +105,7 @@ bool do_one_test(PhoneticLookup<1, 1> * pinyin_lookup,
     get_best_match(phrase_index, pinyin_lookup, &matrix, &results);
 
     assert(1 == results.size());
-    assert(results.get_result(0, guessed_tokens));
+    check_result(results.get_result(0, guessed_tokens));
 
     /* compare the results */
     char * sentence = NULL; char * guessed_sentence = NULL;

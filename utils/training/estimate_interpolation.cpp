@@ -55,7 +55,7 @@ parameter_t compute_interpolation(SingleGram * deleted_bigram,
 		parameter_t elem_poss = 0;
 		if (bigram && bigram->get_freq(token, freq)){
 		    guint32 total_freq;
-		    assert(bigram->get_total_freq(total_freq));
+		    check_result(bigram->get_total_freq(total_freq));
 		    assert(0 != total_freq);
 		    elem_poss = freq / (parameter_t) total_freq;
 		}
@@ -78,7 +78,7 @@ parameter_t compute_interpolation(SingleGram * deleted_bigram,
 	    
 	    next_lambda += deleted_count * (numerator / (numerator + part_of_denominator));
 	}
-	assert(deleted_bigram->get_total_freq(table_num));
+	check_result(deleted_bigram->get_total_freq(table_num));
 	next_lambda /= table_num;
 
 	g_array_free(array, TRUE);

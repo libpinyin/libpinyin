@@ -55,7 +55,7 @@ bool print_k_mixture_model_array_headers(FILE * output,
     for (size_t i = 0; i < items->len; ++i) {
         phrase_token_t token = g_array_index(items, phrase_token_t, i);
         KMixtureModelArrayHeader array_header;
-        assert(bigram->get_array_header(token, array_header));
+        check_result(bigram->get_array_header(token, array_header));
         char * phrase = taglib_token_to_string(phrase_index, token);
         if ( phrase )
             fprintf(output, "\\item %d %s count %d freq %d\n",
@@ -76,7 +76,7 @@ bool print_k_mixture_model_array_items(FILE * output,
     for (size_t i = 0; i < items->len; ++i) {
         phrase_token_t token = g_array_index(items, phrase_token_t, i);
         KMixtureModelSingleGram * single_gram = NULL;
-        assert(bigram->load(token, single_gram));
+        check_result(bigram->load(token, single_gram));
         FlexibleBigramPhraseArray array = g_array_new
             (FALSE, FALSE, sizeof(KMixtureModelArrayItemWithToken));
         single_gram->retrieve_all(array);

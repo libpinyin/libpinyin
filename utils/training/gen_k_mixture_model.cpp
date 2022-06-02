@@ -156,19 +156,19 @@ static void train_word_pair(HashofUnigram hash_of_unigram,
          */
         if ( count > maximum_occurs_allowed ){
             gpointer value = NULL;
-            assert( g_hash_table_lookup_extended
-                    (hash_of_unigram, GUINT_TO_POINTER(token2),
-                     NULL, &value) );
+            check_result(g_hash_table_lookup_extended
+                         (hash_of_unigram, GUINT_TO_POINTER(token2),
+                          NULL, &value));
             guint32 freq = GPOINTER_TO_UINT(value);
             freq -= count;
             if ( freq > 0 ) {
                 g_hash_table_insert(hash_of_unigram, GUINT_TO_POINTER(token2),
                                     GUINT_TO_POINTER(freq));
             } else if ( freq == 0 ) {
-                assert(g_hash_table_steal(hash_of_unigram,
-                                          GUINT_TO_POINTER(token2)));
+                check_result(g_hash_table_steal(hash_of_unigram,
+                                                GUINT_TO_POINTER(token2)));
             } else {
-                assert(false);
+                assert(FALSE);
             }
             return;
         }
@@ -178,24 +178,24 @@ static void train_word_pair(HashofUnigram hash_of_unigram,
         if ( 1 == count )
             array_item.m_n_1 ++;
         array_item.m_Mr = std_lite::max(array_item.m_Mr, count);
-        assert(single_gram->set_array_item(token2, array_item));
+        check_result(single_gram->set_array_item(token2, array_item));
     } else { /* item doesn't exist. */
         /* the same as above. */
         if ( count > g_maximum_occurs ){
             gpointer value = NULL;
-            assert( g_hash_table_lookup_extended
-                    (hash_of_unigram, GUINT_TO_POINTER(token2),
-                     NULL, &value) );
+            check_result(g_hash_table_lookup_extended
+                         (hash_of_unigram, GUINT_TO_POINTER(token2),
+                          NULL, &value));
             guint32 freq = GPOINTER_TO_UINT(value);
             freq -= count;
             if ( freq > 0 ) {
                 g_hash_table_insert(hash_of_unigram, GUINT_TO_POINTER(token2),
                                     GUINT_TO_POINTER(freq));
             } else if ( freq == 0 ) {
-                assert(g_hash_table_steal(hash_of_unigram,
-                                          GUINT_TO_POINTER(token2)));
+                check_result(g_hash_table_steal(hash_of_unigram,
+                                                GUINT_TO_POINTER(token2)));
             } else {
-                assert(false);
+                assert(FALSE);
             }
             return;
         }
@@ -206,7 +206,7 @@ static void train_word_pair(HashofUnigram hash_of_unigram,
         if ( 1 == count )
             array_item.m_n_1 = 1;
         array_item.m_Mr = count;
-        assert(single_gram->insert_array_item(token2, array_item));
+        check_result(single_gram->insert_array_item(token2, array_item));
     }
 
     /* save delta in the array header. */
@@ -224,14 +224,14 @@ bool train_single_gram(HashofUnigram hash_of_unigram,
     assert(NULL != single_gram);
     delta = 0; /* delta in WC of single_gram. */
     KMixtureModelArrayHeader array_header;
-    assert(single_gram->get_array_header(array_header));
+    check_result(single_gram->get_array_header(array_header));
     guint32 saved_array_header_WC = array_header.m_WC;
 
     HashofSecondWord hash_of_second_word = NULL;
     gpointer key, value = NULL;
-    assert(g_hash_table_lookup_extended
-           (hash_of_document, GUINT_TO_POINTER(token1),
-            NULL, &value));
+    check_result(g_hash_table_lookup_extended
+                 (hash_of_document, GUINT_TO_POINTER(token1),
+                  NULL, &value));
     hash_of_second_word = (HashofSecondWord) value;
     assert(NULL != hash_of_second_word);
 
@@ -244,7 +244,7 @@ bool train_single_gram(HashofUnigram hash_of_unigram,
         train_word_pair(hash_of_unigram, single_gram, token2, count);
     }
 
-    assert(single_gram->get_array_header(array_header));
+    check_result(single_gram->get_array_header(array_header));
     delta = array_header.m_WC - saved_array_header_WC;
     return true;
 }
@@ -268,7 +268,7 @@ static bool train_second_word(HashofUnigram hash_of_unigram,
     }
 
     /* save the single gram. */
-    assert(bigram->store(token1, single_gram));
+    check_result(bigram->store(token1, single_gram));
     delete single_gram;
 
     KMixtureModelMagicHeader magic_header;
@@ -282,7 +282,7 @@ static bool train_second_word(HashofUnigram hash_of_unigram,
         return false;
     }
     magic_header.m_WC += delta;
-    assert(bigram->set_magic_header(magic_header));
+    check_result(bigram->set_magic_header(magic_header));
 
     return true;
 }
@@ -306,13 +306,13 @@ static bool post_processing_unigram(KMixtureModelBigram * bigram,
     }
 
     KMixtureModelMagicHeader magic_header;
-    assert(bigram->get_magic_header(magic_header));
+    check_result(bigram->get_magic_header(magic_header));
     if ( magic_header.m_total_freq + total_freq < magic_header.m_total_freq ){
         fprintf(stderr, "the m_total_freq in magic header overflows.\n");
         return false;
     }
     magic_header.m_total_freq += total_freq;
-    assert(bigram->set_magic_header(magic_header));
+    check_result(bigram->set_magic_header(magic_header));
 
     return true;
 }
@@ -369,8 +369,8 @@ int main(int argc, char * argv[]){
         HashofUnigram hash_of_unigram = g_hash_table_new
             (g_direct_hash, g_direct_equal);
 
-        assert(read_document(&phrase_table, &phrase_index, document,
-                             hash_of_document, hash_of_unigram));
+        check_result(read_document(&phrase_table, &phrase_index, document,
+                                   hash_of_document, hash_of_unigram));
         fclose(document);
         document = NULL;
 
@@ -386,9 +386,9 @@ int main(int argc, char * argv[]){
         }
 
         KMixtureModelMagicHeader magic_header;
-        assert(bigram.get_magic_header(magic_header));
+        check_result(bigram.get_magic_header(magic_header));
         magic_header.m_N ++;
-        assert(bigram.set_magic_header(magic_header));
+        check_result(bigram.set_magic_header(magic_header));
 
         post_processing_unigram(&bigram, hash_of_unigram);
 

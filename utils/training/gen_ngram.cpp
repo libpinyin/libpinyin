@@ -113,9 +113,9 @@ int main(int argc, char * argv[]){
         guint32 freq, total_freq;
         /* increase freq */
         if (single_gram->get_freq(cur_token, freq))
-            assert(single_gram->set_freq(cur_token, freq + 1));
+            check_result(single_gram->set_freq(cur_token, freq + 1));
         else
-            assert(single_gram->insert_freq(cur_token, 1));
+            check_result(single_gram->insert_freq(cur_token, 1));
         /* increase total freq */
         single_gram->get_total_freq(total_freq);
         single_gram->set_total_freq(total_freq + 1);

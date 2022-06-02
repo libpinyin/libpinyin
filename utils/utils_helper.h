@@ -22,6 +22,7 @@
 #ifndef UTILS_HELPER_H
 #define UTILS_HELPER_H
 
+#include "pinyin_utils.h"
 
 #define TAGLIB_GET_TOKEN(var, index)                                    \
     phrase_token_t var = null_token;                                    \
@@ -42,8 +43,8 @@
     type var;                                                           \
     {                                                                   \
         gpointer value = NULL;                                          \
-        assert(g_hash_table_lookup_extended                             \
-               (required, #var, NULL, &value));                         \
+        check_result(g_hash_table_lookup_extended                       \
+                     (required, #var, NULL, &value));                   \
         var = conv((const char *)value);                                \
     }
 
@@ -55,13 +56,13 @@
                                                                         \
         gchar ** strs = g_strsplit_set(line, " \t", 2);                 \
         if (2 != g_strv_length(strs))                                   \
-            assert(false);                                              \
+            assert(FALSE);                                              \
                                                                         \
         phrase_token_t _token = atoi(strs[0]);                          \
         const char * phrase = strs[1];                                  \
         if (null_token != _token)                                       \
-            assert(taglib_validate_token_with_string                    \
-                   (phrase_index, _token, phrase));                     \
+            check_result(taglib_validate_token_with_string              \
+                         (phrase_index, _token, phrase));               \
                                                                         \
         var = _token;                                                   \
                                                                         \

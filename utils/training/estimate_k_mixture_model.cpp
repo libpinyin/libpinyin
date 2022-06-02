@@ -41,7 +41,7 @@ parameter_t compute_interpolation(KMixtureModelSingleGram * deleted_bigram,
     parameter_t epsilon = 0.001;
 
     KMixtureModelMagicHeader magic_header;
-    assert(unigram->get_magic_header(magic_header));
+    check_result(unigram->get_magic_header(magic_header));
     assert(0 != magic_header.m_total_freq);
 
     while (fabs(lambda - next_lambda) > epsilon){
@@ -64,7 +64,7 @@ parameter_t compute_interpolation(KMixtureModelSingleGram * deleted_bigram,
                 KMixtureModelArrayHeader array_header;
                 KMixtureModelArrayItem array_item;
                 if ( bigram && bigram->get_array_item(token, array_item) ){
-                    assert(bigram->get_array_header(array_header));
+                    check_result(bigram->get_array_header(array_header));
                     assert(0 != array_header.m_WC);
                     elem_poss = array_item.m_WC / (parameter_t) array_header.m_WC;
                 }
@@ -85,7 +85,7 @@ parameter_t compute_interpolation(KMixtureModelSingleGram * deleted_bigram,
             next_lambda += deleted_count * (numerator / (numerator + part_of_denominator));
         }
         KMixtureModelArrayHeader header;
-        assert(deleted_bigram->get_array_header(header));
+        check_result(deleted_bigram->get_array_header(header));
         assert(0 != header.m_WC);
         next_lambda /= header.m_WC;
 
@@ -131,9 +131,9 @@ int main(int argc, char * argv[]){
 
         KMixtureModelArrayHeader array_header;
         if (single_gram)
-            assert(single_gram->get_array_header(array_header));
+            check_result(single_gram->get_array_header(array_header));
         KMixtureModelArrayHeader deleted_array_header;
-        assert(deleted_single_gram->get_array_header(deleted_array_header));
+        check_result(deleted_single_gram->get_array_header(deleted_array_header));
 
         if ( 0 != deleted_array_header.m_WC ) {
             parameter_t lambda = compute_interpolation(deleted_single_gram, &bigram, single_gram);
