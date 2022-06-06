@@ -168,7 +168,7 @@ static void train_word_pair(HashofUnigram hash_of_unigram,
                 check_result(g_hash_table_steal(hash_of_unigram,
                                                 GUINT_TO_POINTER(token2)));
             } else {
-                assert(FALSE);
+                abort();
             }
             return;
         }
@@ -195,7 +195,7 @@ static void train_word_pair(HashofUnigram hash_of_unigram,
                 check_result(g_hash_table_steal(hash_of_unigram,
                                                 GUINT_TO_POINTER(token2)));
             } else {
-                assert(FALSE);
+                abort();
             }
             return;
         }

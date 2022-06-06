@@ -56,7 +56,7 @@
                                                                         \
         gchar ** strs = g_strsplit_set(line, " \t", 2);                 \
         if (2 != g_strv_length(strs))                                   \
-            assert(FALSE);                                              \
+            abort();                                                    \
                                                                         \
         phrase_token_t _token = atoi(strs[0]);                          \
         const char * phrase = strs[1];                                  \

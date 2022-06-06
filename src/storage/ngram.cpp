@@ -105,7 +105,7 @@ guint32 SingleGram::mask_out(phrase_token_t mask, phrase_token_t value){
 }
 
 bool SingleGram::prune(){
-    assert(false);
+    abort();
 #if 0
     SingleGramItem * begin = (SingleGramItem *)
 	((const char *)(m_chunk.begin()) + sizeof(guint32));

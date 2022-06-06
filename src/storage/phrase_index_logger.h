@@ -294,7 +294,7 @@ public:
             break;
         }
         default:
-            assert(false);
+            abort();
         }
 
         /* store log record. */

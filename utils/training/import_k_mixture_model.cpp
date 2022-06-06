@@ -130,7 +130,7 @@ bool parse_body(FILE * input, PhraseLargeTable3 * phrase_table,
             parse_bigram(input, phrase_table, phrase_index, bigram);
             goto retry;
         default:
-            assert(FALSE);
+            abort();
         }
     } while (my_getline(input) != -1) ;
 
@@ -170,7 +170,7 @@ bool parse_unigram(FILE * input, PhraseLargeTable3 * phrase_table,
         case GRAM_2_LINE:
             goto end;
         default:
-            assert(FALSE);
+            abort();
         }
     } while (my_getline(input) != -1);
 
@@ -244,7 +244,7 @@ bool parse_bigram(FILE * input, PhraseLargeTable3 * phrase_table,
         case GRAM_2_LINE:
             goto end;
         default:
-            assert(FALSE);
+            abort();
         }
     } while (my_getline(input) != -1);
 

@@ -184,7 +184,7 @@ PhraseLengthIndexLevel2::~PhraseLengthIndexLevel2(){
 	    CASE(15);
 	    CASE(16);
 	default:
-	    assert(false);
+	    abort();
         }
     }
     g_array_free(m_phrase_array_indexes, TRUE);
@@ -228,7 +228,7 @@ int PhraseLengthIndexLevel2::search(int phrase_length,
 	CASE(15);
 	CASE(16);
     default:
-	assert(false);
+	abort();
     }
 #undef CASE
 }
@@ -348,7 +348,7 @@ int PhraseLengthIndexLevel2::add_index(int phrase_length,
 	CASE(15);
         CASE(16);
     default:
-	assert(false);
+	abort();
     }
 
 #undef CASE
@@ -402,7 +402,7 @@ int PhraseLengthIndexLevel2::remove_index(int phrase_length,
 	CASE(15);
 	CASE(16);
     default:
-	assert(false);
+	abort();
     }
 #undef CASE
 }
@@ -605,7 +605,7 @@ bool PhraseLengthIndexLevel2::load(MemoryChunk * chunk,
 	    CASE(15);
 	    CASE(16);
 	default:
-	    assert(false);
+	    abort();
         }
 #undef CASE
     }
@@ -661,7 +661,7 @@ bool PhraseLengthIndexLevel2::store(MemoryChunk * new_chunk,
 	    CASE(15);
 	    CASE(16);
 	default:
-	    assert(false);
+	    abort();
         }
         //add '#'
         new_chunk->set_content(offset, &c_separate, sizeof(char));
@@ -781,7 +781,7 @@ bool PhraseLengthIndexLevel2::mask_out(phrase_token_t mask,
 	    CASE(15);
 	    CASE(16);
 	default:
-	    assert(false);
+	    abort();
         }
     }
     /* shrink self array. */

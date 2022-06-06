@@ -105,7 +105,7 @@ bool parse_body(FILE * input, FILE * output){
             parse_bigram(input, output);
             goto retry;
         default:
-            assert(FALSE);
+            abort();
         }
     } while (my_getline(input) != -1);
 
@@ -143,7 +143,7 @@ bool parse_unigram(FILE * input, FILE * output){
         case GRAM_2_LINE:
             goto end;
         default:
-            assert(FALSE);
+            abort();
         }
     } while (my_getline(input) != -1);
 
@@ -180,7 +180,7 @@ bool parse_bigram(FILE * input, FILE * output){
         case GRAM_2_LINE:
             goto end;
         default:
-            assert(FALSE);
+            abort();
         }
     } while (my_getline(input) != -1);
 

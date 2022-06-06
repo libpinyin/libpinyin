@@ -344,7 +344,7 @@ ChewingLengthIndexLevel::~ChewingLengthIndexLevel() {
 	    CASE(14);
 	    CASE(15);
 	default:
-	    assert(false);
+	    abort();
 	}
     }
 #undef CASE
@@ -389,7 +389,7 @@ int ChewingLengthIndexLevel::search(pinyin_option_t options, int phrase_length,
 	CASE(14);
 	CASE(15);
     default:
-	assert(false);
+	abort();
     }
 
 #undef CASE
@@ -545,7 +545,7 @@ int ChewingLengthIndexLevel::add_index(int phrase_length,
 	CASE(14);
 	CASE(15);
     default:
-	assert(false);
+	abort();
     }
 
 #undef CASE
@@ -599,7 +599,7 @@ int ChewingLengthIndexLevel::remove_index(int phrase_length,
 	CASE(14);
 	CASE(15);
     default:
-	assert(false);
+	abort();
     }
 
 #undef CASE
@@ -850,7 +850,7 @@ bool ChewingLengthIndexLevel::load(MemoryChunk * chunk, table_offset_t offset,
 	    CASE(14);
 	    CASE(15);
 	default:
-	    assert(false);
+	    abort();
 	}
 
 #undef CASE
@@ -910,7 +910,7 @@ bool ChewingLengthIndexLevel::store(MemoryChunk * new_chunk,
 	    CASE(14);
 	    CASE(15);
 	default:
-	    assert(false);
+	    abort();
 	}
 #undef CASE
 
@@ -1034,7 +1034,7 @@ bool ChewingLengthIndexLevel::mask_out(phrase_token_t mask,
 	    CASE(14);
 	    CASE(15);
 	default:
-	    assert(false);
+	    abort();
         }
     }
 #undef CASE

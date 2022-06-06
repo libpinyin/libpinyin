@@ -56,7 +56,7 @@ void ChewingLargeTable2::init_entries() {
             CASE(15);
             CASE(16);
         default:
-            assert(false);
+            abort();
         }
     }
 
@@ -97,7 +97,7 @@ void ChewingLargeTable2::fini_entries() {
             CASE(15);
             CASE(16);
         default:
-            assert(false);
+            abort();
         }
     }
 

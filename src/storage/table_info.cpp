@@ -113,7 +113,7 @@ static TABLE_PHONETIC_TYPE to_table_phonetic_type(const char * str) {
     if (0 == strcmp("zhuyin", str))
         return ZHUYIN_TABLE;
 
-    assert(FALSE);
+    abort();
 }
 
 static TABLE_DATABASE_FORMAT_TYPE to_table_database_format_type(const char * str) {
@@ -123,7 +123,7 @@ static TABLE_DATABASE_FORMAT_TYPE to_table_database_format_type(const char * str
     if (0 == strcmp("KyotoCabinet", str))
         return KYOTO_CABINET_FORMAT;
 
-    assert(FALSE);
+    abort();
 }
 
 static TABLE_TARGET to_table_target(const char * str) {
@@ -133,7 +133,7 @@ static TABLE_TARGET to_table_target(const char * str) {
     if (0 == strcmp("addon", str))
         return ADDON_TABLE;
 
-    assert(FALSE);
+    abort();
 }
 
 static guint8 to_index_of_default_tables(const char * str) {
@@ -147,7 +147,7 @@ static guint8 to_index_of_default_tables(const char * str) {
     HANDLE(NETWORK_DICTIONARY);
     HANDLE(USER_DICTIONARY);
 
-    assert(FALSE);
+    abort();
 }
 
 static guint8 to_index_of_addon_tables(const char * str) {
@@ -166,7 +166,7 @@ static PHRASE_FILE_TYPE to_file_type(const char * str) {
     HANDLE(DICTIONARY);
     HANDLE(USER_FILE);
 
-    assert(FALSE);
+    abort();
 }
 
 #undef HANDLE
@@ -178,7 +178,7 @@ static const char * from_table_database_format_type(const TABLE_DATABASE_FORMAT_
     if (format == KYOTO_CABINET_FORMAT)
         return "KyotoCabinet";
 
-    assert(FALSE);
+    abort();
 }
 
 

@@ -291,7 +291,7 @@ bool ZhuyinSimpleParser2::set_scheme(ZhuyinScheme scheme) {
         m_symbol_table = chewing_standard_dvorak_symbols;
         m_tone_table   = chewing_standard_dvorak_tones;
     default:
-        assert(FALSE);
+        abort();
     }
 
     return false;
@@ -484,7 +484,7 @@ bool ZhuyinDiscreteParser2::set_scheme(ZhuyinScheme scheme) {
         INIT_PARSER(hsu_zhuyin_index, hsu_dvorak);
         break;
     default:
-        assert(FALSE);
+        abort();
     }
 
 #undef INIT_PARSER

@@ -79,7 +79,7 @@ static inline parameter_t compute_Pr_G_3(corpus_count_t k,
         return (alpha * gamma / (B - 1)) * pow((1 - 1 / (B - 1)) , k - 2);
     }
 
-    assert(FALSE);
+    abort();
 }
 
 static inline parameter_t compute_Pr_G_3_with_count(corpus_count_t k,

@@ -505,7 +505,7 @@ bool SubPhraseIndex::merge(PhraseIndexLogger * logger){
             break;
         }
         default:
-            assert(false);
+            abort();
         }
     }
     return true;
@@ -801,7 +801,7 @@ bool _compute_new_header(PhraseIndexLogger * logger,
             break;
         }
         default:
-            assert(false);
+            abort();
         }
     }
 

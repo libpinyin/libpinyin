@@ -999,7 +999,7 @@ bool pinyin_set_zhuyin_scheme(pinyin_context_t * context,
         context->m_chewing_parser = new ZhuyinDaChenCP26Parser2();
         break;
     default:
-        assert(FALSE);
+        abort();
     }
     return true;
 }
@@ -1664,7 +1664,7 @@ static bool _compute_phrase_length(pinyin_context_t * context,
 
         switch(candidate->m_candidate_type) {
         case NBEST_MATCH_CANDIDATE:
-            assert(FALSE);
+            abort();
         case NORMAL_CANDIDATE:
         case PREDICTED_CANDIDATE: {
             phrase_index->get_phrase_item(candidate->m_token, item);
@@ -1677,7 +1677,7 @@ static bool _compute_phrase_length(pinyin_context_t * context,
             break;
         }
         case ZOMBIE_CANDIDATE:
-            assert(FALSE);
+            abort();
         }
     }
 
@@ -1713,7 +1713,7 @@ static bool _compute_phrase_strings_of_items(pinyin_instance_t * instance,
                  &(candidate->m_phrase_string));
             break;
         case ZOMBIE_CANDIDATE:
-            assert(FALSE);
+            abort();
         }
     }
 
@@ -2845,7 +2845,7 @@ static gchar * _get_aux_text_prefix(pinyin_instance_t * instance,
         else if (IS_ZHUYIN == options)
             str = key.get_zhuyin_string();
         else
-            assert(FALSE);
+            abort();
 
         gchar * newprefix = g_strconcat(prefix, str, " ", NULL);
 
@@ -2889,7 +2889,7 @@ static gchar * _get_aux_text_postfix(pinyin_instance_t * instance,
         else if (IS_ZHUYIN == options)
             str = key.get_zhuyin_string();
         else
-            assert(FALSE);
+            abort();
 
         gchar * newpostfix = g_strconcat(postfix, str, " ", NULL);
 
@@ -3010,7 +3010,7 @@ bool pinyin_get_double_pinyin_auxiliary_text(pinyin_instance_t * instance,
             middle = g_strconcat(shengmu, yunmu, "|", NULL);
             break;
         default:
-            assert(FALSE);
+            abort();
         }
 
         g_free(shengmu);

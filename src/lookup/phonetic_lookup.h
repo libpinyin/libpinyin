@@ -322,7 +322,7 @@ public:
             return node->eval_item(candidate);
         }
 
-        assert(FALSE);
+        abort();
     }
 
     /* get tails */

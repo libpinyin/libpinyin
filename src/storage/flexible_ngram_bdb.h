@@ -105,7 +105,7 @@ public:
 
         int ret = db_create(&m_db, NULL, 0);
         if ( ret != 0 )
-            assert(false);
+            abort();
 
         ret = m_db->open(m_db, NULL, dbfile, NULL, DB_HASH, db_flags, 0644);
         if ( ret != 0 && (flags & ATTACH_CREATE) ) {

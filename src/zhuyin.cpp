@@ -733,7 +733,7 @@ bool zhuyin_set_chewing_scheme(zhuyin_context_t * context,
         context->m_chewing_parser = new ZhuyinDaChenCP26Parser2();
         break;
     default:
-        assert(FALSE);
+        abort();
     }
     return true;
 }
@@ -1300,7 +1300,7 @@ static bool _compute_phrase_length(zhuyin_context_t * context,
 
         switch(candidate->m_candidate_type) {
         case BEST_MATCH_CANDIDATE:
-            assert(FALSE);
+            abort();
         case NORMAL_CANDIDATE_AFTER_CURSOR:
         case NORMAL_CANDIDATE_BEFORE_CURSOR: {
             phrase_index->get_phrase_item(candidate->m_token, item);
@@ -1308,7 +1308,7 @@ static bool _compute_phrase_length(zhuyin_context_t * context,
             break;
         }
         case ZOMBIE_CANDIDATE:
-            assert(FALSE);
+            abort();
         }
     }
 
@@ -1338,7 +1338,7 @@ static bool _compute_phrase_strings_of_items(zhuyin_instance_t * instance,
                  &(candidate->m_phrase_string));
             break;
         case ZOMBIE_CANDIDATE:
-            assert(FALSE);
+            abort();
         }
     }
 

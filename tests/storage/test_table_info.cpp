@@ -44,7 +44,7 @@ void dump_table_info(const pinyin_table_info_t * table_info) {
         break;
 
     default:
-        assert(FALSE);
+        abort();
     }
 }
 

@@ -195,7 +195,7 @@ int ChewingLargeTable2::search_internal(int phrase_length,
         CASE(15);
         CASE(16);
     default:
-        assert(false);
+        abort();
     }
 
 #undef CASE
@@ -302,7 +302,7 @@ int ChewingLargeTable2::add_index_internal(int phrase_length,
         CASE(15);
         CASE(16);
     default:
-        assert(false);
+        abort();
     }
 
 #undef CASE
@@ -376,7 +376,7 @@ int ChewingLargeTable2::remove_index_internal(int phrase_length,
         CASE(15);
         CASE(16);
     default:
-        assert(false);
+        abort();
     }
 
 #undef CASE
@@ -443,7 +443,7 @@ bool ChewingLargeTable2::mask_out(phrase_token_t mask,
             CASE(15);
             CASE(16);
         default:
-            assert(false);
+            abort();
         }
 
 #undef CASE

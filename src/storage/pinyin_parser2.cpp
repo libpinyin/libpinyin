@@ -395,7 +395,7 @@ bool FullPinyinParser2::set_scheme(FullPinyinScheme scheme){
         m_pinyin_index_len = G_N_ELEMENTS(secondary_zhuyin_index);
         break;
     default:
-        assert(false);
+        abort();
     }
     return true;
 }
@@ -608,7 +608,7 @@ bool DoublePinyinParser2::set_scheme(DoublePinyinScheme scheme) {
         m_fallback_table = double_pinyin_xhe_fallback;
         return true;
     case DOUBLE_PINYIN_CUSTOMIZED:
-        assert(FALSE);
+        abort();
     };
 
     return false; /* no such scheme. */

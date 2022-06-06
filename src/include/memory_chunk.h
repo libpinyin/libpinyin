@@ -72,7 +72,7 @@ private:
             munmap(m_data_begin - header, header + capacity());
 #endif
         else
-            assert(FALSE);
+            abort();
     }
 
 
