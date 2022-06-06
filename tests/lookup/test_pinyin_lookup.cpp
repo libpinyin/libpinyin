@@ -115,7 +115,7 @@ int main( int argc, char * argv[]){
 
         for (size_t i = 0; i < results.size(); ++i) {
             MatchResult result = NULL;
-            assert(results.get_result(i, result));
+            check_result(results.get_result(i, result));
 
             for (size_t j = 0; j < result->len; ++j){
                 phrase_token_t * token = &g_array_index(result, phrase_token_t, j);

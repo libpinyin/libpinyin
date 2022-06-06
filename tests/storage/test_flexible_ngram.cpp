@@ -26,7 +26,7 @@ int main(int argc, char * argv[]) {
     typedef FlexibleSingleGram<guint32, guint32>::ArrayItemWithToken array_item_t;
 
     const guint32 total_freq = 16;
-    assert(single_gram.set_array_header(total_freq));
+    check_result(single_gram.set_array_header(total_freq));
 
     phrase_token_t tokens[6] = { 2, 6, 4, 3, 1, 3 };
     guint32 freqs[6] = { 1, 2, 4, 8, 16, 32};
@@ -35,9 +35,9 @@ int main(int argc, char * argv[]) {
 
     for ( size_t i = 0; i < G_N_ELEMENTS(tokens); ++i ){
         if ( single_gram.get_array_item(tokens[i], freq) )
-            assert(single_gram.set_array_item(tokens[i], freqs[i]));
+            check_result(single_gram.set_array_item(tokens[i], freqs[i]));
         else
-            assert(single_gram.insert_array_item(tokens[i], freqs[i]));
+            check_result(single_gram.insert_array_item(tokens[i], freqs[i]));
     }
 
     single_gram.get_array_item(3, freq);
@@ -53,16 +53,16 @@ int main(int argc, char * argv[]) {
         printf("item:%d:%d\n", item->m_token, item->m_item);
     }
 
-    assert(single_gram.get_array_header(freq));
+    check_result(single_gram.get_array_header(freq));
     assert(freq == total_freq);
 
     FlexibleBigram<guint32, guint32, guint32> bigram("TEST");
-    assert(bigram.attach("/tmp/training.db", ATTACH_READWRITE|ATTACH_CREATE));
+    check_result(bigram.attach("/tmp/training.db", ATTACH_READWRITE|ATTACH_CREATE));
     bigram.store(1, &single_gram);
-    assert(single_gram.insert_array_item(5, 8));
-    assert(single_gram.remove_array_item(1, freq));
-    assert(single_gram.set_array_header(32));
-    assert(single_gram.get_array_header(freq));
+    check_result(single_gram.insert_array_item(5, 8));
+    check_result(single_gram.remove_array_item(1, freq));
+    check_result(single_gram.set_array_header(32));
+    check_result(single_gram.get_array_header(freq));
     printf("new array header:%d\n", freq);
     bigram.store(2, &single_gram);
 
@@ -122,7 +122,7 @@ int main(int argc, char * argv[]) {
         delete train_gram;
     }
 
-    assert(bigram.remove(1));
+    check_result(bigram.remove(1));
 
     bigram.get_all_items(items);
     printf("-----------------------items----------------------------\n");

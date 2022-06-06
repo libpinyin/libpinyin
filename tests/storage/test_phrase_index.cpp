@@ -38,11 +38,11 @@ int main(int argc, char * argv[]){
     assert(string1 == string2);
 
     FacadePhraseIndex phrase_index_test;
-    assert(!phrase_index_test.add_phrase_item(1, &phrase_item));
+    check_result(!phrase_index_test.add_phrase_item(1, &phrase_item));
 
     MemoryChunk* chunk = new MemoryChunk;
-    assert(phrase_index_test.store(0, chunk));
-    assert(phrase_index_test.load(0, chunk));
+    check_result(phrase_index_test.store(0, chunk));
+    check_result(phrase_index_test.load(0, chunk));
 
     PhraseItem item2;
     guint32 time = record_time();

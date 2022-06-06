@@ -55,13 +55,13 @@ int main(int argc, char * argv[]){
     printf("%d\t%d\n", *p3, *(p3+1));
 
     int tmp;
-    assert(chunk->get_content(sizeof(int), &tmp, sizeof(int)));
+    check_result(chunk->get_content(sizeof(int), &tmp, sizeof(int)));
     printf("%d\n", tmp);
 
-    assert(chunk->save("/tmp/test.bin"));
-    assert(chunk->load("/tmp/test.bin"));
+    check_result(chunk->save("/tmp/test.bin"));
+    check_result(chunk->load("/tmp/test.bin"));
 #ifdef LIBPINYIN_USE_MMAP
-    assert(chunk->mmap("/tmp/test.bin"));
+    check_result(chunk->mmap("/tmp/test.bin"));
 #endif
 
     delete chunk;

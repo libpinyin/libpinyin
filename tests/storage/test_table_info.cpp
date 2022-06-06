@@ -44,7 +44,7 @@ void dump_table_info(const pinyin_table_info_t * table_info) {
         break;
 
     default:
-        assert(false);
+        assert(FALSE);
     }
 }
 
@@ -90,8 +90,8 @@ int main(int argc, char * argv[]) {
     retval = user_table_info.is_conform(&system_table_info);
     assert(retval);
 
-    assert(user_table_info.save("/tmp/user.conf"));
-    assert(user_table_info.load("/tmp/user.conf"));
+    check_result(user_table_info.save("/tmp/user.conf"));
+    check_result(user_table_info.load("/tmp/user.conf"));
 
     retval = user_table_info.is_conform(&system_table_info);
     assert(retval);
