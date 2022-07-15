@@ -28,6 +28,43 @@ using namespace kyotocabinet;
 
 namespace pinyin{
 
+/* keep the following function synced between dbm implementations
+   for consistent phrase key compare. */
+inline int compare_phrase(ucs4_t * lhs, ucs4_t * rhs, int phrase_length) {
+    int result;
+    for (int i = 0; i < phrase_length; ++i) {
+        result = lhs[i] - rhs[i];
+        if (0 != result)
+            return result;
+    }
+
+    return 0;
+}
+
+/* keep dbm key compare function inside the corresponding dbm file
+   to get more flexibility. */
+
+bool kyotodb_phrase_continue_search(const char* akbuf, size_t aksiz,
+                                    const char* bkbuf, size_t bksiz) {
+    ucs4_t * lhs_phrase = akbuf;
+    int lhs_phrase_length = aksiz / sizeof(ucs4_t);
+    ucs4_t * rhs_phrase = bkbuf;
+    int rhs_phrase_length = bkbuf / sizeof(ucs4_t);
+
+    /* The key in dbm is longer than the key in application. */
+    if (lhs_phrase_length >= rhs_phrase_length)
+        return false;
+
+    int min_phrase_length = lhs_phrase_length;
+
+    int result = compare_phrase (lhs_phrase, rhs_phrase, min_phrase_length);
+    if (0 != result)
+        return false;
+
+    /* continue the longer phrase search. */
+    return true;
+}
+
 PhraseLargeTable3::PhraseLargeTable3() {
     /* create in-memory db. */
     m_db = new ProtoTreeDB;
