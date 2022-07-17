@@ -122,7 +122,9 @@ public:
      */
     guint32 get_unigram_frequency(){
         char * buf_begin = (char *)m_chunk.begin();
-        return (*(guint32 *)(buf_begin + sizeof(guint8) + sizeof(guint8)));
+        guint32 retval;
+        memcpy(&retval, buf_begin + sizeof(guint8) + sizeof(guint8), sizeof(guint32));
+        return retval;
     }
 
     /**
