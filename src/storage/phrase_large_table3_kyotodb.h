@@ -60,6 +60,8 @@ public:
     /* search method */
     int search(int phrase_length, /* in */ const ucs4_t phrase[],
                /* out */ PhraseTokens tokens) const;
+    int search_suggestion(int phrase_length, /* in */ const ucs4_t phrase[],
+                          /* out */ PhraseTokens tokens) const;
 
     /* add_index/remove_index method */
     int add_index(int phrase_length, /* in */ const ucs4_t phrase[], /* in */ phrase_token_t token);

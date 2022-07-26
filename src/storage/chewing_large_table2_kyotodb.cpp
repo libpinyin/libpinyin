@@ -21,6 +21,7 @@
 #include "chewing_large_table2.h"
 #include <kchashdb.h>
 #include <kccachedb.h>
+#include "pinyin_utils.h"
 #include "kyotodb_utils.h"
 
 using namespace kyotocabinet;

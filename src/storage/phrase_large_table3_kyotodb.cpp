@@ -46,10 +46,10 @@ inline int compare_phrase(ucs4_t * lhs, ucs4_t * rhs, int phrase_length) {
 
 bool kyotodb_phrase_continue_search(const char* akbuf, size_t aksiz,
                                     const char* bkbuf, size_t bksiz) {
-    ucs4_t * lhs_phrase = akbuf;
+    ucs4_t * lhs_phrase = (ucs4_t *) akbuf;
     int lhs_phrase_length = aksiz / sizeof(ucs4_t);
-    ucs4_t * rhs_phrase = bkbuf;
-    int rhs_phrase_length = bkbuf / sizeof(ucs4_t);
+    ucs4_t * rhs_phrase = (ucs4_t *) bkbuf;
+    int rhs_phrase_length = bksiz / sizeof(ucs4_t);
 
     /* The key in dbm is longer than the key in application. */
     if (lhs_phrase_length >= rhs_phrase_length)
@@ -189,6 +189,58 @@ int PhraseLargeTable3::search(int phrase_length,
 
     result = m_entry->search(tokens) | result;
 
+    return result;
+}
+
+int PhraseLargeTable3::search_suggestion(int phrase_length,
+                                         /* in */ const ucs4_t phrase[],
+                                         /* out */ PhraseTokens tokens) const {
+    int result = SEARCH_NONE;
+
+    if (NULL == m_db)
+        return result;
+    assert(NULL != m_entry);
+
+    const char * akbuf = (char *) phrase;
+    const size_t aksiz = phrase_length * sizeof(ucs4_t);
+    const int32_t vsiz = m_db->check(akbuf, aksiz);
+    /* -1 on failure. */
+    if (-1 == vsiz)
+        return result;
+
+    kyotocabinet::BasicDB::Cursor * cursor = m_db->cursor();
+    bool retval = cursor->jump(akbuf, aksiz);
+    if (!retval) {
+        delete cursor;
+        return result;
+    }
+
+    /* Get the next entry */
+    retval = cursor->step();
+    if (!retval) {
+        delete cursor;
+        return result;
+    }
+
+    size_t bksiz = 0;
+    const char * bkbuf = cursor->get_key(&bksiz);
+    while(kyotodb_phrase_continue_search(akbuf, aksiz, bkbuf, bksiz)) {
+
+        size_t bvsiz = 0;
+        char * bvbuf = cursor->get_value(&bvsiz);
+        m_entry->m_chunk.set_chunk(bvbuf, bvsiz, NULL);
+        result = m_entry->search(tokens) | result;
+        m_entry->m_chunk.set_size(0);
+        delete [] bvbuf;
+
+        retval = cursor->step();
+        if (!retval) {
+            delete cursor;
+            return result;
+        }
+    }
+
+    delete cursor;
     return result;
 }
 
