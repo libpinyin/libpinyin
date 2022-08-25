@@ -129,6 +129,31 @@ public:
     }
 
     /**
+     * FacadePhraseTable3::search_suggestion:
+     * @phrase_length: the length of the prefix to be searched.
+     * @phrase: the ucs4 characters of the prefix to be searched.
+     * @tokens: the GArray of tokens to store the matched phrases.
+     * @returns: the search result of enum SearchResult.
+     *
+     * Search the phrase tokens according to the ucs4 prefix characters.
+     *
+     */
+    int search_suggestion(int phrase_length, /* in */ const ucs4_t phrase[],
+                          /* out */ PhraseTokens tokens) const {
+        int result = SEARCH_NONE;
+
+        if (NULL != m_system_phrase_table)
+            result |= m_system_phrase_table->search_suggestion
+                (phrase_length, phrase, tokens);
+
+        if (NULL != m_user_phrase_table)
+            result |= m_user_phrase_table->search_suggestion
+                (phrase_length, phrase, tokens);
+
+        return result;
+    }
+
+    /**
      * FacadePhraseTable3::add_index:
      * @phrase_length: the length of the phrase to be added.
      * @phrase: the ucs4 characters of the phrase to be added.
