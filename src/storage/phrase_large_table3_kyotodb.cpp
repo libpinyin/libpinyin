@@ -208,7 +208,7 @@ int PhraseLargeTable3::search_suggestion(int phrase_length,
     if (-1 == vsiz)
         return result;
 
-    kyotocabinet::BasicDB::Cursor * cursor = m_db->cursor();
+    BasicDB::Cursor * cursor = m_db->cursor();
     bool retval = cursor->jump(akbuf, aksiz);
     if (!retval) {
         delete cursor;
