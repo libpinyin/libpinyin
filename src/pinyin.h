@@ -43,7 +43,8 @@ typedef enum _lookup_candidate_type_t{
     NBEST_MATCH_CANDIDATE = 1,
     NORMAL_CANDIDATE,
     ZOMBIE_CANDIDATE,
-    PREDICTED_CANDIDATE,
+    PREDICTED_BIGRAM_CANDIDATE,
+    PREDICTED_PREFIX_CANDIDATE,
     ADDON_CANDIDATE,
 } lookup_candidate_type_t;
 

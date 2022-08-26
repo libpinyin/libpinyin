@@ -71,6 +71,8 @@ struct _pinyin_instance_t{
     /* pointer of pinyin_context_t. */
     pinyin_context_t * m_context;
 
+    ucs4_t * m_prefix_ucs4;
+    glong m_prefix_len;
     /* the tokens of phrases before the user input. */
     TokenVector m_prefixes;
 
@@ -1116,6 +1118,8 @@ pinyin_instance_t * pinyin_alloc_instance(pinyin_context_t * context){
     pinyin_instance_t * instance = new pinyin_instance_t;
     instance->m_context = context;
 
+    instance->m_prefix_ucs4 = NULL;
+    instance->m_prefix_len = 0;
     instance->m_prefixes = g_array_new(FALSE, FALSE, sizeof(phrase_token_t));
 
     instance->m_parsed_len = 0;
@@ -1144,6 +1148,7 @@ static bool _free_candidates(CandidateVector candidates) {
 }
 
 void pinyin_free_instance(pinyin_instance_t * instance){
+    g_free(instance->m_prefix_ucs4);
     g_array_free(instance->m_prefixes, TRUE);
     delete instance->m_constraints;
     g_array_free(instance->m_phrase_result, TRUE);
@@ -1189,9 +1194,14 @@ static void _compute_prefixes(pinyin_instance_t * instance,
     pinyin_context_t * & context = instance->m_context;
     FacadePhraseIndex * & phrase_index = context->m_phrase_index;
 
-    glong len_str = 0;
-    ucs4_t * ucs4_str = g_utf8_to_ucs4(prefix, -1, NULL, &len_str, NULL);
     GArray * tokenarray = g_array_new(FALSE, FALSE, sizeof(phrase_token_t));
+
+    g_free (instance->m_prefix_ucs4);
+    instance->m_prefix_ucs4 = g_utf8_to_ucs4(prefix, -1, NULL,
+                                             &(instance->m_prefix_len), NULL);
+
+    const ucs4_t * ucs4_str = instance->m_prefix_ucs4;
+    const glong len_str = instance->m_prefix_len;
 
     if (ucs4_str && len_str) {
         /* add prefixes. */
@@ -1199,7 +1209,7 @@ static void _compute_prefixes(pinyin_instance_t * instance,
             if (i > MAX_PHRASE_LENGTH)
                 break;
 
-            ucs4_t * start = ucs4_str + len_str - i;
+            const ucs4_t * start = ucs4_str + len_str - i;
 
             PhraseTokens tokens;
             memset(tokens, 0, sizeof(tokens));
@@ -1214,7 +1224,6 @@ static void _compute_prefixes(pinyin_instance_t * instance,
         }
     }
     g_array_free(tokenarray, TRUE);
-    g_free(ucs4_str);
 }
 
 bool pinyin_guess_sentence_with_prefix(pinyin_instance_t * instance,
@@ -1417,6 +1426,7 @@ bool pinyin_in_chewing_keyboard(pinyin_instance_t * instance,
 
 static bool _token_get_phrase(FacadePhraseIndex * phrase_index,
                               phrase_token_t token,
+                              guint begin,
                               guint * len,
                               gchar ** utf8_str) {
     PhraseItem item;
@@ -1431,7 +1441,7 @@ static bool _token_get_phrase(FacadePhraseIndex * phrase_index,
     if (len)
         *len = length;
     if (utf8_str)
-        *utf8_str = g_ucs4_to_utf8(buffer, length, NULL, NULL, NULL);
+        *utf8_str = g_ucs4_to_utf8(buffer + begin, length, NULL, NULL, NULL);
     return true;
 }
 
@@ -1589,7 +1599,23 @@ static void _compute_frequency_of_items(pinyin_context_t * context,
 
         gfloat lambda = context->m_system_table_info.get_lambda();
 
-        /* handle addon candidates first. */
+        /* handle prefix candidates. */
+        if (PREDICTED_PREFIX_CANDIDATE == item->m_candidate_type) {
+            total_freq = context->m_phrase_index->
+                get_phrase_index_total_freq();
+
+            context->m_phrase_index->get_phrase_item
+                (token, cached_item);
+
+            /* Note: possibility value <= 1.0. */
+            guint32 freq = ((1 - lambda) *
+                            cached_item.get_unigram_frequency() /
+                            (gfloat) total_freq) * 256 * 256 * 256;
+            item->m_freq = freq;
+            continue;
+        }
+
+        /* handle addon candidates. */
         if (ADDON_CANDIDATE == item->m_candidate_type) {
             total_freq = context->m_phrase_index->
                 get_phrase_index_total_freq();
@@ -1666,9 +1692,15 @@ static bool _compute_phrase_length(pinyin_context_t * context,
         case NBEST_MATCH_CANDIDATE:
             abort();
         case NORMAL_CANDIDATE:
-        case PREDICTED_CANDIDATE: {
+        case PREDICTED_BIGRAM_CANDIDATE: {
             phrase_index->get_phrase_item(candidate->m_token, item);
             candidate->m_phrase_length = item.get_phrase_length();
+            break;
+        }
+        case PREDICTED_PREFIX_CANDIDATE: {
+            phrase_index->get_phrase_item(candidate->m_token, item);
+            candidate->m_phrase_length =
+                item.get_phrase_length() - candidate->m_begin;
             break;
         }
         case ADDON_CANDIDATE: {
@@ -1700,16 +1732,22 @@ static bool _compute_phrase_strings_of_items(pinyin_instance_t * instance,
             break;
         }
         case NORMAL_CANDIDATE:
-        case PREDICTED_CANDIDATE:
+        case PREDICTED_BIGRAM_CANDIDATE:
             _token_get_phrase
                 (instance->m_context->m_phrase_index,
-                 candidate->m_token, NULL,
+                 candidate->m_token, 0, NULL,
+                 &(candidate->m_phrase_string));
+            break;
+        case PREDICTED_PREFIX_CANDIDATE:
+            _token_get_phrase
+                (instance->m_context->m_phrase_index,
+                 candidate->m_token, candidate->m_begin, NULL,
                  &(candidate->m_phrase_string));
             break;
         case ADDON_CANDIDATE:
             _token_get_phrase
                 (instance->m_context->m_addon_phrase_index,
-                 candidate->m_token, NULL,
+                 candidate->m_token, 0, NULL,
                  &(candidate->m_phrase_string));
             break;
         case ZOMBIE_CANDIDATE:
@@ -1986,6 +2024,7 @@ bool pinyin_guess_predicted_candidates(pinyin_instance_t * instance,
 
     _free_candidates(candidates);
 
+    /* search bigram candidate. */
     g_array_set_size(instance->m_prefixes, 0);
     _compute_prefixes(instance, prefix);
 
@@ -2036,12 +2075,38 @@ bool pinyin_guess_predicted_candidates(pinyin_instance_t * instance,
                 continue;
 
             lookup_candidate_t item;
-            item.m_candidate_type = PREDICTED_CANDIDATE;
+            item.m_candidate_type = PREDICTED_BIGRAM_CANDIDATE;
             item.m_token = phrase_item->m_token;
             g_array_append_val(candidates, item);
         }
 
     }
+
+    /* search prefix candidate. */
+    GArray * tokenarray = g_array_new(FALSE, FALSE, sizeof(phrase_token_t));
+
+    PhraseTokens phrase_tokens;
+    memset(phrase_tokens, 0, sizeof(phrase_tokens));
+    phrase_index->prepare_tokens(phrase_tokens);
+    int result = context->m_phrase_table->search_suggestion
+        (instance->m_prefix_len, instance->m_prefix_ucs4, phrase_tokens);
+    int num = reduce_tokens(phrase_tokens, tokenarray);
+    phrase_index->destroy_tokens(phrase_tokens);
+
+    for (size_t i = 0; i < tokenarray->len; ++i) {
+        phrase_token_t candidate = g_array_index(tokenarray, phrase_token_t, i);
+
+        lookup_candidate_t template_item;
+        template_item.m_candidate_type = PREDICTED_PREFIX_CANDIDATE;
+        template_item.m_token = candidate;
+        template_item.m_begin = instance->m_prefix_len;
+        /* The prefix candidate only uses the m_begin variable. */
+        template_item.m_end = 0;
+
+        g_array_append_val(candidates, template_item);
+    }
+
+    g_array_free(tokenarray, TRUE);
 
     /* post process to sort the candidates */
 
@@ -2064,7 +2129,7 @@ bool pinyin_guess_predicted_candidates(pinyin_instance_t * instance,
 int pinyin_choose_candidate(pinyin_instance_t * instance,
                             size_t offset,
                             lookup_candidate_t * candidate){
-    assert(PREDICTED_CANDIDATE != candidate->m_candidate_type);
+    assert(PREDICTED_BIGRAM_CANDIDATE != candidate->m_candidate_type);
 
     pinyin_context_t * context = instance->m_context;
     PhoneticKeyMatrix & matrix = instance->m_matrix;
@@ -2125,7 +2190,7 @@ int pinyin_choose_candidate(pinyin_instance_t * instance,
 
 bool pinyin_choose_predicted_candidate(pinyin_instance_t * instance,
                                        lookup_candidate_t * candidate){
-    assert(PREDICTED_CANDIDATE == candidate->m_candidate_type);
+    assert(PREDICTED_BIGRAM_CANDIDATE == candidate->m_candidate_type);
 
     const guint32 initial_seed = 23 * 3;
     const guint32 unigram_factor = 7;
@@ -2305,7 +2370,7 @@ bool pinyin_token_get_phrase(pinyin_instance_t * instance,
     pinyin_context_t * & context = instance->m_context;
 
     return _token_get_phrase(context->m_phrase_index,
-                             token, len, utf8_str);
+                             token, 0, len, utf8_str);
 }
 
 bool pinyin_token_get_n_pronunciation(pinyin_instance_t * instance,
