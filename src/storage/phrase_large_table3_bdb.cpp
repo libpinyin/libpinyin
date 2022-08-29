@@ -230,7 +230,7 @@ int PhraseLargeTable3::search_suggestion(int phrase_length,
     DBT db_data;
     memset(&db_data, 0, sizeof(DBT));
     /* Get the prefix entry */
-    ret = cursorp->c_get(cursorp, &db_key1, &db_data, 0);
+    ret = cursorp->c_get(cursorp, &db_key1, &db_data, DB_SET);
     if (ret != 0) {
         cursorp->c_close(cursorp);
         return result;
