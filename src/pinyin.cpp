@@ -2089,7 +2089,7 @@ bool pinyin_guess_predicted_candidates(pinyin_instance_t * instance,
     phrase_index->prepare_tokens(phrase_tokens);
     int result = context->m_phrase_table->search_suggestion
         (instance->m_prefix_len, instance->m_prefix_ucs4, phrase_tokens);
-    int num = reduce_tokens(phrase_tokens, tokenarray);
+    int num = reduce_tokens(phrase_tokens, tokenarray, false);
     phrase_index->destroy_tokens(phrase_tokens);
 
     for (size_t i = 0; i < tokenarray->len; ++i) {

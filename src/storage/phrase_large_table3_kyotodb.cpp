@@ -238,6 +238,9 @@ int PhraseLargeTable3::search_suggestion(int phrase_length,
             delete cursor;
             return result;
         }
+
+        bksiz = 0;
+        bkbuf = cursor->get_key(&bksiz);
     }
 
     delete cursor;

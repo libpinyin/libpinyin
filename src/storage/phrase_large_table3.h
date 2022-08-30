@@ -69,7 +69,8 @@ public:
 
 
 static inline int reduce_tokens(const PhraseTokens tokens,
-                                TokenVector tokenarray) {
+                                TokenVector tokenarray,
+                                bool validate = true) {
     int num = 0;
     g_array_set_size(tokenarray, 0);
 
@@ -83,8 +84,9 @@ static inline int reduce_tokens(const PhraseTokens tokens,
         g_array_append_vals(tokenarray, array->data, array->len);
     }
 
-    /* the following line will be removed in future after code are verified. */
-    assert(0 <= num && num <= 4);
+    /* the following lines will be removed in future after code are verified. */
+    if (validate)
+        assert(0 <= num && num <= 4);
 
     return num;
 }
