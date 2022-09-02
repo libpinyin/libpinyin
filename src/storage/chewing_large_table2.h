@@ -38,6 +38,32 @@ namespace pinyin{
 
 class MaskOutVisitor2;
 
+template<int phrase_length>
+class PrefixLessThanWithTones{
+protected:
+    int m_prefix_len;
+
+public:
+    PrefixLessThanWithTones(int prefix_len) :
+        m_prefix_len(prefix_len) {}
+
+    ~PrefixLessThanWithTones() {
+        m_prefix_len = 0;
+    }
+
+    int prefix_compare_with_tones(const PinyinIndexItem2<phrase_length> &lhs,
+                                  const PinyinIndexItem2<phrase_length> &rhs) {
+        ChewingKey * keys_lhs = (ChewingKey *) lhs.m_keys;
+        ChewingKey * keys_rhs = (ChewingKey *) rhs.m_keys;
+        return pinyin_compare_with_tones(keys_lhs, keys_rhs, m_prefix_len);
+    }
+
+    bool operator () (const PinyinIndexItem2<phrase_length> &lhs,
+                      const PinyinIndexItem2<phrase_length> &rhs) {
+        return 0 > prefix_compare_with_tones(lhs, rhs);
+    }
+};
+
 /* As this is a template class, the code will be in the header file. */
 template<int phrase_length>
 class ChewingTableEntry{
@@ -57,8 +83,8 @@ public:
     /* convert method. */
     /* compress consecutive tokens */
     int convert(const ChewingKey keys[],
-     const IndexItem * begin, const IndexItem * end,
-     PhraseIndexRanges ranges) const {
+                const IndexItem * begin, const IndexItem * end,
+                PhraseIndexRanges ranges) const {
         const IndexItem * iter = NULL;
         PhraseIndexRange cursor;
         GArray * head, * cursor_head = NULL;
@@ -118,6 +144,58 @@ public:
                                   phrase_less_than_with_tones<phrase_length>);
 
         return convert(keys, range.first, range.second, ranges);
+    }
+
+    int convert_suggestion(int prefix_len,
+                           const ChewingKey prefix_keys[],
+                           const IndexItem * begin, const IndexItem * end,
+                           PhraseTokens tokens) const {
+        assert(prefix_len < phrase_length);
+        const IndexItem * iter = NULL;
+        GArray * array = NULL;
+
+        int result = SEARCH_NONE;
+        for (iter = begin; iter != end; ++iter) {
+            if (0 != pinyin_compare_with_tones
+                (prefix_keys, iter->m_keys, prefix_len))
+                continue;
+
+            phrase_token_t token = iter->m_token;
+            array = tokens[PHRASE_INDEX_LIBRARY_INDEX(token)];
+            if (NULL == array)
+                continue;
+
+            result |= SEARCH_OK;
+            g_array_append_val(array, token);
+        }
+
+        return result;
+    }
+
+    /* search_suggestion method */
+    int search_suggestion(int prefix_len,
+                          /* in */ const ChewingKey prefix_keys[],
+                          /* out */ PhraseTokens tokens) const {
+        /* Usually suggestion candidates will have at least two characters,
+           use PhraseTokens instead of PhraseIndexRanges. */
+        assert(prefix_len < phrase_length);
+
+        IndexItem item;
+        if (contains_incomplete_pinyin(prefix_keys, prefix_len)) {
+            compute_incomplete_chewing_index
+                (prefix_keys, item.m_keys, prefix_len);
+        } else {
+            compute_chewing_index(prefix_keys, item.m_keys, prefix_len);
+        }
+
+        const IndexItem * begin = (IndexItem *) m_chunk.begin();
+        const IndexItem * end = (IndexItem *) m_chunk.end();
+
+        PrefixLessThanWithTones<phrase_length> less_than(prefix_len);
+        std_lite::pair<const IndexItem *, const IndexItem *> range =
+            std_lite::equal_range(begin, end, item, less_than);
+
+        return convert_suggestion(prefix_len, prefix_keys, range.first, range.second, tokens);
     }
 
     /* add/remove index method */

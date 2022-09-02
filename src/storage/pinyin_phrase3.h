@@ -223,8 +223,8 @@ inline int phrase_compare_with_tones(const PinyinIndexItem2<phrase_length> &lhs,
 }
 
 template<size_t phrase_length>
-inline int phrase_less_than_with_tones(const PinyinIndexItem2<phrase_length> &lhs,
-                                       const PinyinIndexItem2<phrase_length> &rhs)
+inline bool phrase_less_than_with_tones(const PinyinIndexItem2<phrase_length> &lhs,
+                                        const PinyinIndexItem2<phrase_length> &rhs)
 {
     return 0 > phrase_compare_with_tones<phrase_length>(lhs, rhs);
 }
