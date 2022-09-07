@@ -24,6 +24,31 @@
 
 namespace pinyin{
 
+/* keep dbm key compare function inside the corresponding dbm file
+   to get more flexibility. */
+
+static bool bdb_chewing_continue_search(const DBT *dbt1,
+                                        const DBT *dbt2) {
+    ChewingKey * lhs_chewing = (ChewingKey *) dbt1->data;
+    int lhs_chewing_length = dbt1->size / sizeof(ChewingKey);
+    ChewingKey * rhs_chewing = (ChewingKey *) dbt2->data;
+    int rhs_chewing_length = dbt2->size / sizeof(ChewingKey);
+
+    /* The key in dbm is longer than the key in application. */
+    if (lhs_chewing_length >= rhs_chewing_length)
+        return false;
+
+    int min_chewing_length = lhs_chewing_length;
+
+    int result = pinyin_exact_compare2
+        (lhs_chewing, rhs_chewing, min_chewing_length);
+    if (0 != result)
+        return false;
+
+    /* continue the longer chewing search. */
+    return true;
+}
+
 ChewingLargeTable2::ChewingLargeTable2() {
     /* create in-memory db. */
     m_db = NULL;
@@ -203,6 +228,64 @@ int ChewingLargeTable2::search_internal(int phrase_length,
     return SEARCH_NONE;
 }
 
+template<int phrase_length>
+int ChewingLargeTable2::search_suggestion_internal
+(/* in */ const DBT & db_data,
+ int prefix_len,
+ /* in */ const ChewingKey prefix_keys[],
+ /* out */ PhraseTokens tokens) const {
+    int result = SEARCH_NONE;
+
+    ChewingTableEntry<phrase_length> * entry =
+        (ChewingTableEntry<phrase_length> *)
+        g_ptr_array_index(m_entries, phrase_length);
+    assert(NULL != entry);
+
+    entry->m_chunk.set_chunk(db_data.data, db_data.size, NULL);
+
+    result = entry->search_suggestion(prefix_len, prefix_keys, tokens) | result;
+
+    return result;
+}
+
+int ChewingLargeTable2::search_suggestion_internal
+(int phrase_length,
+ /* in */ const DBT & db_data,
+ int prefix_len,
+ /* in */ const ChewingKey prefix_keys[],
+ /* out */ PhraseTokens tokens) const {
+    assert(prefix_len < phrase_length);
+
+#define CASE(len) case len:                            \
+    {                                                  \
+        return search_suggestion_internal<len>         \
+            (db_data, prefix_len, prefix_keys, tokens);  \
+    }
+    switch(phrase_length) {
+        CASE(1);
+        CASE(2);
+        CASE(3);
+        CASE(4);
+        CASE(5);
+        CASE(6);
+        CASE(7);
+        CASE(8);
+        CASE(9);
+        CASE(10);
+        CASE(11);
+        CASE(12);
+        CASE(13);
+        CASE(14);
+        CASE(15);
+        CASE(16);
+    default:
+        abort();
+    }
+
+#undef CASE
+
+    return SEARCH_NONE;
+}
 
 template<int phrase_length>
 int ChewingLargeTable2::add_index_internal(/* in */ const ChewingKey index[],
@@ -461,6 +544,70 @@ bool ChewingLargeTable2::mask_out(phrase_token_t mask,
     m_db->sync(m_db, 0);
 
     return true;
+}
+
+/* search_suggesion method */
+int ChewingLargeTable2::search_suggestion
+(int prefix_len,
+ /* in */ const ChewingKey prefix_keys[],
+ /* out */ PhraseTokens tokens) const {
+    ChewingKey index[MAX_PHRASE_LENGTH];
+    int result = SEARCH_NONE;
+
+    if (NULL == m_db)
+        return result;
+
+    if (contains_incomplete_pinyin(prefix_keys, prefix_len))
+        compute_incomplete_chewing_index(prefix_keys, index, prefix_len);
+    else
+        compute_chewing_index(prefix_keys, index, prefix_len);
+
+    DBC * cursorp = NULL;
+    /* Get a cursor */
+    int ret = m_db->cursor(m_db, NULL, &cursorp, 0);
+    if (ret != 0)
+        return result;
+
+    DBT db_key1;
+    memset(&db_key1, 0, sizeof(DBT));
+    db_key1.data = (void *) index;
+    db_key1.size = prefix_len * sizeof(ChewingKey);
+
+    DBT db_data;
+    memset(&db_data, 0, sizeof(DBT));
+    /* Get the prefix entry */
+    ret = cursorp->c_get(cursorp, &db_key1, &db_data, DB_SET);
+    if (ret != 0) {
+        cursorp->c_close(cursorp);
+        return result;
+    }
+
+    /* Get the next entry */
+    DBT db_key2;
+    memset(&db_key2, 0, sizeof(DBT));
+    memset(&db_data, 0, sizeof(DBT));
+    ret = cursorp->c_get(cursorp, &db_key2, &db_data, DB_NEXT);
+    if (ret != 0) {
+        cursorp->c_close(cursorp);
+        return result;
+    }
+
+    while(bdb_chewing_continue_search(&db_key1, &db_key2)) {
+        int phrase_length = db_key2.size / sizeof(ChewingKey);
+        result = search_suggestion_internal
+            (phrase_length, db_data, prefix_len, prefix_keys, tokens) | result;
+
+        memset(&db_key2, 0, sizeof(DBT));
+        memset(&db_data, 0, sizeof(DBT));
+        ret = cursorp->c_get(cursorp, &db_key2, &db_data, DB_NEXT);
+        if (ret != 0) {
+            cursorp->c_close(cursorp);
+            return result;
+        }
+    }
+
+    cursorp->c_close(cursorp);
+    return result;
 }
 
 };
