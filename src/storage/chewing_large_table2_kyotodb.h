@@ -59,6 +59,18 @@ protected:
                         /* out */ PhraseIndexRanges ranges) const;
 
     template<int phrase_length>
+    int search_suggestion_internal(/* in */ const MemoryChunk & chunk,
+                                   int prefix_len,
+                                   /* in */ const ChewingKey prefix_keys[],
+                                   /* out */ PhraseTokens tokens) const;
+
+    int search_suggestion_internal(int phrase_length,
+                                   /* in */ const MemoryChunk & chunk,
+                                   int prefix_len,
+                                   /* in */ const ChewingKey prefix_keys[],
+                                   /* out */ PhraseTokens tokens) const;
+
+    template<int phrase_length>
     int add_index_internal(/* in */ const ChewingKey index[],
                            /* in */ const ChewingKey keys[],
                            /* in */ phrase_token_t token);
@@ -99,6 +111,11 @@ public:
     /* search method */
     int search(int phrase_length, /* in */ const ChewingKey keys[],
                /* out */ PhraseIndexRanges ranges) const;
+
+    /* search_suggesion method */
+    int search_suggestion(int prefix_len,
+                          /* in */ const ChewingKey prefix_keys[],
+                          /* out */ PhraseTokens tokens) const;
 
     /* add/remove index method */
     int add_index(int phrase_length, /* in */ const ChewingKey keys[],

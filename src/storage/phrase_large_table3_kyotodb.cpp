@@ -225,7 +225,6 @@ int PhraseLargeTable3::search_suggestion(int phrase_length,
     size_t bksiz = 0;
     const char * bkbuf = cursor->get_key(&bksiz);
     while(kyotodb_phrase_continue_search(akbuf, aksiz, bkbuf, bksiz)) {
-
         size_t bvsiz = 0;
         char * bvbuf = cursor->get_value(&bvsiz);
         m_entry->m_chunk.set_chunk(bvbuf, bvsiz, NULL);
