@@ -129,6 +129,32 @@ public:
     }
 
     /**
+     * FacadeChewingTable2::search_suggestion:
+     * @prefix_len: the length of the prefix to be searched.
+     * @prefix_keys: the pinyin key of the prefix to be searched.
+     * @tokens: the array of GArrays to store the matched prefix token.
+     * @returns: the search result of enum SearchResult.
+     *
+     * Search the phrase tokens according to the prefix pinyin keys.
+     *
+     */
+    int search_suggestion(int prefix_len,
+                          /* in */ const ChewingKey prefix_keys[],
+                          /* out */ PhraseTokens tokens) const {
+        int result = SEARCH_NONE;
+
+        if (NULL != m_system_chewing_table)
+            result |= m_system_chewing_table->search_suggestion
+                (prefix_len, prefix_keys, tokens);
+
+        if (NULL != m_user_chewing_table)
+            result |= m_user_chewing_table->search_suggestion
+                (prefix_len, prefix_keys, tokens);
+
+        return result;
+    }
+
+    /**
      * FacadeChewingTable2::add_index:
      * @phrase_length: the length of the phrase to be added.
      * @keys: the pinyin keys of the phrase to be added.
