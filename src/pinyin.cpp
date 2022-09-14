@@ -79,6 +79,7 @@ struct _pinyin_instance_t{
     /* cached parsed pinyin keys. */
     PhoneticKeyMatrix m_matrix;
     size_t m_parsed_len;
+    size_t m_parsed_key_len;
 
     /* cached pinyin lookup variables. */
     ForwardPhoneticConstraints * m_constraints;
@@ -1123,6 +1124,7 @@ pinyin_instance_t * pinyin_alloc_instance(pinyin_context_t * context){
     instance->m_prefixes = g_array_new(FALSE, FALSE, sizeof(phrase_token_t));
 
     instance->m_parsed_len = 0;
+    instance->m_parsed_key_len = 0;
 
     instance->m_constraints = new ForwardPhoneticConstraints
         (context->m_phrase_index);
@@ -1312,6 +1314,7 @@ size_t pinyin_parse_more_full_pinyins(pinyin_instance_t * instance,
          key_rests, pinyins, strlen(pinyins));
 
     instance->m_parsed_len = parsed_len;
+    instance->m_parsed_key_len = keys->len;
 
     fill_matrix(&matrix, keys, key_rests, parsed_len);
 
@@ -1354,6 +1357,7 @@ size_t pinyin_parse_more_double_pinyins(pinyin_instance_t * instance,
          key_rests, pinyins, strlen(pinyins));
 
     instance->m_parsed_len = parsed_len;
+    instance->m_parsed_key_len = keys->len;
 
     fill_matrix(&matrix, keys, key_rests, parsed_len);
 
@@ -1398,6 +1402,7 @@ size_t pinyin_parse_more_chewings(pinyin_instance_t * instance,
          key_rests, chewings, strlen(chewings));
 
     instance->m_parsed_len = parsed_len;
+    instance->m_parsed_key_len = keys->len;
 
     fill_matrix(&matrix, keys, key_rests, parsed_len);
 

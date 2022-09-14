@@ -437,6 +437,100 @@ int search_matrix(const FacadeChewingTable2 * table,
     return result;
 }
 
+int search_suggestion_with_matrix_recur(GArray * cached_keys,
+                                        const FacadeChewingTable2 * table,
+                                        const PhoneticKeyMatrix * matrix,
+                                        size_t prefix_len,
+                                        size_t start, size_t end,
+                                        PhraseTokens tokens) {
+    if (start > end)
+        return SEARCH_NONE;
+
+    /* only do chewing table search with 'start' and 'end'. */
+    if (start == end) {
+        /* exceed the maximum phrase length.  */
+        if (cached_keys->len > MAX_PHRASE_LENGTH)
+            return SEARCH_NONE;
+
+        /* skip the phrase longer than prefix_len * 2 + 1,
+           use the m_parsed_key_len variable for the prefix_len. */
+        if (cached_keys->len > prefix_len * 2)
+            return SEARCH_NONE;
+
+        /* only "'" here. */
+        if (0 == cached_keys->len)
+            return SEARCH_NONE;
+
+#if 0
+        printf("search table for suggestion candidate:%d\n", cached_keys->len);
+#endif
+        return table->search_suggestion
+            (cached_keys->len, (ChewingKey *)cached_keys->data, tokens);
+    }
+
+    int result = SEARCH_NONE;
+
+    const size_t size = matrix->get_column_size(start);
+    /* assume pinyin parsers will filter invalid keys. */
+    assert(size > 0);
+
+    for (size_t i = 0; i < size; ++i) {
+        ChewingKey key; ChewingKeyRest key_rest;
+        matrix->get_item(start, i, key, key_rest);
+
+        const size_t newstart = key_rest.m_raw_end;
+
+        const ChewingKey zero_key;
+        if (zero_key == key) {
+            /* assume only one key here for "'" or the last key. */
+            assert(1 == size);
+            return search_suggestion_with_matrix_recur
+                (cached_keys, table, matrix, prefix_len, newstart, end, tokens);
+        }
+
+        /* push value */
+        g_array_append_val(cached_keys, key);
+
+        result |= search_suggestion_with_matrix_recur
+            (cached_keys, table, matrix, prefix_len, newstart, end, tokens);
+
+        /* pop value */
+        g_array_set_size(cached_keys, cached_keys->len - 1);
+    }
+
+    return result;
+}
+
+int search_suggestion_with_matrix(const FacadeChewingTable2 * table,
+                                  const PhoneticKeyMatrix * matrix,
+                                  size_t prefix_len,
+                                  PhraseTokens tokens) {
+    int result = SEARCH_NONE;
+
+    /* skip the prefix phrase is equal or longer than MAX_PHRASE_LENGTH,
+       as the prefix phrase candidate will always longer than prefix_len. */
+    if (prefix_len >= MAX_PHRASE_LENGTH)
+        return result;
+
+    size_t start = 0, end = matrix->size() - 1;
+
+    const size_t start_len = matrix->get_column_size(start);
+    if (0 == start_len)
+        return result;
+
+    const size_t end_len = matrix->get_column_size(end);
+    if (0 == end_len)
+        return result;
+
+    GArray * cached_keys = g_array_new(TRUE, TRUE, sizeof(ChewingKey));
+
+    result = search_suggestion_with_matrix_recur
+        (cached_keys, table, matrix, prefix_len, start, end, tokens);
+
+    g_array_free(cached_keys, TRUE);
+    return result;
+}
+
 gfloat compute_pronunciation_possibility_recur(const PhoneticKeyMatrix * matrix,
                                                size_t start, size_t end,
                                                GArray * cached_keys,

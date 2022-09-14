@@ -212,6 +212,11 @@ int search_matrix(const FacadeChewingTable2 * table,
                   size_t start, size_t end,
                   PhraseIndexRanges ranges);
 
+int search_suggestion_with_matrix(const FacadeChewingTable2 * table,
+                                  const PhoneticKeyMatrix * matrix,
+                                  size_t prefix_len,
+                                  PhraseTokens tokens);
+
 gfloat compute_pronunciation_possibility(const PhoneticKeyMatrix * matrix,
                                          size_t start, size_t end,
                                          GArray * cached_keys,
