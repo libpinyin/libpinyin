@@ -1662,6 +1662,70 @@ static void _compute_frequency_of_items(pinyin_context_t * context,
     }
 }
 
+static bool _prepend_longer_candidates(pinyin_instance_t * instance,
+                                       CandidateVector candidates) {
+
+    pinyin_context_t * & context = instance->m_context;
+    FacadePhraseIndex * & phrase_index = context->m_phrase_index;
+    PhoneticKeyMatrix & matrix = instance->m_matrix;
+    size_t prefix_len = instance->m_parsed_key_len;
+
+    GArray * tokenarray = g_array_new(FALSE, FALSE, sizeof(phrase_token_t));
+
+    PhraseTokens tokens;
+    memset(tokens, 0, sizeof(tokens));
+    phrase_index->prepare_tokens(tokens);
+    int result = search_suggestion_with_matrix
+        (context->m_pinyin_table, &matrix, prefix_len, tokens);
+    int num = reduce_tokens(tokens, tokenarray, false);
+    phrase_index->destroy_tokens(tokens);
+
+    phrase_token_t longer_token = null_token;
+    PhraseItem longer_item, item;
+    for (int i = 0; i < tokenarray->len; ++i) {
+        phrase_token_t token = g_array_index(tokenarray, phrase_token_t, i);
+
+        if (ERROR_OK != phrase_index->get_phrase_item(token, item))
+            continue;
+
+        /* skip the phrase longer than prefix_len * 2 + 1 */
+        if (item.get_phrase_length() > (prefix_len * 2 + 1))
+            continue;
+
+        if (longer_token == null_token) {
+            longer_token = token;
+            phrase_index->get_phrase_item(longer_token, longer_item);
+            continue;
+        }
+
+        if (item.get_unigram_frequency() >
+            longer_item.get_unigram_frequency()) {
+            longer_token = token;
+            phrase_index->get_phrase_item(longer_token, longer_item);
+        }
+    }
+
+    if (longer_token == null_token)
+        return false;
+
+    /* compute the unigram frequency. */
+    gfloat lambda = context->m_system_table_info.get_lambda();
+    guint32 total_freq = phrase_index->get_phrase_index_total_freq();
+    guint32 freq = ((1 - lambda) *
+                    longer_item.get_unigram_frequency() /
+                    (gfloat) total_freq) * 256 * 256 * 256;
+
+    /* prepend longer candidate to candidates. */
+    lookup_candidate_t candidate;
+    candidate.m_candidate_type = LONGER_CANDIDATE;
+    candidate.m_token = longer_token;
+    candidate.m_freq = freq;
+    g_array_prepend_val(candidates, candidate);
+
+    g_array_free(tokenarray, TRUE);
+    return true;
+}
+
 static bool _prepend_sentence_candidates(pinyin_instance_t * instance,
                                          CandidateVector candidates) {
     const size_t size = instance->m_nbest_results.size();
@@ -1737,6 +1801,7 @@ static bool _compute_phrase_strings_of_items(pinyin_instance_t * instance,
             break;
         }
         case NORMAL_CANDIDATE:
+        case LONGER_CANDIDATE:
         case PREDICTED_BIGRAM_CANDIDATE:
             _token_get_phrase
                 (instance->m_context->m_phrase_index,
@@ -1781,8 +1846,7 @@ static gint compare_indexed_item_with_phrase_string(gconstpointer lhs,
 
 
 static bool _remove_duplicated_items_by_phrase_string
-(pinyin_instance_t * instance,
- CandidateVector candidates) {
+(pinyin_instance_t * instance, CandidateVector candidates) {
     size_t i;
     /* create the GArray of indexed item */
     GArray * indices = g_array_new(FALSE, FALSE, sizeof(size_t));
@@ -1808,6 +1872,22 @@ static bool _remove_duplicated_items_by_phrase_string
         if (0 == strcmp(saved_item->m_phrase_string,
                         cur_item->m_phrase_string)) {
             /* found duplicated candidates */
+
+            /* as the longer candidates is longer than the pinyin input,
+               then only longer candidates can be equal. */
+
+            if (LONGER_CANDIDATE == saved_item->m_candidate_type &&
+                LONGER_CANDIDATE == cur_item->m_candidate_type) {
+                /* keep the high possiblity one */
+                if (saved_item->m_freq < cur_item->m_freq) {
+                    cur_item->m_candidate_type = ZOMBIE_CANDIDATE;
+                } else {
+                    saved_item->m_candidate_type = ZOMBIE_CANDIDATE;
+                    saved_item = cur_item;
+                }
+
+                continue;
+            }
 
             /* both are nbest match candidate */
             if (NBEST_MATCH_CANDIDATE == saved_item->m_candidate_type &&
@@ -2001,6 +2081,8 @@ bool pinyin_guess_candidates(pinyin_instance_t * instance,
     }
 
     /* post process to remove duplicated candidates */
+
+    _prepend_longer_candidates(instance, instance->m_candidates);
 
     _prepend_sentence_candidates(instance, instance->m_candidates);
 

@@ -228,7 +228,7 @@ int ChewingLargeTable2::search_suggestion_internal
 
     entry->m_chunk.set_chunk(chunk.begin(), chunk.size(), NULL);
 
-    result = entry->search(prefix_keys, tokens) | result;
+    result = entry->search_suggestion(prefix_len, prefix_keys, tokens) | result;
 
     entry->m_chunk.set_size(0);
 

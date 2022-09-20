@@ -46,6 +46,7 @@ typedef enum _lookup_candidate_type_t{
     PREDICTED_BIGRAM_CANDIDATE,
     PREDICTED_PREFIX_CANDIDATE,
     ADDON_CANDIDATE,
+    LONGER_CANDIDATE,
 } lookup_candidate_type_t;
 
 typedef enum _sort_option_t{
