@@ -50,8 +50,12 @@ typedef enum _lookup_candidate_type_t{
 } lookup_candidate_type_t;
 
 typedef enum _sort_option_t{
-    SORT_BY_PHRASE_LENGTH_AND_FREQUENCY = 1,
-    SORT_BY_PHRASE_LENGTH_AND_PINYIN_LENGTH_AND_FREQUENCY,
+    /* The sort order is phrase length, pinyin length, frequency. */
+    SORT_WITHOUT_SENTENCE_CANDIDATE = 0x1,
+    SORT_WITHOUT_LONGER_CANDIDATE = 0x2,
+    SORT_BY_PHRASE_LENGTH = 0x4,
+    SORT_BY_PINYIN_LENGTH = 0x8,
+    SORT_BY_FREQUENCY = 0x10,
 } sort_option_t;
 
 /**
@@ -485,7 +489,7 @@ bool pinyin_in_chewing_keyboard(pinyin_instance_t * instance,
  */
 bool pinyin_guess_candidates(pinyin_instance_t * instance,
                              size_t offset,
-                             sort_option_t sort_option);
+                             guint sort_option);
 
 /**
  * pinyin_choose_candidate:

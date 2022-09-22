@@ -1461,7 +1461,6 @@ static gint compare_item_with_token(gconstpointer lhs,
 
     return (token_lhs - token_rhs);
 }
-#endif
 
 static gint compare_item_with_phrase_length_and_frequency(gconstpointer lhs,
                                                           gconstpointer rhs) {
@@ -1479,28 +1478,39 @@ static gint compare_item_with_phrase_length_and_frequency(gconstpointer lhs,
 
     return -(freq_lhs - freq_rhs); /* in descendant order */
 }
+#endif
 
-static gint compare_item_with_phrase_length_and_pinyin_length_and_frequency
-(gconstpointer lhs, gconstpointer rhs) {
+static gint compare_item_with_sort_option
+(gconstpointer lhs, gconstpointer rhs, gpointer user_data) {
     lookup_candidate_t * item_lhs = (lookup_candidate_t *)lhs;
     lookup_candidate_t * item_rhs = (lookup_candidate_t *)rhs;
+    guint sort_option = GPOINTER_TO_UINT(user_data);
 
-    guint8 len_lhs = item_lhs->m_phrase_length;
-    guint8 len_rhs = item_rhs->m_phrase_length;
+    if (sort_option & SORT_BY_PHRASE_LENGTH) {
+        guint8 len_lhs = item_lhs->m_phrase_length;
+        guint8 len_rhs = item_rhs->m_phrase_length;
 
-    if (len_lhs != len_rhs)
-        return -(len_lhs - len_rhs); /* in descendant order */
+        if (len_lhs != len_rhs)
+            return -(len_lhs - len_rhs); /* in descendant order */
+    }
 
-    len_lhs = item_lhs->m_end - item_lhs->m_begin;
-    len_rhs = item_rhs->m_end - item_rhs->m_begin;
+    if (sort_option & SORT_BY_PINYIN_LENGTH) {
+        guint8 len_lhs = item_lhs->m_end - item_lhs->m_begin;
+        guint8 len_rhs = item_rhs->m_end - item_rhs->m_begin;
 
-    if (len_lhs != len_rhs)
-        return -(len_lhs - len_rhs); /* in descendant order */
+        if (len_lhs != len_rhs)
+            return -(len_lhs - len_rhs); /* in descendant order */
+    }
 
-    guint32 freq_lhs = item_lhs->m_freq;
-    guint32 freq_rhs = item_rhs->m_freq;
+    if (sort_option & SORT_BY_FREQUENCY) {
+        guint32 freq_lhs = item_lhs->m_freq;
+        guint32 freq_rhs = item_rhs->m_freq;
 
-    return -(freq_lhs - freq_rhs); /* in descendant order */
+        if (freq_lhs != freq_rhs)
+            return -(freq_lhs - freq_rhs); /* in descendant order */
+    }
+
+    return 0;
 }
 
 static phrase_token_t _get_previous_token(pinyin_instance_t * instance,
@@ -1971,7 +1981,7 @@ static bool _check_offset(PhoneticKeyMatrix & matrix, size_t offset) {
 
 bool pinyin_guess_candidates(pinyin_instance_t * instance,
                              size_t offset,
-                             sort_option_t sort_option) {
+                             guint sort_option) {
 
     pinyin_context_t * & context = instance->m_context;
     pinyin_option_t & options = context->m_options;
@@ -2069,22 +2079,17 @@ bool pinyin_guess_candidates(pinyin_instance_t * instance,
     _compute_frequency_of_items(context, prev_token, &merged_gram, candidates);
 
     /* sort the candidates. */
-    switch (sort_option) {
-    case SORT_BY_PHRASE_LENGTH_AND_FREQUENCY:
-        g_array_sort(candidates,
-                     compare_item_with_phrase_length_and_frequency);
-        break;
-    case SORT_BY_PHRASE_LENGTH_AND_PINYIN_LENGTH_AND_FREQUENCY:
-        g_array_sort(candidates,
-                     compare_item_with_phrase_length_and_pinyin_length_and_frequency);
-        break;
-    }
+    g_array_sort_with_data
+        (candidates, compare_item_with_sort_option,
+         GUINT_TO_POINTER(sort_option));
 
     /* post process to remove duplicated candidates */
 
-    _prepend_longer_candidates(instance, instance->m_candidates);
+    if (!(sort_option & SORT_WITHOUT_LONGER_CANDIDATE))
+        _prepend_longer_candidates(instance, instance->m_candidates);
 
-    _prepend_sentence_candidates(instance, instance->m_candidates);
+    if (!(sort_option & SORT_WITHOUT_SENTENCE_CANDIDATE))
+        _prepend_sentence_candidates(instance, instance->m_candidates);
 
     _compute_phrase_strings_of_items(instance, instance->m_candidates);
 
@@ -2201,7 +2206,11 @@ bool pinyin_guess_predicted_candidates(pinyin_instance_t * instance,
     _compute_frequency_of_items(context, prev_token, &merged_gram, candidates);
 
     /* sort the candidates by phrase length and frequency. */
-    g_array_sort(candidates, compare_item_with_phrase_length_and_frequency);
+    guint sort_option = SORT_BY_PHRASE_LENGTH | SORT_BY_FREQUENCY;
+
+    g_array_sort_with_data
+        (candidates, compare_item_with_sort_option,
+         GUINT_TO_POINTER(sort_option));
 
     /* post process to remove duplicated candidates */
 
