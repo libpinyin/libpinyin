@@ -2240,6 +2240,20 @@ int pinyin_choose_candidate(pinyin_instance_t * instance,
         return matrix.size() - 1;
     }
 
+    if (LONGER_CANDIDATE == candidate->m_candidate_type) {
+        /* only train uni-gram for longer candidate. */
+        const guint32 initial_seed = 23 * 3;
+        const guint32 unigram_factor = 7;
+
+        phrase_token_t token = candidate->m_token;
+        int error = context->m_phrase_index->add_unigram_frequency
+            (token, initial_seed * unigram_factor);
+        if (ERROR_INTEGER_OVERFLOW == error)
+            return false;
+
+        return true;
+    }
+
     if (ADDON_CANDIDATE == candidate->m_candidate_type) {
         PhraseItem item;
         context->m_addon_phrase_index->get_phrase_item
@@ -3402,7 +3416,8 @@ bool pinyin_remember_user_input(pinyin_instance_t * instance,
 
 bool pinyin_is_user_candidate(pinyin_instance_t * instance,
                               lookup_candidate_t * candidate) {
-    if (NORMAL_CANDIDATE != candidate->m_candidate_type)
+    if (NORMAL_CANDIDATE != candidate->m_candidate_type &&
+        LONGER_CANDIDATE != candidate->m_candidate_type)
         return false;
 
     phrase_token_t token = candidate->m_token;
