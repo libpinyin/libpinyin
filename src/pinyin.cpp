@@ -2184,12 +2184,18 @@ bool pinyin_guess_predicted_candidates(pinyin_instance_t * instance,
     int num = reduce_tokens(phrase_tokens, tokenarray, false);
     phrase_index->destroy_tokens(phrase_tokens);
 
+    PhraseItem item;
     for (size_t i = 0; i < tokenarray->len; ++i) {
-        phrase_token_t candidate = g_array_index(tokenarray, phrase_token_t, i);
+        phrase_token_t token = g_array_index(tokenarray, phrase_token_t, i);
+
+        phrase_index->get_phrase_item(token, item);
+        /* skip the phrase longer than prefix_len * 2 + 1 */
+        if (item.get_phrase_length() > (instance->m_prefix_len * 2 + 1))
+            continue;
 
         lookup_candidate_t template_item;
         template_item.m_candidate_type = PREDICTED_PREFIX_CANDIDATE;
-        template_item.m_token = candidate;
+        template_item.m_token = token;
         template_item.m_begin = instance->m_prefix_len;
         /* The prefix candidate only uses the m_begin variable. */
         template_item.m_end = 0;
