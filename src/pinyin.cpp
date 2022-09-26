@@ -86,6 +86,9 @@ struct _pinyin_instance_t{
     NBestMatchResults m_nbest_results;
     TokenVector m_phrase_result;
     CandidateVector m_candidates;
+
+    /* cache the sort option here. */
+    guint m_sort_option;
 };
 
 struct _lookup_candidate_t{
@@ -1134,6 +1137,9 @@ pinyin_instance_t * pinyin_alloc_instance(pinyin_context_t * context){
     instance->m_candidates =
         g_array_new(TRUE, TRUE, sizeof(lookup_candidate_t));
 
+    instance->m_sort_option =
+        SORT_BY_PHRASE_LENGTH | SORT_BY_PINYIN_LENGTH | SORT_BY_FREQUENCY;
+
     return instance;
 }
 
@@ -1993,6 +1999,8 @@ bool pinyin_guess_candidates(pinyin_instance_t * instance,
     if (0 == matrix.size())
         return false;
 
+    instance->m_sort_option = sort_option;
+
     /* lookup the previous token here. */
     phrase_token_t prev_token = null_token;
 
@@ -2230,6 +2238,9 @@ bool pinyin_guess_predicted_candidates(pinyin_instance_t * instance,
 int pinyin_choose_candidate(pinyin_instance_t * instance,
                             size_t offset,
                             lookup_candidate_t * candidate){
+    const guint32 initial_seed = 23 * 3;
+    const guint32 unigram_factor = 7;
+
     assert(PREDICTED_BIGRAM_CANDIDATE != candidate->m_candidate_type &&
            PREDICTED_PREFIX_CANDIDATE != candidate->m_candidate_type);
 
@@ -2248,9 +2259,6 @@ int pinyin_choose_candidate(pinyin_instance_t * instance,
 
     if (LONGER_CANDIDATE == candidate->m_candidate_type) {
         /* only train uni-gram for longer candidate. */
-        const guint32 initial_seed = 23 * 3;
-        const guint32 unigram_factor = 7;
-
         phrase_token_t token = candidate->m_token;
         int error = context->m_phrase_index->add_unigram_frequency
             (token, initial_seed * unigram_factor);
@@ -2289,6 +2297,19 @@ int pinyin_choose_candidate(pinyin_instance_t * instance,
         /* update the candidate. */
         candidate->m_candidate_type = NORMAL_CANDIDATE;
         candidate->m_token = token;
+    }
+
+    if (instance->m_sort_option & SORT_WITHOUT_SENTENCE_CANDIDATE) {
+        assert(0 == offset);
+
+        /* only train uni-gram. */
+        phrase_token_t token = candidate->m_token;
+        int error = context->m_phrase_index->add_unigram_frequency
+            (token, initial_seed * unigram_factor);
+        if (ERROR_INTEGER_OVERFLOW == error)
+            return false;
+
+        return true;
     }
 
     /* sync m_constraints to the length of m_pinyin_keys. */
