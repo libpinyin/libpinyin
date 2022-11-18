@@ -11,10 +11,13 @@ jobs:
 
     runs-on: ubuntu-latest
 
+    container:
+      image: fedora:rawhide
+
     steps:
     - uses: actions/checkout@v2
     - name: install build dependency
-      run: sudo apt-get install -y libdb-dev libglib2.0-dev
+      run: sudo dnf install -y gcc-c++ libdb-devel glib2-devel make gnome-common wget
     - name: autoconf
       run: ./autogen.sh
     - name: configure
