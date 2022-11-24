@@ -561,7 +561,8 @@ bool PhraseLengthIndexLevel2::load(MemoryChunk * chunk,
                                    table_offset_t offset,
                                    table_offset_t end) {
     char * buf_begin = (char *) chunk->begin();
-    guint32 nindex = *((guint32 *)(buf_begin + offset));
+    guint32 nindex = chunk->get_content<guint32>(offset);
+
     table_offset_t * index = (table_offset_t *)
         (buf_begin + offset + sizeof(guint32));
 

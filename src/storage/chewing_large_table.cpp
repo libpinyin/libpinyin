@@ -804,7 +804,7 @@ bool ChewingBitmapIndexLevel::store(MemoryChunk * new_chunk,
 bool ChewingLengthIndexLevel::load(MemoryChunk * chunk, table_offset_t offset,
                                    table_offset_t end) {
     char * begin = (char *) chunk->begin();
-    guint32 nindex = *((guint32 *)(begin + offset)); /* number of index */
+    guint32 nindex = chunk->get_content<guint32>(offset); /* number of index */
     table_offset_t * index = (table_offset_t *)
         (begin + offset + sizeof(guint32));
 

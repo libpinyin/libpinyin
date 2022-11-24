@@ -46,14 +46,12 @@ SingleGram::SingleGram(void * buffer, size_t length, bool copy){
 }
 
 bool SingleGram::get_total_freq(guint32 & total) const{
-    char * buf_begin = (char *)m_chunk.begin();
-    total = *((guint32 *)buf_begin);
+    total = m_chunk.get_content<guint32>(0);
     return true;
 }
 
 bool SingleGram::set_total_freq(guint32 total){
-    char * buf_begin = (char *)m_chunk.begin();
-    *((guint32 *)buf_begin) = total;
+    m_chunk.set_content<guint32>(0, total);
     return true;
 }
 
