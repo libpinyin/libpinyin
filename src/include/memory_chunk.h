@@ -134,7 +134,7 @@ private:
         /* checksum for aligned parts. */
         guint32 index = 0;
         for (; index < aligns; index += sizeof(guint32)) {
-            const char * p = data + index;
+            const unsigned char * p = (const unsigned char *)data + index;
 
             /* use little endian here. */
             guint32 item = *p | *(p + 1) << 8 |
@@ -146,7 +146,7 @@ private:
         /* checksum for remained parts. */
         guint32 shift = 0;
         for (; index < length; index++) {
-            const char * p = data + index;
+            const unsigned char * p = (const unsigned char *)data + index;
 
             guint32 item = *p << shift;
             shift += 8;
