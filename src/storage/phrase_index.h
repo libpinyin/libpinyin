@@ -31,6 +31,7 @@
 #include "memory_chunk.h"
 #include "phrase_index_logger.h"
 #include "table_info.h"
+#include "unaligned_memory.h"
 
 /**
  * Phrase Index File Format
@@ -121,8 +122,7 @@ public:
      *
      */
     guint32 get_unigram_frequency(){
-        char * buf_begin = (char *)m_chunk.begin();
-        return (*(guint32 *)(buf_begin + sizeof(guint8) + sizeof(guint8)));
+        return m_chunk.get_content<guint32>(sizeof(guint8) + sizeof(guint8));
     }
 
     /**
@@ -142,12 +142,13 @@ public:
         for ( int i = 0 ; i < npron ; ++i){
             char * chewing_begin = buf_begin + offset +
                 i * (phrase_length * sizeof(ChewingKey) + sizeof(guint32));
-            guint32 * freq = (guint32 *)(chewing_begin +
-                                         phrase_length * sizeof(ChewingKey));
-            total_freq += *freq;
+            
+            guint32 freq = UnalignedMemory<guint32>::load(chewing_begin +
+                                                          phrase_length * sizeof(ChewingKey));
+            total_freq += freq;
             if ( 0 == pinyin_compare_with_tones(keys, (ChewingKey *)chewing_begin,
                                                 phrase_length) ){
-                matched += *freq;
+                matched += freq;
             }
         }
 

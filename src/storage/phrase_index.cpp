@@ -20,6 +20,7 @@
 
 #include "phrase_index.h"
 #include "pinyin_custom2.h"
+#include "unaligned_memory.h"
 
 namespace pinyin{
 
@@ -61,10 +62,12 @@ bool PhraseItem::add_pronunciation(ChewingKey * keys, guint32 delta){
     for (int i = 0; i < npron; ++i) {
         char * chewing_begin = buf_begin + offset +
             i * (phrase_length * sizeof(ChewingKey) + sizeof(guint32));
-        guint32 * freq = (guint32 *)(chewing_begin +
-                                     phrase_length * sizeof(ChewingKey));
+        
+        guint32 * pfreq = (guint32 *)(chewing_begin +
+                                      phrase_length * sizeof(ChewingKey));
+        guint32 freq = UnalignedMemory<guint32>::load(pfreq);
 
-        total_freq += *freq;
+        total_freq += freq;
 
         if (0 == pinyin_exact_compare2
             (keys, (ChewingKey *)chewing_begin, phrase_length)) {
@@ -74,8 +77,9 @@ bool PhraseItem::add_pronunciation(ChewingKey * keys, guint32 delta){
             if (delta > 0 && total_freq > total_freq + delta)
                 return false;
 
-            *freq += delta;
+            freq += delta;
             total_freq += delta;
+            UnalignedMemory<guint32>::store(freq, pfreq);
             return true;
         }
     }
@@ -117,9 +121,11 @@ void PhraseItem::increase_pronunciation_possibility(ChewingKey * keys,
     for (int i = 0; i < npron; ++i) {
         char * chewing_begin = buf_begin + offset +
             i * (phrase_length * sizeof(ChewingKey) + sizeof(guint32));
-        guint32 * freq = (guint32 *)(chewing_begin +
-                                     phrase_length * sizeof(ChewingKey));
-        total_freq += *freq;
+        
+        guint32 * pfreq = (guint32 *)(chewing_begin +
+                                      phrase_length * sizeof(ChewingKey));
+        guint32 freq = UnalignedMemory<guint32>::load(pfreq);
+        total_freq += freq;
 
         if (0 == pinyin_compare_with_tones(keys, (ChewingKey *)chewing_begin,
                                            phrase_length)) {
@@ -128,8 +134,9 @@ void PhraseItem::increase_pronunciation_possibility(ChewingKey * keys,
             if (delta > 0 && total_freq > total_freq + delta)
                 return;
 
-            *freq += delta;
+            freq += delta;
             total_freq += delta;
+            UnalignedMemory<guint32>::store(freq, pfreq);
         }
     }
 }

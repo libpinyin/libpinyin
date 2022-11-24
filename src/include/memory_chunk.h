@@ -290,6 +290,25 @@ public:
     }
 
     /**
+     * MemoryChunk::set_content:
+     * @offset: the offset in this MemoryChunk.
+     * @data: the data to be copied.
+     * @returns: whether the data is copied successfully.
+     *
+     * Data are written directly to the memory area in this MemoryChunk.
+     *
+     */
+    template <typename T>
+    bool set_content(size_t offset, T data){
+        const size_t len = sizeof(data);
+        size_t cursize = std_lite::max(size(), offset + len);
+        ensure_has_space(offset + len);
+        memmove(m_data_begin + offset, &data, len);
+        m_data_end = m_data_begin + cursize;
+        return true;
+    }
+
+    /**
      * MemoryChunk::append_content:
      * @data: the begin of the data to be copied.
      * @len: the length of the data to be copied.
@@ -354,6 +373,21 @@ public:
             return false;
         memcpy( buffer, m_data_begin + offset, length);
         return true;
+    }
+
+    /**
+     * MemoryChunk::get_content:
+     * @offset: the offset in this MemoryChunk.
+     * @returns: the content
+     *
+     * Get the content in this MemoryChunk.
+     *
+     */
+    template <typename T>
+    T get_content(size_t offset) const {
+        T value;
+        memcpy(&value, m_data_begin + offset, sizeof(value));
+        return value;
     }
 
     /**
