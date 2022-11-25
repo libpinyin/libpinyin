@@ -22,4 +22,5 @@ libpinyininclude_HEADERS= novel_types.h
 
 noinst_HEADERS = memory_chunk.h \
                  pinyin_utils.h \
-                 stl_lite.h
+                 stl_lite.h \
+                 unaligned_memory.h
