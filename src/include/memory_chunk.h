@@ -33,6 +33,7 @@
 #define LIBPINYIN_USE_MMAP
 #endif
 #include "stl_lite.h"
+#include "pinyin_utils.h"
 
 namespace pinyin{
 
@@ -300,12 +301,7 @@ public:
      */
     template <typename T>
     bool set_content(size_t offset, T data){
-        const size_t len = sizeof(data);
-        size_t cursize = std_lite::max(size(), offset + len);
-        ensure_has_space(offset + len);
-        memmove(m_data_begin + offset, &data, len);
-        m_data_end = m_data_begin + cursize;
-        return true;
+        return set_content(offset, &data, sizeof(T));
     }
 
     /**
@@ -368,7 +364,7 @@ public:
      * Get the content in this MemoryChunk.
      *
      */
-    bool get_content(size_t offset, void * buffer, size_t length){
+    bool get_content(size_t offset, void * buffer, size_t length) const {
         if ( size() < offset + length )
             return false;
         memcpy( buffer, m_data_begin + offset, length);
@@ -386,7 +382,7 @@ public:
     template <typename T>
     T get_content(size_t offset) const {
         T value;
-        memcpy(&value, m_data_begin + offset, sizeof(value));
+        check_result(get_content(offset, &value, sizeof(T)));
         return value;
     }
 
