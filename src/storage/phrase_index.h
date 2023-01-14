@@ -142,7 +142,7 @@ public:
         for ( int i = 0 ; i < npron ; ++i){
             char * chewing_begin = buf_begin + offset +
                 i * (phrase_length * sizeof(ChewingKey) + sizeof(guint32));
-            
+
             guint32 freq = UnalignedMemory<guint32>::load(chewing_begin +
                                                           phrase_length * sizeof(ChewingKey));
             total_freq += freq;

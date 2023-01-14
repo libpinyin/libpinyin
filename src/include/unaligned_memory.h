@@ -41,7 +41,6 @@ namespace pinyin{
     public:
         /**
          * Read a value from a possibly unaligned memory address.
-         * 
          */
         static T load(const void * src) {
             T value;
@@ -51,7 +50,6 @@ namespace pinyin{
 
         /**
          * Store a value into a possibly unaligned memory address.
-         * 
          */
         static void store(T value, void * dest) {
             memcpy(dest, &value, sizeof(T));

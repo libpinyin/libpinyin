@@ -62,7 +62,7 @@ bool PhraseItem::add_pronunciation(ChewingKey * keys, guint32 delta){
     for (int i = 0; i < npron; ++i) {
         char * chewing_begin = buf_begin + offset +
             i * (phrase_length * sizeof(ChewingKey) + sizeof(guint32));
-        
+
         guint32 * pfreq = (guint32 *)(chewing_begin +
                                       phrase_length * sizeof(ChewingKey));
         guint32 freq = UnalignedMemory<guint32>::load(pfreq);
@@ -121,7 +121,7 @@ void PhraseItem::increase_pronunciation_possibility(ChewingKey * keys,
     for (int i = 0; i < npron; ++i) {
         char * chewing_begin = buf_begin + offset +
             i * (phrase_length * sizeof(ChewingKey) + sizeof(guint32));
-        
+
         guint32 * pfreq = (guint32 *)(chewing_begin +
                                       phrase_length * sizeof(ChewingKey));
         guint32 freq = UnalignedMemory<guint32>::load(pfreq);
