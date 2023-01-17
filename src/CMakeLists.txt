@@ -10,7 +10,6 @@ set(
 
 add_library(
     pinyin
-    SHARED
     ${LIBPINYIN_SOURCES}
 )
 

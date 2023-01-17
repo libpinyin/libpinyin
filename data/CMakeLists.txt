@@ -79,6 +79,8 @@ add_custom_command(
     COMMENT
         "Building binary bigram data..."
     COMMAND
+        rm -rf bigram.db
+    COMMAND
         ${import_interpolation_BIN} --table-dir ${CMAKE_SOURCE_DIR}/data < ${CMAKE_SOURCE_DIR}/data/interpolation2.text
     COMMAND
         ${gen_unigram_BIN} --table-dir ${CMAKE_SOURCE_DIR}/data
