@@ -91,6 +91,10 @@ libpinyin_la_LDFLAGS = -Wl,--version-script=$(srcdir)/libpinyin.ver \
 			  -version-info @LT_VERSION_INFO@
 endif
 
+if WINDOWS
+libpinyin_la_LDFLAGS += -no-undefined
+endif
+
 if ENABLE_LIBZHUYIN
 lib_LTLIBRARIES     += libzhuyin.la
 
@@ -107,6 +111,11 @@ else
 libzhuyin_la_LDFLAGS = -Wl,--version-script=$(srcdir)/libzhuyin.ver \
 			  -version-info @LT_VERSION_INFO@
 endif
+
+if WINDOWS
+libzhuyin_la_LDFLAGS += -no-undefined
+endif
+
 endif
 
 libpinyin_internal_a_SOURCES = pinyin_internal.cpp

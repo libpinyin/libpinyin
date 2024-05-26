@@ -132,6 +132,16 @@ AC_ARG_ENABLE(libzhuyin,
 )
 AM_CONDITIONAL(ENABLE_LIBZHUYIN, test x"$enable_libzhuyin" = x"yes")
 
+AC_CANONICAL_HOST
+build_windows=no
+case "${host_os}" in
+    cygwin*|mingw*)
+        build_windows=yes
+        ;;
+    *)
+        ;;
+esac
+AM_CONDITIONAL([WINDOWS], [test x"$build_windows" = x"yes"])
 
 AC_CONFIG_FILES([libpinyin.pc
                  libzhuyin.pc
