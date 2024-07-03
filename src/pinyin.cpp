@@ -65,6 +65,7 @@ struct _pinyin_context_t{
     bool m_modified;
 
     SystemTableInfo2 m_system_table_info;
+    UserTableInfo m_user_table_info;
 };
 
 struct _pinyin_instance_t{
@@ -152,14 +153,21 @@ static bool _clean_user_files(const char * user_dir,
 static bool check_format(pinyin_context_t * context){
     const char * user_dir = context->m_user_dir;
 
-    UserTableInfo user_table_info;
+    UserTableInfo & user_table_info = context->m_user_table_info;
     gchar * filename = g_build_filename
         (user_dir, USER_TABLE_INFO, NULL);
     user_table_info.load(filename);
-    g_free(filename);
 
     bool exists = user_table_info.is_conform
         (&context->m_system_table_info);
+
+    user_table_info.make_conform(&context->m_system_table_info);
+
+    int counter = user_table_info.get_open_counter();
+    user_table_info.set_open_counter(counter + 1);
+    user_table_info.save(filename);
+
+    g_free(filename);
 
     if (exists)
         return exists;
@@ -193,7 +201,7 @@ static bool check_format(pinyin_context_t * context){
 static bool mark_version(pinyin_context_t * context){
     const char * userdir = context->m_user_dir;
 
-    UserTableInfo user_table_info;
+    UserTableInfo & user_table_info = context->m_user_table_info;
     user_table_info.make_conform(&context->m_system_table_info);
 
     gchar * filename = g_build_filename
@@ -1011,6 +1019,13 @@ bool pinyin_set_zhuyin_scheme(pinyin_context_t * context,
 }
 
 void pinyin_fini(pinyin_context_t * context){
+    /* decrease the open counter */
+    int counter = context->m_user_table_info.get_open_counter();
+    counter = counter > 1 ? counter - 1 : 0;
+    context->m_user_table_info.set_open_counter(counter);
+
+    mark_version(context);
+
     delete context->m_full_pinyin_parser;
     delete context->m_double_pinyin_parser;
     delete context->m_chewing_parser;
