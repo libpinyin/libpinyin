@@ -28,6 +28,9 @@
 using namespace pinyin;
 
 
+/* clean the user history data after several crashes */
+#define OPEN_COUNTER_LIMIT 6
+
 #if 0
 static const pinyin_table_info_t reserved_tables[] = {
     {RESERVED, NULL, NULL, NULL, NOT_USED},
@@ -303,11 +306,13 @@ TABLE_PHONETIC_TYPE SystemTableInfo2::get_table_phonetic_type() {
 UserTableInfo::UserTableInfo() {
     m_binary_format_version = 0;
     m_model_data_version = 0;
+    m_open_counter = 0;
 }
 
 void UserTableInfo::reset() {
     m_binary_format_version = 0;
     m_model_data_version = 0;
+    m_open_counter = 0;
 }
 
 bool UserTableInfo::load(const char * filename) {
@@ -341,6 +346,11 @@ bool UserTableInfo::load(const char * filename) {
     if (EOF != num)
         format = to_table_database_format_type (str);
 
+    int counter = 0;
+    num = fscanf(input, "open counter:%d\n", &counter);
+    if (1 != num)
+        counter = 0;
+
 #if 0
     printf("binver:%d modelver:%d\n", binver, modelver);
 #endif
@@ -348,6 +358,7 @@ bool UserTableInfo::load(const char * filename) {
     m_binary_format_version = binver;
     m_model_data_version = modelver;
     m_table_database_format_type = format;
+    m_open_counter = counter;
 
     fclose(input);
 
@@ -369,6 +380,7 @@ bool UserTableInfo::save(const char * filename) {
     fprintf(output, "model data version:%d\n", m_model_data_version);
     fprintf(output, "database format:%s\n",
             from_table_database_format_type (m_table_database_format_type));
+    fprintf(output, "open counter:%d\n", m_open_counter);
 
     fclose(output);
 
@@ -387,6 +399,9 @@ bool UserTableInfo::is_conform(const SystemTableInfo2 * sysinfo) {
     if (sysinfo->m_table_database_format_type != m_table_database_format_type)
         return false;
 
+    if (m_open_counter > OPEN_COUNTER_LIMIT)
+        return false;
+
     return true;
 }
 
@@ -395,4 +410,14 @@ bool UserTableInfo::make_conform(const SystemTableInfo2 * sysinfo) {
     m_model_data_version = sysinfo->m_model_data_version;
     m_table_database_format_type = sysinfo->m_table_database_format_type;
     return true;
+}
+
+int UserTableInfo::get_open_counter() {
+    if (m_open_counter > OPEN_COUNTER_LIMIT)
+        return 0;
+    return m_open_counter;
+}
+
+void UserTableInfo::set_open_counter(int counter) {
+    m_open_counter = counter;
 }

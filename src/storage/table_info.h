@@ -98,6 +98,7 @@ private:
     int m_binary_format_version;
     int m_model_data_version;
     TABLE_DATABASE_FORMAT_TYPE m_table_database_format_type;
+    int m_open_counter;
 
 private:
     void reset();
@@ -112,6 +113,10 @@ public:
     bool is_conform(const SystemTableInfo2 * sysinfo);
 
     bool make_conform(const SystemTableInfo2 * sysinfo);
+
+    int get_open_counter();
+
+    void set_open_counter(int counter);
 };
 
 };
