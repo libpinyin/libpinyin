@@ -38,6 +38,7 @@ typedef struct _lookup_candidate_t lookup_candidate_t;
 
 typedef struct _import_iterator_t import_iterator_t;
 typedef struct _export_iterator_t export_iterator_t;
+typedef struct _bigram_export_iterator_t bigram_export_iterator_t;
 
 typedef enum _lookup_candidate_type_t{
     NBEST_MATCH_CANDIDATE = 1,
@@ -205,6 +206,51 @@ bool pinyin_iterator_get_next_phrase(export_iterator_t * iter,
  *
  */
 void pinyin_end_get_phrases(export_iterator_t * iter);
+
+/**
+ * pinyin_begin_get_bigram_phrases:
+ * @context: the pinyin context.
+ * @returns: the bigram export iterator.
+ *
+ * Begin to get phrases.
+ *
+ */
+bigram_export_iterator_t * pinyin_begin_get_bigram_phrases(pinyin_context_t * context);
+
+/**
+ * pinyin_bigram_iterator_has_next_phrase:
+ * @iter: the bigram export iterator.
+ * @returns: whether the iterator has the next phrase.
+ *
+ * Check whether the iterator has the next phrase.
+ *
+ */
+bool pinyin_bigram_iterator_has_next_phrase(bigram_export_iterator_t * iter);
+
+/**
+ * pinyin_bigram_iterator_get_next_phrase:
+ * @iter: the export iterator.
+ * @phrase: the phrase string.
+ * @pinyin: the pinyin string.
+ * @count: the count of the phrase/pinyin pair, -1 means the default value.
+ * @returns: whether the get next phrase operation succeeded.
+ *
+ * Get a pair of phrase and pinyin with count.
+ *
+ */
+bool pinyin_bigram_iterator_get_next_phrase(bigram_export_iterator_t * iter,
+                                            gchar ** phrase,
+                                            gchar ** pinyin,
+                                            gint * count);
+
+/**
+ * pinyin_end_get_bigram_phrases:
+ * @iter: the bigram export iterator.
+ *
+ * End getting phrases.
+ *
+ */
+void pinyin_end_get_bigram_phrases(bigram_export_iterator_t * iter);
 
 /**
  * pinyin_save:

@@ -127,6 +127,21 @@ struct _export_iterator_t{
     guint8 m_next_pronunciation;
 };
 
+struct _bigram_export_iterator_t{
+    pinyin_context_t * m_context;
+    /* The items from the user bigram. */
+    GArray * m_items;
+    /* The index token in the user bigram. */
+    phrase_token_t m_index_token;
+    /* The phrase tokens from the previous item. */
+    BigramPhraseWithCountArray m_phrase_tokens;
+    /* The current phrase. */
+    gchar * m_phrase;
+    /* The pinyins for the current phrase. */
+    GPtrArray * m_pinyins;
+    size_t m_pinyin_index;
+};
+
 static bool _clean_user_files(const char * user_dir,
                               const pinyin_table_info_t * phrase_files){
     /* clean up files, if version mis-matches. */
@@ -743,6 +758,154 @@ bool pinyin_iterator_get_next_phrase(export_iterator_t * iter,
 }
 
 void pinyin_end_get_phrases(export_iterator_t * iter){
+    delete iter;
+}
+
+bigram_export_iterator_t * pinyin_begin_get_bigram_phrases(pinyin_context_t * context){
+    bigram_export_iterator_t * iter = new bigram_export_iterator_t;
+    iter->m_context = context;
+    iter->m_items = g_array_new(TRUE, TRUE, sizeof(phrase_token_t));
+    context->m_user_bigram->get_all_items(iter->m_items);
+    iter->m_index_token = null_token;
+    iter->m_phrase_tokens = g_array_new(TRUE, TRUE, sizeof(BigramPhraseItemWithCount));
+    iter->m_phrase = NULL;
+    iter->m_pinyins = g_ptr_array_new();
+    iter->m_pinyin_index = 0;
+    return iter;
+}
+
+bool pinyin_bigram_iterator_has_next_phrase(bigram_export_iterator_t * iter){
+    /* pre-check the bigram sequence has been used at least twice. */
+    const guint32 initial_seed = 23 * 3;
+    const guint32 expand_factor = 2;
+    const guint32 threshold = initial_seed * expand_factor - 1;
+
+    if (iter->m_phrase && iter->m_pinyin_index < iter->m_pinyins->len)
+        return true;
+
+    do {
+        if (iter->m_index_token) {
+            while (iter->m_phrase_tokens->len) {
+                BigramPhraseItemWithCount * item = &g_array_index
+                    (iter->m_phrase_tokens, BigramPhraseItemWithCount, 0);
+                /* find the next item. */
+                if (item->m_count > threshold) {
+                    /* clean up old values. */
+                    iter->m_pinyin_index = 0;
+                    g_ptr_array_free(iter->m_pinyins, TRUE);
+                    iter->m_pinyins = g_ptr_array_new();
+
+                    /* list all the pinyins here. */
+                    PhraseItem first_item, second_item;
+                    iter->m_context->m_phrase_index->get_phrase_item
+                        (iter->m_index_token, first_item);
+                    iter->m_context->m_phrase_index->get_phrase_item
+                        (item->m_token, second_item);
+
+                    ucs4_t phrase[MAX_PHRASE_LENGTH];
+                    size_t first_len = first_item.get_phrase_length();
+                    size_t first_num = first_item.get_n_pronunciation();
+
+                    first_item.get_phrase_string(phrase);
+                    gchar * first_phrase = g_ucs4_to_utf8(phrase, first_len, NULL, NULL, NULL);
+
+                    size_t second_len = second_item.get_phrase_length();
+                    size_t second_num = second_item.get_n_pronunciation();
+
+                    second_item.get_phrase_string(phrase);
+                    gchar * second_phrase = g_ucs4_to_utf8(phrase, second_len, NULL, NULL, NULL);
+
+                    gchar * cur_phrase = g_strconcat(first_phrase, second_phrase, NULL);
+                    g_free(iter->m_phrase);
+                    iter->m_phrase = cur_phrase;
+
+                    g_free(second_phrase);
+                    g_free(first_phrase);
+
+                    ChewingKey keys[MAX_PHRASE_LENGTH];
+                    for (int i = 0; i < first_num; ++i) {
+                        gchar * first_pinyin = NULL;
+                        guint32 freq = 0;
+                        first_item.get_nth_pronunciation(i, keys, freq);
+
+                        GPtrArray * pinyins = g_ptr_array_new();
+                        for (int k = 0; k < first_len; ++k) {
+                            g_ptr_array_add(pinyins, keys[k].get_pinyin_string());
+                        }
+                        gchar ** strs = (gchar **)g_ptr_array_free(pinyins, FALSE);
+                        first_pinyin = g_strjoinv("'", strs);
+                        g_strfreev(strs);
+
+                        for (int j = 0; j < second_num; ++j) {
+                            gchar * second_pinyin = NULL;
+                            guint32 freq = 0;
+                            second_item.get_nth_pronunciation(j, keys, freq);
+
+                            GPtrArray * pinyins = g_ptr_array_new();
+                            for (int k = 0; k < second_len; ++k) {
+                                g_ptr_array_add(pinyins, keys[k].get_pinyin_string());
+                            }
+                            gchar ** strs = (gchar **)g_ptr_array_free(pinyins, FALSE);
+                            second_pinyin = g_strjoinv("'", strs);
+                            g_strfreev(strs);
+
+                            gchar * cur_pinyin = g_strconcat(first_pinyin, "'", second_pinyin, NULL);
+                            g_ptr_array_add(iter->m_pinyins, cur_pinyin);
+
+                            g_free(second_pinyin);
+                        }
+
+                        g_free(first_pinyin);
+                    }
+
+                    return true;
+                }
+                g_array_remove_index (iter->m_phrase_tokens, 0);
+            }
+        }
+
+        if (iter->m_items->len == 0)
+            break;
+
+        iter->m_index_token = g_array_index(iter->m_items, phrase_token_t, 0);
+        g_array_remove_index(iter->m_items, 0);
+        SingleGram * user_gram = NULL;
+        iter->m_context->m_user_bigram->load(iter->m_index_token, user_gram, true);
+        user_gram->retrieve_all(iter->m_phrase_tokens);
+        delete user_gram;
+    } while (iter->m_items->len);
+
+    return false;
+}
+
+bool pinyin_bigram_iterator_get_next_phrase(bigram_export_iterator_t * iter,
+                                            gchar ** phrase,
+                                            gchar ** pinyin,
+                                            gint * count){
+    /* just get the first phrase as the phrase is pre-checked by has_next_phrase. */
+    const guint32 initial_seed = 23 * 3;
+    const guint32 expand_factor = 2;
+    const guint32 threshold = initial_seed * expand_factor - 1;
+    const guint32 unigram_factor = 7;
+    assert(iter->m_index_token != null_token);
+    BigramPhraseItemWithCount item = g_array_index
+        (iter->m_phrase_tokens, BigramPhraseItemWithCount, 0);
+    assert(item.m_count > threshold);
+
+    *phrase = iter->m_phrase;
+    *pinyin = (gchar *) g_ptr_array_index(iter->m_pinyins, iter->m_pinyin_index);
+    *count = item.m_count * unigram_factor;
+
+    ++(iter->m_pinyin_index);
+
+    return pinyin_bigram_iterator_has_next_phrase(iter);
+}
+
+void pinyin_end_get_bigram_phrases(bigram_export_iterator_t * iter){
+    g_array_free(iter->m_phrase_tokens, TRUE);
+    g_array_free(iter->m_items, TRUE);
+    g_ptr_array_free(iter->m_pinyins, TRUE);
+    iter->m_pinyin_index = 0;
     delete iter;
 }
 
