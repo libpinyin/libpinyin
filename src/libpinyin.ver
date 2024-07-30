@@ -74,6 +74,10 @@ LIBPINYIN {
         pinyin_remember_user_input;
         pinyin_is_user_candidate;
         pinyin_remove_user_candidate;
+        pinyin_begin_get_bigram_phrases;
+        pinyin_bigram_iterator_has_next_phrase;
+        pinyin_bigram_iterator_get_next_phrase;
+        pinyin_end_get_bigram_phrases;
 
     local:
 	*;
