@@ -823,26 +823,26 @@ bool pinyin_bigram_iterator_has_next_phrase(bigram_export_iterator_t * iter){
                     g_free(first_phrase);
 
                     ChewingKey keys[MAX_PHRASE_LENGTH];
-                    for (int i = 0; i < first_num; ++i) {
+                    for (size_t i = 0; i < first_num; ++i) {
                         gchar * first_pinyin = NULL;
                         guint32 freq = 0;
                         first_item.get_nth_pronunciation(i, keys, freq);
 
                         GPtrArray * pinyins = g_ptr_array_new();
-                        for (int k = 0; k < first_len; ++k) {
+                        for (size_t k = 0; k < first_len; ++k) {
                             g_ptr_array_add(pinyins, keys[k].get_pinyin_string());
                         }
                         gchar ** strs = (gchar **)g_ptr_array_free(pinyins, FALSE);
                         first_pinyin = g_strjoinv("'", strs);
                         g_strfreev(strs);
 
-                        for (int j = 0; j < second_num; ++j) {
+                        for (size_t j = 0; j < second_num; ++j) {
                             gchar * second_pinyin = NULL;
                             guint32 freq = 0;
                             second_item.get_nth_pronunciation(j, keys, freq);
 
                             GPtrArray * pinyins = g_ptr_array_new();
-                            for (int k = 0; k < second_len; ++k) {
+                            for (size_t k = 0; k < second_len; ++k) {
                                 g_ptr_array_add(pinyins, keys[k].get_pinyin_string());
                             }
                             gchar ** strs = (gchar **)g_ptr_array_free(pinyins, FALSE);

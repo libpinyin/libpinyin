@@ -92,7 +92,7 @@ private:
     trellis_value_t m_element;
 
 public:
-    trellis_node <1> () : m_element(-FLT_MAX) {}
+    trellis_node () : m_element(-FLT_MAX) {}
 
 public:
     gint32 length() { return 1; }

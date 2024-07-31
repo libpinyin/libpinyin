@@ -183,13 +183,13 @@ struct PinyinIndexItem2{
     ChewingKey m_keys[phrase_length];
 
 public:
-    PinyinIndexItem2<phrase_length> () {
-        memset(m_keys, 0, sizeof(ChewingKey) * phrase_length);
+    PinyinIndexItem2 () {
+        /* memset(m_keys, 0, sizeof(ChewingKey) * phrase_length); */
         m_token = null_token;
     }
 
-    PinyinIndexItem2<phrase_length> (const ChewingKey * keys,
-                                     phrase_token_t token) {
+    PinyinIndexItem2 (const ChewingKey * keys,
+                      phrase_token_t token) {
         memmove(m_keys, keys, sizeof(ChewingKey) * phrase_length);
         m_token = token;
     }

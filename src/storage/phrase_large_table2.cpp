@@ -61,7 +61,7 @@ struct PhraseIndexItem2{
     phrase_token_t m_token;
     ucs4_t m_phrase[phrase_length];
 public:
-    PhraseIndexItem2<phrase_length>(const ucs4_t phrase[], phrase_token_t token){
+    PhraseIndexItem2(const ucs4_t phrase[], phrase_token_t token){
         memmove(m_phrase, phrase, sizeof(ucs4_t) * phrase_length);
         m_token = token;
     }
