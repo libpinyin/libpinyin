@@ -140,6 +140,8 @@ struct _bigram_export_iterator_t{
     /* The pinyins for the current phrase. */
     GPtrArray * m_pinyins;
     size_t m_pinyin_index;
+    /* Cache the count. */
+    gint m_count;
 };
 
 static bool _clean_user_files(const char * user_dir,
@@ -771,30 +773,31 @@ bigram_export_iterator_t * pinyin_begin_get_bigram_phrases(pinyin_context_t * co
     iter->m_phrase = NULL;
     iter->m_pinyins = g_ptr_array_new();
     iter->m_pinyin_index = 0;
+    iter->m_count = 0;
     return iter;
 }
 
 bool pinyin_bigram_iterator_has_next_phrase(bigram_export_iterator_t * iter){
     /* pre-check the bigram sequence has been used at least twice. */
     const guint32 initial_seed = 23 * 3;
-    const guint32 expand_factor = 2;
-    const guint32 threshold = initial_seed * expand_factor - 1;
+    const guint32 threshold = initial_seed - 1;
+    bool retval = false;
 
     if (iter->m_phrase && iter->m_pinyin_index < iter->m_pinyins->len)
         return true;
 
+    /* clean up old values. */
+    iter->m_pinyin_index = 0;
+    g_ptr_array_free(iter->m_pinyins, TRUE);
+    iter->m_pinyins = g_ptr_array_new();
+
     do {
-        if (iter->m_index_token) {
-            while (iter->m_phrase_tokens->len) {
+        if (iter->m_index_token != null_token && iter->m_index_token != sentence_start) {
+            while (iter->m_phrase_tokens->len > 0) {
                 BigramPhraseItemWithCount * item = &g_array_index
                     (iter->m_phrase_tokens, BigramPhraseItemWithCount, 0);
                 /* find the next item. */
                 if (item->m_count > threshold) {
-                    /* clean up old values. */
-                    iter->m_pinyin_index = 0;
-                    g_ptr_array_free(iter->m_pinyins, TRUE);
-                    iter->m_pinyins = g_ptr_array_new();
-
                     /* list all the pinyins here. */
                     PhraseItem first_item, second_item;
                     iter->m_context->m_phrase_index->get_phrase_item
@@ -818,6 +821,7 @@ bool pinyin_bigram_iterator_has_next_phrase(bigram_export_iterator_t * iter){
                     gchar * cur_phrase = g_strconcat(first_phrase, second_phrase, NULL);
                     g_free(iter->m_phrase);
                     iter->m_phrase = cur_phrase;
+                    iter->m_count = item->m_count;
 
                     g_free(second_phrase);
                     g_free(first_phrase);
@@ -858,13 +862,15 @@ bool pinyin_bigram_iterator_has_next_phrase(bigram_export_iterator_t * iter){
                         g_free(first_pinyin);
                     }
 
-                    return true;
+                    g_array_remove_index (iter->m_phrase_tokens, 0);
+                    retval = true;
+                    break;
                 }
                 g_array_remove_index (iter->m_phrase_tokens, 0);
             }
         }
 
-        if (iter->m_items->len == 0)
+        if (retval || iter->m_items->len == 0)
             break;
 
         iter->m_index_token = g_array_index(iter->m_items, phrase_token_t, 0);
@@ -875,7 +881,7 @@ bool pinyin_bigram_iterator_has_next_phrase(bigram_export_iterator_t * iter){
         delete user_gram;
     } while (iter->m_items->len);
 
-    return false;
+    return retval;
 }
 
 bool pinyin_bigram_iterator_get_next_phrase(bigram_export_iterator_t * iter,
@@ -883,18 +889,12 @@ bool pinyin_bigram_iterator_get_next_phrase(bigram_export_iterator_t * iter,
                                             gchar ** pinyin,
                                             gint * count){
     /* just get the first phrase as the phrase is pre-checked by has_next_phrase. */
-    const guint32 initial_seed = 23 * 3;
-    const guint32 expand_factor = 2;
-    const guint32 threshold = initial_seed * expand_factor - 1;
-    const guint32 unigram_factor = 7;
-    assert(iter->m_index_token != null_token);
-    BigramPhraseItemWithCount item = g_array_index
-        (iter->m_phrase_tokens, BigramPhraseItemWithCount, 0);
-    assert(item.m_count > threshold);
+    const guint32 unigram_factor = 2;
+    assert(iter->m_index_token != null_token && iter->m_index_token != sentence_start);
 
-    *phrase = iter->m_phrase;
-    *pinyin = (gchar *) g_ptr_array_index(iter->m_pinyins, iter->m_pinyin_index);
-    *count = item.m_count * unigram_factor;
+    *phrase = g_strdup(iter->m_phrase);
+    *pinyin = g_strdup((gchar *) g_ptr_array_index(iter->m_pinyins, iter->m_pinyin_index));
+    *count = iter->m_count * unigram_factor;
 
     ++(iter->m_pinyin_index);
 
@@ -906,6 +906,7 @@ void pinyin_end_get_bigram_phrases(bigram_export_iterator_t * iter){
     g_array_free(iter->m_items, TRUE);
     g_ptr_array_free(iter->m_pinyins, TRUE);
     iter->m_pinyin_index = 0;
+    iter->m_count = 0;
     delete iter;
 }
 
