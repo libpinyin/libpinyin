@@ -22,6 +22,14 @@ add_executable(
     gen_unigram
     gen_unigram.cpp
 )
+if(INSTALL_DATA_UTILS)
+    install(
+        TARGETS
+            gen_unigram
+        RUNTIME DESTINATION
+            ${DIR_BIN}
+    )
+endif()
 
 target_link_libraries(
     gen_unigram
