@@ -23,7 +23,6 @@
 #define PUNCT_TABLE_KYOTODB_H
 
 #include <kcdb.h>
-#include "memory_chunk.h"
 
 namespace pinyin{
 

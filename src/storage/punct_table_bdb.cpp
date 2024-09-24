@@ -94,7 +94,7 @@ bool PunctTable::load_db(const char * dbfile) {
     if (NULL == tmp_db)
         return false;
 
-    ret = tmp_db->open(tmp_db, NULL, filename, NULL,
+    ret = tmp_db->open(tmp_db, NULL, dbfile, NULL,
                        DB_BTREE, DB_RDONLY, 0600);
     if (ret != 0)
         return false;
@@ -111,7 +111,7 @@ bool PunctTable::load_db(const char * dbfile) {
 bool PunctTable::save_db(const char * dbfile) {
     DB * tmp_db = NULL;
 
-    int ret = unlink(new_filename);
+    int ret = unlink(dbfile);
     if (ret != 0 && errno != ENOENT)
         return false;
 
@@ -121,7 +121,7 @@ bool PunctTable::save_db(const char * dbfile) {
     if (NULL == tmp_db)
         return false;
 
-    ret = tmp_db->open(tmp_db, NULL, new_filename, NULL,
+    ret = tmp_db->open(tmp_db, NULL, dbfile, NULL,
                        DB_BTREE, DB_CREATE, 0600);
     if (ret != 0)
         return false;
@@ -173,7 +173,7 @@ bool PunctTable::store_entry(phrase_token_t index) {
     memset(&db_data, 0, sizeof(DBT));
     db_data.data = m_entry->m_chunk.begin();
     db_data.size = m_entry->m_chunk.size();
-    ret = m_db->put(m_db, NULL, &db_key, &db_data, 0);
+    int ret = m_db->put(m_db, NULL, &db_key, &db_data, 0);
     if (ret != 0)
         return false;
     return true;
@@ -183,7 +183,7 @@ bool PunctTable::get_all_punctuations(/* in */ phrase_token_t index,
                                       /* out */ gchar ** & puncts) {
     assert(NULL == puncts);
 
-    if (!load_entry())
+    if (!load_entry(index))
         return false;
 
     return m_entry->get_all_punctuations(puncts);
@@ -191,22 +191,22 @@ bool PunctTable::get_all_punctuations(/* in */ phrase_token_t index,
 
 bool PunctTable::append_punctuation(/* in */ phrase_token_t index,
                                     /* in */ const gchar * punct) {
-    if (!load_entry())
+    if (!load_entry(index))
         return false;
     if (!m_entry->append_punctuation(punct))
         return false;
-    if (!store_entry())
+    if (!store_entry(index))
         return false;
     return true;
 }
 
 bool PunctTable::remove_punctuation(/* in */ phrase_token_t index,
                                     /* in */ const gchar * punct) {
-    if (!load_entry())
+    if (!load_entry(index))
         return false;
     if (!m_entry->remove_punctuation(punct))
         return false;
-    if (!store_entry())
+    if (!store_entry(index))
         return false;
     return true;
 }

@@ -35,7 +35,7 @@ PunctTableEntry::~PunctTableEntry() {
     m_utf8_cache = NULL;
 }
 
-bool PunctTableEntry::escape(const gchar * punct, gint maxlen = -1) {
+bool PunctTableEntry::escape(const gchar * punct, gint maxlen) {
     if (maxlen == -1)
         maxlen = G_MAXINT;
 
@@ -54,7 +54,7 @@ bool PunctTableEntry::escape(const gchar * punct, gint maxlen = -1) {
     return true;
 }
 
-int PunctTableEntry::unescape(const ucs4_t * punct, gint maxlen = -1) {
+int PunctTableEntry::unescape(const ucs4_t * punct, gint maxlen) {
     if (maxlen == -1)
         maxlen = G_MAXINT;
 

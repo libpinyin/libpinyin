@@ -64,7 +64,7 @@ bool PunctTable::attach(const char * dbfile, guint32 flags) {
     return m_db->open(dbfile, mode);
 }
 
-/* load_db/store_db method */
+/* load_db/save_db method */
 /* use in-memory DBM here, for better performance. */
 bool PunctTable::load_db(const char * filename) {
     reset();
@@ -83,7 +83,7 @@ bool PunctTable::load_db(const char * filename) {
     return true;
 }
 
-bool PunctTable::store_db(const char * new_filename) {
+bool PunctTable::save_db(const char * new_filename) {
     int ret = unlink(new_filename);
     if ( ret != 0 && errno != ENOENT)
         return false;
@@ -130,7 +130,7 @@ bool PunctTable::get_all_punctuations(/* in */ phrase_token_t index,
                                       /* out */ gchar ** & puncts) {
     assert(NULL == puncts);
 
-    if (!load_entry())
+    if (!load_entry(index))
         return false;
 
     return m_entry->get_all_punctuations(puncts);
@@ -138,22 +138,22 @@ bool PunctTable::get_all_punctuations(/* in */ phrase_token_t index,
 
 bool PunctTable::append_punctuation(/* in */ phrase_token_t index,
                                     /* in */ const gchar * punct) {
-    if (!load_entry())
+    if (!load_entry(index))
         return false;
     if (!m_entry->append_punctuation(punct))
         return false;
-    if (!store_entry())
+    if (!store_entry(index))
         return false;
     return true;
 }
 
 bool PunctTable::remove_punctuation(/* in */ phrase_token_t index,
                                     /* in */ const gchar * punct) {
-    if (!load_entry())
+    if (!load_entry(index))
         return false;
     if (!m_entry->remove_punctuation(punct))
         return false;
-    if (!store_entry())
+    if (!store_entry(index))
         return false;
     return true;
 }

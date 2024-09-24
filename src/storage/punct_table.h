@@ -23,6 +23,7 @@
 #define PUNCT_TABLE_H
 
 #include <glib.h>
+#include "novel_types.h"
 #include "memory_chunk.h"
 
 #ifdef HAVE_BERKELEY_DB
