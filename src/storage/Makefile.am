@@ -61,7 +61,10 @@ noinst_HEADERS = chewing_enum.h \
 			  facade_phrase_table3.h \
 			  table_info.h \
 			  bdb_utils.h \
-			  kyotodb_utils.h
+			  kyotodb_utils.h \
+			  punct_table.h \
+			  punct_table_bdb.h \
+			  punct_table_kyotodb.h
 
 
 noinst_LIBRARIES = libstorage.a
@@ -77,16 +80,19 @@ libstorage_a_SOURCES = phrase_index.cpp \
 			   phonetic_key_matrix.cpp \
 			   chewing_large_table.cpp \
 			   chewing_large_table2.cpp \
-			   table_info.cpp
+			   table_info.cpp \
+			   punct_table.cpp
 
 if BERKELEYDB
 libstorage_a_SOURCES += ngram_bdb.cpp \
 			   phrase_large_table3_bdb.cpp \
-			   chewing_large_table2_bdb.cpp
+			   chewing_large_table2_bdb.cpp \
+			   punct_table_bdb.cpp
 endif
 
 if KYOTOCABINET
 libstorage_a_SOURCES += ngram_kyotodb.cpp \
 			   phrase_large_table3_kyotodb.cpp \
-			   chewing_large_table2_kyotodb.cpp
+			   chewing_large_table2_kyotodb.cpp \
+			   punct_table_kyotodb.cpp
 endif
