@@ -153,7 +153,7 @@ bool PunctTable::load_entry(phrase_token_t index) {
     memset(&db_data, 0, sizeof(DBT));
     int ret = m_db->get(m_db, NULL, &db_key, &db_data, 0);
     if (ret != 0)
-        return false;
+        return true;
 
     m_entry->m_chunk.set_content(0, db_data.data, db_data.size);
     return true;

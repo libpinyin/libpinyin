@@ -40,8 +40,7 @@ class PunctTable;
 
 /**
  * In order to support some punctuations with variable length,
- * the code store "..." like ".....". The ".." string means
- * this punctuation has another character following ".".
+ * the punctuations are appended with the null ucs4_t character.
  */
 class PunctTableEntry{
     friend class PunctTable;

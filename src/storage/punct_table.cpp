@@ -23,6 +23,8 @@
 
 using namespace pinyin;
 
+static const ucs4_t null_char = 0;
+
 PunctTableEntry::PunctTableEntry() {
     m_ucs4_cache = g_array_new(TRUE, TRUE, sizeof(ucs4_t));
     m_utf8_cache = g_string_new(NULL);
@@ -44,11 +46,8 @@ bool PunctTableEntry::escape(const gchar * punct, gint maxlen) {
     glong ucs4_len = 0;
     gunichar * ucs4_str = g_utf8_to_ucs4(punct, maxlen, NULL, &ucs4_len, NULL);
 
-    for(int i = 0; i < ucs4_len; ++i) {
-        g_array_append_val(m_ucs4_cache, ucs4_str[i]);
-        if (i < ucs4_len - 1)
-            g_array_append_val(m_ucs4_cache, ucs4_str[i]);
-    }
+    g_array_append_vals(m_ucs4_cache, ucs4_str, ucs4_len);
+    g_array_append_val(m_ucs4_cache, null_char);
 
     g_free(ucs4_str);
     return true;
@@ -64,15 +63,11 @@ int PunctTableEntry::unescape(const ucs4_t * punct, gint maxlen) {
     while (index < maxlen) {
         g_string_append_unichar(m_utf8_cache, punct[index]);
         index++;
-        if (index >= maxlen)
-            break;
-        if (punct[index - 1] == punct[index])
-            index++;
-        else
+        if (punct[index] == null_char)
             break;
     }
 
-    return index;
+    return index + 1;
 }
 
 bool PunctTableEntry::get_all_punctuations(gchar ** & puncts) {
@@ -102,8 +97,11 @@ bool PunctTableEntry::append_punctuation(const gchar * punct) {
     gchar ** puncts = NULL;
 
     get_all_punctuations(puncts);
-    if (puncts && g_strv_contains(puncts, punct))
-        abort();
+    if (puncts && g_strv_contains(puncts, punct)) {
+        fprintf(stderr, "duplicated punctuations: %s\n", punct);
+        g_strfreev(puncts);
+        return false;
+    }
     g_strfreev(puncts);
 
     if (!escape(punct))
@@ -138,13 +136,9 @@ bool PunctTableEntry::remove_punctuation(const gchar * punct) {
         }
 
         /* check the next punctuation index */
+        while (null_char != *(begin + index))
+            index++;
         index++;
-        while (begin + index < end) {
-            if (begin[index - 1] == begin[index])
-                index += 2;
-            else
-                break;
-        }
     }
 
     return false;

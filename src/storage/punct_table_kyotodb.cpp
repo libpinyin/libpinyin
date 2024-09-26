@@ -80,6 +80,19 @@ bool PunctTable::load_db(const char * filename) {
     if (!m_db->load_snapshot(filename, NULL))
         return false;
 
+#if 0
+    /* load db into memory. */
+    BasicDB * tmp_db = new TreeDB;
+    if (!tmp_db->open(filename, BasicDB::OREADER))
+        return false;
+
+    CopyVisitor visitor(m_db);
+    tmp_db->iterate(&visitor, false);
+
+    tmp_db->close();
+    delete tmp_db;
+#endif
+
     return true;
 }
 
@@ -90,6 +103,19 @@ bool PunctTable::save_db(const char * new_filename) {
 
     if (!m_db->dump_snapshot(new_filename, NULL))
         return false;
+
+#if 0
+    BasicDB * tmp_db = new TreeDB;
+    if (!tmp_db->open(new_filename, BasicDB::OWRITER|BasicDB::OCREATE))
+        return false;
+
+    CopyVisitor visitor(tmp_db);
+    m_db->iterate(&visitor, false);
+
+    tmp_db->synchronize();
+    tmp_db->close();
+    delete tmp_db;
+#endif
 
     return true;
 }
@@ -105,7 +131,7 @@ bool PunctTable::load_entry(phrase_token_t index) {
     const int32_t vsiz = m_db->check(kbuf, sizeof(phrase_token_t));
     /* -1 on failure. */
     if (-1 == vsiz || 0 == vsiz)
-        return false;
+        return true;
 
     m_entry->m_chunk.set_size(vsiz);
     /* m_chunk may re-allocate here. */
