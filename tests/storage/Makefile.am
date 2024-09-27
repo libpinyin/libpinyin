@@ -30,7 +30,9 @@ LDADD			= \
 
 TESTS			= test_phrase_index_logger \
 			  test_ngram \
-			  test_flexible_ngram
+			  test_flexible_ngram \
+			  test_table_info \
+			  test_punct_table
 
 noinst_PROGRAMS		= test_phrase_index \
 			  test_phrase_index_logger \
@@ -40,7 +42,8 @@ noinst_PROGRAMS		= test_phrase_index \
 			  test_parser2 \
 			  test_matrix \
 			  test_chewing_table \
-			  test_table_info
+			  test_table_info \
+			  test_punct_table
 
 
 test_phrase_index_SOURCES = test_phrase_index.cpp
@@ -60,3 +63,5 @@ test_matrix_SOURCES = test_matrix.cpp
 test_chewing_table_SOURCES    = test_chewing_table.cpp
 
 test_table_info_SOURCES    = test_table_info.cpp
+
+test_punct_table_SOURCES    = test_punct_table.cpp
