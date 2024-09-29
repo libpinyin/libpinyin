@@ -20,7 +20,8 @@ tablefiles		= gb_char.table gbk_char.table \
 				art.table culture.table economy.table \
 				geology.table history.table life.table \
 				nature.table people.table science.table \
-				society.table sport.table technology.table
+				society.table sport.table technology.table \
+				punct.table
 
 binfiles		= ${tablefiles:.table=.bin}
 

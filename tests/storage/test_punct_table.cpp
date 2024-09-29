@@ -46,7 +46,7 @@ void print_table(PunctTable & table) {
 
 int main(int argc, char * argv[]){
     PunctTable table;
-    check_result(table.attach("/tmp/punct.db", ATTACH_CREATE|ATTACH_READWRITE));
+    check_result(table.attach("/tmp/punct.bin", ATTACH_CREATE|ATTACH_READWRITE));
     printf("created table.\n");
     print_table(table);
 

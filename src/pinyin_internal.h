@@ -63,7 +63,7 @@
 #define USER_PHRASE_INDEX "user_phrase_index.bin"
 #define ADDON_SYSTEM_PINYIN_INDEX "addon_pinyin_index.bin"
 #define ADDON_SYSTEM_PHRASE_INDEX "addon_phrase_index.bin"
-#define SYSTEM_PUNCT_TABLE "punct.db"
+#define SYSTEM_PUNCT_TABLE "punct.bin"
 
 
 using namespace pinyin;
