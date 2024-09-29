@@ -62,6 +62,8 @@ public:
 
     bool remove_all_punctuations(/* in */ phrase_token_t index);
     bool get_all_items(/* out */ GArray * items);
+
+    bool load_text(FILE * infile);
 };
 
 };

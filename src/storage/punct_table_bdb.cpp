@@ -179,38 +179,6 @@ bool PunctTable::store_entry(phrase_token_t index) {
     return true;
 }
 
-bool PunctTable::get_all_punctuations(/* in */ phrase_token_t index,
-                                      /* out */ gchar ** & puncts) {
-    assert(NULL == puncts);
-
-    if (!load_entry(index))
-        return false;
-
-    return m_entry->get_all_punctuations(puncts);
-}
-
-bool PunctTable::append_punctuation(/* in */ phrase_token_t index,
-                                    /* in */ const gchar * punct) {
-    if (!load_entry(index))
-        return false;
-    if (!m_entry->append_punctuation(punct))
-        return false;
-    if (!store_entry(index))
-        return false;
-    return true;
-}
-
-bool PunctTable::remove_punctuation(/* in */ phrase_token_t index,
-                                    /* in */ const gchar * punct) {
-    if (!load_entry(index))
-        return false;
-    if (!m_entry->remove_punctuation(punct))
-        return false;
-    if (!store_entry(index))
-        return false;
-    return true;
-}
-
 bool PunctTable::remove_all_punctuations(/* in */ phrase_token_t index) {
     if (NULL == m_db)
         return false;

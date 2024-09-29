@@ -143,3 +143,61 @@ bool PunctTableEntry::remove_punctuation(const gchar * punct) {
 
     return false;
 }
+
+bool PunctTable::get_all_punctuations(/* in */ phrase_token_t index,
+                                      /* out */ gchar ** & puncts) {
+    assert(NULL == puncts);
+
+    if (!load_entry(index))
+        return false;
+
+    return m_entry->get_all_punctuations(puncts);
+}
+
+bool PunctTable::append_punctuation(/* in */ phrase_token_t index,
+                                    /* in */ const gchar * punct) {
+    if (!load_entry(index))
+        return false;
+    if (!m_entry->append_punctuation(punct))
+        return false;
+    if (!store_entry(index))
+        return false;
+    return true;
+}
+
+bool PunctTable::remove_punctuation(/* in */ phrase_token_t index,
+                                    /* in */ const gchar * punct) {
+    if (!load_entry(index))
+        return false;
+    if (!m_entry->remove_punctuation(punct))
+        return false;
+    if (!store_entry(index))
+        return false;
+    return true;
+}
+
+bool PunctTable::load_text(FILE * infile) {
+    phrase_token_t token;
+    char phrase[256];
+    char punct[256];
+    size_t freq;
+
+    while (!feof(infile)) {
+#ifdef __APPLE__
+        int num = fscanf(infile, "%u %255[^ \t] %255[^ \t] %ld",
+                         &token, phrase, punct, &freq);
+#else
+        int num = fscanf(infile, "%u %255s %255s  %ld",
+                         &token, phrase, punct, &freq);
+#endif
+
+        if (4 != num)
+            continue;
+
+        if (feof(infile))
+            break;
+
+        append_punctuation(token, punct);
+    }
+    return true;
+}
