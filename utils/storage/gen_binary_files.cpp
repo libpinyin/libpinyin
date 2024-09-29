@@ -83,6 +83,29 @@ bool generate_binary_files(const char * pinyin_table_filename,
     return true;
 }
 
+bool generate_punct_table(const char * tablename) {
+    PunctTable punct_table;
+    bool retval = punct_table.attach(tablename, ATTACH_CREATE|ATTACH_READWRITE);
+    if (!retval) {
+        fprintf(stderr, "open %s failed!\n", tablename);
+        exit(ENOENT);
+    }
+
+    gchar * filename = g_build_filename(table_dir, "punct.table", NULL);
+    FILE * tablefile = fopen(filename, "r");
+    if (NULL == tablefile) {
+        fprintf(stderr, "open %s failed!\n", filename);
+        exit(ENOENT);
+    }
+
+    punct_table.load_text(tablefile);
+
+    fclose(tablefile);
+    g_free(filename);
+
+    return true;
+}
+
 int main(int argc, char * argv[]){
     setlocale(LC_ALL, "");
 
@@ -119,6 +142,8 @@ int main(int argc, char * argv[]){
     generate_binary_files(ADDON_SYSTEM_PINYIN_INDEX,
                           ADDON_SYSTEM_PHRASE_INDEX,
                           phrase_files, type);
+
+    generate_punct_table(SYSTEM_PUNCT_TABLE);
 
     return 0;
 }
