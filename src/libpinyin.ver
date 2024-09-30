@@ -25,6 +25,7 @@ LIBPINYIN {
         pinyin_guess_sentence;
         pinyin_guess_sentence_with_prefix;
         pinyin_guess_predicted_candidates;
+        pinyin_guess_predicted_candidates_with_punctuations;
         pinyin_phrase_segment;
         pinyin_get_sentence;
         pinyin_parse_full_pinyin;
