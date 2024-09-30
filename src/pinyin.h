@@ -48,6 +48,7 @@ typedef enum _lookup_candidate_type_t{
     PREDICTED_PREFIX_CANDIDATE,
     ADDON_CANDIDATE,
     LONGER_CANDIDATE,
+    PREDICTED_PUNCTUATION_CANDIDATE,
 } lookup_candidate_type_t;
 
 typedef enum _sort_option_t{

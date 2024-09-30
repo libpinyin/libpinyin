@@ -66,6 +66,8 @@ struct _pinyin_context_t{
 
     SystemTableInfo2 m_system_table_info;
     UserTableInfo m_user_table_info;
+
+    PunctTable * m_system_punct_table;
 };
 
 struct _pinyin_instance_t{
@@ -430,6 +432,13 @@ pinyin_context_t * pinyin_init(const char * systemdir, const char * userdir){
     context->m_addon_phrase_index = new FacadePhraseIndex;
 
     /* don't load addon phrase libraries. */
+
+    /* load system punct table. */
+    context->m_system_punct_table = new PunctTable;
+    system_filename = g_build_filename
+        (context->m_system_dir, SYSTEM_PUNCT_TABLE, NULL);
+    context->m_system_punct_table->attach(system_filename, ATTACH_READONLY);
+    g_free(system_filename);
 
     return context;
 }
@@ -1203,6 +1212,7 @@ void pinyin_fini(pinyin_context_t * context){
     delete context->m_addon_pinyin_table;
     delete context->m_addon_phrase_table;
     delete context->m_addon_phrase_index;
+    delete context->m_system_punct_table;
 
     g_free(context->m_system_dir);
     g_free(context->m_user_dir);
@@ -2290,8 +2300,8 @@ bool pinyin_guess_candidates(pinyin_instance_t * instance,
     return true;
 }
 
-bool pinyin_guess_predicted_candidates(pinyin_instance_t * instance,
-                                       const char * prefix) {
+bool _compute_predicted_bigram_candidates(pinyin_instance_t * instance,
+                                          SingleGram * merged_gram) {
     const guint32 length = 2;
     const guint32 filter = 10;
 
@@ -2299,39 +2309,28 @@ bool pinyin_guess_predicted_candidates(pinyin_instance_t * instance,
     FacadePhraseIndex * phrase_index = context->m_phrase_index;
     CandidateVector candidates = instance->m_candidates;
     TokenVector prefixes = instance->m_prefixes;
-    phrase_token_t prev_token = null_token;
-
-    _free_candidates(candidates);
-
-    /* search bigram candidate. */
-    g_array_set_size(instance->m_prefixes, 0);
-    _compute_prefixes(instance, prefix);
-
-    if (0 == prefixes->len)
-        return false;
 
     /* merge single gram. */
-    SingleGram merged_gram;
     SingleGram * user_gram = NULL;
     for (gint i = prefixes->len - 1; i >= 0; --i) {
-        prev_token = g_array_index(prefixes, phrase_token_t, i);
+        phrase_token_t prev_token = g_array_index(prefixes, phrase_token_t, i);
 
         context->m_user_bigram->load(prev_token, user_gram);
-        merge_single_gram(&merged_gram, NULL, user_gram);
+        merge_single_gram(merged_gram, NULL, user_gram);
 
         if (user_gram)
             delete user_gram;
 
-        if (merged_gram.get_length())
+        if (merged_gram->get_length())
             break;
     }
 
-    if (0 != merged_gram.get_length()) {
+    if (0 != merged_gram->get_length()) {
 
         /* retrieve all items. */
         BigramPhraseWithCountArray tokens = g_array_new
             (FALSE, FALSE, sizeof(BigramPhraseItemWithCount));
-        merged_gram.retrieve_all(tokens);
+        merged_gram->retrieve_all(tokens);
 
         /* sort the longer word first. */
         PhraseItem cached_item;
@@ -2359,6 +2358,15 @@ bool pinyin_guess_predicted_candidates(pinyin_instance_t * instance,
             }
         }
     }
+
+    return true;
+}
+
+bool _compute_predicted_prefix_candidates(pinyin_instance_t * instance) {
+    pinyin_context_t * context = instance->m_context;
+    FacadePhraseIndex * phrase_index = context->m_phrase_index;
+    CandidateVector candidates = instance->m_candidates;
+    TokenVector prefixes = instance->m_prefixes;
 
     /* search prefix candidate. */
     GArray * tokenarray = g_array_new(FALSE, FALSE, sizeof(phrase_token_t));
@@ -2391,6 +2399,31 @@ bool pinyin_guess_predicted_candidates(pinyin_instance_t * instance,
     }
 
     g_array_free(tokenarray, TRUE);
+
+    return true;
+}
+
+bool pinyin_guess_predicted_candidates(pinyin_instance_t * instance,
+                                       const char * prefix) {
+    pinyin_context_t * context = instance->m_context;
+    FacadePhraseIndex * phrase_index = context->m_phrase_index;
+    CandidateVector candidates = instance->m_candidates;
+    TokenVector prefixes = instance->m_prefixes;
+    phrase_token_t prev_token = null_token;
+
+    _free_candidates(candidates);
+
+    /* search bigram candidate. */
+    g_array_set_size(instance->m_prefixes, 0);
+    _compute_prefixes(instance, prefix);
+
+    if (0 == prefixes->len)
+        return false;
+
+    SingleGram merged_gram;
+    _compute_predicted_bigram_candidates(instance, &merged_gram);
+
+    _compute_predicted_prefix_candidates(instance);
 
     /* post process to sort the candidates */
 
