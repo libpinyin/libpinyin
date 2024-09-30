@@ -400,6 +400,18 @@ bool pinyin_guess_predicted_candidates(pinyin_instance_t * instance,
                                        const char * prefix);
 
 /**
+ * pinyin_guess_predicted_candidates_with_punctuations:
+ * @instance: the pinyin instance.
+ * @prefix: the prefix before the predicted candidates.
+ * @returns: whether the predicted candidates are guessed successfully.
+ *
+ * Guess the predicted candidates after the prefix word.
+ *
+ */
+bool pinyin_guess_predicted_candidates_with_punctuations(pinyin_instance_t * instance,
+                                                         const char * prefix);
+
+/**
  * pinyin_phrase_segment:
  * @instance: the pinyin instance.
  * @sentence: the utf-8 sentence to be segmented.

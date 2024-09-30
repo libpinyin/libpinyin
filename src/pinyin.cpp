@@ -2019,6 +2019,9 @@ static bool _compute_phrase_strings_of_items(pinyin_instance_t * instance,
                  candidate->m_token, candidate->m_begin, NULL,
                  &(candidate->m_phrase_string));
             break;
+        case PREDICTED_PUNCTUATION_CANDIDATE:
+            /* already computed. */
+            break;
         case ADDON_CANDIDATE:
             _token_get_phrase
                 (instance->m_context->m_addon_phrase_index,
@@ -2309,11 +2312,12 @@ bool _compute_predicted_bigram_candidates(pinyin_instance_t * instance,
     FacadePhraseIndex * phrase_index = context->m_phrase_index;
     CandidateVector candidates = instance->m_candidates;
     TokenVector prefixes = instance->m_prefixes;
+    phrase_token_t prev_token = null_token;
 
     /* merge single gram. */
     SingleGram * user_gram = NULL;
     for (gint i = prefixes->len - 1; i >= 0; --i) {
-        phrase_token_t prev_token = g_array_index(prefixes, phrase_token_t, i);
+        prev_token = g_array_index(prefixes, phrase_token_t, i);
 
         context->m_user_bigram->load(prev_token, user_gram);
         merge_single_gram(merged_gram, NULL, user_gram);
@@ -2443,6 +2447,50 @@ bool pinyin_guess_predicted_candidates(pinyin_instance_t * instance,
     _compute_phrase_strings_of_items(instance, instance->m_candidates);
 
     _remove_duplicated_items_by_phrase_string(instance, instance->m_candidates);
+
+    return true;
+}
+
+bool pinyin_guess_predicted_candidates_with_punctuations(pinyin_instance_t * instance,
+                                                         const char * prefix)
+{
+    pinyin_guess_predicted_candidates(instance, prefix);
+
+    pinyin_context_t * context = instance->m_context;
+    FacadePhraseIndex * phrase_index = context->m_phrase_index;
+    CandidateVector candidates = instance->m_candidates;
+    TokenVector prefixes = instance->m_prefixes;
+    phrase_token_t prev_token = null_token;
+    PunctTable * punct_table = context->m_system_punct_table;
+
+    /* prepend the punctuations */
+    GArray * punct_array = g_array_new(TRUE, TRUE, sizeof(gchar *));
+    for (gint index = 0; index < prefixes->len; ++index) {
+        prev_token = g_array_index(prefixes, phrase_token_t, index);
+
+        gchar ** puncts = NULL;
+        punct_table->get_all_punctuations(prev_token, puncts);
+
+        guint len = g_strv_length(puncts);
+        for (guint i = 0; i < len; ++i) {
+            if (g_strv_contains((gchar **) punct_array->data, puncts[i]))
+                continue;
+            g_array_append_val(punct_array, puncts[i]);
+        }
+
+        g_strfreev(puncts);
+    }
+
+    for (gint i = punct_array->len - 1; i >= 0; --i) {
+        lookup_candidate_t item;
+        item.m_candidate_type = PREDICTED_PUNCTUATION_CANDIDATE;
+        item.m_token = null_token;
+        item.m_phrase_string = g_strdup
+            (g_array_index(punct_array, gchar *, i));
+        g_array_prepend_val(candidates, item);
+    }
+
+    g_array_free(punct_array, TRUE);
 
     return true;
 }
