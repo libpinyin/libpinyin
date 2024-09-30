@@ -52,6 +52,7 @@ pinyin_SOURCES = \
                storage/chewing_large_table.cpp \
                storage/chewing_large_table2.cpp \
                storage/table_info.cpp \
+               storage/punct_table.cpp \
                lookup/pinyin_lookup2.cpp \
                lookup/phrase_lookup.cpp \
                lookup/lookup.cpp \
@@ -61,13 +62,15 @@ pinyin_SOURCES = \
 if BERKELEYDB
 pinyin_SOURCES += storage/ngram_bdb.cpp \
                   storage/phrase_large_table3_bdb.cpp \
-                  storage/chewing_large_table2_bdb.cpp
+                  storage/chewing_large_table2_bdb.cpp \
+                  storage/punct_table_bdb.cpp
 endif
 
 if KYOTOCABINET
 pinyin_SOURCES += storage/ngram_kyotodb.cpp \
                   storage/phrase_large_table3_kyotodb.cpp \
-                  storage/chewing_large_table2_kyotodb.cpp
+                  storage/chewing_large_table2_kyotodb.cpp \
+                  storage/punct_table_kyotodb.cpp
 endif
 
 
