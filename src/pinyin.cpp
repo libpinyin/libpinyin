@@ -2588,13 +2588,18 @@ int pinyin_choose_candidate(pinyin_instance_t * instance,
 bool pinyin_choose_predicted_candidate(pinyin_instance_t * instance,
                                        lookup_candidate_t * candidate){
     assert(PREDICTED_BIGRAM_CANDIDATE == candidate->m_candidate_type ||
-           PREDICTED_PREFIX_CANDIDATE == candidate->m_candidate_type);
+           PREDICTED_PREFIX_CANDIDATE == candidate->m_candidate_type ||
+           PREDICTED_PUNCTUATION_CANDIDATE == candidate->m_candidate_type);
 
     const guint32 initial_seed = 23 * 3;
     const guint32 unigram_factor = 7;
 
     pinyin_context_t * & context = instance->m_context;
     FacadePhraseIndex * & phrase_index = context->m_phrase_index;
+
+    /* the punctuation candidate does not have the frequency. */
+    if (PREDICTED_PUNCTUATION_CANDIDATE == candidate->m_candidate_type)
+        return true;
 
     /* train uni-gram */
     phrase_token_t token = candidate->m_token;
