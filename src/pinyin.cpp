@@ -2475,7 +2475,8 @@ bool pinyin_guess_predicted_candidates_with_punctuations(pinyin_instance_t * ins
         for (guint i = 0; i < len; ++i) {
             if (g_strv_contains((gchar **) punct_array->data, puncts[i]))
                 continue;
-            g_array_append_val(punct_array, puncts[i]);
+            gchar * punct = g_strdup(puncts[i]);
+            g_array_append_val(punct_array, punct);
         }
 
         g_strfreev(puncts);
@@ -2485,8 +2486,7 @@ bool pinyin_guess_predicted_candidates_with_punctuations(pinyin_instance_t * ins
         lookup_candidate_t item;
         item.m_candidate_type = PREDICTED_PUNCTUATION_CANDIDATE;
         item.m_token = null_token;
-        item.m_phrase_string = g_strdup
-            (g_array_index(punct_array, gchar *, i));
+        item.m_phrase_string = g_array_index(punct_array, gchar *, i);
         g_array_prepend_val(candidates, item);
     }
 
