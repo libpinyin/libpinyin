@@ -6,7 +6,7 @@
 m4_define([libpinyin_released], [1])
 m4_define([libpinyin_major_version], [2])
 m4_define([libpinyin_minor_version], [9])
-m4_define([libpinyin_micro_version], [91])
+m4_define([libpinyin_micro_version], [92])
 m4_define(libpinyin_maybe_datestamp,
     m4_esyscmd([if test x]libpinyin_released[ != x1; then date +.%Y%m%d | tr -d '\n\r'; fi]))
 
