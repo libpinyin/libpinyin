@@ -2470,6 +2470,8 @@ bool pinyin_guess_predicted_candidates_with_punctuations(pinyin_instance_t * ins
 
         gchar ** puncts = NULL;
         punct_table->get_all_punctuations(prev_token, puncts);
+        if (NULL == puncts)
+            continue;
 
         guint len = g_strv_length(puncts);
         for (guint i = 0; i < len; ++i) {
