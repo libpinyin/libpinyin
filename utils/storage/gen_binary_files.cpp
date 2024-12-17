@@ -24,10 +24,12 @@
 #include "utils_helper.h"
 
 static const gchar * table_dir = ".";
+static gboolean gen_punct_table = FALSE;
 
 static GOptionEntry entries[] =
 {
     {"table-dir", 0, 0, G_OPTION_ARG_FILENAME, &table_dir, "table directory", NULL},
+    {"gen-punct-table", 0, 0, G_OPTION_ARG_NONE, &gen_punct_table, "generate punctuation table", NULL},
     {NULL}
 };
 
@@ -143,7 +145,8 @@ int main(int argc, char * argv[]){
                           ADDON_SYSTEM_PHRASE_INDEX,
                           phrase_files, type);
 
-    generate_punct_table(SYSTEM_PUNCT_TABLE);
+    if (gen_punct_table)
+        generate_punct_table(SYSTEM_PUNCT_TABLE);
 
     return 0;
 }
