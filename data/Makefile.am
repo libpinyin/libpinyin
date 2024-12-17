@@ -57,7 +57,7 @@ $(tablefiles) table.conf: interpolation2.text
 
 bigram.db: $(textual_model_data)
 	$(RM) $(binary_model_data)
-	../utils/storage/gen_binary_files --table-dir $(top_srcdir)/data
+	../utils/storage/gen_binary_files --gen-punct-table --table-dir $(top_srcdir)/data
 	../utils/storage/import_interpolation --table-dir $(top_srcdir)/data < $(top_srcdir)/data/interpolation2.text
 	../utils/training/gen_unigram --table-dir $(top_srcdir)/data
 
