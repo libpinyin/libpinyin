@@ -1827,7 +1827,7 @@ static void _compute_frequency_of_items(pinyin_context_t * context,
 
         /* handle addon candidates. */
         if (ADDON_CANDIDATE == item->m_candidate_type) {
-            total_freq = context->m_phrase_index->
+            total_freq = context->m_addon_phrase_index->
                 get_phrase_index_total_freq();
 
             /* assume the unigram of every addon phrases is 1. */
@@ -3502,7 +3502,7 @@ bool pinyin_get_double_pinyin_auxiliary_text(pinyin_instance_t * instance,
         g_free(middle);
         middle = newmiddle;
 
-        offset = key_rest.m_raw_end;
+        break;
     }
 
     gchar * auxtext = g_strconcat(prefix, middle, postfix, NULL);
@@ -3562,7 +3562,7 @@ bool pinyin_get_chewing_auxiliary_text(pinyin_instance_t * instance,
         g_free(right);
         g_free(zhuyin);
 
-        offset = key_rest.m_raw_end;
+        break;
     }
 
     gchar * auxtext = g_strconcat(prefix, middle, postfix, NULL);
