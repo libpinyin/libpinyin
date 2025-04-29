@@ -230,6 +230,7 @@ int PhraseLargeTable3::search_suggestion(int phrase_length,
         m_entry->m_chunk.set_chunk(bvbuf, bvsiz, NULL);
         result = m_entry->search(tokens) | result;
         m_entry->m_chunk.set_size(0);
+        delete [] bkbuf;
         delete [] bvbuf;
 
         retval = cursor->step();
@@ -240,6 +241,10 @@ int PhraseLargeTable3::search_suggestion(int phrase_length,
 
         bksiz = 0;
         bkbuf = cursor->get_key(&bksiz);
+    }
+
+    if (bkbuf) {
+        delete [] bkbuf;
     }
 
     delete cursor;
