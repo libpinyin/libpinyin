@@ -568,6 +568,7 @@ int ChewingLargeTable2::search_suggestion
         result = search_suggestion_internal
             (phrase_length, chunk, prefix_len, prefix_keys, tokens) | result;
         chunk.set_size(0);
+        delete [] bkbuf;
         delete [] bvbuf;
 
         retval = cursor->step();
@@ -578,6 +579,10 @@ int ChewingLargeTable2::search_suggestion
 
         bksiz = 0;
         bkbuf = cursor->get_key(&bksiz);
+    }
+
+    if (bkbuf) {
+        delete [] bkbuf;
     }
 
     delete cursor;
