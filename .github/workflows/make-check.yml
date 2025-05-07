@@ -17,7 +17,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: install build dependency
-      run: sudo dnf install -y gcc-c++ libdb-devel glib2-devel make gnome-common wget
+      run: sudo dnf install -y gcc-c++ libdb-devel glib2-devel make gnome-common wget awk
     - name: autoconf
       run: ./autogen.sh
     - name: configure
