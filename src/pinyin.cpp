@@ -1887,7 +1887,7 @@ static bool _prepend_longer_candidates(pinyin_instance_t * instance,
 
     phrase_token_t longer_token = null_token;
     PhraseItem longer_item, item;
-    for (int i = 0; i < tokenarray->len; ++i) {
+    for (guint i = 0; i < tokenarray->len; ++i) {
         phrase_token_t token = g_array_index(tokenarray, phrase_token_t, i);
 
         if (ERROR_OK != phrase_index->get_phrase_item(token, item))
@@ -1964,6 +1964,8 @@ static bool _compute_phrase_length(pinyin_context_t * context,
 
         switch(candidate->m_candidate_type) {
         case NBEST_MATCH_CANDIDATE:
+        case LONGER_CANDIDATE:
+        case PREDICTED_PUNCTUATION_CANDIDATE:
             abort();
         case NORMAL_CANDIDATE:
         case PREDICTED_BIGRAM_CANDIDATE: {
@@ -2370,7 +2372,6 @@ bool _compute_predicted_prefix_candidates(pinyin_instance_t * instance) {
     pinyin_context_t * context = instance->m_context;
     FacadePhraseIndex * phrase_index = context->m_phrase_index;
     CandidateVector candidates = instance->m_candidates;
-    TokenVector prefixes = instance->m_prefixes;
 
     /* search prefix candidate. */
     GArray * tokenarray = g_array_new(FALSE, FALSE, sizeof(phrase_token_t));
@@ -2410,7 +2411,6 @@ bool _compute_predicted_prefix_candidates(pinyin_instance_t * instance) {
 bool pinyin_guess_predicted_candidates(pinyin_instance_t * instance,
                                        const char * prefix) {
     pinyin_context_t * context = instance->m_context;
-    FacadePhraseIndex * phrase_index = context->m_phrase_index;
     CandidateVector candidates = instance->m_candidates;
     TokenVector prefixes = instance->m_prefixes;
     phrase_token_t prev_token = null_token;
@@ -2457,7 +2457,6 @@ bool pinyin_guess_predicted_candidates_with_punctuations(pinyin_instance_t * ins
     pinyin_guess_predicted_candidates(instance, prefix);
 
     pinyin_context_t * context = instance->m_context;
-    FacadePhraseIndex * phrase_index = context->m_phrase_index;
     CandidateVector candidates = instance->m_candidates;
     TokenVector prefixes = instance->m_prefixes;
     phrase_token_t prev_token = null_token;
@@ -2465,7 +2464,7 @@ bool pinyin_guess_predicted_candidates_with_punctuations(pinyin_instance_t * ins
 
     /* prepend the punctuations */
     GArray * punct_array = g_array_new(TRUE, TRUE, sizeof(gchar *));
-    for (gint index = 0; index < prefixes->len; ++index) {
+    for (guint index = 0; index < prefixes->len; ++index) {
         prev_token = g_array_index(prefixes, phrase_token_t, index);
 
         gchar ** puncts = NULL;

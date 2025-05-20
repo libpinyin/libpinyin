@@ -171,8 +171,8 @@ bool get_top_results(size_t num,
     return true;
 }
 
-static gint trellis_value_compare(const trellis_value_t ** lhs,
-                                  const trellis_value_t ** rhs) {
+static G_GNUC_UNUSED gint trellis_value_compare(const trellis_value_t ** lhs,
+                                                const trellis_value_t ** rhs) {
     /* in descending order */
     return -((*lhs)->m_poss - (*rhs)->m_poss);
 }
