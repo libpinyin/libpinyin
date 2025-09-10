@@ -123,8 +123,6 @@ endif
 
 libpinyin_internal_a_SOURCES = pinyin_internal.cpp
 
-libpinyin_internal_a_LIBADD = storage/libstorage.a lookup/liblookup.a
-
 ## Note:
 ## As libpinyin internal interface will change, only provides static library
 ##   to catch errors when compiling instead of running.
