@@ -29,7 +29,7 @@ _zhuyin_clear_constraint
 _zhuyin_lookup_tokens
 _zhuyin_train
 _zhuyin_reset
-_zhuyin_get__zhuyin_string
+_zhuyin_get_zhuyin_string
 _zhuyin_get_pinyin_string
 _zhuyin_token_get_phrase
 _zhuyin_token_get_n_pronunciation
