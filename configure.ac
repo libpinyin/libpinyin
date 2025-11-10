@@ -120,6 +120,17 @@ fi
 
 AM_CONDITIONAL([KYOTOCABINET], [test x"$DBM" = x"KyotoCabinet"])
 
+if test x"$DBM" = x"Tkrzw"; then
+   # Check Tkrzw
+   PKG_CHECK_MODULES(TKRZW, [tkrzw], [])
+
+   AC_SEARCH_LIBS([tkrzw_dbm_open], [tkrzw], [], AC_MSG_ERROR([Cannot find Tkrzw library]))
+
+   AC_DEFINE([HAVE_TKRZW], [], [Have Tkrzw.])
+fi
+
+AM_CONDITIONAL([TKRZW], [test x"$DBM" = x"Tkrzw"])
+
 DATABASE_FORMAT="$DBM"
 AC_SUBST(DATABASE_FORMAT)
 
