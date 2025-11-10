@@ -19,9 +19,9 @@
  */
 
 #include "punct_table.h"
-#include <tkrzw/dbm.h>
-#include <tkrzw/tree_dbm.h>
-#include <tkrzw/file_util.h>
+#include <tkrzw_dbm.h>
+#include <tkrzw_dbm_tree.h>
+#include <tkrzw_file_util.h>
 #include <string>
 #include <string_view>
 #include <memory>

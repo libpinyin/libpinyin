@@ -23,6 +23,7 @@
 
 #include <assert.h>
 #include <tkrzw_dbm.h>
+#include <tkrzw_file_util.h>
 #include <memory>
 #include <string>
 
@@ -36,10 +37,10 @@ inline int32_t attach_options(guint32 flags, bool & writable) {
     if (flags & ATTACH_READWRITE) {
         assert( !( flags & ATTACH_READONLY ) );
         writable = true;
-        options = File::OPEN_DEFAULT;
+        options = tkrzw::File::OPEN_DEFAULT;
     }
     if ( !(flags & ATTACH_CREATE) )
-        options |= File::OPEN_NO_CREATE;
+        options |= tkrzw::File::OPEN_NO_CREATE;
 
     return options;
 }

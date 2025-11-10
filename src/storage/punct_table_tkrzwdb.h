@@ -23,6 +23,8 @@
 #define PUNCT_TABLE_TKRZWDB_H
 
 #include <tkrzw_dbm.h>
+#include <tkrzw_dbm_baby.h>
+#include "novel_types.h"
 
 namespace pinyin{
 
