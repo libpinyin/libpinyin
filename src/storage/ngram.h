@@ -34,6 +34,10 @@
 #include "ngram_kyotodb.h"
 #endif
 
+#ifdef HAVE_TKRZW
+#include "ngram_tkrzwdb.h"
+#endif
+
 namespace pinyin{
 
 class Bigram;

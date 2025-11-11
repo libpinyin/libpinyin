@@ -82,11 +82,11 @@ public:
 
     /**
      * Bigram::attach:
-     * @dbfile: the Berkeley DB file name.
+     * @dbfile: the Kyoto Cabinet file name.
      * @flags: the flags of enum ATTACH_FLAG.
      * @returns: whether the attach operation is successful.
      *
-     * Attach this Bigram with the Berkeley DB.
+     * Attach this Bigram with the Kyoto Cabinet.
      *
      */
     bool attach(const char * dbfile, guint32 flags);

@@ -80,6 +80,8 @@ bool Bigram::load_db(const char * dbfile){
 }
 
 bool Bigram::save_db(const char * dbfile){
+    if (!m_db)
+        return false;
 
     int ret = unlink(dbfile);
     if ( ret != 0 && errno != ENOENT)
