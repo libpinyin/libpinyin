@@ -34,6 +34,10 @@
 #include "phrase_large_table3_kyotodb.h"
 #endif
 
+#ifdef HAVE_TKRZW
+#include "phrase_large_table3_tkrzwdb.h"
+#endif
+
 namespace pinyin{
 
 /**
@@ -41,10 +45,12 @@ namespace pinyin{
  * m_chunk consists of array of tokens.
  */
 class MaskOutVisitor;
+class MaskOutProcessor;
 
 class PhraseTableEntry{
     friend class PhraseLargeTable3;
     friend class MaskOutVisitor;
+    friend class MaskOutProcessor;
 protected:
     MemoryChunk m_chunk;
 

@@ -52,7 +52,7 @@ bool Bigram::load_db(const char * dbfile){
     m_db = new TinyDBM;
 
     HashDBM tmp_db;
-    if (tmp_db.Open(dbfile, false, File::OPEN_DEFAULT) != Status::SUCCESS)
+    if (tmp_db.Open(dbfile, false, File::OPEN_NO_CREATE) != Status::SUCCESS)
         return false;
 
     copy_tkrzwdb(&tmp_db, m_db);
