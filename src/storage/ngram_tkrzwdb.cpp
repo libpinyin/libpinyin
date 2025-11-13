@@ -154,8 +154,6 @@ public:
     }
 
     std::string_view ProcessEmpty(std::string_view key) override {
-        /* assume no empty record. */
-        assert (FALSE);
         return NOOP;
     }
 };

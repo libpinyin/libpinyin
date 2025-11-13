@@ -35,6 +35,7 @@ typedef enum {
     UNKNOWN_FORMAT,
     BERKELEY_DB_FORMAT,
     KYOTO_CABINET_FORMAT,
+    TKRZW_FORMAT,
 } TABLE_DATABASE_FORMAT_TYPE;
 
 typedef enum {
