@@ -93,7 +93,7 @@ public:
     bool store(const char * new_user_filename) {
         if (NULL == m_user_chewing_table)
             return false;
-        return m_user_chewing_table->store_db(new_user_filename);
+        return m_user_chewing_table->save_db(new_user_filename);
     }
 
     /**

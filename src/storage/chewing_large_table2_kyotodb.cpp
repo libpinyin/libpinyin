@@ -121,7 +121,7 @@ bool ChewingLargeTable2::load_db(const char * filename) {
     return true;
 }
 
-bool ChewingLargeTable2::store_db(const char * new_filename) {
+bool ChewingLargeTable2::save_db(const char * new_filename) {
     int ret = unlink(new_filename);
     if ( ret != 0 && errno != ENOENT)
         return false;

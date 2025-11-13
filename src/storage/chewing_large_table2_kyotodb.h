@@ -104,7 +104,7 @@ public:
     /* use in-memory DBM here, for better performance. */
     bool load_db(const char * filename);
 
-    bool store_db(const char * new_filename);
+    bool save_db(const char * new_filename);
 
     bool load_text(FILE * infile, TABLE_PHONETIC_TYPE type);
 

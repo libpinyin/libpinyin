@@ -79,7 +79,7 @@ bool PhraseLargeTable3::attach(const char * dbfile, guint32 flags) {
     return m_db->Open(dbfile, writable, options).IsOK();
 }
 
-/* load_db/store_db method */
+/* load_db/save_db method */
 bool PhraseLargeTable3::load_db(const char * filename) {
     reset();
 
@@ -99,7 +99,7 @@ bool PhraseLargeTable3::load_db(const char * filename) {
     return true;
 }
 
-bool PhraseLargeTable3::store_db(const char * new_filename){
+bool PhraseLargeTable3::save_db(const char * new_filename){
     if (!m_db)
         return false;
 

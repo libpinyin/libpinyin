@@ -147,7 +147,7 @@ bool PhraseLargeTable3::load_db(const char * filename) {
     return true;
 }
 
-bool PhraseLargeTable3::store_db(const char * new_filename) {
+bool PhraseLargeTable3::save_db(const char * new_filename) {
     DB * tmp_db = NULL;
 
     int ret = unlink(new_filename);
