@@ -73,6 +73,12 @@ pinyin_SOURCES += storage/ngram_kyotodb.cpp \
                   storage/punct_table_kyotodb.cpp
 endif
 
+if TKRZW
+pinyin_SOURCES += storage/ngram_tkrzwdb.cpp \
+                  storage/phrase_large_table3_tkrzwdb.cpp \
+                  storage/chewing_large_table2_tkrzwdb.cpp \
+                  storage/punct_table_tkrzwdb.cpp
+endif
 
 noinst_HEADERS		= pinyin_internal.h
 

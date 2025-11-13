@@ -37,13 +37,16 @@ noinst_HEADERS = chewing_enum.h \
 			  phrase_large_table3.h \
 			  phrase_large_table3_bdb.h \
 			  phrase_large_table3_kyotodb.h \
+			  phrase_large_table3_tkrzwdb.h \
 			  ngram.h \
 			  ngram_bdb.h \
 			  ngram_kyotodb.h \
+			  ngram_tkrzwdb.h \
 			  flexible_ngram.h \
 			  flexible_single_gram.h \
 			  flexible_ngram_bdb.h \
 			  flexible_ngram_kyotodb.h \
+			  flexible_ngram_tkrzwdb.h \
 			  tag_utility.h \
 			  pinyin_parser_table.h \
 			  special_table.h \
@@ -55,6 +58,7 @@ noinst_HEADERS = chewing_enum.h \
 			  chewing_large_table2.h \
 			  chewing_large_table2_bdb.h \
 			  chewing_large_table2_kyotodb.h \
+			  chewing_large_table2_tkrzwdb.h \
 			  facade_chewing_table.h \
 			  facade_chewing_table2.h \
 			  facade_phrase_table2.h \
@@ -95,4 +99,11 @@ libstorage_a_SOURCES += ngram_kyotodb.cpp \
 			   phrase_large_table3_kyotodb.cpp \
 			   chewing_large_table2_kyotodb.cpp \
 			   punct_table_kyotodb.cpp
+endif
+
+if TKRZW
+libstorage_a_SOURCES += ngram_tkrzwdb.cpp \
+			   phrase_large_table3_tkrzwdb.cpp \
+			   chewing_large_table2_tkrzwdb.cpp \
+			   punct_table_tkrzwdb.cpp
 endif
