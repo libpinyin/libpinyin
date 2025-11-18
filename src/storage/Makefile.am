@@ -66,9 +66,11 @@ noinst_HEADERS = chewing_enum.h \
 			  table_info.h \
 			  bdb_utils.h \
 			  kyotodb_utils.h \
+			  tkrzwdb_utils.h \
 			  punct_table.h \
 			  punct_table_bdb.h \
-			  punct_table_kyotodb.h
+			  punct_table_kyotodb.h \
+			  punct_table_tkrzwdb.h
 
 
 noinst_LIBRARIES = libstorage.a
