@@ -99,7 +99,7 @@ public:
      *
      */
     FlexibleBigram(const char * magic_number){
-        m_db = nullptr; // Use nullptr
+        m_db = nullptr;
         m_magic_header_index[0] = null_token;
         m_magic_header_index[1] = null_token;
 
