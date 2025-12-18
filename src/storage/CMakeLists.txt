@@ -21,6 +21,7 @@ set(
     chewing_large_table.cpp
     chewing_large_table2.cpp
     table_info.cpp
+    punct_table.cpp
 )
 
 if (HAVE_BERKELEY_DB)
@@ -30,6 +31,7 @@ if (HAVE_BERKELEY_DB)
     chewing_large_table2_bdb.cpp
     ngram_bdb.cpp
     phrase_large_table3_bdb.cpp
+    punct_table_bdb.cpp
     )
 endif (HAVE_BERKELEY_DB)
 
@@ -40,6 +42,7 @@ if (HAVE_KYOTO_CABINET)
     chewing_large_table2_kyotodb.cpp
     ngram_kyotodb.cpp
     phrase_large_table3_kyotodb.cpp
+    punct_table_kyotodb.cpp
     )
 endif (HAVE_KYOTO_CABINET)
 

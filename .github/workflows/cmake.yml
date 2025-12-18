@@ -1,0 +1,32 @@
+name: CMake CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container:
+      image: fedora:rawhide
+
+    steps:
+    - uses: actions/checkout@v6
+    - name: install build dependency
+      run: sudo dnf install -y gcc-c++ kyotocabinet-devel glib2-devel cmake ninja wget
+    - name: configure
+      run: cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Release
+    - name: build
+      run: cmake --build build
+    - name: install
+      env:
+        DESTDIR: ${{ github.workspace }}/dist
+      run: cmake --install build
+    - name: run tests
+      working-directory: ${{ github.workspace }}/build
+      run: ctest --output-on-failure
+    - name: list artifact
+      working-directory: ${{ github.workspace }}/dist/usr/local
+      run: find .
