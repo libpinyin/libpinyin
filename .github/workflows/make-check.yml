@@ -15,7 +15,7 @@ jobs:
       image: fedora:rawhide
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v6
     - name: install build dependency
       run: sudo dnf install -y gcc-c++ libdb-devel glib2-devel make gnome-common wget awk
     - name: autoconf

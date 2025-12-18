@@ -78,7 +78,7 @@ endif (DB_FOUND)
 
 if (NOT HAVE_BERKELEY_DB)
   # DBM: Kyoto Cabinet
-  find_package(KyotoCabinet)
+  find_package(KyotoCabinet REQUIRED)
   if (KyotoCabinet_FOUND)
     include_directories ( ${KyotoCabinet_INCLUDE_PATH} )
     SET (LIBS ${LIBS} ${KyotoCabinet_LIBRARY})
