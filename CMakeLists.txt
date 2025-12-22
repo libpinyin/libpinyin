@@ -39,6 +39,9 @@ set (
 
 set (VERSION ${LIBPINYIN_VERSION})
 
+######## Options
+option(BUILD_SHARED_LIBS "Build libpinyin as shared library" ON)
+
 ######## Validation
 
 include(CheckIncludeFileCXX)
