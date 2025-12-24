@@ -18,7 +18,6 @@
 cmake_minimum_required(VERSION 3.5)
 set (PACKAGE_NAME libpinyin)
 project (${PACKAGE_NAME} CXX C)
-enable_testing()
 
 ######## Package information
 set (PACKAGE_URL https://github.com/libpinyin/libpinyin)
@@ -41,6 +40,8 @@ set (VERSION ${LIBPINYIN_VERSION})
 
 ######## Options
 option(BUILD_SHARED_LIBS "Build libpinyin as shared library" ON)
+option(BUILD_TESTING "Build automated tests." ON)
+option(BUILD_UTILS "Build libpinyin utils and data." ON)
 
 ######## Validation
 
@@ -181,6 +182,13 @@ include_directories(
 ######## Subdirectories
 
 add_subdirectory(src)
-add_subdirectory(tests)
-add_subdirectory(utils)
-add_subdirectory(data)
+
+if (BUILD_TESTING)
+    enable_testing()
+    add_subdirectory(tests)
+endif()
+
+if (BUILD_UTILS)
+    add_subdirectory(utils)
+    add_subdirectory(data)
+endif()
