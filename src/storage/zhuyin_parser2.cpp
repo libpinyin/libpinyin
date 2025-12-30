@@ -26,6 +26,7 @@
 #include "stl_lite.h"
 #include "pinyin_phrase3.h"
 #include "pinyin_custom2.h"
+#include "zhuyin_custom2.h"
 #include "chewing_key.h"
 #include "pinyin_parser_table.h"
 #include "zhuyin_table.h"
@@ -51,8 +52,8 @@ static bool check_chewing_options(pinyin_option_t options, const chewing_index_i
     }
 
     /* handle correct chewing, currently only one flag per item. */
-    flags &= ZHUYIN_CORRECT_ALL;
-    options &= ZHUYIN_CORRECT_ALL;
+    flags &= ZHUYIN_CORRECT_ALL | ZHUYIN_AMB_ALL;
+    options &= ZHUYIN_CORRECT_ALL | ZHUYIN_AMB_ALL;
 
     if (flags) {
         if ((flags & options) != flags)

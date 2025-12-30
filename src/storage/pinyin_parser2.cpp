@@ -46,8 +46,8 @@ static bool check_pinyin_options(pinyin_option_t options, const pinyin_index_ite
     }
 
     /* handle correct pinyin, currently only one flag per item. */
-    flags &= PINYIN_CORRECT_ALL;
-    options &= PINYIN_CORRECT_ALL;
+    flags &= PINYIN_CORRECT_ALL | PINYIN_AMB_ALL;
+    options &= PINYIN_CORRECT_ALL | PINYIN_AMB_ALL;
 
     if (flags) {
         if ((flags & options) != flags)
