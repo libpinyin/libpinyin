@@ -94,6 +94,7 @@ def gen_pinyin_list():
                              gen_shengmu(),
                              gen_corrects(),
                              gen_u_to_v(),
+                             gen_fuzzy_corrects(),
                              ):
         yield p
 
@@ -163,6 +164,14 @@ def gen_u_to_v():
         zhuyin = PINYIN_ZHUYIN_MAP[pinyin]
         yield correct, wrong, zhuyin, flags, get_chewing(pinyin), distance
 
+def gen_fuzzy_corrects():
+    #generate fuzzy corrects
+    for correct, wrong, flag, distance in fuzzy_corrects:
+        #over-ride flags
+        flags = ['IS_PINYIN', flag]
+        pinyin = correct
+        zhuyin = PINYIN_ZHUYIN_MAP[pinyin]
+        yield correct, wrong, zhuyin, flags, get_chewing(pinyin), distance
 
 #pinyin table
 content_table = []

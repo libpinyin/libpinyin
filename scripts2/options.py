@@ -21,7 +21,7 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 auto_correct = [
-    # "correct", "wrong"
+    # "correct", "wrong", distance
     ("ng", "gn", 1),
     ("ng", "mg", 1),
     ("iu", "iou", 1),
@@ -33,7 +33,7 @@ auto_correct = [
 ]
 
 auto_correct_ext = [
-    # "correct", "wrong", flag
+    # "correct", "wrong", flag, distance
     ("ju", "jv", "PINYIN_CORRECT_V_U", 1),
     ("qu", "qv", "PINYIN_CORRECT_V_U", 1),
     ("xu", "xv", "PINYIN_CORRECT_V_U", 1),
@@ -92,6 +92,11 @@ fuzzy_yunmu = [
     ("ing", "in"),
 ]
 
+fuzzy_corrects = [
+    # "correct", "wrong", flag, distance
+    ("shua", "sua", "PINYIN_AMB_S_SH", 1),
+    ("zhua", "zua", "PINYIN_AMB_Z_ZH", 1),
+]
 
 # for HSU and ETEN26
 
