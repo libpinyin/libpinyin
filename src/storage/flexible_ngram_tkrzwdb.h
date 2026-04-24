@@ -409,14 +409,16 @@ public:
         const size_t ksiz = sizeof(phrase_token_t);
 
         std::string value_str;
+        size_t vsiz = 0; char * vbuf = NULL;
         Status status = m_db->Get(std::string_view(kbuf, ksiz), &value_str);
-        if (!status.IsOK())
-            return false;
-
-        size_t vsiz = value_str.size();
-        m_chunk.set_size(vsiz);
-        char * vbuf = (char *) m_chunk.begin();
-        memcpy(vbuf, value_str.data(), vsiz);
+        if (!status.IsOK()) {
+            vsiz = sizeof(ArrayHeader);
+        } else {
+            vsiz = value_str.size();
+            m_chunk.set_size(vsiz);
+            vbuf = (char *) m_chunk.begin();
+            memcpy(vbuf, value_str.data(), vsiz);
+        }
 
         m_chunk.set_content(0, &header, sizeof(ArrayHeader));
 
