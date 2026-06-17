@@ -25,6 +25,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <locale.h>
+#include <fstream>
+#include <iostream>
+#include <string>
 #include "pinyin_internal.h"
 #include "utils_helper.h"
 
@@ -101,7 +104,8 @@ bool deal_with_unknown(GArray * current_ucs4, FILE * output){
 
 
 int main(int argc, char * argv[]){
-    FILE * input = stdin;
+    std::istream * input = &std::cin;
+    std::ifstream input_file;
     FILE * output = stdout;
 
     setlocale(LC_ALL, "");
@@ -130,11 +134,12 @@ int main(int argc, char * argv[]){
     }
 
     if (2 == argc) {
-        input = fopen(argv[1], "r");
-        if (NULL == input) {
+        input_file.open(argv[1]);
+        if (!input_file) {
             perror("open file failed");
             exit(EINVAL);
         }
+        input = &input_file;
     }
 
     SystemTableInfo2 system_table_info;
@@ -179,18 +184,14 @@ int main(int argc, char * argv[]){
     phrase_index.prepare_tokens(tokens);
 
     /* split the sentence */
-    char * linebuf = NULL; size_t size = 0; ssize_t read;
-    while( (read = getline(&linebuf, &size, input)) != -1 ){
-        if ( '\n' ==  linebuf[strlen(linebuf) - 1] ) {
-            linebuf[strlen(linebuf) - 1] = '\0';
-        }
-
+    std::string linebuf;
+    while (std::getline(*input, linebuf)) {
         /* check non-ucs4 characters */
-        const glong num_of_chars = g_utf8_strlen(linebuf, -1);
+        const glong num_of_chars = g_utf8_strlen(linebuf.c_str(), -1);
         glong len = 0;
-        ucs4_t * sentence = g_utf8_to_ucs4(linebuf, -1, NULL, &len, NULL);
+        ucs4_t * sentence = g_utf8_to_ucs4(linebuf.c_str(), -1, NULL, &len, NULL);
         if ( len != num_of_chars ) {
-            fprintf(stderr, "non-ucs4 characters encountered:%s.\n", linebuf);
+            fprintf(stderr, "non-ucs4 characters encountered:%s.\n", linebuf.c_str());
             fprintf(output, "%d \n", null_token);
             continue;
         }
@@ -255,8 +256,6 @@ int main(int argc, char * argv[]){
     /* print enter at file tail */
     fprintf(output, "%d \n", null_token);
     g_array_free(current_ucs4, TRUE);
-    free(linebuf);
-    fclose(input);
     fclose(output);
     return 0;
 }

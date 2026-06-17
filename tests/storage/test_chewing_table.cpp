@@ -24,6 +24,8 @@
 
 #include "timer.h"
 #include <string.h>
+#include <iostream>
+#include <string>
 #include "pinyin_internal.h"
 #include "tests_helper.h"
 
@@ -56,13 +58,9 @@ int main(int argc, char * argv[]) {
     largetable.load(new_chunk);
 #endif
 
-    char* linebuf = NULL; size_t size = 0; ssize_t read;
-    while ((read = getline(&linebuf, &size, stdin)) != -1) {
-        if ( '\n' == linebuf[strlen(linebuf) - 1] ) {
-            linebuf[strlen(linebuf) - 1] = '\0';
-        }
-
-	if ( strcmp ( linebuf, "quit" ) == 0)
+    std::string linebuf;
+    while (std::getline(std::cin, linebuf)) {
+	if ( linebuf == "quit" )
 	    break;
 
         FullPinyinParser2 parser;
@@ -70,7 +68,7 @@ int main(int argc, char * argv[]) {
         ChewingKeyRestVector key_rests =
             g_array_new(FALSE, FALSE, sizeof(ChewingKeyRest));
 
-        parser.parse(options, keys, key_rests, linebuf, strlen(linebuf));
+        parser.parse(options, keys, key_rests, linebuf.c_str(), linebuf.size());
         if (0 == keys->len) {
             fprintf(stderr, "Invalid input.\n");
             continue;
@@ -107,9 +105,6 @@ int main(int argc, char * argv[]) {
         g_array_free(keys, TRUE);
         g_array_free(key_rests, TRUE);
     }
-
-    if (linebuf)
-        free(linebuf);
 
     /* mask out all index items. */
     largetable.mask_out(0x0, 0x0);

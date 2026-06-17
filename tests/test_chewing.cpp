@@ -27,6 +27,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <iostream>
+#include <string>
 
 int main(int argc, char * argv[]){
     pinyin_context_t * context =
@@ -34,18 +36,12 @@ int main(int argc, char * argv[]){
 
     pinyin_instance_t * instance = pinyin_alloc_instance(context);
 
-    char* linebuf = NULL;
-    size_t size = 0;
-    ssize_t read;
-    while( (read = getline(&linebuf, &size, stdin)) != -1 ){
-        if ( '\n' == linebuf[strlen(linebuf) - 1] ) {
-            linebuf[strlen(linebuf) - 1] = '\0';
-        }
-
-        if ( strcmp ( linebuf, "quit" ) == 0)
+    std::string linebuf;
+    while (std::getline(std::cin, linebuf)) {
+        if ( linebuf == "quit" )
             break;
 
-        size_t len = pinyin_parse_more_chewings(instance, linebuf);
+        size_t len = pinyin_parse_more_chewings(instance, linebuf.c_str());
         pinyin_guess_sentence(instance);
 
         char * sentence = NULL;
@@ -72,6 +68,5 @@ int main(int argc, char * argv[]){
     pinyin_save(context);
     pinyin_fini(context);
 
-    free(linebuf);
     return 0;
 }

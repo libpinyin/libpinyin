@@ -4,6 +4,8 @@
 
 #include "timer.h"
 #include <string.h>
+#include <iostream>
+#include <string>
 #include "pinyin_internal.h"
 #include "tests_helper.h"
 
@@ -35,17 +37,13 @@ int main(int argc, char * argv[]){
     largetable.load(chunk);
 #endif
 
-    char* linebuf = NULL; size_t size = 0; ssize_t read;
-    while ((read = getline(&linebuf, &size, stdin)) != -1) {
-        if ( '\n' == linebuf[strlen(linebuf) - 1] ) {
-            linebuf[strlen(linebuf) - 1] = '\0';
-        }
-
-        if ( strcmp ( linebuf, "quit" ) == 0)
+    std::string linebuf;
+    while (std::getline(std::cin, linebuf)) {
+        if ( linebuf == "quit" )
             break;
 
-        glong phrase_len = g_utf8_strlen(linebuf, -1);
-        ucs4_t * new_phrase = g_utf8_to_ucs4(linebuf, -1, NULL, NULL, NULL);
+        glong phrase_len = g_utf8_strlen(linebuf.c_str(), -1);
+        ucs4_t * new_phrase = g_utf8_to_ucs4(linebuf.c_str(), -1, NULL, NULL, NULL);
 
         if (0 == phrase_len)
             continue;
@@ -93,9 +91,6 @@ int main(int argc, char * argv[]){
         phrase_index.destroy_tokens(tokens);
         g_free(new_phrase);
     }
-
-    if ( linebuf )
-        free(linebuf);
 
     /* mask out all index items. */
     largetable.mask_out(0x0, 0x0);

@@ -29,6 +29,8 @@
 #include <assert.h>
 #include <stdlib.h>
 #include <string.h>
+#include <iostream>
+#include <string>
 #include "pinyin_internal.h"
 
 
@@ -93,13 +95,9 @@ int main(int argc, char * argv[]) {
     if (!parser)
         parser = new FullPinyinParser2();
 
-    char* linebuf = NULL; size_t size = 0; ssize_t read;
-    while( (read = getline(&linebuf, &size, stdin)) != -1 ){
-        if ( '\n' == linebuf[strlen(linebuf) - 1] ) {
-            linebuf[strlen(linebuf) - 1] = '\0';
-        }
-
-        if ( strcmp ( linebuf, "quit" ) == 0)
+    std::string linebuf;
+    while (std::getline(std::cin, linebuf)) {
+        if ( linebuf == "quit" )
             break;
 
 #if 0
@@ -118,7 +116,7 @@ int main(int argc, char * argv[]) {
         guint32 start_time = record_time();
         for ( size_t i = 0; i < bench_times; ++i)
             len = parser->parse(options, keys, key_rests,
-                                linebuf, strlen(linebuf));
+                                linebuf.c_str(), linebuf.size());
 
         print_time(start_time, bench_times);
 
@@ -141,9 +139,6 @@ int main(int argc, char * argv[]) {
 #endif
 
     }
-
-    if (linebuf)
-        free(linebuf);
 
     delete parser;
 

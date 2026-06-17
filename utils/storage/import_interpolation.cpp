@@ -25,6 +25,8 @@
 #include <stdio.h>
 #include <locale.h>
 #include <glib.h>
+#include <iostream>
+#include <string>
 #include "pinyin_internal.h"
 #include "utils_helper.h"
 
@@ -51,27 +53,19 @@ static int line_type = 0;
 static GPtrArray * values = NULL;
 static GHashTable * required = NULL;
 /* variables for line buffer. */
-static char * linebuf = NULL;
-static size_t len = 0;
+static std::string linebuf;
 
 bool parse_headline();
 
-bool parse_unigram(FILE * input, PhraseLargeTable3 * phrase_table,
+bool parse_unigram(std::istream & input, PhraseLargeTable3 * phrase_table,
                    FacadePhraseIndex * phrase_index);
 
-bool parse_bigram(FILE * input, PhraseLargeTable3 * phrase_table,
+bool parse_bigram(std::istream & input, PhraseLargeTable3 * phrase_table,
                   FacadePhraseIndex * phrase_index,
                   Bigram * bigram);
 
-static ssize_t my_getline(FILE * input){
-    ssize_t result = getline(&linebuf, &len, input);
-    if ( result == -1 )
-        return result;
-
-    if ( '\n' == linebuf[strlen(linebuf) - 1] ) {
-        linebuf[strlen(linebuf) - 1] = '\0';
-    }
-    return result;
+static bool my_getline(std::istream & input){
+    return static_cast<bool>(std::getline(input, linebuf));
 }
 
 bool parse_headline(){
@@ -79,7 +73,7 @@ bool parse_headline(){
     check_result(taglib_add_tag(BEGIN_LINE, "\\data", 0, "model", ""));
 
     /* read "\data" line */
-    if ( !taglib_read(linebuf, line_type, values, required) ) {
+    if ( !taglib_read(linebuf.c_str(), line_type, values, required) ) {
         fprintf(stderr, "error: interpolation model expected.\n");
         return false;
     }
@@ -94,7 +88,7 @@ bool parse_headline(){
     return true;
 }
 
-bool parse_body(FILE * input, PhraseLargeTable3 * phrase_table,
+bool parse_body(std::istream & input, PhraseLargeTable3 * phrase_table,
                 FacadePhraseIndex * phrase_index,
                 Bigram * bigram){
     taglib_push_state();
@@ -105,7 +99,7 @@ bool parse_body(FILE * input, PhraseLargeTable3 * phrase_table,
 
     do {
     retry:
-        check_result(taglib_read(linebuf, line_type, values, required));
+        check_result(taglib_read(linebuf.c_str(), line_type, values, required));
         switch(line_type) {
         case END_LINE:
             goto end;
@@ -120,21 +114,21 @@ bool parse_body(FILE * input, PhraseLargeTable3 * phrase_table,
         default:
             abort();
         }
-    } while (my_getline(input) != -1) ;
+    } while (my_getline(input)) ;
 
  end:
     taglib_pop_state();
     return true;
 }
 
-bool parse_unigram(FILE * input, PhraseLargeTable3 * phrase_table,
+bool parse_unigram(std::istream & input, PhraseLargeTable3 * phrase_table,
                    FacadePhraseIndex * phrase_index){
     taglib_push_state();
 
     check_result(taglib_add_tag(GRAM_1_ITEM_LINE, "\\item", 2, "count", ""));
 
     do {
-        check_result(taglib_read(linebuf, line_type, values, required));
+        check_result(taglib_read(linebuf.c_str(), line_type, values, required));
         switch (line_type) {
         case GRAM_1_ITEM_LINE:{
             /* handle \item in \1-gram */
@@ -154,14 +148,14 @@ bool parse_unigram(FILE * input, PhraseLargeTable3 * phrase_table,
         default:
             abort();
         }
-    } while (my_getline(input) != -1);
+    } while (my_getline(input));
 
  end:
     taglib_pop_state();
     return true;
 }
 
-bool parse_bigram(FILE * input, PhraseLargeTable3 * phrase_table,
+bool parse_bigram(std::istream & input, PhraseLargeTable3 * phrase_table,
                   FacadePhraseIndex * phrase_index,
                   Bigram * bigram){
     taglib_push_state();
@@ -170,7 +164,7 @@ bool parse_bigram(FILE * input, PhraseLargeTable3 * phrase_table,
 
     phrase_token_t last_token = 0; SingleGram * last_single_gram = NULL;
     do {
-        check_result(taglib_read(linebuf, line_type, values, required));
+        check_result(taglib_read(linebuf.c_str(), line_type, values, required));
         switch (line_type) {
         case GRAM_2_ITEM_LINE:{
             /* handle \item in \2-gram */
@@ -222,7 +216,7 @@ bool parse_bigram(FILE * input, PhraseLargeTable3 * phrase_table,
         default:
             abort();
         }
-    } while (my_getline(input) != -1);
+    } while (my_getline(input));
 
  end:
     if ( last_token && last_single_gram ) {
@@ -238,7 +232,7 @@ bool parse_bigram(FILE * input, PhraseLargeTable3 * phrase_table,
 }
 
 int main(int argc, char * argv[]){
-    FILE * input = stdin;
+    std::istream & input = std::cin;
     const char * bigram_filename = SYSTEM_BIGRAM;
 
     setlocale(LC_ALL, "");
@@ -291,8 +285,8 @@ int main(int argc, char * argv[]){
     required = g_hash_table_new(g_str_hash, g_str_equal);
 
     /* read first line */
-    ssize_t result = my_getline(input);
-    if ( result == -1 ) {
+    bool result = my_getline(input);
+    if ( !result ) {
         fprintf(stderr, "empty file input.\n");
         exit(ENODATA);
     }
@@ -301,7 +295,7 @@ int main(int argc, char * argv[]){
         exit(ENODATA);
 
     result = my_getline(input);
-    if ( result != -1 )
+    if ( result )
         parse_body(input, &phrase_table, &phrase_index, &bigram);
 
     taglib_fini();

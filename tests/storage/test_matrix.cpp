@@ -24,6 +24,8 @@
 
 #include "timer.h"
 #include <stdlib.h>
+#include <iostream>
+#include <string>
 #include "pinyin_internal.h"
 #include "tests_helper.h"
 
@@ -110,13 +112,9 @@ int main(int argc, char * argv[]) {
 
     PhoneticKeyMatrix matrix;
 
-    char* linebuf = NULL; size_t size = 0; ssize_t read;
-    while( (read = getline(&linebuf, &size, stdin)) != -1 ){
-        if ( '\n' == linebuf[strlen(linebuf) - 1] ) {
-            linebuf[strlen(linebuf) - 1] = '\0';
-        }
-
-        if ( strcmp ( linebuf, "quit" ) == 0)
+    std::string linebuf;
+    while (std::getline(std::cin, linebuf)) {
+        if ( linebuf == "quit" )
             break;
 
         int len = 0;
@@ -125,7 +123,7 @@ int main(int argc, char * argv[]) {
             matrix.clear_all();
 
             len = parser->parse(options, keys, key_rests,
-                                linebuf, strlen(linebuf));
+                                linebuf.c_str(), linebuf.size());
 
             fill_matrix(&matrix, keys, key_rests, len);
 
@@ -168,9 +166,6 @@ int main(int argc, char * argv[]) {
 
         phrase_index.destroy_ranges(ranges);
     }
-
-    if (linebuf)
-        free(linebuf);
 
     delete parser;
 
