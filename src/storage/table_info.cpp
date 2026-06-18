@@ -126,9 +126,6 @@ static TABLE_DATABASE_FORMAT_TYPE to_table_database_format_type(const char * str
     if (0 == strcmp("KyotoCabinet", str))
         return KYOTO_CABINET_FORMAT;
 
-    if (0 == strcmp("Tkrzw", str))
-        return TKRZW_FORMAT;
-
     abort();
 }
 
@@ -183,9 +180,6 @@ static const char * from_table_database_format_type(const TABLE_DATABASE_FORMAT_
 
     if (format == KYOTO_CABINET_FORMAT)
         return "KyotoCabinet";
-
-    if (format == TKRZW_FORMAT)
-        return "Tkrzw";
 
     abort();
 }
@@ -244,8 +238,7 @@ bool SystemTableInfo2::load(const char * filename) {
     /* Note: support pinyin and zhuyin table now. */
     assert(PINYIN_TABLE == type || ZHUYIN_TABLE == type);
     m_table_phonetic_type = type;
-    assert(BERKELEY_DB_FORMAT == format || KYOTO_CABINET_FORMAT == format ||
-           TKRZW_FORMAT == format);
+    assert(BERKELEY_DB_FORMAT == format || KYOTO_CABINET_FORMAT == format);
     m_table_database_format_type = format;
 
     int index = 0;

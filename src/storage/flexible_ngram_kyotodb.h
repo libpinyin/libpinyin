@@ -120,10 +120,10 @@ public:
     /**
      * FlexibleBigram::attach:
      * @dbfile: the path name of the flexible bi-gram.
-     * @flags: the attach flags for the Kyoto Cabinet.
+     * @flags: the attach flags for the Berkeley DB.
      * @returns: whether the attach operation is successful.
      *
-     * Attach Kyoto Cabinet on filesystem for training purpose.
+     * Attach Berkeley DB on filesystem for training purpose.
      *
      */
     bool attach(const char * dbfile, guint32 flags){

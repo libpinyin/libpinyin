@@ -39,8 +39,4 @@
 #include "flexible_ngram_kyotodb.h"
 #endif
 
-#ifdef HAVE_TKRZW
-#include "flexible_ngram_tkrzwdb.h"
-#endif
-
 #endif

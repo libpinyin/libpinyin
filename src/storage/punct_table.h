@@ -34,10 +34,6 @@
 #include "punct_table_kyotodb.h"
 #endif
 
-#ifdef HAVE_TKRZW
-#include "punct_table_tkrzwdb.h"
-#endif
-
 namespace pinyin{
 
 class PunctTable;

@@ -5,8 +5,8 @@
 # if not 1, append datestamp to the version number.
 m4_define([libpinyin_released], [1])
 m4_define([libpinyin_major_version], [2])
-m4_define([libpinyin_minor_version], [11])
-m4_define([libpinyin_micro_version], [91])
+m4_define([libpinyin_minor_version], [10])
+m4_define([libpinyin_micro_version], [3])
 m4_define(libpinyin_maybe_datestamp,
     m4_esyscmd([if test x]libpinyin_released[ != x1; then date +.%Y%m%d | tr -d '\n\r'; fi]))
 
@@ -119,17 +119,6 @@ if test x"$DBM" = x"KyotoCabinet"; then
 fi
 
 AM_CONDITIONAL([KYOTOCABINET], [test x"$DBM" = x"KyotoCabinet"])
-
-if test x"$DBM" = x"Tkrzw"; then
-   # Check Tkrzw
-   PKG_CHECK_MODULES(TKRZW, [tkrzw], [])
-
-   AC_SEARCH_LIBS([tkrzw_dbm_open], [tkrzw], [], AC_MSG_ERROR([Cannot find Tkrzw library]))
-
-   AC_DEFINE([HAVE_TKRZW], [], [Have Tkrzw.])
-fi
-
-AM_CONDITIONAL([TKRZW], [test x"$DBM" = x"Tkrzw"])
 
 DATABASE_FORMAT="$DBM"
 AC_SUBST(DATABASE_FORMAT)

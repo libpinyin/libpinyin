@@ -32,7 +32,6 @@
 #include <sys/mman.h>
 #define LIBPINYIN_USE_MMAP
 #endif
-#include <glib/gstdio.h>
 #include "stl_lite.h"
 #include "pinyin_utils.h"
 
@@ -548,7 +547,7 @@ public:
             return false;
         }
 
-        g_fsync(fd);
+        fsync(fd);
         close(fd);
         return true;
     }

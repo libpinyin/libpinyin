@@ -1,0 +1,41 @@
+name: Build libpinyin.so
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y build-essential autoconf automake \
+              libtool libglib2.0-dev libdb-dev pkg-config
+
+      - name: Configure
+        run: |
+          ./configure --prefix=/tmp/libpinyin-out
+
+      - name: Build
+        run: |
+          make -j$(nproc)
+          make install
+
+      - name: Package artifacts
+        run: |
+          mkdir -p /tmp/artifact
+          cp /tmp/libpinyin-out/lib/libpinyin.so* /tmp/artifact/
+          cp /tmp/libpinyin-out/include/libpinyin-*/pinyin.h /tmp/artifact/
+          # 列出产物
+          ls -lh /tmp/artifact/
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: libpinyin-linux-x86_64
+          path: |
+            /tmp/artifact/libpinyin.so*
+            /tmp/artifact/pinyin.h

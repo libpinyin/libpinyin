@@ -34,14 +34,9 @@
 #include "chewing_large_table2_kyotodb.h"
 #endif
 
-#ifdef HAVE_TKRZW
-#include "chewing_large_table2_tkrzwdb.h"
-#endif
-
 namespace pinyin{
 
 class MaskOutVisitor2;
-class MaskOutProcessor2;
 
 template<int phrase_length>
 class PrefixLessThanWithTones{
@@ -74,7 +69,6 @@ template<int phrase_length>
 class ChewingTableEntry{
     friend class ChewingLargeTable2;
     friend class MaskOutVisitor2;
-    friend class MaskOutProcessor2;
 protected:
     typedef PinyinIndexItem2<phrase_length> IndexItem;
 
