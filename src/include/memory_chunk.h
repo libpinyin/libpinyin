@@ -36,6 +36,10 @@
 #include "stl_lite.h"
 #include "pinyin_utils.h"
 
+#ifndef O_BINARY
+#define O_BINARY 0
+#endif
+
 namespace pinyin{
 
 /*  for unmanaged mode
@@ -413,7 +417,7 @@ public:
         /* free old data */
         reset();
 
-        int fd = open(filename, O_RDONLY);
+        int fd = open(filename, O_RDONLY|O_BINARY);
         if (-1 == fd)
             return false;
 
@@ -472,7 +476,7 @@ public:
         /* free old data */
         reset();
 
-        int fd = open(filename, O_RDONLY);
+        int fd = open(filename, O_RDONLY|O_BINARY);
         if (-1 == fd)
             return false;
 
@@ -530,7 +534,7 @@ public:
      *
      */
     bool save(const char * filename){
-        int fd = open(filename, O_CREAT|O_WRONLY|O_TRUNC, 0644);
+        int fd = open(filename, O_CREAT|O_WRONLY|O_TRUNC|O_BINARY, 0644);
         if ( -1 == fd )
             return false;
 
