@@ -19,6 +19,7 @@
  */
 
 #include "phrase_large_table3.h"
+#include "table_text_parser.h"
 
 namespace pinyin{
 
@@ -127,21 +128,8 @@ bool PhraseLargeTable3::load_text(FILE * infile){
     phrase_token_t token;
     size_t freq;
 
-    while (!feof(infile)) {
-#ifdef __APPLE__
-        int num = fscanf(infile, "%255s %255[^ \t] %u %ld",
-                         pinyin, phrase, &token, &freq);
-#else
-        int num = fscanf(infile, "%255s %255s %u %ld",
-                         pinyin, phrase, &token, &freq);
-#endif
-
-        if (4 != num)
-            continue;
-
-        if (feof(infile))
-            break;
-
+    while (table_text_read_pinyin_record(infile, pinyin, phrase,
+                                         &token, &freq)) {
         glong phrase_len = g_utf8_strlen(phrase, -1);
         ucs4_t * new_phrase = g_utf8_to_ucs4(phrase, -1, NULL, NULL, NULL);
         add_index(phrase_len, new_phrase, token);
