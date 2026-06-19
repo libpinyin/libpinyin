@@ -24,6 +24,7 @@
 #include "pinyin_phrase3.h"
 #include "pinyin_parser2.h"
 #include "zhuyin_parser2.h"
+#include "table_text_parser.h"
 
 
 /* internal class definition */
@@ -668,21 +669,8 @@ bool ChewingLargeTable::load_text(FILE * infile, TABLE_PHONETIC_TYPE type) {
     phrase_token_t token;
     size_t freq;
 
-    while (!feof(infile)) {
-#ifdef __APPLE__
-        int num = fscanf(infile, "%255s %255[^ \t] %u %ld",
-                         pinyin, phrase, &token, &freq);
-#else
-        int num = fscanf(infile, "%255s %255s %u %ld",
-                         pinyin, phrase, &token, &freq);
-#endif
-
-        if (4 != num)
-            continue;
-
-        if(feof(infile))
-            break;
-
+    while (table_text_read_pinyin_record(infile, pinyin, phrase,
+                                         &token, &freq)) {
         glong len = g_utf8_strlen(phrase, -1);
 
         ChewingKeyVector keys;
@@ -708,8 +696,9 @@ bool ChewingLargeTable::load_text(FILE * infile, TABLE_PHONETIC_TYPE type) {
         };
 
         if (len != keys->len) {
-            fprintf(stderr, "ChewingLargeTable::load_text:%s\t%s\t%u\t%ld\n",
-                    pinyin, phrase, token, freq);
+            fprintf(stderr, "ChewingLargeTable::load_text:%s\t%s\t%u\t%"
+                    G_GSIZE_FORMAT "\n", pinyin, phrase, token,
+                    (gsize) freq);
             continue;
         }
 

@@ -63,6 +63,7 @@ noinst_HEADERS = chewing_enum.h \
 			  facade_chewing_table2.h \
 			  facade_phrase_table2.h \
 			  facade_phrase_table3.h \
+			  table_text_parser.h \
 			  table_info.h \
 			  bdb_utils.h \
 			  kyotodb_utils.h \

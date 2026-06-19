@@ -20,6 +20,7 @@
 
 
 #include "punct_table.h"
+#include "table_text_parser.h"
 
 using namespace pinyin;
 
@@ -182,21 +183,8 @@ bool PunctTable::load_text(FILE * infile) {
     char punct[256];
     size_t freq;
 
-    while (!feof(infile)) {
-#ifdef __APPLE__
-        int num = fscanf(infile, "%u %255[^ \t] %255[^ \t] %ld",
-                         &token, phrase, punct, &freq);
-#else
-        int num = fscanf(infile, "%u %255s %255s  %ld",
-                         &token, phrase, punct, &freq);
-#endif
-
-        if (4 != num)
-            continue;
-
-        if (feof(infile))
-            break;
-
+    while (table_text_read_punct_record(infile, &token, phrase, punct,
+                                        &freq)) {
         append_punctuation(token, punct);
     }
     return true;
