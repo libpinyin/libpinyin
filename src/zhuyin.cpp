@@ -606,7 +606,7 @@ bool zhuyin_save(zhuyin_context_t * context){
                                                      userfilename, NULL);
             log->save(tmppathname);
 
-            int result = rename(tmppathname, chunkpathname);
+            int result = g_rename(tmppathname, chunkpathname);
             if (0 != result)
                 fprintf(stderr, "rename %s to %s failed.\n",
                         tmppathname, chunkpathname);
@@ -632,7 +632,7 @@ bool zhuyin_save(zhuyin_context_t * context){
 
             chunk->save(tmppathname);
 
-            int result = rename(tmppathname, chunkpathname);
+            int result = g_rename(tmppathname, chunkpathname);
             if (0 != result)
                 fprintf(stderr, "rename %s to %s failed.\n",
                         tmppathname, chunkpathname);
@@ -652,7 +652,7 @@ bool zhuyin_save(zhuyin_context_t * context){
 
     context->m_pinyin_table->store(tmpfilename);
 
-    int result = rename(tmpfilename, filename);
+    int result = g_rename(tmpfilename, filename);
     if (0 != result)
         fprintf(stderr, "rename %s to %s failed.\n",
                 tmpfilename, filename);
@@ -669,7 +669,7 @@ bool zhuyin_save(zhuyin_context_t * context){
 
     context->m_phrase_table->store(tmpfilename);
 
-    result = rename(tmpfilename, filename);
+    result = g_rename(tmpfilename, filename);
     if (0 != result)
         fprintf(stderr, "rename %s to %s failed.\n",
                 tmpfilename, filename);
@@ -684,7 +684,7 @@ bool zhuyin_save(zhuyin_context_t * context){
     filename = g_build_filename(context->m_user_dir, USER_BIGRAM, NULL);
     context->m_user_bigram->save_db(tmpfilename);
 
-    result = rename(tmpfilename, filename);
+    result = g_rename(tmpfilename, filename);
     if (0 != result)
         fprintf(stderr, "rename %s to %s failed.\n",
                 tmpfilename, filename);
