@@ -27,6 +27,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <iostream>
+#include <string>
 
 int main(int argc, char * argv[]){
     zhuyin_context_t * context =
@@ -34,19 +36,13 @@ int main(int argc, char * argv[]){
 
     zhuyin_instance_t * instance = zhuyin_alloc_instance(context);
 
-    char* linebuf = NULL;
-    size_t size = 0;
-    ssize_t read;
-    while( (read = getline(&linebuf, &size, stdin)) != -1 ){
-        if ( '\n' == linebuf[strlen(linebuf) - 1] ) {
-            linebuf[strlen(linebuf) - 1] = '\0';
-        }
-
-	if ( strcmp ( linebuf, "quit" ) == 0)
+    std::string linebuf;
+    while (std::getline(std::cin, linebuf)) {
+	if ( linebuf == "quit" )
             break;
 
         zhuyin_parse_more_chewings
-            (instance, linebuf);
+            (instance, linebuf.c_str());
         zhuyin_guess_sentence(instance);
 
         char * sentence = NULL;
@@ -66,6 +62,5 @@ int main(int argc, char * argv[]){
     zhuyin_save(context);
     zhuyin_fini(context);
 
-    free(linebuf);
     return 0;
 }

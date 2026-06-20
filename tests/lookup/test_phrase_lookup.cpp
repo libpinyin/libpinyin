@@ -25,6 +25,8 @@
 
 #include <stdio.h>
 #include <locale.h>
+#include <iostream>
+#include <string>
 #include "pinyin_internal.h"
 #include "tests_helper.h"
 
@@ -89,21 +91,15 @@ int main(int argc, char * argv[]){
                                &system_bigram, &user_bigram);
 
     /* try one sentence */
-    char * linebuf = NULL;
-    size_t size = 0;
-    ssize_t read;
-    while( (read = getline(&linebuf, &size, stdin)) != -1 ){
-        if ( '\n' == linebuf[strlen(linebuf) - 1] ) {
-            linebuf[strlen(linebuf) - 1] = '\0';
-        }
-
-        if ( strcmp ( linebuf, "quit" ) == 0)
+    std::string linebuf;
+    while (std::getline(std::cin, linebuf)) {
+        if ( linebuf == "quit" )
             break;
 
         /* check non-ucs4 characters */
-        const glong num_of_chars = g_utf8_strlen(linebuf, -1);
+        const glong num_of_chars = g_utf8_strlen(linebuf.c_str(), -1);
         glong len = 0;
-        ucs4_t * sentence = g_utf8_to_ucs4(linebuf, -1, NULL, &len, NULL);
+        ucs4_t * sentence = g_utf8_to_ucs4(linebuf.c_str(), -1, NULL, &len, NULL);
         if ( len != num_of_chars ) {
             fprintf(stderr, "non-ucs4 characters are not accepted.\n");
             g_free(sentence);
@@ -114,6 +110,5 @@ int main(int argc, char * argv[]){
         g_free(sentence);
     }
 
-    free(linebuf);
     return 0;
 }

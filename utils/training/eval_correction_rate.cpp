@@ -25,6 +25,8 @@
 
 #include "pinyin_internal.h"
 #include "utils_helper.h"
+#include <fstream>
+#include <string>
 
 
 void print_help(){
@@ -161,26 +163,19 @@ int main(int argc, char * argv[]){
                                     &system_bigram, &user_bigram);
 
     /* open evals text. */
-    FILE * evals_file = fopen(evals_text, "r");
-    if ( NULL == evals_file ) {
+    std::ifstream evals_file(evals_text);
+    if (!evals_file) {
         fprintf(stderr, "Can't open file:%s\n", evals_text);
         exit(ENOENT);
     }
 
     /* Evaluates the correction rate of test text documents. */
     size_t tested_count = 0; size_t passed_count = 0;
-    char* linebuf = NULL; size_t size = 0;
+    std::string linebuf;
     TokenVector tokens = g_array_new(FALSE, TRUE, sizeof(phrase_token_t));
 
-    while( getline(&linebuf, &size, evals_file) ) {
-        if ( feof(evals_file) )
-            break;
-
-        if ( '\n' == linebuf[strlen(linebuf) - 1] ) {
-            linebuf[strlen(linebuf) - 1] = '\0';
-        }
-
-        TAGLIB_PARSE_SEGMENTED_LINE(&phrase_index, token, linebuf);
+    while (std::getline(evals_file, linebuf)) {
+        TAGLIB_PARSE_SEGMENTED_LINE(&phrase_index, token, linebuf.c_str());
 
         if ( null_token == token ) {
             if ( tokens->len ) { /* one test. */
@@ -208,8 +203,6 @@ int main(int argc, char * argv[]){
     printf("correction rate:%f\n", rate);
 
     g_array_free(tokens, TRUE);
-    fclose(evals_file);
-    free(linebuf);
 
     return 0;
 }

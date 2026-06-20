@@ -25,7 +25,10 @@
 #include <stdio.h>
 #include <locale.h>
 #include <string.h>
+#include <fstream>
 #include <glib.h>
+#include <iostream>
+#include <string>
 #include "pinyin_internal.h"
 #include "utils_helper.h"
 
@@ -195,7 +198,8 @@ bool feed_line(FacadePhraseTable3 * phrase_table,
 
 
 int main(int argc, char * argv[]){
-    FILE * input = stdin;
+    std::istream * input = &std::cin;
+    std::ifstream input_file;
     FILE * output = stdout;
 
     setlocale(LC_ALL, "");
@@ -224,11 +228,12 @@ int main(int argc, char * argv[]){
     }
 
     if (2 == argc) {
-        input = fopen(argv[1], "r");
-        if (NULL == input) {
+        input_file.open(argv[1]);
+        if (!input_file) {
             perror("open file failed");
             exit(EINVAL);
         }
+        input = &input_file;
     }
 
     SystemTableInfo2 system_table_info;
@@ -255,18 +260,14 @@ int main(int argc, char * argv[]){
     GArray * unichars = g_array_new(TRUE, TRUE, sizeof(ucs4_t));
     GArray * tokeninfos = g_array_new(TRUE, TRUE, sizeof(TokenInfo));
 
-    char * linebuf = NULL; size_t size = 0; ssize_t read;
-    while( (read = getline(&linebuf, &size, input)) != -1 ){
-        if ( '\n' ==  linebuf[strlen(linebuf) - 1] ) {
-            linebuf[strlen(linebuf) - 1] = '\0';
-        }
-
-        if (0 == strlen(linebuf))
+    std::string linebuf;
+    while (std::getline(*input, linebuf)) {
+        if (linebuf.empty())
             continue;
 
         feed_line(&phrase_table, &phrase_index,
                   unichars, tokeninfos,
-                  linebuf, output);
+                  linebuf.c_str(), output);
     }
 
     /* append one null token for EOF. */
@@ -276,8 +277,6 @@ int main(int argc, char * argv[]){
 
     g_array_free(unichars, TRUE);
     g_array_free(tokeninfos, TRUE);
-    free(linebuf);
-    fclose(input);
     fclose(output);
     return 0;
 }

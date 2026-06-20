@@ -27,6 +27,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <iostream>
+#include <string>
 
 int main(int argc, char * argv[]){
     pinyin_context_t * context =
@@ -39,36 +41,27 @@ int main(int argc, char * argv[]){
 
     pinyin_instance_t * instance = pinyin_alloc_instance(context);
 
-    char * prefixbuf = NULL; size_t prefixsize = 0;
-    char * linebuf = NULL; size_t linesize = 0;
-    ssize_t read;
+    std::string prefixbuf;
+    std::string linebuf;
 
     while( TRUE ){
         fprintf(stdout, "prefix:");
         fflush(stdout);
 
-        if ((read = getline(&prefixbuf, &prefixsize, stdin)) == -1)
+        if (!std::getline(std::cin, prefixbuf))
             break;
-
-        if ( '\n' == prefixbuf[strlen(prefixbuf) - 1] ) {
-            prefixbuf[strlen(prefixbuf) - 1] = '\0';
-        }
 
         fprintf(stdout, "pinyin:");
         fflush(stdout);
 
-        if ((read = getline(&linebuf, &linesize, stdin)) == -1)
+        if (!std::getline(std::cin, linebuf))
             break;
 
-        if ( '\n' == linebuf[strlen(linebuf) - 1] ) {
-            linebuf[strlen(linebuf) - 1] = '\0';
-        }
-
-        if ( strcmp ( linebuf, "quit" ) == 0)
+        if ( linebuf == "quit" )
             break;
 
-        size_t len = pinyin_parse_more_full_pinyins(instance, linebuf);
-        pinyin_guess_sentence_with_prefix(instance, prefixbuf);
+        size_t len = pinyin_parse_more_full_pinyins(instance, linebuf.c_str());
+        pinyin_guess_sentence_with_prefix(instance, prefixbuf.c_str());
         guint sort_option = SORT_BY_PHRASE_LENGTH | SORT_BY_FREQUENCY;
         pinyin_guess_candidates(instance, 0, sort_option);
 
@@ -104,6 +97,5 @@ int main(int argc, char * argv[]){
     pinyin_save(context);
     pinyin_fini(context);
 
-    free(prefixbuf); free(linebuf);
     return 0;
 }

@@ -24,7 +24,9 @@
 #endif
 
 #include <stdio.h>
+#include <fstream>
 #include <glib.h>
+#include <string>
 #include "pinyin_internal.h"
 
 
@@ -136,38 +138,28 @@ int main(int argc, char * argv[]){
 }
 
 void feed_file ( const char * filename){
-    FILE * infile = fopen(filename, "r");
-    if ( NULL == infile ){
+    std::ifstream infile(filename);
+    if (!infile) {
         fprintf(stderr, "Can't open file %s.\n", filename);
         exit(ENOENT);
     }
 
-    char * linebuf = NULL; size_t size = 0; ssize_t read;
-    while( (read = getline(&linebuf, &size, infile)) != -1 ){
-        if ( '\n' ==  linebuf[strlen(linebuf) - 1] ) {
-            linebuf[strlen(linebuf) - 1] = '\0';
-        }
-
+    std::string linebuf;
+    while (std::getline(infile, linebuf)) {
         /* assume tsi.src only use the single space to separate tokens. */
-        gchar ** strs = g_strsplit_set(linebuf, " ", 3);
+        gchar ** strs = g_strsplit_set(linebuf.c_str(), " ", 3);
 
         const char * phrase = strs[0];
         guint32 freq = atoi(strs[1]);
         const char * pinyin = strs[2];
 
         if (3 != g_strv_length(strs)) {
-            fprintf(stderr, "wrong line format:%s\n", linebuf);
+            fprintf(stderr, "wrong line format:%s\n", linebuf.c_str());
             continue;
         }
 
-	if (feof(infile))
-            break;
-
 	feed_line(phrase, pinyin, freq);
     }
-
-    free(linebuf);
-    fclose(infile);
 }
 
 void feed_line(const char * phrase, const char * pinyin, const guint32 freq) {

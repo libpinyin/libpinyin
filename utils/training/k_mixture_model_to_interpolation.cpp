@@ -24,6 +24,8 @@
 
 #include "pinyin_internal.h"
 #include "utils_helper.h"
+#include <iostream>
+#include <string>
 
 enum LINE_TYPE{
     BEGIN_LINE = 1,
@@ -38,31 +40,25 @@ static int line_type = 0;
 static GPtrArray * values = NULL;
 static GHashTable * required = NULL;
 /* variables for line buffer. */
-static char * linebuf = NULL;
-static size_t len = 0;
+static std::string linebuf;
 
-bool parse_headline(FILE * input, FILE * output);
+bool parse_headline(FILE * output);
 
-bool parse_unigram(FILE * input, FILE * output);
+bool parse_unigram(std::istream & input, FILE * output);
 
-bool parse_bigram(FILE * input, FILE * output);
+bool parse_bigram(std::istream & input, FILE * output);
 
-static ssize_t my_getline(FILE * input){
-    ssize_t result = getline(&linebuf, &len, input);
-    if ( result == -1 )
-        return result;
-
-    linebuf[strlen(linebuf) - 1] = '\0';
-    return result;
+static bool my_getline(std::istream & input){
+    return static_cast<bool>(std::getline(input, linebuf));
 }
 
-bool parse_headline(FILE * input, FILE * output) {
+bool parse_headline(FILE * output) {
     /* enter "\data" line */
     check_result(taglib_add_tag(BEGIN_LINE, "\\data", 0, "model",
                                 "count:N:total_freq"));
 
     /* read "\data" line */
-    if ( !taglib_read(linebuf, line_type, values, required) ) {
+    if ( !taglib_read(linebuf.c_str(), line_type, values, required) ) {
         fprintf(stderr, "error: k mixture model expected.\n");
         return false;
     }
@@ -80,7 +76,7 @@ bool parse_headline(FILE * input, FILE * output) {
     return true;
 }
 
-bool parse_body(FILE * input, FILE * output){
+bool parse_body(std::istream & input, FILE * output){
     taglib_push_state();
 
     check_result(taglib_add_tag(END_LINE, "\\end", 0, "", ""));
@@ -89,7 +85,7 @@ bool parse_body(FILE * input, FILE * output){
 
     do {
     retry:
-        check_result(taglib_read(linebuf, line_type, values, required));
+        check_result(taglib_read(linebuf.c_str(), line_type, values, required));
         switch(line_type) {
         case END_LINE:
             fprintf(output, "\\end\n");
@@ -107,20 +103,20 @@ bool parse_body(FILE * input, FILE * output){
         default:
             abort();
         }
-    } while (my_getline(input) != -1);
+    } while (my_getline(input));
 
  end:
     taglib_pop_state();
     return true;
 }
 
-bool parse_unigram(FILE * input, FILE * output){
+bool parse_unigram(std::istream & input, FILE * output){
     taglib_push_state();
 
     check_result(taglib_add_tag(GRAM_1_ITEM_LINE, "\\item", 2, "freq", "count"));
 
     do {
-        check_result(taglib_read(linebuf, line_type, values, required));
+        check_result(taglib_read(linebuf.c_str(), line_type, values, required));
         switch(line_type) {
         case GRAM_1_ITEM_LINE: {
             /* handle \item in \1-gram */
@@ -145,21 +141,21 @@ bool parse_unigram(FILE * input, FILE * output){
         default:
             abort();
         }
-    } while (my_getline(input) != -1);
+    } while (my_getline(input));
 
  end:
     taglib_pop_state();
     return true;
 }
 
-bool parse_bigram(FILE * input, FILE * output){
+bool parse_bigram(std::istream & input, FILE * output){
     taglib_push_state();
 
     check_result(taglib_add_tag(GRAM_2_ITEM_LINE, "\\item", 4,
                                 "count", "T:N_n_0:n_1:Mr"));
 
     do {
-        check_result(taglib_read(linebuf, line_type, values, required));
+        check_result(taglib_read(linebuf.c_str(), line_type, values, required));
         switch (line_type) {
         case GRAM_2_ITEM_LINE:{
             /* handle \item in \2-gram */
@@ -182,7 +178,7 @@ bool parse_bigram(FILE * input, FILE * output){
         default:
             abort();
         }
-    } while (my_getline(input) != -1);
+    } while (my_getline(input));
 
  end:
     taglib_pop_state();
@@ -190,7 +186,7 @@ bool parse_bigram(FILE * input, FILE * output){
 }
 
 int main(int argc, char * argv[]){
-    FILE * input = stdin;
+    std::istream & input = std::cin;
     FILE * output = stdout;
 
     taglib_init();
@@ -198,17 +194,17 @@ int main(int argc, char * argv[]){
     values = g_ptr_array_new();
     required = g_hash_table_new(g_str_hash, g_str_equal);
 
-    ssize_t result = my_getline(input);
-    if ( result == -1 ) {
+    bool result = my_getline(input);
+    if ( !result ) {
         fprintf(stderr, "empty file input.\n");
         exit(ENODATA);
     }
 
-    if (!parse_headline(input, output))
+    if (!parse_headline(output))
         exit(ENODATA);
 
     result = my_getline(input);
-    if ( result != -1 )
+    if ( result )
         parse_body(input, output);
 
     taglib_fini();

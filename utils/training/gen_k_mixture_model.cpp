@@ -24,7 +24,9 @@
 #endif
 
 #include <glib.h>
+#include <fstream>
 #include <locale.h>
+#include <string>
 #include "pinyin_internal.h"
 #include "utils_helper.h"
 #include "k_mixture_model.h"
@@ -62,22 +64,15 @@ static GOptionEntry entries[] =
 
 bool read_document(PhraseLargeTable3 * phrase_table,
                    FacadePhraseIndex * phrase_index,
-                   FILE * document,
+                   std::istream & document,
                    HashofDocument hash_of_document,
                    HashofUnigram hash_of_unigram){
 
-    char * linebuf = NULL;size_t size = 0;
+    std::string linebuf;
     phrase_token_t last_token, cur_token = last_token = 0;
 
-    while ( getline(&linebuf, &size, document) ){
-        if ( feof(document) )
-            break;
-
-        if ( '\n' == linebuf[strlen(linebuf) - 1] ) {
-            linebuf[strlen(linebuf) - 1] = '\0';
-        }
-
-        TAGLIB_PARSE_SEGMENTED_LINE(phrase_index, token, linebuf);
+    while (std::getline(document, linebuf)) {
+        TAGLIB_PARSE_SEGMENTED_LINE(phrase_index, token, linebuf.c_str());
 
         last_token = cur_token;
         cur_token = token;
@@ -135,8 +130,6 @@ bool read_document(PhraseLargeTable3 * phrase_table,
                             GUINT_TO_POINTER(last_token),
                             hash_of_second_word);
     }
-
-    free(linebuf);
 
     return true;
 }
@@ -356,9 +349,9 @@ int main(int argc, char * argv[]){
 
     while ( i < argc ){
         const char * filename = argv[i];
-        FILE * document = fopen(filename, "r");
-        if ( NULL == document ){
-            int err_saved = errno;
+        std::ifstream document(filename);
+        if (!document) {
+            int err_saved = errno ? errno : ENOENT;
             fprintf(stderr, "can't open file: %s.\n", filename);
             fprintf(stderr, "error:%s.\n", strerror(err_saved));
             exit(err_saved);
@@ -371,8 +364,6 @@ int main(int argc, char * argv[]){
 
         check_result(read_document(&phrase_table, &phrase_index, document,
                                    hash_of_document, hash_of_unigram));
-        fclose(document);
-        document = NULL;
 
         GHashTableIter iter;
         gpointer key, value;

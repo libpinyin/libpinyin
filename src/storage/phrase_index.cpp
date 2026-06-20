@@ -20,6 +20,7 @@
 
 #include "phrase_index.h"
 #include "pinyin_custom2.h"
+#include "table_text_parser.h"
 #include "unaligned_memory.h"
 
 namespace pinyin{
@@ -533,21 +534,8 @@ bool FacadePhraseIndex::load_text(guint8 phrase_index, FILE * infile,
     PhraseItem * item_ptr = new PhraseItem;
     phrase_token_t cur_token = 0;
 
-    while (!feof(infile)){
-#ifdef __APPLE__
-        int num = fscanf(infile, "%255s %255[^ \t] %u %ld",
-                         pinyin, phrase, &token, &freq);
-#else
-        int num = fscanf(infile, "%255s %255s %u %ld",
-                         pinyin, phrase, &token, &freq);
-#endif
-
-        if (4 != num)
-            continue;
-
-        if (feof(infile))
-            break;
-
+    while (table_text_read_pinyin_record(infile, pinyin, phrase,
+                                         &token, &freq)){
         assert(PHRASE_INDEX_LIBRARY_INDEX(token) == phrase_index );
 
         glong written;
