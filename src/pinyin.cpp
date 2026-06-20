@@ -1056,7 +1056,7 @@ static bool _rename_files(pinyin_context_t * context){
             gchar * chunkpathname = g_build_filename(context->m_user_dir,
                                                      userfilename, NULL);
 
-            int result = rename(tmppathname, chunkpathname);
+            int result = g_rename(tmppathname, chunkpathname);
             if (0 != result)
                 fprintf(stderr, "rename %s to %s failed.\n",
                         tmppathname, chunkpathname);
@@ -1075,7 +1075,7 @@ static bool _rename_files(pinyin_context_t * context){
             gchar * chunkpathname = g_build_filename(context->m_user_dir,
                                                      userfilename, NULL);
 
-            int result = rename(tmppathname, chunkpathname);
+            int result = g_rename(tmppathname, chunkpathname);
             if (0 != result)
                 fprintf(stderr, "rename %s to %s failed.\n",
                         tmppathname, chunkpathname);
@@ -1091,7 +1091,7 @@ static bool _rename_files(pinyin_context_t * context){
     gchar * filename = g_build_filename
         (context->m_user_dir, USER_PINYIN_INDEX, NULL);
 
-    int result = rename(tmpfilename, filename);
+    int result = g_rename(tmpfilename, filename);
     if (0 != result)
         fprintf(stderr, "rename %s to %s failed.\n",
                 tmpfilename, filename);
@@ -1105,7 +1105,7 @@ static bool _rename_files(pinyin_context_t * context){
     filename = g_build_filename
         (context->m_user_dir, USER_PHRASE_INDEX, NULL);
 
-    result = rename(tmpfilename, filename);
+    result = g_rename(tmpfilename, filename);
     if (0 != result)
         fprintf(stderr, "rename %s to %s failed.\n",
                 tmpfilename, filename);
@@ -1118,7 +1118,7 @@ static bool _rename_files(pinyin_context_t * context){
         (context->m_user_dir, USER_BIGRAM ".tmp", NULL);
     filename = g_build_filename(context->m_user_dir, USER_BIGRAM, NULL);
 
-    result = rename(tmpfilename, filename);
+    result = g_rename(tmpfilename, filename);
     if (0 != result)
         fprintf(stderr, "rename %s to %s failed.\n",
                 tmpfilename, filename);
