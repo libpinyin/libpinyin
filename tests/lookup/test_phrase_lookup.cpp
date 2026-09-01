@@ -25,6 +25,8 @@
 
 #include <stdio.h>
 #include <locale.h>
+#include <iostream>
+#include <string>
 #include "pinyin_internal.h"
 #include "tests_helper.h"
 
@@ -89,15 +91,9 @@ int main(int argc, char * argv[]){
                                &system_bigram, &user_bigram);
 
     /* try one sentence */
-    char * linebuf = NULL;
-    size_t size = 0;
-    ssize_t read;
-    while( (read = getline(&linebuf, &size, stdin)) != -1 ){
-        if ( '\n' == linebuf[strlen(linebuf) - 1] ) {
-            linebuf[strlen(linebuf) - 1] = '\0';
-        }
-
-        if ( strcmp ( linebuf, "quit" ) == 0)
+    LineString linebuf;
+    while (std::getline(std::cin, linebuf)) {
+        if ( linebuf == "quit" )
             break;
 
         /* check non-ucs4 characters */
@@ -114,6 +110,5 @@ int main(int argc, char * argv[]){
         g_free(sentence);
     }
 
-    free(linebuf);
     return 0;
 }

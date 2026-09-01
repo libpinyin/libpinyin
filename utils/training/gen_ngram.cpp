@@ -27,6 +27,8 @@
 #include <string.h>
 #include <locale.h>
 #include <glib.h>
+#include <iostream>
+#include <string>
 #include "pinyin_internal.h"
 #include "utils_helper.h"
 
@@ -41,8 +43,6 @@ static GOptionEntry entries[] =
 };
 
 int main(int argc, char * argv[]){
-    FILE * input = stdin;
-
     setlocale(LC_ALL, "");
 
     GError * error = NULL;
@@ -74,16 +74,9 @@ int main(int argc, char * argv[]){
     Bigram bigram;
     bigram.attach(bigram_filename, ATTACH_CREATE|ATTACH_READWRITE);
 
-    char* linebuf = NULL; size_t size = 0;
+    LineString linebuf;
     phrase_token_t last_token, cur_token = last_token = 0;
-    while( getline(&linebuf, &size, input) ){
-	if ( feof(input) )
-	    break;
-
-        if ( '\n' == linebuf[strlen(linebuf) - 1] ) {
-            linebuf[strlen(linebuf) - 1] = '\0';
-        }
-
+    while (std::getline(std::cin, linebuf)) {
         TAGLIB_PARSE_SEGMENTED_LINE(&phrase_index, token, linebuf);
 
 	last_token = cur_token;
@@ -124,8 +117,6 @@ int main(int argc, char * argv[]){
         delete single_gram;
     }
 
-    free(linebuf);
-    
     if (!save_phrase_index(phrase_files, &phrase_index))
         exit(ENOENT);
 

@@ -22,11 +22,20 @@
 #define PINYIN_UTILS_H
 
 #include <assert.h>
+#include <string>
 
 #if defined(NDEBUG) || defined(G_DISABLE_ASSERT)
 #define check_result(expr) expr
 #else
 #define check_result(expr) assert(expr)
 #endif
+
+class LineString : public std::string {
+public:
+    operator const gchar *(void) const
+    {
+        return this->c_str ();
+    }
+};
 
 #endif
