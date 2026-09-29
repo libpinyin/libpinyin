@@ -1,3 +1,7 @@
+version 2.11.92
+* compile on MinGW
+* bug fixes
+
 version 2.11.91
 * support tkrzw
 * update cmake
