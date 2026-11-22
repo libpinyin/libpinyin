@@ -460,9 +460,14 @@ static bool _add_phrase(zhuyin_context_t * context,
         PhraseItem * removed_item = NULL;
         retval = phrase_index->remove_phrase_item(token, removed_item);
         if (ERROR_OK == retval) {
-            /* maybe check whether there are duplicated pronunciations here. */
+            /* index the pronunciation when it is newly added,
+               otherwise the phrase can not be found by the new keys. */
+            guint8 npron = removed_item->get_n_pronunciation();
             removed_item->add_pronunciation((ChewingKey *)keys->data,
                                             count);
+            if (removed_item->get_n_pronunciation() > npron)
+                pinyin_table->add_index
+                    (keys->len, (ChewingKey *)(keys->data), token);
             phrase_index->add_phrase_item(token, removed_item);
             delete removed_item;
             result = true;
