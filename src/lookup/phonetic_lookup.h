@@ -850,6 +850,24 @@ public:
         const guint32 pinyin_factor = 1;
         const guint32 ceiling_seed = 23 * 15 * 64;
 
+        /* The result must agree with the one-step constraints set when
+           the candidate was chosen. A caller that trains another result
+           (or trains twice with different indexes) would otherwise hit
+           the assertion in the loop below, or silently corrupt the user
+           model in release builds. Refuse to train instead. */
+        for (size_t i = 0; i < constraints->length(); ++i) {
+            phrase_token_t token = g_array_index(result, phrase_token_t, i);
+            if (null_token == token)
+                continue;
+
+            const trellis_constraint_t * constraint = NULL;
+            check_result(constraints->get_constraint(i, constraint));
+
+            if (CONSTRAINT_ONESTEP == constraint->m_type &&
+                token != constraint->m_token)
+                return false;
+        }
+
         /* begin training based on constraints and result. */
         bool train_next = false;
 

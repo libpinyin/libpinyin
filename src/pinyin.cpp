@@ -2685,8 +2685,10 @@ bool pinyin_train(pinyin_instance_t * instance, guint8 index){
 
     context->m_modified = true;
 
+    if (index >= results.size())
+        return false;
+
     MatchResult result = NULL;
-    assert(index < results.size());
     check_result(results.get_result(index, result));
 
     bool retval = context->m_pinyin_lookup->train_result3
